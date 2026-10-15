@@ -1,0 +1,27 @@
+# Allumi — Wiki
+
+Allumi est un logiciel de comptabilité **open source** (MIT) et **auto-hébergeable** pour les PME et travailleurs autonomes du Québec et du Canada. Français par défaut, anglais disponible.
+
+> **État : pré-alpha.** L'infrastructure et la documentation sont prêtes; l'application est en développement. Ne l'utilise pas pour de la comptabilité réelle avant une version stable.
+
+## Pour installer et exploiter
+- [[Installation]] — installer sur un serveur Ubuntu en une commande
+- [[Configuration]] — toutes les variables d'environnement
+- [[Sauvegardes]] — sauvegarder et restaurer (chiffré, hors site)
+- [[Mise-a-jour]] — mettre à jour et revenir en arrière
+- [[Securite-et-Loi-25]] — durcissement, vie privée, hébergement canadien
+- [[Depannage]] — problèmes fréquents
+- [[FAQ]]
+
+## Pour comprendre le projet
+- [[Architecture]] — stack, modules, infrastructure
+- [[Regles-comptables]] — les règles que le moteur comptable ne doit jamais enfreindre
+- [[Feuille-de-route]] — ce qui est prévu
+
+## Pour contribuer
+- [[Developpement-local]] — environnement de dev
+- [[Developpement-cloud]] — développer dans Claude Code sur le web
+- Voir aussi `CONTRIBUTING.md` et `SECURITY.md` dans le dépôt.
+
+## Avertissement
+Allumi ne remplace pas un comptable. Vérifie les taux et règles de taxes auprès de Revenu Québec et de l'Agence du revenu du Canada.

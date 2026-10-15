@@ -1,1 +1,50 @@
 # Allumi
+
+Logiciel de comptabilité **open source** et **auto-hébergeable** pour les PME et les travailleurs autonomes du Québec et du Canada. Une alternative libre aux logiciels de comptabilité infonuagiques propriétaires.
+
+> **État : pré-alpha.** Ce dépôt contient pour l'instant l'infrastructure (Docker, scripts d'installation, sauvegardes) et le wiki. Le code de l'application est développé avec Claude Code à partir de [`CLAUDE_CODE_PROMPT.md`](CLAUDE_CODE_PROMPT.md). N'utilise pas Allumi pour de la comptabilité réelle avant une version stable.
+
+*English summary: Allumi is an open-source, self-hostable accounting app for Canadian small businesses (QST/GST aware, French-first, bilingual). The repo ships a Docker Compose stack, an Ubuntu install script, encrypted backups and a full wiki in `docs/`. Application code is in pre-alpha.*
+
+## Fonctions visées (MVP)
+- Plan comptable et journal à partie double
+- Clients, fournisseurs, factures, paiements, dépenses
+- Rapprochement bancaire (CSV/OFX)
+- TPS/TVQ avec taux configurables
+- Rapports : balance de vérification, bilan, état des résultats, âge des comptes
+- Multi-entreprise, rôles, piste d'audit
+- Interface en français (par défaut) et en anglais
+
+## Installation rapide (Ubuntu 22.04/24.04)
+
+Prérequis : un serveur Ubuntu avec accès root, un nom de domaine dont l'enregistrement DNS pointe vers le serveur.
+
+```bash
+# Remplace OWNER par ton compte ou ton organisation GitHub
+git clone https://github.com/OWNER/allumi.git /opt/allumi
+cd /opt/allumi
+sudo ./scripts/install.sh --domain compta.exemple.ca --email admin@exemple.ca
+```
+
+Le script installe Docker, configure le pare-feu, génère les secrets, démarre la pile (PostgreSQL, application, Caddy avec HTTPS automatique) et planifie des sauvegardes chiffrées quotidiennes. Détails : [`docs/Installation.md`](docs/Installation.md).
+
+## Développement local
+
+```bash
+cp .env.example .env
+docker compose -f docker-compose.dev.yml up -d   # PostgreSQL + Mailpit
+```
+
+Voir [`docs/Developpement-local.md`](docs/Developpement-local.md). Pour développer dans le cloud (Claude Code sur le web, sans Docker) : [`docs/Developpement-cloud.md`](docs/Developpement-cloud.md).
+
+## Documentation
+Le dossier [`docs/`](docs/) est le wiki du projet. Point de départ : [`docs/Home.md`](docs/Home.md). La commande `scripts/sync-wiki.sh` le publie sur le wiki GitHub.
+
+## Contribuer
+Lis [`CONTRIBUTING.md`](CONTRIBUTING.md). Pour signaler une faille de sécurité : [`SECURITY.md`](SECURITY.md).
+
+## Avertissement
+Allumi est un outil. Il ne remplace ni un comptable professionnel ni un avis juridique ou fiscal. Les taux et règles de taxes doivent être vérifiés auprès de Revenu Québec et de l'Agence du revenu du Canada. Chaque exploitant d'une instance est responsable de la conformité de son usage (dont la Loi 25 sur la protection des renseignements personnels).
+
+## Licence
+[MIT](LICENSE)

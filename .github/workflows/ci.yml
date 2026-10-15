@@ -1,0 +1,59 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: allumi
+          POSTGRES_USER: allumi
+          POSTGRES_PASSWORD: allumi_ci_only
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U allumi" --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://allumi:allumi_ci_only@localhost:5432/allumi?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scripts shell
+        run: |
+          bash -n scripts/*.sh
+          shellcheck -x -S warning scripts/*.sh
+      - uses: actions/setup-node@v4
+        if: hashFiles('package.json') != ''
+        with:
+          node-version: 22
+          cache: npm
+      - name: Lint, types, tests
+        if: hashFiles('package.json') != ''
+        run: |
+          npm ci
+          npx prisma generate
+          npx prisma migrate deploy
+          npm run lint
+          npm run typecheck
+          npm test
+          npm audit --omit=dev --audit-level=high
+
+  docker:
+    runs-on: ubuntu-latest
+    if: hashFiles('package.json') != ''
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build + démarrage de la pile + healthcheck
+        run: |
+          cp .env.example .env
+          sed -i "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=ci_only_pw|; s|^DATABASE_URL=.*|DATABASE_URL=postgresql://allumi:ci_only_pw@db:5432/allumi?schema=public|; s|^AUTH_SECRET=.*|AUTH_SECRET=$(openssl rand -base64 48 | tr -d '\n')|; s|^ENCRYPTION_KEY=.*|ENCRYPTION_KEY=$(openssl rand -base64 32 | tr -d '\n')|" .env
+          docker compose build
+          docker compose up -d db migrate app
+          for i in $(seq 1 40); do
+            [ "$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose ps -q app)")" = healthy ] && exit 0
+            sleep 3
+          done
+          docker compose logs app; exit 1

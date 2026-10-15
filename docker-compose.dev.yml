@@ -1,0 +1,30 @@
+# Allumi — services de développement (PostgreSQL + Mailpit)
+# L'app tourne sur ta machine avec `npm run dev`.
+
+name: allumi-dev
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: allumi
+      POSTGRES_USER: allumi
+      POSTGRES_PASSWORD: allumi_dev_only
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - db_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U allumi -d allumi"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "127.0.0.1:1025:1025"   # SMTP
+      - "127.0.0.1:8025:8025"   # interface web
+
+volumes:
+  db_dev:
