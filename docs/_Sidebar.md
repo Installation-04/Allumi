@@ -14,6 +14,8 @@
 **Comprendre**
 - [[Architecture]]
 - [[Regles-comptables]]
+- [[Schema-de-donnees]]
+- [[Plan-de-tests]]
 - [[Feuille-de-route]]
 
 **Contribuer**

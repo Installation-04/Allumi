@@ -17,6 +17,8 @@ Allumi est un logiciel de comptabilité **open source** (MIT) et **auto-héberge
 ## Pour comprendre le projet
 - [[Architecture]] — stack, modules, infrastructure
 - [[Regles-comptables]] — les règles que le moteur comptable ne doit jamais enfreindre
+- [[Schema-de-donnees]] — tables, contraintes, triggers de partie double, isolation par entreprise
+- [[Plan-de-tests]] — comment le moteur comptable est testé (tests de propriétés inclus)
 - [[Feuille-de-route]] — ce qui est prévu
 
 ## Pour contribuer
