@@ -28,8 +28,10 @@ CMD ["npx", "prisma", "migrate", "deploy"]
 
 # ---------- runner ----------
 FROM node:${NODE_VERSION}-bookworm-slim AS runner
+ARG APP_VERSION=dev
 WORKDIR /app
-ENV NODE_ENV=production \
+ENV APP_VERSION=${APP_VERSION} \
+    NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000 \
     HOSTNAME=0.0.0.0

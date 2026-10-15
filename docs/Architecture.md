@@ -28,7 +28,7 @@ Volumes : db_data · app_storage (pièces jointes) · caddy_data (certificats)
 
 ## Contrat d'infrastructure
 Ce que l'application garantit à l'infrastructure :
-- `GET /api/health` → 200 `{"status":"ok"}` si la base répond
+- `GET /api/health` → 200 `{"status":"ok","version":"x.y.z"}` si la base répond (version = variable `APP_VERSION` de l'image, sinon `package.json`)
 - Configuration par variables d'environnement validées au démarrage
 - Migrations appliquées par `migrate`, jamais par l'app
 - Écritures disque seulement dans `/tmp`, `/app/.next/cache`, `/app/storage`

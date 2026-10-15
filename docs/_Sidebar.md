@@ -6,6 +6,7 @@
 - [[Configuration]]
 - [[Sauvegardes]]
 - [[Mise-a-jour]]
+- [[Versions-et-releases]]
 - [[Securite-et-Loi-25]]
 - [[Depannage]]
 - [[FAQ]]

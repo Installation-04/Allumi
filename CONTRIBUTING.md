@@ -15,6 +15,9 @@ Ne soumets **aucun** code, texte, icône, capture ou design provenant de QuickBo
 3. Avant la PR : lint, typecheck, tests, build Docker, docs et CHANGELOG à jour, traductions fr-CA et en.
 4. Ouvre la PR en décrivant le *pourquoi*. Petites PR, un sujet à la fois.
 
+## Versions
+Chaque PR ajoute une ligne sous **[Non publié]** dans `CHANGELOG.md`. Les versions (SemVer) sont publiées par les mainteneurs : voir [Versions et releases](docs/Versions-et-releases.md).
+
 ## Exigences comptables
 Pas de float pour l'argent, partie double validée, écritures immuables, piste d'audit, isolation par entreprise. Tout changement au moteur comptable demande des tests (dont des tests de propriétés).
 

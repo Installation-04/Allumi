@@ -1,4 +1,4 @@
-.PHONY: help dev-up dev-down up down logs backup update wiki
+.PHONY: release help dev-up dev-down up down logs backup update wiki
 
 help: ## Affiche l'aide
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-10s %s\n", $$1, $$2}'
@@ -17,6 +17,9 @@ down: ## Arrête la pile de production
 
 logs: ## Suit les logs de l'application
 	docker compose logs -f app
+
+release: ## Prépare une version (make release V=0.1.0)
+	./scripts/release.sh $(V)
 
 backup: ## Sauvegarde maintenant
 	./scripts/backup.sh

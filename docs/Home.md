@@ -9,6 +9,7 @@ Allumi est un logiciel de comptabilité **open source** (MIT) et **auto-héberge
 - [[Configuration]] — toutes les variables d'environnement
 - [[Sauvegardes]] — sauvegarder et restaurer (chiffré, hors site)
 - [[Mise-a-jour]] — mettre à jour et revenir en arrière
+- [[Versions-et-releases]] — numéros de version, tags et releases
 - [[Securite-et-Loi-25]] — durcissement, vie privée, hébergement canadien
 - [[Depannage]] — problèmes fréquents
 - [[FAQ]]

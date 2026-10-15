@@ -10,6 +10,8 @@ Le script : sauvegarde, `git pull --ff-only`, reconstruit les images, applique l
 Option : `--no-backup` (déconseillé).
 
 ## Épingler une version
+Les numéros et le processus de publication sont décrits dans [[Versions-et-releases]].
+
 Pour la production, utilise une version étiquetée plutôt que `main` :
 ```bash
 git fetch --tags

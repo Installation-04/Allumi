@@ -8,3 +8,5 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 - Scripts : installation Ubuntu, sauvegarde chiffrée, restauration, mise à jour, publication du wiki.
 - Wiki complet dans `docs/`, CONTRIBUTING, SECURITY.
 - Prompt de développement Claude Code et conventions (`CLAUDE.md`).
+- Environnement de développement cloud (`scripts/cloud-setup.sh`) et CI GitHub Actions.
+- Versionnage SemVer : `scripts/release.sh`, workflow Release (release GitHub + image GHCR), version dans `/api/health`.

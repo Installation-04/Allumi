@@ -25,6 +25,10 @@ Allumi est un logiciel de comptabilité open source (MIT), auto-hébergeable, po
 - Le build Docker et le healthcheck sont validés par la CI GitHub (`.github/workflows/ci.yml`). Garde le Dockerfile et docker-compose.yml cohérents avec l'app et vérifie le résultat de la CI.
 - Travaille sur une branche, ouvre une PR, ne pousse pas directement sur `main`.
 
+## Versions
+- SemVer, tags `vX.Y.Z`. Ne crée ni ne modifie de tag toi-même : les releases passent par `scripts/release.sh` (voir docs/Versions-et-releases.md).
+- Chaque PR ajoute une ligne sous [Non publié] dans CHANGELOG.md.
+
 ## Documentation
 - docs/ est le wiki. Mettre à jour la page concernée dans le même commit que la fonctionnalité.
 - Liens internes au format [[Nom-de-page]].

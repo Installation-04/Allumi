@@ -38,7 +38,7 @@ TypeScript strict, Next.js (App Router, output "standalone"), PostgreSQL 17, Pri
 
 5. CONTRAT D'INFRASTRUCTURE (l'app doit respecter)
 - next.config : output "standalone". Garde un dossier public/ (même vide, avec .gitkeep).
-- GET /api/health : 200 + {"status":"ok"} si la base répond (SELECT 1). Sans authentification, sans donnée sensible.
+- GET /api/health : 200 + {"status":"ok","version":"x.y.z"} si la base répond (SELECT 1). La version vient de APP_VERSION (injectée par le Dockerfile), sinon de package.json. Sans authentification, sans autre donnée sensible. Affiche aussi la version dans l'interface (pied de page ou page « À propos »).
 - Configuration uniquement par variables d'environnement, validée au démarrage avec Zod. Toute nouvelle variable va dans .env.example ET docs/Configuration.md. Message d'erreur clair si une variable manque.
 - Migrations Prisma versionnées dans prisma/migrations, appliquées par le service "migrate" de docker-compose, jamais par l'app au runtime.
 - Logs JSON sur stdout (pino), niveau via LOG_LEVEL, jamais de secrets ni de renseignements personnels.
@@ -53,6 +53,7 @@ TypeScript strict, Next.js (App Router, output "standalone"), PostgreSQL 17, Pri
 6. OPEN SOURCE
 - Licence MIT. Aucun secret, aucune donnée client, aucun code propriétaire dans le dépôt.
 - README, CONTRIBUTING, SECURITY et CHANGELOG (Keep a Changelog) à jour. Commits Conventional Commits.
+- Versionnage SemVer (voir docs/Versions-et-releases.md). Chaque PR ajoute une ligne sous [Non publié] du CHANGELOG. Les versions se publient avec scripts/release.sh (tag vX.Y.Z), jamais à la main. package.json commence à 0.1.0.
 - i18n : toutes les chaînes visibles dans des fichiers de traduction fr-CA et en. Zéro chaîne en dur.
 - CI GitHub Actions : lint, typecheck, tests, build Docker, npm audit.
 - Dépendances à licence compatible MIT, maintenues. Justifie toute nouvelle dépendance importante.
