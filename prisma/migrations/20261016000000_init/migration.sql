@@ -2922,20 +2922,23 @@ CREATE CONSTRAINT TRIGGER membership_keeps_owner
   AFTER UPDATE OR DELETE ON membership DEFERRABLE INITIALLY DEFERRED
   FOR EACH ROW EXECUTE FUNCTION membership_owner_check();
 
--- Il reste toujours au moins un administrateur d'instance actif.
+-- Il reste toujours au moins un administrateur d'instance actif : on ne réagit qu'au retrait
+-- d'un administrateur actif (rétrogradation ou désactivation), jamais aux autres modifications.
 CREATE FUNCTION instance_admin_check() RETURNS trigger
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, public AS $$
 BEGIN
-  PERFORM pg_advisory_xact_lock(hashtext('allumi.instance_admins'));
-  IF EXISTS (SELECT 1 FROM public.app_user) AND NOT EXISTS (
-       SELECT 1 FROM public.app_user WHERE is_instance_admin AND disabled_at IS NULL) THEN
-    RAISE EXCEPTION 'the instance must keep at least one active administrator' USING ERRCODE = 'AL009';
+  IF OLD.is_instance_admin AND OLD.disabled_at IS NULL THEN
+    -- Sérialise les retraits concurrents : le second voit le résultat du premier.
+    PERFORM pg_advisory_xact_lock(hashtext('allumi.instance_admins'));
+    IF NOT EXISTS (SELECT 1 FROM public.app_user WHERE is_instance_admin AND disabled_at IS NULL) THEN
+      RAISE EXCEPTION 'the instance must keep at least one active administrator' USING ERRCODE = 'AL009';
+    END IF;
   END IF;
   RETURN NULL;
 END $$;
 
 CREATE CONSTRAINT TRIGGER app_user_keeps_admin
-  AFTER UPDATE ON app_user DEFERRABLE INITIALLY DEFERRED
+  AFTER UPDATE OF is_instance_admin, disabled_at ON app_user DEFERRABLE INITIALLY DEFERRED
   FOR EACH ROW EXECUTE FUNCTION instance_admin_check();
 
 -- ---------------------------------------------------------------------
