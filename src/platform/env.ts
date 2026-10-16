@@ -17,7 +17,7 @@ const schema = z
     ENCRYPTION_KEY: z
       .string()
       .refine((value) => Buffer.from(value, "base64").length === 32, "must be 32 bytes encoded in base64"),
-    LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),
+    LOG_LEVEL: z.enum(["silent", "fatal", "error", "warn", "info", "debug", "trace"]).default("info"),
     DEFAULT_LOCALE: z.enum(["fr-CA", "en"]).default("fr-CA"),
     SMTP_HOST: z.string().optional(),
     SMTP_PORT: z.coerce.number().int().positive().default(587),
