@@ -33,23 +33,18 @@ jobs:
           bash -n scripts/*.sh
           shellcheck -x -P SCRIPTDIR -S warning scripts/*.sh
       - uses: actions/setup-node@v4
-        if: hashFiles('package.json') != ''
         with:
           node-version: 22
           cache: npm
       - name: Dépendances et client Prisma
-        if: hashFiles('package.json') != ''
         run: |
           npm ci
           npx prisma generate
       - name: Migrations (propriétaire) et rôle de l'application
-        if: hashFiles('package.json') != ''
         run: npm run db:migrate
       - name: Aucune dérive entre le schéma Prisma et la base migrée
-        if: hashFiles('package.json') != ''
         run: npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code
       - name: Lint, types, tests, audit
-        if: hashFiles('package.json') != ''
         run: |
           npm run lint
           npm run typecheck
@@ -58,7 +53,6 @@ jobs:
 
   e2e:
     runs-on: ubuntu-latest
-    if: hashFiles('package.json') != ''
     services:
       postgres:
         image: postgres:17-alpine
@@ -88,7 +82,6 @@ jobs:
 
   docker:
     runs-on: ubuntu-latest
-    if: hashFiles('package.json') != ''
     steps:
       - uses: actions/checkout@v4
       - name: Build + démarrage de la pile + healthcheck
