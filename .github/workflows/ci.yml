@@ -18,28 +18,73 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U allumi" --health-interval 5s --health-timeout 3s --health-retries 10
     env:
+      # Propriétaire (migrations, gabarit des tests) et rôle restreint de l'application.
       DATABASE_URL: postgresql://allumi:allumi_ci_only@localhost:5432/allumi?schema=public
+      APP_DB_PASSWORD: allumi_app_ci_only
+      APP_DATABASE_URL: postgresql://allumi_app:allumi_app_ci_only@localhost:5432/allumi
+      APP_URL: http://localhost:3000
+      AUTH_SECRET: ci-only-secret-ci-only-secret-ci-only-secret
+      ENCRYPTION_KEY: BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=
+      NEXT_TELEMETRY_DISABLED: "1"
     steps:
       - uses: actions/checkout@v4
       - name: Scripts shell
         run: |
           bash -n scripts/*.sh
-          shellcheck -x -S warning scripts/*.sh
+          shellcheck -x -P SCRIPTDIR -S warning scripts/*.sh
       - uses: actions/setup-node@v4
         if: hashFiles('package.json') != ''
         with:
           node-version: 22
           cache: npm
-      - name: Lint, types, tests
+      - name: Dépendances et client Prisma
         if: hashFiles('package.json') != ''
         run: |
           npm ci
           npx prisma generate
-          npx prisma migrate deploy
+      - name: Migrations (propriétaire) et rôle de l'application
+        if: hashFiles('package.json') != ''
+        run: npm run db:migrate
+      - name: Aucune dérive entre le schéma Prisma et la base migrée
+        if: hashFiles('package.json') != ''
+        run: npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code
+      - name: Lint, types, tests, audit
+        if: hashFiles('package.json') != ''
+        run: |
           npm run lint
           npm run typecheck
           npm test
           npm audit --omit=dev --audit-level=high
+
+  e2e:
+    runs-on: ubuntu-latest
+    if: hashFiles('package.json') != ''
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: allumi
+          POSTGRES_USER: allumi
+          POSTGRES_PASSWORD: allumi_ci_only
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U allumi" --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://allumi:allumi_ci_only@localhost:5432/allumi?schema=public
+      APP_DB_PASSWORD: allumi_app_ci_only
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Parcours dans un navigateur (serveur autonome, base neuve)
+        run: npm run test:e2e
 
   docker:
     runs-on: ubuntu-latest
@@ -49,11 +94,17 @@ jobs:
       - name: Build + démarrage de la pile + healthcheck
         run: |
           cp .env.example .env
-          sed -i "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=ci_only_pw|; s|^DATABASE_URL=.*|DATABASE_URL=postgresql://allumi:ci_only_pw@db:5432/allumi?schema=public|; s|^AUTH_SECRET=.*|AUTH_SECRET=$(openssl rand -base64 48 | tr -d '\n')|; s|^ENCRYPTION_KEY=.*|ENCRYPTION_KEY=$(openssl rand -base64 32 | tr -d '\n')|" .env
+          sed -i "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=ci_only_pw|; s|^DATABASE_URL=.*|DATABASE_URL=postgresql://allumi:ci_only_pw@db:5432/allumi?schema=public|; s|^APP_DB_PASSWORD=.*|APP_DB_PASSWORD=ci_app_only_pw|; s|^APP_DATABASE_URL=.*|APP_DATABASE_URL=postgresql://allumi_app:ci_app_only_pw@db:5432/allumi|; s|^AUTH_SECRET=.*|AUTH_SECRET=$(openssl rand -base64 48 | tr -d '\n')|; s|^ENCRYPTION_KEY=.*|ENCRYPTION_KEY=$(openssl rand -base64 32 | tr -d '\n')|" .env
           docker compose build
           docker compose up -d db migrate app
           for i in $(seq 1 40); do
             [ "$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose ps -q app)")" = healthy ] && exit 0
             sleep 3
           done
-          docker compose logs app; exit 1
+          docker compose logs migrate app; exit 1
+      - name: La page /setup répond depuis l'image (base, rôle restreint, traductions)
+        run: |
+          docker compose exec -T app node -e "fetch('http://127.0.0.1:3000/setup').then(async (r) => { const t = await r.text(); process.exit(r.ok && t.includes('Bienvenue dans Allumi') ? 0 : 1); }).catch(() => process.exit(1))"
+      - name: Journaux en cas d'échec
+        if: failure()
+        run: docker compose logs migrate app

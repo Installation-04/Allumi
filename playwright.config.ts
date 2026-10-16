@@ -21,12 +21,18 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    // Needs `npm run build` first. `next start` serves the same build as the standalone server.
-    command: `npx next start --hostname 127.0.0.1 --port ${PORT}`,
+    // Needs `npm run build` first. Same artifact as the Docker image: the standalone server, with its
+    // static assets copied next to it (this is what the Dockerfile does), so a missing traced file shows up here.
+    command:
+      "rm -rf .next/standalone/.next/static .next/standalone/public && " +
+      "cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public && " +
+      "node .next/standalone/server.js",
     url: `http://127.0.0.1:${PORT}/api/health`,
     reuseExistingServer: false,
     timeout: 60_000,
     env: {
+      HOSTNAME: "127.0.0.1",
+      PORT: String(PORT),
       NODE_ENV: "production",
       NEXT_TELEMETRY_DISABLED: "1",
       APP_URL: `http://127.0.0.1:${PORT}`,

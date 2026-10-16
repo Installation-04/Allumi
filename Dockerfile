@@ -20,11 +20,13 @@ COPY . .
 RUN npx prisma generate && npm run build
 
 # ---------- migrate (utilisé par le service "migrate") ----------
+# Applique les migrations puis (re)configure le rôle restreint de l'application (prisma/app-role.mjs).
 FROM deps AS migrate
 WORKDIR /app
 COPY prisma ./prisma
+COPY prisma.config.ts ./
 USER node
-CMD ["npx", "prisma", "migrate", "deploy"]
+CMD ["npm", "run", "db:migrate"]
 
 # ---------- runner ----------
 FROM node:${NODE_VERSION}-bookworm-slim AS runner
