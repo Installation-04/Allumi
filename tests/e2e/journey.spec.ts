@@ -1,0 +1,81 @@
+import { expect, test } from "@playwright/test";
+import { Secret, TOTP } from "otpauth";
+
+const EMAIL = "admin@exemple.test";
+const PASSWORD = "une phrase de passe très longue 2026";
+
+test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ page, browser }) => {
+  // Fresh instance: everything leads to /setup.
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/setup$/);
+  await expect(page.getByRole("heading", { name: "Bienvenue dans Allumi" })).toBeVisible();
+  await expect(page.getByText(/Version 0\.1\.0/)).toBeVisible();
+
+  await page.getByLabel("Nom de l'entreprise").fill("Atelier Exemple inc.");
+  await page.getByLabel("Ton nom").fill("Alex Exemple");
+  await page.getByLabel("Courriel").fill(EMAIL);
+  await page.getByLabel("Mot de passe", { exact: true }).fill(PASSWORD);
+  await page.getByLabel("Confirmation du mot de passe").fill(PASSWORD);
+  await page.getByRole("button", { name: "Créer l'entreprise et commencer" }).click();
+
+  // Signed in on the company dashboard.
+  await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
+  await expect(page.getByRole("heading", { name: "Atelier Exemple inc." })).toBeVisible();
+  await expect(page.getByText("Ton rôle : Propriétaire")).toBeVisible();
+
+  // /setup is disabled for good: a visitor without a session is sent to the sign-in page...
+  const visitor = await browser.newContext();
+  const visitorPage = await visitor.newPage();
+  await visitorPage.goto("/setup");
+  await expect(visitorPage).toHaveURL(/\/connexion$/);
+  await visitor.close();
+  // ...and a signed-in user to the dashboard.
+  await page.goto("/setup");
+  await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
+
+  // Cookie is httpOnly (no script access).
+  const cookies = await page.context().cookies();
+  const session = cookies.find((cookie) => cookie.name.endsWith("allumi_session"));
+  expect(session?.httpOnly).toBe(true);
+  expect(session?.sameSite).toBe("Lax");
+
+  // Enable two-factor authentication.
+  await page.goto("/compte/securite");
+  await page.getByRole("button", { name: "Activer la 2FA" }).click();
+  const manualKey = await page.locator("code").first().innerText();
+  const totp = new TOTP({ secret: Secret.fromBase32(manualKey), digits: 6, period: 30 });
+  await page.getByLabel("Code à 6 chiffres").fill(totp.generate());
+  await page.getByRole("button", { name: "Confirmer et activer" }).click();
+  await expect(page.getByRole("heading", { name: "Codes de récupération" })).toBeVisible();
+  const recoveryCodes = await page.locator("li").allInnerTexts();
+  expect(recoveryCodes).toHaveLength(10);
+
+  // Sign out, then sign in again: password alone is not enough.
+  await page.getByRole("button", { name: "Se déconnecter" }).click();
+  await expect(page).toHaveURL(/\/connexion$/);
+  await page.getByLabel("Courriel").fill(EMAIL);
+  await page.getByLabel("Mot de passe").fill("mauvais mot de passe");
+  await page.getByRole("button", { name: "Se connecter" }).click();
+  await expect(page.getByText("Courriel ou mot de passe incorrect.")).toBeVisible();
+
+  await page.getByLabel("Mot de passe").fill(PASSWORD);
+  await page.getByRole("button", { name: "Se connecter" }).click();
+  await expect(page).toHaveURL(/\/connexion\/2fa$/);
+
+  // A protected page stays closed until the second factor is done.
+  await page.goto("/compte/securite");
+  await expect(page).toHaveURL(/\/connexion\/2fa$/);
+
+  // The code that enabled 2FA cannot be replayed; a recovery code works once.
+  await page.getByLabel("Code à 6 chiffres").fill(totp.generate({ timestamp: Date.now() }));
+  await page.getByRole("button", { name: "Vérifier" }).click();
+  await expect(page.getByText("Code invalide ou déjà utilisé.")).toBeVisible();
+
+  await page.getByLabel("Code à 6 chiffres").fill(recoveryCodes[0] ?? "");
+  await page.getByRole("button", { name: "Vérifier" }).click();
+  await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
+
+  // English interface.
+  await page.getByRole("button", { name: "English" }).click();
+  await expect(page.getByText("Your role: Owner")).toBeVisible();
+});
