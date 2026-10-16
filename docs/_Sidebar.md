@@ -3,6 +3,8 @@
 
 **Exploiter**
 - [[Installation]]
+- [[Premier-demarrage]]
+- [[Authentification]]
 - [[Configuration]]
 - [[Sauvegardes]]
 - [[Mise-a-jour]]

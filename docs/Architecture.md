@@ -13,13 +13,14 @@ Volumes : db_data · app_storage (pièces jointes) · app_cache · caddy_data (c
 ```
 
 ## Stack
-Versions stables visées pour la phase 2 (fixées dans `package.json`, mises à jour par PR).
+Versions stables fixées dans `package.json` (mises à jour par PR).
 
 | Élément | Choix | Pourquoi |
 |---|---|---|
 | Exécution | Node.js 22 | Image du `Dockerfile`; requis par Prisma 7 et Vitest 5 |
 | Web | Next.js 16 (App Router, `output: "standalone"`) | Rendu serveur, Server Actions, image Docker compacte |
 | Langage | TypeScript 6, mode strict | TypeScript 7 n'est pas encore pris en charge par typescript-eslint |
+| Lint | ESLint 9 | Les plugins de `eslint-config-next` ne prennent pas encore en charge ESLint 10 |
 | Base de données | PostgreSQL 17 | Contraintes, triggers, RLS, `EXCLUDE` |
 | ORM | Prisma 7.10 + `@prisma/adapter-pg` | Migrations versionnées, client typé; la version 8 est encore en RC |
 | Validation | Zod 4 | Entrées, formulaires, environnement au démarrage |
@@ -37,26 +38,27 @@ Toutes ces dépendances sont sous licence MIT ou Apache-2.0, compatibles avec la
 prisma/
   schema.prisma          modèle de données (voir [[Schema-de-donnees]])
   migrations/            SQL généré + SQL complémentaire (CHECK, triggers, RLS, GRANT)
-  seed.ts                données de démonstration fictives
+  app-role.mjs           (re)configure le rôle restreint de l'application, à chaque démarrage de `migrate`
 prisma.config.ts
 messages/                fr-CA.json, en.json (aucune chaîne en dur dans l'interface)
 src/
-  proxy.ts               session et en-têtes (remplace middleware.ts dans Next 16)
+  instrumentation.ts     valide la configuration et le rôle de base au démarrage
+  proxy.ts               identifiant de requête et redirection sans cookie (remplace middleware.ts dans Next 16)
   app/                   routes et écrans : couche mince, sans règle d'affaires
-    (public)/            /setup, /connexion, /invitation/[jeton]
-    (app)/c/[companyId]/ écrans de chaque module
+    setup/ connexion/ compte/ c/[companyId]/   pages et actions serveur
     api/health/          contrat d'infrastructure
   modules/<module>/
-    domain/              fonctions pures (montants, taxes, règles d'imputation) : cible des tests de propriétés
-    service/             cas d'utilisation : autorisation, transaction, appels au grand livre
-    repo/                accès Prisma, toujours dans le contexte d'une entreprise
+    domain/              fonctions pures (règles, schémas Zod) : cible des tests de propriétés
+    service/             cas d'utilisation : transaction, accès à la base, audit
     index.ts             API publique du module (seul point d'import pour les autres modules)
-  platform/              env (Zod), logger, db + contexte d'entreprise, i18n, stockage, courriel, erreurs
-tests/                   intégration (base réelle), e2e (Playwright), fixtures
+  platform/              env (Zod), logger, db + contexte d'entreprise (tenant), erreurs, i18n, version
+tests/
+  unit/ integration/ e2e/ support/   voir [[Plan-de-tests]]
 ```
 
 Règles de dépendance, vérifiées par ESLint (`no-restricted-imports`) :
 - `app` appelle les services; jamais Prisma directement.
+- Seul `platform/db.ts` importe le client Prisma généré; les accès passent par `withCompany`, `withUser` ou `withAnonymous` (`platform/tenant.ts`).
 - Un module n'importe un autre module que par son `index.ts`.
 - **Seul `ledger` écrit dans `journal_entry` et `journal_line`.** Les ventes, achats, paiements et la banque appellent `ledger.post()` et `ledger.reverse()`.
 - `reports` ne fait que lire.
@@ -172,9 +174,9 @@ Ce que l'application garantit à l'infrastructure :
 - Aucun appel Internet obligatoire au démarrage
 - Page `/setup` au premier démarrage, désactivée ensuite
 
-### Changements prévus en phase 2 (avec le code qui les exige)
+### Infrastructure ajoutée en phase 2 (avec le code qui l'exige)
 - Nouvelles variables `APP_DB_PASSWORD` (générée par `install.sh` et `cloud-setup.sh`) et `APP_DATABASE_URL` (rôle `allumi_app`), dans `.env.example` et [[Configuration]].
-- `migrate` : après `prisma migrate deploy`, donne `LOGIN` et le mot de passe au rôle `allumi_app`. Script placé dans `prisma/`, car `.dockerignore` exclut `scripts/`. L'étape copie aussi `prisma.config.ts` (Prisma 7).
+- `migrate` : exécute `npm run db:migrate` = `prisma migrate deploy` puis `prisma/app-role.mjs`, qui donne `LOGIN` et le mot de passe au rôle `allumi_app`. Le script est dans `prisma/`, car `.dockerignore` exclut `scripts/`. L'étape copie aussi `prisma.config.ts` (Prisma 7).
 - `app` : reçoit seulement les variables dont il a besoin (plus `env_file: .env` au complet), donc ni `DATABASE_URL` propriétaire ni `POSTGRES_PASSWORD`.
 - CI : migrations avec `DATABASE_URL`, tests avec `APP_DATABASE_URL`, plus une vérification de dérive Prisma et l'application de toutes les migrations sur une base vide.
 - `restore.sh` : crée les rôles `allumi_app` et `allumi_redactor` avant `pg_restore` (les rôles sont globaux à la grappe et absents du `pg_dump`, mais les `GRANT` y sont), restaure avec `--exit-on-error --single-transaction`, relance l'étape `migrate`, puis `ANALYZE` (PostgreSQL ne restaure pas les statistiques).

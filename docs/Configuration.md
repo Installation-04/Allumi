@@ -2,7 +2,7 @@
 
 Toute la configuration passe par des variables d'environnement, lues depuis le fichier `.env` à la racine. Après une modification : `docker compose up -d`.
 
-> Le fichier `.env` contient des secrets : permissions `600`, jamais dans Git, copie dans un gestionnaire de mots de passe.
+> Le fichier `.env` contient des secrets : permissions `600`, jamais dans Git, copie dans un gestionnaire de mots de passe. Ne le « source » pas dans un shell (`source .env`) : certaines valeurs, comme `SMTP_FROM`, contiennent des espaces.
 
 ## Domaine et HTTPS
 | Variable | Description |
@@ -16,9 +16,11 @@ Toute la configuration passe par des variables d'environnement, lues depuis le f
 |---|---|
 | `POSTGRES_DB`, `POSTGRES_USER` | Nom de la base et de l'utilisateur (défaut `allumi`). |
 | `POSTGRES_PASSWORD` | Mot de passe PostgreSQL. |
-| `DATABASE_URL` | URL de connexion. Doit contenir le même mot de passe. L'hôte est `db` (réseau Docker interne). |
+| `DATABASE_URL` | URL de connexion du **propriétaire** de la base. Utilisée seulement par le service `migrate` (migrations, sauvegardes). Doit contenir le même mot de passe que `POSTGRES_PASSWORD`. L'hôte est `db` (réseau Docker interne). **L'application ne la reçoit jamais.** |
+| `APP_DB_PASSWORD` | Mot de passe du rôle restreint `allumi_app`. Généré par `install.sh`; le service `migrate` le configure à chaque démarrage. |
+| `APP_DATABASE_URL` | URL utilisée par l'application (rôle `allumi_app`, sans droit de contourner la sécurité par ligne). Doit contenir `APP_DB_PASSWORD`. L'application refuse de démarrer si elle est identique à `DATABASE_URL` ou si le rôle est superutilisateur. |
 
-PostgreSQL n'est **pas** exposé hors du réseau Docker en production.
+PostgreSQL n'est **pas** exposé hors du réseau Docker en production. Pourquoi deux rôles ? Le rôle propriétaire contourne l'isolation entre entreprises; l'application utilise donc un rôle restreint : voir [[Architecture]].
 
 ## Sécurité
 | Variable | Description |
@@ -30,7 +32,7 @@ PostgreSQL n'est **pas** exposé hors du réseau Docker en production.
 | Variable | Description |
 |---|---|
 | `NODE_ENV` | `production` en prod. |
-| `LOG_LEVEL` | `debug`, `info`, `warn`, `error`. |
+| `LOG_LEVEL` | `silent`, `fatal`, `error`, `warn`, `info` (défaut), `debug`, `trace`. Journaux JSON sur la sortie standard; jamais de secrets ni de renseignements personnels. |
 | `DEFAULT_LOCALE` | `fr-CA` (défaut) ou `en`. |
 
 ## Courriel (SMTP)
@@ -47,4 +49,6 @@ PostgreSQL n'est **pas** exposé hors du réseau Docker en production.
 Détails : [[Sauvegardes]].
 
 ## Ajouter une variable (contributeurs)
-Toute nouvelle variable doit être ajoutée à `.env.example`, validée au démarrage (Zod) et documentée ici dans le même commit.
+Toute nouvelle variable doit être ajoutée à `.env.example`, validée au démarrage (Zod, dans `src/platform/env.ts`), transmise à l'application dans `docker-compose.yml` (liste explicite : le service `app` ne lit pas tout le `.env`) et documentée ici, dans le même commit.
+
+Au démarrage, une variable manquante ou invalide arrête l'application avec un message qui les nomme toutes (voir [[Depannage]]).

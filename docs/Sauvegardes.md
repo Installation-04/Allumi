@@ -34,11 +34,11 @@ sudo ./scripts/backup.sh
 ```bash
 sudo ./scripts/restore.sh /var/backups/allumi/allumi-20260101-023000.tar.age ~/allumi-backup.key
 ```
-Le script demande confirmation, remplace la base et les pièces jointes, puis redémarre.
+Le script demande confirmation, remplace la base et les pièces jointes, puis redémarre. Il crée d'abord les rôles PostgreSQL de l'application s'ils manquent (les rôles appartiennent au serveur, pas à la base : ils ne sont pas dans la sauvegarde, alors que leurs droits y sont), restaure en une seule transaction qui s'arrête à la première erreur, recalcule les statistiques (`ANALYZE`), puis le service `migrate` redonne son mot de passe au rôle de l'application.
 
 ### Restaurer sur un nouveau serveur (reprise après sinistre)
 1. Installer Allumi : [[Installation]] (même version si possible).
-2. Remplacer `.env` par ta copie de sauvegarde (mêmes `ENCRYPTION_KEY` et `AUTH_SECRET`; l'ancien mot de passe PostgreSQL doit rester cohérent avec `DATABASE_URL`).
+2. Remplacer `.env` par ta copie de sauvegarde (mêmes `ENCRYPTION_KEY` et `AUTH_SECRET`; les mots de passe PostgreSQL doivent rester cohérents avec `DATABASE_URL` et `APP_DATABASE_URL`).
 3. Copier la sauvegarde sur le serveur et lancer `restore.sh`.
 
 ## Test de restauration

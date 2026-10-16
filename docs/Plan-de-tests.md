@@ -98,6 +98,14 @@ Un scénario fictif figé (une année d'activité d'« Atelier Exemple inc. ») 
 4. Import d'un relevé CSV fictif → appariement → rapprochement complété.
 5. Interface en anglais : aucune chaîne manquante.
 
+## État d'avancement
+Phase 2 (squelette) : 85 tests unitaires et d'intégration, plus un parcours Playwright.
+- `tests/unit` : environnement, mot de passe, TOTP (dont une propriété), codes de récupération, politique de session, détection des erreurs `ALxxx`, chiffrement (propriété aller-retour), parité des catalogues de messages.
+- `tests/integration` (base clonée par fichier, rôle `allumi_app`) : catalogue de la base (RLS partout, aucun `TRUNCATE`, audit non inscriptible, `EXECUTE` retiré à `PUBLIC`), `/setup` (course entre deux requêtes, désactivation, limite), connexion (verrouillage, limitation de débit, réponses identiques), sessions (inactivité, durée absolue, désactivation), 2FA (rejeu refusé, code de récupération à usage unique, désactivation), isolation entre entreprises (IDOR, rôles, audit, caviardage, dernier propriétaire), erreurs `ALxxx` à travers Prisma, `/api/health`.
+- `tests/e2e` : `/setup`, tableau de bord, cookie `httpOnly`, 2FA et codes de récupération, rejeu refusé, bascule en anglais. Le serveur testé est le serveur autonome, comme dans l'image Docker.
+
+Les propriétés du moteur comptable (P1 à P17) et le test à états arrivent avec la phase 3.
+
 ## Critères de réussite
 - Domaine : ≥ 95 % de couverture des lignes et des branches. Services : ≥ 85 %.
 - Toutes les propriétés passent avec `FC_NUM_RUNS=200` en CI et `10000` la nuit.
