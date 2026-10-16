@@ -1,0 +1,1448 @@
+// Allumi — schéma de données (conception, phase 1).
+// Les objets que Prisma ne modélise pas (CHECK, EXCLUDE, triggers, RLS, GRANT)
+// sont dans le SQL complémentaire de la migration initiale.
+
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["partialIndexes", "postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [btree_gist]
+}
+
+// ─────────────────────────────── Enums ───────────────────────────────
+
+enum AppLocale {
+  fr_CA @map("fr-CA")
+  en
+
+  @@map("app_locale")
+}
+
+enum Province {
+  AB
+  BC
+  MB
+  NB
+  NL
+  NS
+  NT
+  NU
+  ON
+  PE
+  QC
+  SK
+  YT
+
+  @@map("province")
+}
+
+enum MemberRole {
+  OWNER
+  ACCOUNTANT
+  READ_ONLY
+
+  @@map("member_role")
+}
+
+enum TaxRounding {
+  PER_LINE
+  PER_DOCUMENT
+
+  @@map("tax_rounding")
+}
+
+enum FilingFrequency {
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+
+  @@map("filing_frequency")
+}
+
+enum FiscalYearStatus {
+  OPEN
+  CLOSED
+
+  @@map("fiscal_year_status")
+}
+
+enum PeriodStatus {
+  OPEN
+  LOCKED
+
+  @@map("period_status")
+}
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+
+  @@map("account_type")
+}
+
+enum AccountSubtype {
+  CASH
+  BANK
+  ACCOUNTS_RECEIVABLE
+  CURRENT_ASSET
+  FIXED_ASSET
+  OTHER_ASSET
+  CREDIT_CARD
+  ACCOUNTS_PAYABLE
+  SALES_TAX
+  CURRENT_LIABILITY
+  LONG_TERM_LIABILITY
+  EQUITY
+  RETAINED_EARNINGS
+  OPERATING_REVENUE
+  OTHER_REVENUE
+  COST_OF_SALES
+  OPERATING_EXPENSE
+  OTHER_EXPENSE
+
+  @@map("account_subtype")
+}
+
+enum SystemAccount {
+  ACCOUNTS_RECEIVABLE
+  ACCOUNTS_PAYABLE
+  UNDEPOSITED_FUNDS
+  RETAINED_EARNINGS
+  OPENING_BALANCE_EQUITY
+
+  @@map("system_account")
+}
+
+enum SequenceKey {
+  JOURNAL_ENTRY
+  INVOICE
+  CREDIT_NOTE
+  PURCHASE_DOCUMENT
+  PAYMENT_RECEIVED
+  PAYMENT_SENT
+  DEPOSIT
+
+  @@map("sequence_key")
+}
+
+enum JournalSource {
+  MANUAL
+  OPENING_BALANCE
+  SALES_DOCUMENT
+  PURCHASE_DOCUMENT
+  PAYMENT
+  DEPOSIT
+  BANK
+  TAX_SETTLEMENT
+  REVERSAL
+
+  @@map("journal_source")
+}
+
+/// Rôle d'une ligne portée à un compte de taxes, pour les déclarations.
+enum TaxBox {
+  /// Taxe perçue sur les ventes.
+  COLLECTED
+  /// CTI/RTI : taxe payée récupérable.
+  RECOVERABLE
+  /// Redressement (créances irrécouvrables, corrections).
+  ADJUSTMENT
+  /// Versement ou remboursement d'une déclaration.
+  SETTLEMENT
+
+  @@map("tax_box")
+}
+
+enum TaxReturnStatus {
+  DRAFT
+  FILED
+
+  @@map("tax_return_status")
+}
+
+enum TaxTreatment {
+  STANDARD
+  ZERO_RATED
+  EXEMPT
+  OUT_OF_SCOPE
+
+  @@map("tax_treatment")
+}
+
+enum SalesDocumentKind {
+  INVOICE
+  CREDIT_NOTE
+
+  @@map("sales_document_kind")
+}
+
+enum PurchaseDocumentKind {
+  BILL
+  SUPPLIER_CREDIT
+  EXPENSE
+
+  @@map("purchase_document_kind")
+}
+
+enum DocumentStatus {
+  DRAFT
+  POSTED
+  VOID
+
+  @@map("document_status")
+}
+
+enum PaymentDirection {
+  RECEIVED
+  SENT
+
+  @@map("payment_direction")
+}
+
+enum PaymentMethod {
+  CASH
+  CHEQUE
+  EFT
+  INTERAC
+  CREDIT_CARD
+  DEBIT_CARD
+  OTHER
+
+  @@map("payment_method")
+}
+
+/// Sous-grand livre touché par un paiement.
+enum PaymentLedger {
+  RECEIVABLE
+  PAYABLE
+
+  @@map("payment_ledger")
+}
+
+enum PaymentStatus {
+  POSTED
+  VOID
+
+  @@map("payment_status")
+}
+
+enum BankImportFormat {
+  CSV
+  OFX
+
+  @@map("bank_import_format")
+}
+
+enum BankTransactionStatus {
+  UNMATCHED
+  MATCHED
+  EXCLUDED
+
+  @@map("bank_transaction_status")
+}
+
+enum ReconciliationStatus {
+  IN_PROGRESS
+  COMPLETED
+
+  @@map("reconciliation_status")
+}
+
+enum ActorKind {
+  USER
+  SYSTEM
+
+  @@map("actor_kind")
+}
+
+// ─────────────────────── Instance et identité (global, sans RLS) ───────────────────────
+
+/// Ligne unique (id = 1). setup_completed_at non nul => /setup désactivée.
+model Instance {
+  id               Int       @id @default(1)
+  setupCompletedAt DateTime? @map("setup_completed_at") @db.Timestamptz(6)
+
+  @@map("instance")
+}
+
+model User {
+  id              String    @id @default(uuid(7)) @db.Uuid
+  /// Normalisé en minuscules (CHECK).
+  email           String    @unique
+  displayName     String    @map("display_name")
+  locale          AppLocale @default(fr_CA)
+  lastLoginAt     DateTime? @map("last_login_at") @db.Timestamptz(6)
+  /// Administrateur de l'instance : crée des entreprises, désactive des comptes, réinitialise la 2FA.
+  /// Le propriétaire créé par /setup l'est; il en reste toujours au moins un actif (trigger).
+  isInstanceAdmin Boolean   @default(false) @map("is_instance_admin")
+  /// Un utilisateur n'est jamais supprimé : il est désactivé.
+  disabledAt      DateTime? @map("disabled_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  credential          UserCredential?
+  memberships         Membership[]
+  sessions            Session[]
+  recoveryCodes       UserRecoveryCode[]
+  passwordResetTokens PasswordResetToken[]
+  journalEntries      JournalEntry[]
+  auditEvents         AuditLog[]           @relation("AuditActor")
+  auditSubjectEvents  AuditLog[]           @relation("AuditSubject")
+
+  @@map("app_user")
+}
+
+/// Secrets d'authentification, séparés du profil : seul l'utilisateur lui-même y accède (RLS).
+model UserCredential {
+  userId            String    @id @map("user_id") @db.Uuid
+  /// argon2id.
+  passwordHash      String    @map("password_hash")
+  passwordChangedAt DateTime  @map("password_changed_at") @db.Timestamptz(6)
+  /// Secret TOTP chiffré AES-256-GCM (ENCRYPTION_KEY). Jamais copié dans l'audit.
+  totpSecretEnc     Bytes?    @map("totp_secret_enc")
+  totpEnabledAt     DateTime? @map("totp_enabled_at") @db.Timestamptz(6)
+  /// Dernier pas de temps TOTP accepté : un code n'est jamais accepté deux fois (RFC 6238 §5.2).
+  totpLastStep      BigInt?   @map("totp_last_step")
+  failedLoginCount  Int       @default(0) @map("failed_login_count")
+  lockedUntil       DateTime? @map("locked_until") @db.Timestamptz(6)
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@map("user_credential")
+}
+
+model UserRecoveryCode {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  codeHash  String    @map("code_hash")
+  usedAt    DateTime? @map("used_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_recovery_code")
+}
+
+/// id = SHA-256 (hex) du jeton envoyé par courriel; usage unique.
+model PasswordResetToken {
+  id        String    @id @db.Char(64)
+  userId    String    @map("user_id") @db.Uuid
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz(6)
+  usedAt    DateTime? @map("used_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_token")
+}
+
+/// id = SHA-256 (hex) du jeton de session; le jeton lui-même n'est jamais stocké.
+model Session {
+  id            String    @id @db.Char(64)
+  userId        String    @map("user_id") @db.Uuid
+  mfaVerifiedAt DateTime? @map("mfa_verified_at") @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  lastSeenAt    DateTime  @default(now()) @map("last_seen_at") @db.Timestamptz(6)
+  expiresAt     DateTime  @map("expires_at") @db.Timestamptz(6)
+  /// Tronqué à 256 caractères.
+  userAgent     String?   @map("user_agent")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("session")
+}
+
+/// Fenêtre fixe par clé (ex. « login:ip:<hash> », « login:email:<hash> »).
+model RateLimit {
+  key         String   @id
+  windowStart DateTime @map("window_start") @db.Timestamptz(6)
+  count       Int
+
+  @@index([windowStart])
+  @@map("rate_limit")
+}
+
+// ─────────────────────── Entreprise, membres (RLS) ───────────────────────
+
+model Company {
+  id                   String          @id @default(uuid(7)) @db.Uuid
+  name                 String
+  legalName            String?         @map("legal_name")
+  /// Numéro d'entreprise du Québec (10 chiffres).
+  neq                  String?
+  /// Numéro d'entreprise fédéral (9 chiffres).
+  businessNumber       String?         @map("business_number")
+  /// TPS/TVH : 9 chiffres + RT + 4 chiffres.
+  gstNumber            String?         @map("gst_number")
+  /// TVQ : 10 chiffres + TQ + 4 chiffres.
+  qstNumber            String?         @map("qst_number")
+  addressLine1         String?         @map("address_line1")
+  addressLine2         String?         @map("address_line2")
+  city                 String?
+  province             Province        @default(QC)
+  postalCode           String?         @map("postal_code")
+  email                String?
+  phone                String?
+  /// MVP : CAD seulement (CHECK). Colonne réservée pour la multidevise.
+  currency             String          @default("CAD") @db.Char(3)
+  defaultLocale        AppLocale       @default(fr_CA) @map("default_locale")
+  fiscalYearStartMonth Int             @default(1) @map("fiscal_year_start_month")
+  taxRounding          TaxRounding     @default(PER_LINE) @map("tax_rounding")
+  taxFilingFrequency   FilingFrequency @default(QUARTERLY) @map("tax_filing_frequency")
+  createdAt            DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  memberships       Membership[]
+  invitations       Invitation[]
+  numberSequences   NumberSequence[]
+  fiscalYears       FiscalYear[]
+  accounts          Account[]
+  journalEntries    JournalEntry[]
+  contacts          Contact[]
+  items             Item[]
+  taxes             Tax[]
+  taxCodes          TaxCode[]
+  salesDocuments    SalesDocument[]
+  purchaseDocuments PurchaseDocument[]
+  payments          Payment[]
+  bankDeposits      BankDeposit[]
+  taxReturns        TaxReturn[]
+  attachments       Attachment[]
+  auditLogs         AuditLog[]
+
+  @@map("company")
+}
+
+model Membership {
+  id        String     @id @default(uuid(7)) @db.Uuid
+  companyId String     @map("company_id") @db.Uuid
+  userId    String     @map("user_id") @db.Uuid
+  role      MemberRole
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([companyId, userId])
+  @@index([userId])
+  @@map("membership")
+}
+
+model Invitation {
+  id          String     @id @default(uuid(7)) @db.Uuid
+  companyId   String     @map("company_id") @db.Uuid
+  email       String
+  role        MemberRole
+  /// SHA-256 (hex) du jeton envoyé par courriel.
+  tokenHash   String     @unique @map("token_hash") @db.Char(64)
+  expiresAt   DateTime   @map("expires_at") @db.Timestamptz(6)
+  acceptedAt  DateTime?  @map("accepted_at") @db.Timestamptz(6)
+  revokedAt   DateTime?  @map("revoked_at") @db.Timestamptz(6)
+  createdById String     @map("created_by_id") @db.Uuid
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict)
+
+  @@index([companyId])
+  @@map("invitation")
+}
+
+/// Numérotation sans trou : UPDATE ... SET next_value = next_value + 1 RETURNING (verrou de ligne).
+model NumberSequence {
+  companyId String      @map("company_id") @db.Uuid
+  key       SequenceKey
+  prefix    String      @default("")
+  nextValue BigInt      @default(1) @map("next_value")
+  padding   Int         @default(0)
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict)
+
+  @@id([companyId, key])
+  @@map("number_sequence")
+}
+
+// ─────────────────────── Exercices et périodes ───────────────────────
+
+model FiscalYear {
+  id         String           @id @default(uuid(7)) @db.Uuid
+  companyId  String           @map("company_id") @db.Uuid
+  startDate  DateTime         @map("start_date") @db.Date
+  endDate    DateTime         @map("end_date") @db.Date
+  status     FiscalYearStatus @default(OPEN)
+  closedAt   DateTime?        @map("closed_at") @db.Timestamptz(6)
+  closedById String?          @map("closed_by_id") @db.Uuid
+  createdAt  DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  company Company        @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  periods FiscalPeriod[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, startDate])
+  @@map("fiscal_year")
+}
+
+model FiscalPeriod {
+  id           String       @id @default(uuid(7)) @db.Uuid
+  companyId    String       @map("company_id") @db.Uuid
+  fiscalYearId String       @map("fiscal_year_id") @db.Uuid
+  periodNumber Int          @map("period_number")
+  startDate    DateTime     @map("start_date") @db.Date
+  endDate      DateTime     @map("end_date") @db.Date
+  status       PeriodStatus @default(OPEN)
+  lockedAt     DateTime?    @map("locked_at") @db.Timestamptz(6)
+  lockedById   String?      @map("locked_by_id") @db.Uuid
+
+  fiscalYear     FiscalYear     @relation(fields: [companyId, fiscalYearId], references: [companyId, id], onDelete: Restrict)
+  journalEntries JournalEntry[]
+
+  @@unique([companyId, id])
+  @@unique([fiscalYearId, periodNumber])
+  @@index([companyId, startDate])
+  @@map("fiscal_period")
+}
+
+// ─────────────────────── Plan comptable et journal ───────────────────────
+
+model Account {
+  id          String         @id @default(uuid(7)) @db.Uuid
+  companyId   String         @map("company_id") @db.Uuid
+  code        String
+  nameFr      String         @map("name_fr")
+  nameEn      String         @map("name_en")
+  type        AccountType
+  subtype     AccountSubtype
+  parentId    String?        @map("parent_id") @db.Uuid
+  /// Code de l'Index général des renseignements financiers (IGRF, norme publique de l'ARC).
+  gifiCode    String?        @map("gifi_code")
+  /// Compte de contrôle ou système, unique par entreprise.
+  systemKey   SystemAccount? @map("system_key")
+  isActive    Boolean        @default(true) @map("is_active")
+  description String?
+  createdAt   DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  company  Company   @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  parent   Account?  @relation("AccountHierarchy", fields: [companyId, parentId], references: [companyId, id], onDelete: Restrict)
+  children Account[] @relation("AccountHierarchy")
+
+  journalLines          JournalLine[]
+  itemsIncome           Item[]                 @relation("ItemIncomeAccount")
+  itemsExpense          Item[]                 @relation("ItemExpenseAccount")
+  taxesPayable          Tax[]                  @relation("TaxPayableAccount")
+  taxesRecoverable      Tax[]                  @relation("TaxRecoverableAccount")
+  salesLines            SalesDocumentLine[]
+  purchaseLines         PurchaseDocumentLine[]
+  purchaseDocumentsPaid PurchaseDocument[]     @relation("PurchasePaymentAccount")
+  payments              Payment[]
+  bankDeposits          BankDeposit[]
+  bankProfile           BankAccountProfile?
+  bankImports           BankImport[]
+  bankTransactions      BankTransaction[]
+  reconciliations       BankReconciliation[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, code])
+  @@unique([companyId, systemKey])
+  @@index([companyId, type])
+  @@map("account")
+}
+
+/// Écriture validée dès son insertion. Ajout seulement (triggers + GRANT).
+model JournalEntry {
+  id              String        @id @default(uuid(7)) @db.Uuid
+  companyId       String        @map("company_id") @db.Uuid
+  entryNumber     BigInt        @map("entry_number")
+  entryDate       DateTime      @map("entry_date") @db.Date
+  fiscalPeriodId  String        @map("fiscal_period_id") @db.Uuid
+  sourceType      JournalSource @map("source_type")
+  /// Document, paiement ou transaction bancaire d'origine (selon source_type).
+  sourceId        String?       @map("source_id") @db.Uuid
+  memo            String?
+  reversesEntryId String?       @map("reverses_entry_id") @db.Uuid
+  createdById     String        @map("created_by_id") @db.Uuid
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  /// Transaction (xid de premier niveau) qui a créé l'écriture, posée par trigger : des lignes ne
+  /// s'ajoutent que dans cette transaction. pg_current_xact_id() reste exact dans un savepoint.
+  createdTxid     BigInt        @default(dbgenerated("((pg_current_xact_id())::text)::bigint")) @map("created_txid")
+
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  fiscalPeriod FiscalPeriod  @relation(fields: [companyId, fiscalPeriodId], references: [companyId, id], onDelete: Restrict)
+  createdBy    User          @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  reverses     JournalEntry? @relation("Reversal", fields: [companyId, reversesEntryId], references: [companyId, id], onDelete: Restrict)
+  reversedBy   JournalEntry? @relation("Reversal")
+  lines        JournalLine[]
+
+  salesDocumentPosted    SalesDocument?    @relation("SalesDocumentPosting")
+  salesDocumentVoided    SalesDocument?    @relation("SalesDocumentVoid")
+  purchaseDocumentPosted PurchaseDocument? @relation("PurchaseDocumentPosting")
+  purchaseDocumentVoided PurchaseDocument? @relation("PurchaseDocumentVoid")
+  paymentPosted          Payment?          @relation("PaymentPosting")
+  paymentVoided          Payment?          @relation("PaymentVoid")
+  depositPosted          BankDeposit?      @relation("DepositPosting")
+  depositVoided          BankDeposit?      @relation("DepositVoid")
+  taxReturnSettled       TaxReturn?
+  attachmentLinks        AttachmentLink[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, entryNumber])
+  @@unique([companyId, reversesEntryId])
+  @@index([companyId, entryDate])
+  @@index([companyId, sourceType, sourceId])
+  @@map("journal_entry")
+}
+
+/// Exactement un de debit_cents / credit_cents est non nul (CHECK).
+model JournalLine {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  companyId   String   @map("company_id") @db.Uuid
+  entryId     String   @map("entry_id") @db.Uuid
+  lineNo      Int      @map("line_no") @db.SmallInt
+  accountId   String   @map("account_id") @db.Uuid
+  debitCents  BigInt   @default(0) @map("debit_cents")
+  creditCents BigInt   @default(0) @map("credit_cents")
+  description String?
+  /// Obligatoire sur les comptes clients/fournisseurs (trigger).
+  contactId   String?  @map("contact_id") @db.Uuid
+  /// Copie de journal_entry.entry_date (vérifiée par trigger) pour les rapports par plage de dates.
+  entryDate   DateTime @map("entry_date") @db.Date
+  /// Obligatoires ensemble sur un compte de taxes, interdits ailleurs (trigger) : les déclarations
+  /// se calculent depuis le grand livre.
+  taxId       String?  @map("tax_id") @db.Uuid
+  taxBox      TaxBox?  @map("tax_box")
+
+  entry          JournalEntry    @relation(fields: [companyId, entryId], references: [companyId, id], onDelete: Restrict)
+  account        Account         @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict)
+  contact        Contact?        @relation(fields: [companyId, contactId], references: [companyId, id], onDelete: Restrict)
+  tax            Tax?            @relation(fields: [companyId, taxId], references: [companyId, id], onDelete: Restrict)
+  bankMatch      BankMatch?
+  reconciledLine ReconciledLine?
+
+  @@unique([companyId, id])
+  @@unique([companyId, entryId, lineNo])
+  @@index([companyId, accountId, entryDate])
+  @@index([companyId, contactId, entryDate])
+  @@index([companyId, taxId, entryDate])
+  @@map("journal_line")
+}
+
+// ─────────────────────── Contacts et articles ───────────────────────
+
+model Contact {
+  id                 String    @id @default(uuid(7)) @db.Uuid
+  companyId          String    @map("company_id") @db.Uuid
+  isCustomer         Boolean   @default(false) @map("is_customer")
+  isSupplier         Boolean   @default(false) @map("is_supplier")
+  displayName        String    @map("display_name")
+  legalName          String?   @map("legal_name")
+  email              String?
+  phone              String?
+  addressLine1       String?   @map("address_line1")
+  addressLine2       String?   @map("address_line2")
+  city               String?
+  province           Province?
+  postalCode         String?   @map("postal_code")
+  country            String    @default("CA") @db.Char(2)
+  locale             AppLocale @default(fr_CA)
+  defaultTaxCodeId   String?   @map("default_tax_code_id") @db.Uuid
+  paymentTermsDays   Int       @default(30) @map("payment_terms_days")
+  /// Numéros d'inscription du fournisseur, exigés pour justifier les CTI/RTI.
+  gstNumber          String?   @map("gst_number")
+  qstNumber          String?   @map("qst_number")
+  taxExemptionNumber String?   @map("tax_exemption_number")
+  notes              String?
+  isActive           Boolean   @default(true) @map("is_active")
+  /// Loi 25 : anonymisation plutôt que suppression (pièces comptables à conserver).
+  anonymizedAt       DateTime? @map("anonymized_at") @db.Timestamptz(6)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  company        Company  @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  defaultTaxCode TaxCode? @relation("ContactDefaultTaxCode", fields: [companyId, defaultTaxCodeId], references: [companyId, id], onDelete: Restrict)
+
+  journalLines      JournalLine[]
+  salesDocuments    SalesDocument[]
+  purchaseDocuments PurchaseDocument[]
+  payments          Payment[]
+  attachmentLinks   AttachmentLink[]
+
+  @@unique([companyId, id])
+  @@index([companyId, displayName])
+  @@map("contact")
+}
+
+model Item {
+  id               String   @id @default(uuid(7)) @db.Uuid
+  companyId        String   @map("company_id") @db.Uuid
+  code             String?
+  name             String
+  description      String?
+  unitPrice        Decimal? @map("unit_price") @db.Decimal(19, 6)
+  incomeAccountId  String?  @map("income_account_id") @db.Uuid
+  expenseAccountId String?  @map("expense_account_id") @db.Uuid
+  defaultTaxCodeId String?  @map("default_tax_code_id") @db.Uuid
+  isActive         Boolean  @default(true) @map("is_active")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  company        Company  @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  incomeAccount  Account? @relation("ItemIncomeAccount", fields: [companyId, incomeAccountId], references: [companyId, id], onDelete: Restrict)
+  expenseAccount Account? @relation("ItemExpenseAccount", fields: [companyId, expenseAccountId], references: [companyId, id], onDelete: Restrict)
+  defaultTaxCode TaxCode? @relation("ItemDefaultTaxCode", fields: [companyId, defaultTaxCodeId], references: [companyId, id], onDelete: Restrict)
+
+  salesLines    SalesDocumentLine[]
+  purchaseLines PurchaseDocumentLine[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, code])
+  @@index([companyId, incomeAccountId])
+  @@index([companyId, expenseAccountId])
+  @@map("item")
+}
+
+// ─────────────────────── Taxes ───────────────────────
+
+/// Une taxe (TPS, TVQ, TVH...). Les montants vont au compte à payer; la portion récupérable (CTI/RTI) au compte récupérable.
+model Tax {
+  id                   String   @id @default(uuid(7)) @db.Uuid
+  companyId            String   @map("company_id") @db.Uuid
+  code                 String
+  nameFr               String   @map("name_fr")
+  nameEn               String   @map("name_en")
+  registrationNumber   String?  @map("registration_number")
+  payableAccountId     String   @map("payable_account_id") @db.Uuid
+  recoverableAccountId String?  @map("recoverable_account_id") @db.Uuid
+  isActive             Boolean  @default(true) @map("is_active")
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  company            Company  @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  payableAccount     Account  @relation("TaxPayableAccount", fields: [companyId, payableAccountId], references: [companyId, id], onDelete: Restrict)
+  recoverableAccount Account? @relation("TaxRecoverableAccount", fields: [companyId, recoverableAccountId], references: [companyId, id], onDelete: Restrict)
+
+  rates                 TaxRate[]
+  components            TaxCodeComponent[]
+  salesDocumentTaxes    SalesDocumentTax[]
+  purchaseDocumentTaxes PurchaseDocumentTax[]
+  journalLines          JournalLine[]
+  returns               TaxReturn[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, code])
+  @@index([companyId, payableAccountId])
+  @@index([companyId, recoverableAccountId])
+  @@map("tax")
+}
+
+/// Taux par date d'effet; les plages d'une même taxe ne se chevauchent pas (EXCLUDE). effective_to inclusif.
+model TaxRate {
+  id            String    @id @default(uuid(7)) @db.Uuid
+  companyId     String    @map("company_id") @db.Uuid
+  taxId         String    @map("tax_id") @db.Uuid
+  rate          Decimal   @db.Decimal(9, 6)
+  effectiveFrom DateTime  @map("effective_from") @db.Date
+  effectiveTo   DateTime? @map("effective_to") @db.Date
+
+  tax Tax @relation(fields: [companyId, taxId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([taxId, effectiveFrom])
+  @@map("tax_rate")
+}
+
+/// Code appliqué sur une ligne (ex. « TPS+TVQ », « TVH ON », « Détaxé », « Exonéré »).
+model TaxCode {
+  id        String       @id @default(uuid(7)) @db.Uuid
+  companyId String       @map("company_id") @db.Uuid
+  code      String
+  nameFr    String       @map("name_fr")
+  nameEn    String       @map("name_en")
+  treatment TaxTreatment
+  isActive  Boolean      @default(true) @map("is_active")
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  company    Company            @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  components TaxCodeComponent[]
+
+  contacts      Contact[]              @relation("ContactDefaultTaxCode")
+  items         Item[]                 @relation("ItemDefaultTaxCode")
+  salesLines    SalesDocumentLine[]
+  purchaseLines PurchaseDocumentLine[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, code])
+  @@map("tax_code")
+}
+
+model TaxCodeComponent {
+  id        String @id @default(uuid(7)) @db.Uuid
+  companyId String @map("company_id") @db.Uuid
+  taxCodeId String @map("tax_code_id") @db.Uuid
+  taxId     String @map("tax_id") @db.Uuid
+  position  Int    @db.SmallInt
+
+  taxCode TaxCode @relation(fields: [companyId, taxCodeId], references: [companyId, id], onDelete: Cascade)
+  tax     Tax     @relation(fields: [companyId, taxId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([taxCodeId, taxId])
+  @@unique([taxCodeId, position])
+  @@map("tax_code_component")
+}
+
+// ─────────────────────── Ventes : factures et avoirs ───────────────────────
+
+model SalesDocument {
+  id                 String            @id @default(uuid(7)) @db.Uuid
+  companyId          String            @map("company_id") @db.Uuid
+  kind               SalesDocumentKind
+  status             DocumentStatus    @default(DRAFT)
+  /// Attribué à la validation (séquence INVOICE ou CREDIT_NOTE).
+  number             String?
+  contactId          String            @map("contact_id") @db.Uuid
+  /// Date du document (échéance, âge des comptes, moment de la taxe).
+  issueDate          DateTime          @map("issue_date") @db.Date
+  /// Date comptable de l'écriture (documents d'ouverture, facture saisie après une fermeture).
+  postingDate        DateTime          @map("posting_date") @db.Date
+  dueDate            DateTime?         @map("due_date") @db.Date
+  /// Avoir : facture corrigée (ses taux de taxe s'appliquent).
+  creditedDocumentId String?           @map("credited_document_id") @db.Uuid
+  currency           String            @default("CAD") @db.Char(3)
+  locale             AppLocale         @default(fr_CA)
+  reference          String?
+  memo               String?
+  terms              String?
+  taxRounding        TaxRounding       @map("tax_rounding")
+  /// Nom, adresse et numéros du client figés à la validation.
+  billingSnapshot    Json?             @map("billing_snapshot")
+  /// Nom, adresse et numéros TPS/TVQ de l'entreprise émettrice figés à la validation (réimpression conforme).
+  issuerSnapshot     Json?             @map("issuer_snapshot")
+  subtotalCents      BigInt            @default(0) @map("subtotal_cents")
+  taxTotalCents      BigInt            @default(0) @map("tax_total_cents")
+  totalCents         BigInt            @default(0) @map("total_cents")
+  journalEntryId     String?           @map("journal_entry_id") @db.Uuid
+  voidEntryId        String?           @map("void_entry_id") @db.Uuid
+  postedAt           DateTime?         @map("posted_at") @db.Timestamptz(6)
+  postedById         String?           @map("posted_by_id") @db.Uuid
+  voidedAt           DateTime?         @map("voided_at") @db.Timestamptz(6)
+  voidedById         String?           @map("voided_by_id") @db.Uuid
+  voidReason         String?           @map("void_reason")
+  createdById        String            @map("created_by_id") @db.Uuid
+  createdAt          DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  company          Company         @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  contact          Contact         @relation(fields: [companyId, contactId], references: [companyId, id], onDelete: Restrict)
+  journalEntry     JournalEntry?   @relation("SalesDocumentPosting", fields: [companyId, journalEntryId], references: [companyId, id], onDelete: Restrict)
+  voidEntry        JournalEntry?   @relation("SalesDocumentVoid", fields: [companyId, voidEntryId], references: [companyId, id], onDelete: Restrict)
+  creditedDocument SalesDocument?  @relation("CreditedSalesDocument", fields: [companyId, creditedDocumentId], references: [companyId, id], onDelete: Restrict)
+  creditNotes      SalesDocument[] @relation("CreditedSalesDocument")
+
+  lines           SalesDocumentLine[]
+  taxes           SalesDocumentTax[]
+  allocations     PaymentAllocation[]
+  creditsApplied  SalesCreditApplication[] @relation("CreditNoteApplied")
+  creditsReceived SalesCreditApplication[] @relation("InvoiceCredited")
+  attachmentLinks AttachmentLink[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, kind, number])
+  @@unique([companyId, journalEntryId])
+  @@unique([companyId, voidEntryId])
+  @@index([companyId, contactId])
+  @@index([companyId, status, issueDate])
+  @@map("sales_document")
+}
+
+model SalesDocumentLine {
+  id          String  @id @default(uuid(7)) @db.Uuid
+  companyId   String  @map("company_id") @db.Uuid
+  documentId  String  @map("document_id") @db.Uuid
+  position    Int     @db.SmallInt
+  itemId      String? @map("item_id") @db.Uuid
+  description String
+  quantity    Decimal @default(1) @db.Decimal(19, 4)
+  unitPrice   Decimal @map("unit_price") @db.Decimal(19, 6)
+  /// round(quantity × unit_price) au cent, par la fonction d'arrondi centrale.
+  amountCents BigInt  @map("amount_cents")
+  accountId   String  @map("account_id") @db.Uuid
+  taxCodeId   String? @map("tax_code_id") @db.Uuid
+
+  document SalesDocument @relation(fields: [companyId, documentId], references: [companyId, id], onDelete: Cascade)
+  item     Item?         @relation(fields: [companyId, itemId], references: [companyId, id], onDelete: Restrict)
+  account  Account       @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict)
+  taxCode  TaxCode?      @relation(fields: [companyId, taxCodeId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([companyId, documentId, position])
+  @@index([companyId, accountId])
+  @@map("sales_document_line")
+}
+
+/// Totaux de taxe du document, avec le taux appliqué figé.
+model SalesDocumentTax {
+  id          String  @id @default(uuid(7)) @db.Uuid
+  companyId   String  @map("company_id") @db.Uuid
+  documentId  String  @map("document_id") @db.Uuid
+  taxId       String  @map("tax_id") @db.Uuid
+  rate        Decimal @db.Decimal(9, 6)
+  baseCents   BigInt  @map("base_cents")
+  amountCents BigInt  @map("amount_cents")
+
+  document SalesDocument @relation(fields: [companyId, documentId], references: [companyId, id], onDelete: Cascade)
+  tax      Tax           @relation(fields: [companyId, taxId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([documentId, taxId])
+  @@map("sales_document_tax")
+}
+
+// ─────────────────────── Achats : factures fournisseurs, crédits, dépenses ───────────────────────
+
+model PurchaseDocument {
+  id                 String               @id @default(uuid(7)) @db.Uuid
+  companyId          String               @map("company_id") @db.Uuid
+  kind               PurchaseDocumentKind
+  status             DocumentStatus       @default(DRAFT)
+  /// Numéro interne attribué à la validation (séquence PURCHASE_DOCUMENT).
+  number             String?
+  /// Obligatoire pour BILL et SUPPLIER_CREDIT (CHECK); facultatif pour EXPENSE.
+  contactId          String?              @map("contact_id") @db.Uuid
+  payeeName          String?              @map("payee_name")
+  /// Numéro de la facture du fournisseur; unique par fournisseur.
+  supplierReference  String?              @map("supplier_reference")
+  /// Date inscrite sur la pièce du fournisseur.
+  documentDate       DateTime             @map("document_date") @db.Date
+  /// Date comptable de l'écriture (facture reçue après la fermeture de sa période, etc.).
+  postingDate        DateTime             @map("posting_date") @db.Date
+  dueDate            DateTime?            @map("due_date") @db.Date
+  /// Crédit fournisseur : facture corrigée.
+  creditedDocumentId String?              @map("credited_document_id") @db.Uuid
+  /// Nom et numéros TPS/TVQ du fournisseur figés à la validation (justification des CTI/RTI).
+  supplierSnapshot   Json?                @map("supplier_snapshot")
+  currency           String               @default("CAD") @db.Char(3)
+  memo               String?
+  taxRounding        TaxRounding          @map("tax_rounding")
+  /// EXPENSE seulement : compte de banque, d'encaisse ou de carte de crédit débité.
+  paymentAccountId   String?              @map("payment_account_id") @db.Uuid
+  paymentMethod      PaymentMethod?       @map("payment_method")
+  subtotalCents      BigInt               @default(0) @map("subtotal_cents")
+  taxTotalCents      BigInt               @default(0) @map("tax_total_cents")
+  totalCents         BigInt               @default(0) @map("total_cents")
+  journalEntryId     String?              @map("journal_entry_id") @db.Uuid
+  voidEntryId        String?              @map("void_entry_id") @db.Uuid
+  postedAt           DateTime?            @map("posted_at") @db.Timestamptz(6)
+  postedById         String?              @map("posted_by_id") @db.Uuid
+  voidedAt           DateTime?            @map("voided_at") @db.Timestamptz(6)
+  voidedById         String?              @map("voided_by_id") @db.Uuid
+  voidReason         String?              @map("void_reason")
+  createdById        String               @map("created_by_id") @db.Uuid
+  createdAt          DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  company          Company            @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  contact          Contact?           @relation(fields: [companyId, contactId], references: [companyId, id], onDelete: Restrict)
+  paymentAccount   Account?           @relation("PurchasePaymentAccount", fields: [companyId, paymentAccountId], references: [companyId, id], onDelete: Restrict)
+  journalEntry     JournalEntry?      @relation("PurchaseDocumentPosting", fields: [companyId, journalEntryId], references: [companyId, id], onDelete: Restrict)
+  voidEntry        JournalEntry?      @relation("PurchaseDocumentVoid", fields: [companyId, voidEntryId], references: [companyId, id], onDelete: Restrict)
+  creditedDocument PurchaseDocument?  @relation("CreditedPurchaseDocument", fields: [companyId, creditedDocumentId], references: [companyId, id], onDelete: Restrict)
+  supplierCredits  PurchaseDocument[] @relation("CreditedPurchaseDocument")
+
+  lines           PurchaseDocumentLine[]
+  taxes           PurchaseDocumentTax[]
+  allocations     PaymentAllocation[]
+  creditsApplied  PurchaseCreditApplication[] @relation("SupplierCreditApplied")
+  creditsReceived PurchaseCreditApplication[] @relation("BillCredited")
+  attachmentLinks AttachmentLink[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, number])
+  /// Un numéro de facture fournisseur n'est utilisé qu'une fois par fournisseur, sauf sur un document annulé.
+  @@unique([companyId, contactId, kind, supplierReference], map: "purchase_document_supplier_reference_live", where: raw("status <> 'VOID'"))
+  @@unique([companyId, journalEntryId])
+  @@unique([companyId, voidEntryId])
+  @@index([companyId, status, documentDate])
+  @@index([companyId, paymentAccountId])
+  @@map("purchase_document")
+}
+
+model PurchaseDocumentLine {
+  id          String  @id @default(uuid(7)) @db.Uuid
+  companyId   String  @map("company_id") @db.Uuid
+  documentId  String  @map("document_id") @db.Uuid
+  position    Int     @db.SmallInt
+  itemId      String? @map("item_id") @db.Uuid
+  description String
+  quantity    Decimal @default(1) @db.Decimal(19, 4)
+  unitPrice   Decimal @map("unit_price") @db.Decimal(19, 6)
+  amountCents BigInt  @map("amount_cents")
+  accountId   String  @map("account_id") @db.Uuid
+  taxCodeId   String? @map("tax_code_id") @db.Uuid
+
+  document PurchaseDocument @relation(fields: [companyId, documentId], references: [companyId, id], onDelete: Cascade)
+  item     Item?            @relation(fields: [companyId, itemId], references: [companyId, id], onDelete: Restrict)
+  account  Account          @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict)
+  taxCode  TaxCode?         @relation(fields: [companyId, taxCodeId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([companyId, documentId, position])
+  @@index([companyId, accountId])
+  @@map("purchase_document_line")
+}
+
+/// recoverable_cents va au compte récupérable de la taxe (CTI/RTI); le reste est passé en charge avec les lignes.
+model PurchaseDocumentTax {
+  id               String  @id @default(uuid(7)) @db.Uuid
+  companyId        String  @map("company_id") @db.Uuid
+  documentId       String  @map("document_id") @db.Uuid
+  taxId            String  @map("tax_id") @db.Uuid
+  rate             Decimal @db.Decimal(9, 6)
+  baseCents        BigInt  @map("base_cents")
+  amountCents      BigInt  @map("amount_cents")
+  recoverableCents BigInt  @map("recoverable_cents")
+
+  document PurchaseDocument @relation(fields: [companyId, documentId], references: [companyId, id], onDelete: Cascade)
+  tax      Tax              @relation(fields: [companyId, taxId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([documentId, taxId])
+  @@map("purchase_document_tax")
+}
+
+// ─────────────────────── Paiements et affectations ───────────────────────
+
+/// Validé à la création (pas de brouillon). Annulation = contre-passation + status VOID.
+model Payment {
+  id             String           @id @default(uuid(7)) @db.Uuid
+  companyId      String           @map("company_id") @db.Uuid
+  direction      PaymentDirection
+  /// Comptes clients (encaissement, remboursement d'avoir) ou comptes fournisseurs.
+  ledger         PaymentLedger
+  number         String?
+  contactId      String           @map("contact_id") @db.Uuid
+  paymentDate    DateTime         @map("payment_date") @db.Date
+  amountCents    BigInt           @map("amount_cents")
+  /// Compte de banque, d'encaisse ou « fonds non déposés ».
+  accountId      String           @map("account_id") @db.Uuid
+  method         PaymentMethod
+  reference      String?
+  memo           String?
+  status         PaymentStatus    @default(POSTED)
+  journalEntryId String           @map("journal_entry_id") @db.Uuid
+  voidEntryId    String?          @map("void_entry_id") @db.Uuid
+  voidedAt       DateTime?        @map("voided_at") @db.Timestamptz(6)
+  voidedById     String?          @map("voided_by_id") @db.Uuid
+  voidReason     String?          @map("void_reason")
+  createdById    String           @map("created_by_id") @db.Uuid
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  contact      Contact       @relation(fields: [companyId, contactId], references: [companyId, id], onDelete: Restrict)
+  account      Account       @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict)
+  journalEntry JournalEntry  @relation("PaymentPosting", fields: [companyId, journalEntryId], references: [companyId, id], onDelete: Restrict)
+  voidEntry    JournalEntry? @relation("PaymentVoid", fields: [companyId, voidEntryId], references: [companyId, id], onDelete: Restrict)
+
+  allocations       PaymentAllocation[]
+  offsetsAsReceived PaymentOffset[]     @relation("OffsetReceived")
+  offsetsAsSent     PaymentOffset[]     @relation("OffsetSent")
+  depositItems      BankDepositItem[]
+  attachmentLinks   AttachmentLink[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, direction, number])
+  @@unique([companyId, journalEntryId])
+  @@unique([companyId, voidEntryId])
+  @@index([companyId, contactId])
+  @@index([companyId, paymentDate])
+  @@index([companyId, accountId])
+  @@map("payment")
+}
+
+/// Affecte un paiement à exactement un document (CHECK num_nonnulls = 1).
+model PaymentAllocation {
+  id                 String    @id @default(uuid(7)) @db.Uuid
+  companyId          String    @map("company_id") @db.Uuid
+  paymentId          String    @map("payment_id") @db.Uuid
+  salesDocumentId    String?   @map("sales_document_id") @db.Uuid
+  purchaseDocumentId String?   @map("purchase_document_id") @db.Uuid
+  amountCents        BigInt    @map("amount_cents")
+  /// Date d'effet : l'âge des comptes à une date passée reste reproductible.
+  appliedDate        DateTime  @map("applied_date") @db.Date
+  /// Retrait daté : une affectation ne s'efface jamais.
+  unappliedDate      DateTime? @map("unapplied_date") @db.Date
+  unappliedById      String?   @map("unapplied_by_id") @db.Uuid
+  createdById        String    @map("created_by_id") @db.Uuid
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  payment          Payment           @relation(fields: [companyId, paymentId], references: [companyId, id], onDelete: Restrict)
+  salesDocument    SalesDocument?    @relation(fields: [companyId, salesDocumentId], references: [companyId, id], onDelete: Restrict)
+  purchaseDocument PurchaseDocument? @relation(fields: [companyId, purchaseDocumentId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([paymentId, salesDocumentId], map: "payment_allocation_live_sales_key", where: raw("unapplied_date IS NULL"))
+  @@unique([paymentId, purchaseDocumentId], map: "payment_allocation_live_purchase_key", where: raw("unapplied_date IS NULL"))
+  @@index([companyId, paymentId])
+  @@index([companyId, salesDocumentId])
+  @@index([companyId, purchaseDocumentId])
+  @@map("payment_allocation")
+}
+
+/// Application d'un avoir client à une facture (sans effet sur le grand livre : les deux sont au compte clients).
+model SalesCreditApplication {
+  id            String    @id @default(uuid(7)) @db.Uuid
+  companyId     String    @map("company_id") @db.Uuid
+  creditNoteId  String    @map("credit_note_id") @db.Uuid
+  invoiceId     String    @map("invoice_id") @db.Uuid
+  amountCents   BigInt    @map("amount_cents")
+  appliedDate   DateTime  @map("applied_date") @db.Date
+  unappliedDate DateTime? @map("unapplied_date") @db.Date
+  unappliedById String?   @map("unapplied_by_id") @db.Uuid
+  createdById   String    @map("created_by_id") @db.Uuid
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  creditNote SalesDocument @relation("CreditNoteApplied", fields: [companyId, creditNoteId], references: [companyId, id], onDelete: Restrict)
+  invoice    SalesDocument @relation("InvoiceCredited", fields: [companyId, invoiceId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([creditNoteId, invoiceId], map: "sales_credit_application_live_key", where: raw("unapplied_date IS NULL"))
+  @@index([companyId, creditNoteId])
+  @@index([companyId, invoiceId])
+  @@map("sales_credit_application")
+}
+
+model PurchaseCreditApplication {
+  id               String    @id @default(uuid(7)) @db.Uuid
+  companyId        String    @map("company_id") @db.Uuid
+  supplierCreditId String    @map("supplier_credit_id") @db.Uuid
+  billId           String    @map("bill_id") @db.Uuid
+  amountCents      BigInt    @map("amount_cents")
+  appliedDate      DateTime  @map("applied_date") @db.Date
+  unappliedDate    DateTime? @map("unapplied_date") @db.Date
+  unappliedById    String?   @map("unapplied_by_id") @db.Uuid
+  createdById      String    @map("created_by_id") @db.Uuid
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  supplierCredit PurchaseDocument @relation("SupplierCreditApplied", fields: [companyId, supplierCreditId], references: [companyId, id], onDelete: Restrict)
+  bill           PurchaseDocument @relation("BillCredited", fields: [companyId, billId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([supplierCreditId, billId], map: "purchase_credit_application_live_key", where: raw("unapplied_date IS NULL"))
+  @@index([companyId, supplierCreditId])
+  @@index([companyId, billId])
+  @@map("purchase_credit_application")
+}
+
+/// Compensation d'un encaissement et d'un décaissement du même contact et du même sous-grand livre
+/// (remboursement d'un trop-perçu ou d'un acompte), sans faux avoir.
+model PaymentOffset {
+  id                String    @id @default(uuid(7)) @db.Uuid
+  companyId         String    @map("company_id") @db.Uuid
+  receivedPaymentId String    @map("received_payment_id") @db.Uuid
+  sentPaymentId     String    @map("sent_payment_id") @db.Uuid
+  amountCents       BigInt    @map("amount_cents")
+  appliedDate       DateTime  @map("applied_date") @db.Date
+  unappliedDate     DateTime? @map("unapplied_date") @db.Date
+  unappliedById     String?   @map("unapplied_by_id") @db.Uuid
+  createdById       String    @map("created_by_id") @db.Uuid
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  receivedPayment Payment @relation("OffsetReceived", fields: [companyId, receivedPaymentId], references: [companyId, id], onDelete: Restrict)
+  sentPayment     Payment @relation("OffsetSent", fields: [companyId, sentPaymentId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([receivedPaymentId, sentPaymentId], map: "payment_offset_live_key", where: raw("unapplied_date IS NULL"))
+  @@index([companyId, sentPaymentId])
+  @@map("payment_offset")
+}
+
+// ─────────────────────── Dépôts ───────────────────────
+
+/// Dépôt bancaire regroupant des paiements reçus dans « fonds non déposés ».
+model BankDeposit {
+  id             String        @id @default(uuid(7)) @db.Uuid
+  companyId      String        @map("company_id") @db.Uuid
+  number         String?
+  /// Compte de banque ou d'encaisse qui reçoit le dépôt.
+  accountId      String        @map("account_id") @db.Uuid
+  depositDate    DateTime      @map("deposit_date") @db.Date
+  totalCents     BigInt        @map("total_cents")
+  status         PaymentStatus @default(POSTED)
+  journalEntryId String        @map("journal_entry_id") @db.Uuid
+  voidEntryId    String?       @map("void_entry_id") @db.Uuid
+  voidedAt       DateTime?     @map("voided_at") @db.Timestamptz(6)
+  voidedById     String?       @map("voided_by_id") @db.Uuid
+  createdById    String        @map("created_by_id") @db.Uuid
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  company      Company           @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  account      Account           @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict)
+  journalEntry JournalEntry      @relation("DepositPosting", fields: [companyId, journalEntryId], references: [companyId, id], onDelete: Restrict)
+  voidEntry    JournalEntry?     @relation("DepositVoid", fields: [companyId, voidEntryId], references: [companyId, id], onDelete: Restrict)
+  items        BankDepositItem[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, number])
+  @@unique([companyId, journalEntryId])
+  @@unique([companyId, voidEntryId])
+  @@index([companyId, accountId])
+  @@map("bank_deposit")
+}
+
+model BankDepositItem {
+  id        String @id @default(uuid(7)) @db.Uuid
+  companyId String @map("company_id") @db.Uuid
+  depositId String @map("deposit_id") @db.Uuid
+  paymentId String @map("payment_id") @db.Uuid
+
+  deposit BankDeposit @relation(fields: [companyId, depositId], references: [companyId, id], onDelete: Restrict)
+  payment Payment     @relation(fields: [companyId, paymentId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([depositId, paymentId])
+  @@index([companyId, paymentId])
+  @@map("bank_deposit_item")
+}
+
+// ─────────────────────── Déclarations de taxes ───────────────────────
+
+/// Déclaration d'une taxe pour une période. Une fois produite (FILED), aucune ligne de cette taxe
+/// ne peut plus être datée dans sa période (trigger).
+model TaxReturn {
+  id                String          @id @default(uuid(7)) @db.Uuid
+  companyId         String          @map("company_id") @db.Uuid
+  taxId             String          @map("tax_id") @db.Uuid
+  periodStart       DateTime        @map("period_start") @db.Date
+  periodEnd         DateTime        @map("period_end") @db.Date
+  status            TaxReturnStatus @default(DRAFT)
+  collectedCents    BigInt          @default(0) @map("collected_cents")
+  recoverableCents  BigInt          @default(0) @map("recoverable_cents")
+  adjustmentCents   BigInt          @default(0) @map("adjustment_cents")
+  netCents          BigInt          @default(0) @map("net_cents")
+  filedAt           DateTime?       @map("filed_at") @db.Timestamptz(6)
+  filedById         String?         @map("filed_by_id") @db.Uuid
+  /// Écriture de versement ou de remboursement (TAX_SETTLEMENT).
+  settlementEntryId String?         @map("settlement_entry_id") @db.Uuid
+  createdById       String          @map("created_by_id") @db.Uuid
+  createdAt         DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  company         Company       @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  tax             Tax           @relation(fields: [companyId, taxId], references: [companyId, id], onDelete: Restrict)
+  settlementEntry JournalEntry? @relation(fields: [companyId, settlementEntryId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([companyId, settlementEntryId])
+  @@index([companyId, taxId, periodStart])
+  @@map("tax_return")
+}
+
+// ─────────────────────── Banque et rapprochement ───────────────────────
+
+model BankAccountProfile {
+  id              String   @id @default(uuid(7)) @db.Uuid
+  companyId       String   @map("company_id") @db.Uuid
+  accountId       String   @map("account_id") @db.Uuid
+  institutionName String?  @map("institution_name")
+  /// 4 derniers chiffres seulement.
+  accountMask     String?  @map("account_mask")
+  /// Correspondance des colonnes CSV (date, montant, description...).
+  csvMapping      Json?    @map("csv_mapping")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  account Account @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([companyId, accountId])
+  @@map("bank_account_profile")
+}
+
+model BankImport {
+  id           String           @id @default(uuid(7)) @db.Uuid
+  companyId    String           @map("company_id") @db.Uuid
+  accountId    String           @map("account_id") @db.Uuid
+  format       BankImportFormat
+  fileName     String           @map("file_name")
+  /// Empêche l'import du même fichier deux fois sur un compte.
+  fileSha256   String           @map("file_sha256") @db.Char(64)
+  rowCount     Int              @map("row_count")
+  importedById String           @map("imported_by_id") @db.Uuid
+  importedAt   DateTime         @default(now()) @map("imported_at") @db.Timestamptz(6)
+
+  account         Account           @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict)
+  transactions    BankTransaction[]
+  attachmentLinks AttachmentLink[]
+
+  @@unique([companyId, id])
+  @@unique([accountId, fileSha256])
+  @@map("bank_import")
+}
+
+/// amount_cents signé du point de vue du relevé : + dépôt, − retrait.
+model BankTransaction {
+  id          String                @id @default(uuid(7)) @db.Uuid
+  companyId   String                @map("company_id") @db.Uuid
+  accountId   String                @map("account_id") @db.Uuid
+  importId    String?               @map("import_id") @db.Uuid
+  txnDate     DateTime              @map("txn_date") @db.Date
+  amountCents BigInt                @map("amount_cents")
+  description String
+  payee       String?
+  /// Identifiant OFX (FITID) lorsqu'il existe.
+  externalId  String?               @map("external_id")
+  /// Empreinte (date, montant, description normalisée, rang d'occurrence) pour les CSV.
+  dedupeKey   String                @map("dedupe_key")
+  status      BankTransactionStatus @default(UNMATCHED)
+  createdAt   DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime              @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  account Account     @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict)
+  import  BankImport? @relation(fields: [companyId, importId], references: [companyId, id], onDelete: Restrict)
+  matches BankMatch[]
+
+  @@unique([companyId, id])
+  @@unique([accountId, externalId])
+  @@unique([accountId, dedupeKey])
+  @@index([companyId, accountId, txnDate])
+  @@index([companyId, status])
+  @@map("bank_transaction")
+}
+
+/// Lie une transaction bancaire à une ou plusieurs lignes du grand livre sur le même compte.
+model BankMatch {
+  id                String   @id @default(uuid(7)) @db.Uuid
+  companyId         String   @map("company_id") @db.Uuid
+  bankTransactionId String   @map("bank_transaction_id") @db.Uuid
+  journalLineId     String   @map("journal_line_id") @db.Uuid
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  bankTransaction BankTransaction @relation(fields: [companyId, bankTransactionId], references: [companyId, id], onDelete: Restrict)
+  journalLine     JournalLine     @relation(fields: [companyId, journalLineId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([companyId, journalLineId])
+  @@index([companyId, bankTransactionId])
+  @@map("bank_match")
+}
+
+model BankReconciliation {
+  id                    String               @id @default(uuid(7)) @db.Uuid
+  companyId             String               @map("company_id") @db.Uuid
+  accountId             String               @map("account_id") @db.Uuid
+  statementDate         DateTime             @map("statement_date") @db.Date
+  statementBalanceCents BigInt               @map("statement_balance_cents")
+  status                ReconciliationStatus @default(IN_PROGRESS)
+  completedAt           DateTime?            @map("completed_at") @db.Timestamptz(6)
+  completedById         String?              @map("completed_by_id") @db.Uuid
+  createdById           String               @map("created_by_id") @db.Uuid
+  createdAt             DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  account Account          @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict)
+  lines   ReconciledLine[]
+
+  @@unique([companyId, id])
+  @@unique([accountId, statementDate])
+  /// Un seul rapprochement en cours par compte.
+  @@unique([accountId], map: "bank_reconciliation_one_in_progress", where: raw("status = 'IN_PROGRESS'"))
+  @@map("bank_reconciliation")
+}
+
+/// Ligne du grand livre pointée par un rapprochement (le journal reste immuable).
+model ReconciledLine {
+  id               String @id @default(uuid(7)) @db.Uuid
+  companyId        String @map("company_id") @db.Uuid
+  reconciliationId String @map("reconciliation_id") @db.Uuid
+  journalLineId    String @map("journal_line_id") @db.Uuid
+
+  reconciliation BankReconciliation @relation(fields: [companyId, reconciliationId], references: [companyId, id], onDelete: Restrict)
+  journalLine    JournalLine        @relation(fields: [companyId, journalLineId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([companyId, journalLineId])
+  @@index([companyId, reconciliationId])
+  @@map("reconciled_line")
+}
+
+// ─────────────────────── Pièces jointes ───────────────────────
+
+/// Fichier dans /app/storage derrière une interface de stockage abstraite. storage_key = <company_id>/<aaaa>/<mm>/<uuid> (jamais le nom fourni).
+model Attachment {
+  id           String    @id @default(uuid(7)) @db.Uuid
+  companyId    String    @map("company_id") @db.Uuid
+  storageKey   String    @unique @map("storage_key")
+  fileName     String    @map("file_name")
+  mimeType     String    @map("mime_type")
+  sizeBytes    Int       @map("size_bytes")
+  sha256       String    @db.Char(64)
+  uploadedById String    @map("uploaded_by_id") @db.Uuid
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  company Company          @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  links   AttachmentLink[]
+
+  @@unique([companyId, id])
+  @@index([companyId, sha256])
+  @@map("attachment")
+}
+
+/// Rattache une pièce jointe à exactement une cible (CHECK num_nonnulls = 1).
+model AttachmentLink {
+  id                 String   @id @default(uuid(7)) @db.Uuid
+  companyId          String   @map("company_id") @db.Uuid
+  attachmentId       String   @map("attachment_id") @db.Uuid
+  journalEntryId     String?  @map("journal_entry_id") @db.Uuid
+  salesDocumentId    String?  @map("sales_document_id") @db.Uuid
+  purchaseDocumentId String?  @map("purchase_document_id") @db.Uuid
+  paymentId          String?  @map("payment_id") @db.Uuid
+  contactId          String?  @map("contact_id") @db.Uuid
+  bankImportId       String?  @map("bank_import_id") @db.Uuid
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  attachment       Attachment        @relation(fields: [companyId, attachmentId], references: [companyId, id], onDelete: Restrict)
+  journalEntry     JournalEntry?     @relation(fields: [companyId, journalEntryId], references: [companyId, id], onDelete: Restrict)
+  salesDocument    SalesDocument?    @relation(fields: [companyId, salesDocumentId], references: [companyId, id], onDelete: Restrict)
+  purchaseDocument PurchaseDocument? @relation(fields: [companyId, purchaseDocumentId], references: [companyId, id], onDelete: Restrict)
+  payment          Payment?          @relation(fields: [companyId, paymentId], references: [companyId, id], onDelete: Restrict)
+  contact          Contact?          @relation(fields: [companyId, contactId], references: [companyId, id], onDelete: Restrict)
+  bankImport       BankImport?       @relation(fields: [companyId, bankImportId], references: [companyId, id], onDelete: Restrict)
+
+  @@index([companyId, attachmentId])
+  @@index([companyId, journalEntryId])
+  @@index([companyId, salesDocumentId])
+  @@index([companyId, purchaseDocumentId])
+  @@index([companyId, paymentId])
+  @@index([companyId, contactId])
+  @@index([companyId, bankImportId])
+  @@map("attachment_link")
+}
+
+// ─────────────────────── Piste d'audit (ajout seulement) ───────────────────────
+
+/// Écrite par triggers (changements de lignes) et par l'application (connexion, export, fermeture...).
+/// company_id nul = événement global (ex. connexion).
+model AuditLog {
+  id            BigInt    @id @default(autoincrement())
+  companyId     String?   @map("company_id") @db.Uuid
+  occurredAt    DateTime  @default(now()) @map("occurred_at") @db.Timestamptz(6)
+  actorKind     ActorKind @map("actor_kind")
+  actorUserId   String?   @map("actor_user_id") @db.Uuid
+  /// Utilisateur concerné par un événement global (ex. échec de connexion), visible par lui.
+  subjectUserId String?   @map("subject_user_id") @db.Uuid
+  /// Ex. « row.insert », « row.update », « auth.login », « period.reopen ».
+  action        String
+  entityType    String    @map("entity_type")
+  entityId      String?   @map("entity_id")
+  /// INSERT/DELETE : ligne complète; UPDATE : colonnes modifiées seulement. Colonnes secrètes exclues.
+  before        Json?
+  after         Json?
+  requestId     String?   @map("request_id")
+
+  company     Company? @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  actorUser   User?    @relation("AuditActor", fields: [actorUserId], references: [id], onDelete: Restrict)
+  subjectUser User?    @relation("AuditSubject", fields: [subjectUserId], references: [id], onDelete: Restrict)
+
+  @@index([companyId, occurredAt])
+  @@index([companyId, entityType, entityId])
+  @@index([actorUserId, occurredAt])
+  @@index([subjectUserId, occurredAt])
+  @@map("audit_log")
+}

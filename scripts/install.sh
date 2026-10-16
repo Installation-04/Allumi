@@ -72,6 +72,14 @@ else
   env_set ENCRYPTION_KEY "$(openssl rand -base64 32 | tr -d '\n')"
 fi
 chmod 600 "$ENV_FILE"
+# Rôle PostgreSQL restreint de l'application (aussi pour les installations plus anciennes sans ces variables).
+APPPASS="$(env_get APP_DB_PASSWORD)"
+if [ -z "$APPPASS" ] || [ "$APPPASS" = "CHANGE_ME" ]; then
+  APPPASS="$(openssl rand -hex 24)"
+  env_set APP_DB_PASSWORD "$APPPASS"
+fi
+PGDB="$(env_get POSTGRES_DB)"; PGDB="${PGDB:-allumi}"
+env_set APP_DATABASE_URL "postgresql://allumi_app:${APPPASS}@db:5432/${PGDB}"
 env_set ALLUMI_DOMAIN "$DOMAIN"
 env_set ACME_EMAIL "$EMAIL"
 env_set APP_URL "https://${DOMAIN}"

@@ -8,7 +8,7 @@ cd "$ROOT"
 SUDO=""; [ "$(id -u)" -eq 0 ] || SUDO="sudo"
 as_pg() { if [ "$(id -u)" -eq 0 ]; then runuser -u postgres -- "$@"; else sudo -u postgres "$@"; fi; }
 
-DB=allumi; DBUSER=allumi; DBPASS=allumi_dev_only
+DB=allumi; DBUSER=allumi; DBPASS=allumi_dev_only; APPPASS=allumi_app_dev_only
 
 # 1. PostgreSQL
 if ! command -v pg_ctlcluster >/dev/null 2>&1; then
@@ -36,6 +36,8 @@ if [ ! -f .env ]; then
   sed -i \
     -e "s|^DATABASE_URL=.*|DATABASE_URL=postgresql://$DBUSER:$DBPASS@localhost:5432/$DB?schema=public|" \
     -e "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$DBPASS|" \
+    -e "s|^APP_DB_PASSWORD=.*|APP_DB_PASSWORD=$APPPASS|" \
+    -e "s|^APP_DATABASE_URL=.*|APP_DATABASE_URL=postgresql://allumi_app:$APPPASS@localhost:5432/$DB|" \
     -e "s|^APP_URL=.*|APP_URL=http://localhost:3000|" \
     -e "s|^NODE_ENV=.*|NODE_ENV=development|" \
     -e "s|^AUTH_SECRET=.*|AUTH_SECRET=$(openssl rand -base64 48 | tr -d '\n')|" \
@@ -44,9 +46,17 @@ if [ ! -f .env ]; then
   chmod 600 .env
 fi
 
-# 4. Dépendances (si l'app existe déjà)
+# 3b. .env de dev créé avant l'introduction du rôle applicatif : on ajoute les variables manquantes.
+if ! grep -q '^APP_DATABASE_URL=' .env; then
+  printf '\nAPP_DB_PASSWORD=%s\nAPP_DATABASE_URL=postgresql://allumi_app:%s@localhost:5432/%s\n' "$APPPASS" "$APPPASS" "$DB" >> .env
+fi
+
+# 4. Dépendances, migrations et rôle applicatif (si l'app existe déjà)
 if [ -f package.json ]; then
   npm ci || npm install
-  [ -d prisma ] && npx prisma generate && npx prisma migrate deploy || true
+  if [ -f prisma/schema.prisma ]; then
+    npx prisma generate
+    npm run db:migrate
+  fi
 fi
 echo "[cloud-setup] OK — base : postgresql://$DBUSER@localhost:5432/$DB"
