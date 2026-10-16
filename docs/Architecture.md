@@ -139,7 +139,8 @@ Le rôle `allumi_app` est créé par la migration sans droit de connexion; l'ét
 - `/setup` crée l'administrateur d'instance, propriétaire de la première entreprise, si `instance.setup_completed_at` est nul. L'opération (`app_setup_instance`) est sérialisée par un verrou sur la ligne `instance`, puis la page se désactive. Seul un administrateur d'instance crée ensuite d'autres entreprises.
 - Mots de passe hachés en argon2id. Sessions en base : on ne stocke que le SHA-256 du jeton. Cookie `__Host-` httpOnly, Secure, SameSite=Lax, avec expiration glissante et absolue.
 - TOTP (RFC 6238). Le secret est chiffré en AES-256-GCM avec `ENCRYPTION_KEY`; un code déjà accepté ne l'est jamais deux fois (`totp_last_step`); les codes de récupération sont hachés et à usage unique. Réinitialisation du mot de passe par courriel (jeton haché, à usage unique).
-- Limitation de débit dans PostgreSQL (pas de Redis), par IP et par courriel. L'IP vient de `X-Forwarded-For`, posé par Caddy seulement.
+- Limitation de débit dans PostgreSQL (pas de Redis), par IP (IPv6 : par /64) et par courriel. L'IP est l'entrée de `X-Forwarded-For` située à `TRUSTED_PROXY_HOPS` places de la droite (1 avec le Caddy fourni, qui remplace l'en-tête du client). Les clés sont des HMAC (sous-clé HKDF dérivée d'`AUTH_SECRET`); les codes de récupération suivent `ENCRYPTION_KEY`.
+- `/setup` exige `SETUP_TOKEN` s'il est défini (comparaison à temps constant), pour qu'on ne puisse pas s'emparer d'une instance neuve.
 - Server Actions : vérification d'origine de Next. Route handlers qui modifient des données : vérification de l'en-tête `Origin`.
 
 ### Rôles

@@ -1,5 +1,5 @@
 import "server-only";
-import { createCipheriv, createDecipheriv, createHash, createHmac, hkdfSync, randomBytes } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, createHmac, hkdfSync, randomBytes, timingSafeEqual } from "node:crypto";
 import { hash, verify } from "@node-rs/argon2";
 import { env } from "@/platform/env";
 
@@ -28,6 +28,12 @@ export function dummyPasswordHash(): Promise<string> {
 /** Opaque token for cookies and links: 256 random bits, base64url. */
 export function newToken(): string {
   return randomBytes(32).toString("base64url");
+}
+
+/** Constant-time comparison of two secrets of any length (their digests are compared). */
+export function secretsMatch(expected: string, given: string): boolean {
+  const digest = (value: string) => createHash("sha256").update(value, "utf8").digest();
+  return timingSafeEqual(digest(expected), digest(given));
 }
 
 export function sha256Hex(value: string): string {

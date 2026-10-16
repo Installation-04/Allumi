@@ -34,6 +34,14 @@ describe("first-run setup", () => {
     expect((await db.query("SELECT count(*)::int AS n FROM app_user")).rows[0].n).toBe(0);
   });
 
+  it("asks for the setup token when the server has one, and creates nothing without it", async () => {
+    const token = "0123456789abcdef0123456789abcdef";
+    expect(await setupInstance(input(), "198.51.100.10", token)).toEqual({ status: "invalid_token" });
+    expect(await setupInstance(input({ setupToken: "mauvais" }), "198.51.100.10", token)).toEqual({ status: "invalid_token" });
+    expect(await isSetUp()).toBe(false);
+    expect((await db.query("SELECT count(*)::int AS n FROM app_user")).rows[0].n).toBe(0);
+  });
+
   it("creates the administrator and the company once, even when two requests race", async () => {
     const [a, b] = await Promise.all([
       setupInstance(input({ email: "premier@exemple.test" }), "198.51.100.2"),

@@ -5,13 +5,17 @@ import { useTranslations } from "next-intl";
 import { Field, FormError, SubmitButton } from "@/app/_components/ui";
 import { setupAction } from "./actions";
 
-export function SetupForm({ passwordMin, defaultLocale }: { passwordMin: number; defaultLocale: "fr-CA" | "en" }) {
+export function SetupForm({ passwordMin, defaultLocale, tokenRequired }: { passwordMin: number; defaultLocale: "fr-CA" | "en"; tokenRequired: boolean }) {
   const t = useTranslations();
   const [state, action] = useActionState(setupAction, undefined);
   const v = state?.values ?? {};
   return (
     <form action={action} className="space-y-6">
       {state?.error ? <FormError message={t(`errors.form.${state.error}`, { min: passwordMin })} /> : null}
+
+      {tokenRequired ? (
+        <Field name="setupToken" label={t("setup.token")} hint={t("setup.tokenHint")} autoComplete="off" />
+      ) : null}
 
       <fieldset className="space-y-4">
         <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-stone-600 dark:text-stone-400">{t("setup.company")}</legend>

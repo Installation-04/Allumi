@@ -34,6 +34,8 @@ PostgreSQL n'est **pas** exposé hors du réseau Docker en production. Pourquoi 
 | `NODE_ENV` | `production` en prod. |
 | `LOG_LEVEL` | `silent`, `fatal`, `error`, `warn`, `info` (défaut), `debug`, `trace`. Journaux JSON sur la sortie standard; jamais de secrets ni de renseignements personnels. |
 | `DEFAULT_LOCALE` | `fr-CA` (défaut) ou `en`. |
+| `SETUP_TOKEN` | Jeton demandé **une seule fois** par la page `/setup` (16 caractères ou plus). Sans lui, la première personne qui atteint l'adresse pourrait créer l'administrateur. Généré par `install.sh` et affiché à la fin de l'installation. Vide : pas de jeton (développement). Voir [[Premier-demarrage]]. |
+| `TRUSTED_PROXY_HOPS` | Nombre de proxys inversés devant l'application, de 1 à 5 (défaut 1 : le Caddy fourni). L'adresse du client est l'entrée de `X-Forwarded-For` située à cette distance **à partir de la droite**, la seule qu'un proxy de confiance a écrite : ce que le client envoie plus à gauche est ignoré. Si tu ajoutes un CDN devant Caddy, mets 2 **et** configure `trusted_proxies` dans le `Caddyfile` ; l'application ne doit jamais être joignable sans passer par ces proxys. Les adresses IPv6 d'un même /64 partagent un seul budget d'essais. |
 
 ## Courriel (SMTP)
 `SMTP_HOST`, `SMTP_PORT` (587 par défaut), `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`. Utilise un service transactionnel avec SPF, DKIM et DMARC configurés sur ton domaine, sinon les factures risquent d'aboutir dans les pourriels.

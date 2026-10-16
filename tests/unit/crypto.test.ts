@@ -62,6 +62,14 @@ describe("crypto helpers", () => {
     expect((await load()).recoveryCodeHash("ABCD-EFGH")).not.toBe(hash);
   });
 
+  it("compares secrets of any length without throwing", async () => {
+    const { secretsMatch } = await load();
+    expect(secretsMatch("0123456789abcdef", "0123456789abcdef")).toBe(true);
+    expect(secretsMatch("0123456789abcdef", "0123456789abcdeg")).toBe(false);
+    expect(secretsMatch("0123456789abcdef", "")).toBe(false);
+    expect(secretsMatch("0123456789abcdef", "x".repeat(500))).toBe(false);
+  });
+
   it("issues unguessable opaque tokens", async () => {
     const { newToken, sha256Hex } = await load();
     const [a, b] = [newToken(), newToken()];

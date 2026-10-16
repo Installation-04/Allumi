@@ -22,6 +22,8 @@ export const setupSchema = z
     passwordConfirm: z.string(),
     locale: z.enum(["fr-CA", "en"]),
     fiscalYearStartMonth: z.coerce.number().int().min(1).max(12),
+    // Only asked for when the server sets SETUP_TOKEN.
+    setupToken: z.string().trim().max(200).optional(),
   })
   .refine((value) => value.password === value.passwordConfirm, { path: ["passwordConfirm"], message: "mismatch" });
 

@@ -17,6 +17,19 @@ describe("environment validation", () => {
     expect(env.SMTP_PORT).toBe(587);
   });
 
+  it("trusts one proxy by default, and checks the bounds", () => {
+    expect(parseEnv(GOOD).TRUSTED_PROXY_HOPS).toBe(1);
+    expect(parseEnv({ ...GOOD, TRUSTED_PROXY_HOPS: "2" }).TRUSTED_PROXY_HOPS).toBe(2);
+    for (const bad of ["0", "6", "-1", "1.5", "deux"]) expect(() => parseEnv({ ...GOOD, TRUSTED_PROXY_HOPS: bad })).toThrowError(/TRUSTED_PROXY_HOPS/);
+  });
+
+  it("makes the setup token optional but never short", () => {
+    expect(parseEnv(GOOD).SETUP_TOKEN).toBeUndefined();
+    expect(parseEnv({ ...GOOD, SETUP_TOKEN: "" }).SETUP_TOKEN).toBeUndefined();
+    expect(parseEnv({ ...GOOD, SETUP_TOKEN: "0123456789abcdef" }).SETUP_TOKEN).toBe("0123456789abcdef");
+    expect(() => parseEnv({ ...GOOD, SETUP_TOKEN: "court" })).toThrowError(/SETUP_TOKEN/);
+  });
+
   it("lists every invalid variable in one readable message", () => {
     expect(() => parseEnv({ ...GOOD, APP_URL: undefined, AUTH_SECRET: "short", ENCRYPTION_KEY: "AAAA" })).toThrowError(
       /APP_URL[\s\S]*AUTH_SECRET[\s\S]*ENCRYPTION_KEY|AUTH_SECRET[\s\S]*ENCRYPTION_KEY[\s\S]*APP_URL|ENCRYPTION_KEY/,

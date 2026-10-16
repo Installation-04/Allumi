@@ -21,6 +21,8 @@ export async function setupAction(_previous: FormState, formData: FormData): Pro
   switch (result.status) {
     case "rate_limited":
       return { error: "rateLimited", values };
+    case "invalid_token":
+      return { error: "setupToken", values };
     case "already_set_up":
       return { error: "alreadySetUp", values };
     case "weak_password":

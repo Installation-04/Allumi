@@ -8,6 +8,7 @@ export type FormErrorKey =
   | "tooLong"
   | "sameAsEmail"
   | "alreadySetUp"
+  | "setupToken"
   | "generic";
 
 /** Result of a server action used with useActionState. */

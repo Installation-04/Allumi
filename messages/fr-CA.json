@@ -23,6 +23,8 @@
   "setup": {
     "title": "Bienvenue dans Allumi",
     "intro": "Crée l'entreprise et le compte administrateur. Cette page se désactive ensuite.",
+    "token": "Jeton d'installation",
+    "tokenHint": "Il se trouve dans le fichier .env du serveur (SETUP_TOKEN) et dans le message de fin de l'installation.",
     "company": "Entreprise",
     "companyName": "Nom de l'entreprise",
     "fiscalYearStart": "Premier mois de l'exercice financier",
@@ -89,6 +91,7 @@
       "invalid": "Vérifie les champs du formulaire.",
       "credentials": "Courriel ou mot de passe incorrect, ou compte temporairement verrouillé.",
       "rateLimited": "Trop de tentatives. Réessaie dans quelques minutes.",
+      "setupToken": "Jeton d'installation incorrect.",
       "code": "Code invalide ou déjà utilisé.",
       "mismatch": "Les mots de passe ne correspondent pas.",
       "tooShort": "Le mot de passe est trop court (au moins {min} caractères).",

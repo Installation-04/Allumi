@@ -2,7 +2,8 @@ import "server-only";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
-import { resolveSession, type SessionInfo } from "@/modules/auth";
+import { clientIpFromForwardedFor, resolveSession, type SessionInfo } from "@/modules/auth";
+import { env } from "@/platform/env";
 import { isSecureDeployment, sessionCookieName } from "./cookie-name";
 
 export async function readSessionToken(): Promise<string | undefined> {
@@ -38,10 +39,12 @@ export async function clearSessionCookie(): Promise<void> {
   (await cookies()).set(sessionCookieName(), "", { httpOnly: true, secure: isSecureDeployment(), sameSite: "lax", path: "/", maxAge: 0 });
 }
 
-/** Caddy sets X-Forwarded-For and replaces any value sent by the client. */
+/**
+ * The bundled Caddy replaces any X-Forwarded-For sent by the client with the address it saw. Behind
+ * further proxies, TRUSTED_PROXY_HOPS says how many entries to skip from the right.
+ */
 export async function clientIp(): Promise<string> {
-  const forwarded = (await headers()).get("x-forwarded-for");
-  return forwarded?.split(",")[0]?.trim() || "unknown";
+  return clientIpFromForwardedFor((await headers()).get("x-forwarded-for"), env().TRUSTED_PROXY_HOPS);
 }
 
 export async function userAgent(): Promise<string | null> {
