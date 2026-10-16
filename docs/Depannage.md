@@ -27,6 +27,16 @@ docker compose logs migrate        # migrations
 - « Trop de tentatives » : attends 15 minutes (limitation de débit et verrouillage du compte).
 - Code de la 2FA refusé : vérifie l'heure de ton téléphone (synchronisation automatique) et n'utilise pas deux fois le même code. Sinon, un code de récupération fonctionne une fois.
 - Perte du mot de passe et des codes de récupération : voir [[Authentification]].
+- Compte verrouillé (10 échecs de suite) : le verrou tombe seul après 15 minutes. Pour le lever tout de suite, en tant que propriétaire de la base :
+  ```bash
+  docker compose exec db psql -U allumi allumi -c "UPDATE user_credential SET failed_login_count = 0, locked_until = NULL WHERE user_id = (SELECT id FROM app_user WHERE email = 'toi@exemple.com');"
+  ```
+
+## Déconnecter tout le monde
+Les sessions sont des lignes de la base (`AUTH_SECRET` n'y change rien). Après un incident :
+```bash
+docker compose exec db psql -U allumi allumi -c "DELETE FROM session;"
+```
 
 ## `migrate` échoue
 Lis `docker compose logs migrate`. N'efface jamais une base de production pour « régler » une migration : restaure plutôt la dernière sauvegarde ([[Sauvegardes]]) et ouvre une issue.

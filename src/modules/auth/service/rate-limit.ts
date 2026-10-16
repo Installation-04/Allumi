@@ -1,6 +1,6 @@
 import "server-only";
 import { withAnonymous } from "@/platform/tenant";
-import { hmacHex } from "./crypto";
+import { rateLimitKey } from "./crypto";
 
 export type RateLimit = { max: number; windowSeconds: number };
 
@@ -11,7 +11,7 @@ const PURGE_PROBABILITY = 0.01;
  * addresses are never stored. Runs in its own transaction so a failed attempt still counts.
  */
 export async function hit(scope: string, subject: string, limit: RateLimit): Promise<{ allowed: boolean; count: number }> {
-  const key = `${scope}:${hmacHex(subject)}`;
+  const key = `${scope}:${rateLimitKey(subject)}`;
   const rows = await withAnonymous((tx) =>
     tx.$queryRaw<{ count: number }[]>`
       INSERT INTO rate_limit (key, window_start, count) VALUES (${key}, now(), 1)

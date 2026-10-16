@@ -4,7 +4,7 @@ import { withUser } from "@/platform/tenant";
 import { generateRecoveryCodes, normalizeRecoveryCode } from "../domain/recovery-codes";
 import { RATE_LIMITS } from "../domain/policy";
 import { newTotpSecret, totpUri, verifyTotp } from "../domain/totp";
-import { decrypt, encrypt, hmacHex, verifyPassword } from "./crypto";
+import { decrypt, encrypt, recoveryCodeHash, verifyPassword } from "./crypto";
 import { hit } from "./rate-limit";
 import { randomBytes } from "node:crypto";
 
@@ -33,7 +33,7 @@ export async function verifySecondFactor(userId: string, code: string, now = new
     const recovery = normalizeRecoveryCode(code);
     if (recovery) {
       const used = await tx.userRecoveryCode.updateMany({
-        where: { userId, codeHash: hmacHex(recovery), usedAt: null },
+        where: { userId, codeHash: recoveryCodeHash(recovery), usedAt: null },
         data: { usedAt: now },
       });
       if (used.count === 1) {
@@ -81,7 +81,7 @@ export async function confirmTotpEnrollment(userId: string, code: string, now = 
     if (step === null) return false;
     await tx.userCredential.update({ where: { userId }, data: { totpEnabledAt: now, totpLastStep: BigInt(step) } });
     await tx.userRecoveryCode.deleteMany({ where: { userId } });
-    await tx.userRecoveryCode.createMany({ data: codes.map((value) => ({ userId, codeHash: hmacHex(value) })) });
+    await tx.userRecoveryCode.createMany({ data: codes.map((value) => ({ userId, codeHash: recoveryCodeHash(value) })) });
     await recordEvent(tx, { action: "auth.totp_enabled", entityType: "app_user", entityId: userId, global: true });
     return true;
   });

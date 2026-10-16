@@ -1,5 +1,5 @@
 import "server-only";
-import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, createHmac, hkdfSync, randomBytes } from "node:crypto";
 import { hash, verify } from "@node-rs/argon2";
 import { env } from "@/platform/env";
 
@@ -34,9 +34,26 @@ export function sha256Hex(value: string): string {
   return createHash("sha256").update(value, "utf8").digest("hex");
 }
 
-/** Keyed hash for values that must not be stored in clear (rate-limit keys: IPs, emails). */
-export function hmacHex(value: string): string {
-  return createHmac("sha256", env().AUTH_SECRET).update(value, "utf8").digest("hex");
+/** HMAC-SHA-256 under a subkey derived (HKDF) for one purpose, so a secret never plays two roles. */
+function keyedHash(secret: Buffer, purpose: string, value: string): string {
+  const subkey = Buffer.from(hkdfSync("sha256", secret, "allumi", purpose, 32));
+  return createHmac("sha256", subkey).update(value, "utf8").digest("hex");
+}
+
+/**
+ * Rate-limit keys: IP addresses and e-mails are never stored in clear. Keyed with AUTH_SECRET, which
+ * can be rotated at any time (the counters simply start over).
+ */
+export function rateLimitKey(value: string): string {
+  return keyedHash(Buffer.from(env().AUTH_SECRET, "utf8"), "rate-limit", value);
+}
+
+/**
+ * Recovery codes are stored hashed. They follow the life of ENCRYPTION_KEY, like the TOTP secrets
+ * they stand in for, so rotating AUTH_SECRET never invalidates them.
+ */
+export function recoveryCodeHash(code: string): string {
+  return keyedHash(encryptionKey(), "recovery-code", code);
 }
 
 // AES-256-GCM with ENCRYPTION_KEY. Layout: version (1) | iv (12) | tag (16) | ciphertext.

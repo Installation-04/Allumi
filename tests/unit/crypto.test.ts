@@ -45,11 +45,21 @@ describe("crypto helpers", () => {
   });
 
   it("derives different rate-limit keys for different secrets", async () => {
-    const first = (await load()).hmacHex("203.0.113.7");
+    const first = (await load()).rateLimitKey("203.0.113.7");
     vi.stubEnv("AUTH_SECRET", "b".repeat(48));
-    const second = (await load()).hmacHex("203.0.113.7");
+    const second = (await load()).rateLimitKey("203.0.113.7");
     expect(first).not.toBe(second);
     expect(first).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it("keeps recovery-code hashes independent of AUTH_SECRET, and separate from rate-limit keys", async () => {
+    const first = await load();
+    const hash = first.recoveryCodeHash("ABCD-EFGH");
+    expect(hash).not.toBe(first.rateLimitKey("ABCD-EFGH"));
+    vi.stubEnv("AUTH_SECRET", "b".repeat(48));
+    expect((await load()).recoveryCodeHash("ABCD-EFGH")).toBe(hash); // rotating AUTH_SECRET keeps recovery codes valid
+    vi.stubEnv("ENCRYPTION_KEY", Buffer.alloc(32, 7).toString("base64"));
+    expect((await load()).recoveryCodeHash("ABCD-EFGH")).not.toBe(hash);
   });
 
   it("issues unguessable opaque tokens", async () => {
