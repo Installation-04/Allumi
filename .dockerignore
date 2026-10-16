@@ -8,3 +8,5 @@ docs
 scripts
 *.md
 coverage
+src/generated
+tests
