@@ -87,7 +87,7 @@
   "errors": {
     "form": {
       "invalid": "Vérifie les champs du formulaire.",
-      "credentials": "Courriel ou mot de passe incorrect.",
+      "credentials": "Courriel ou mot de passe incorrect, ou compte temporairement verrouillé.",
       "rateLimited": "Trop de tentatives. Réessaie dans quelques minutes.",
       "code": "Code invalide ou déjà utilisé.",
       "mismatch": "Les mots de passe ne correspondent pas.",

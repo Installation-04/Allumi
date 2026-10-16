@@ -99,6 +99,8 @@ export async function disableTotp(userId: string, password: string, code: string
     if (!stepFresh || !(await verifyPassword(credential.passwordHash, password))) return "invalid";
     await tx.userCredential.update({ where: { userId }, data: { totpSecretEnc: null, totpEnabledAt: null, totpLastStep: null } });
     await tx.userRecoveryCode.deleteMany({ where: { userId } });
+    // A session verified under the old factor must not skip the next one if 2FA is turned back on.
+    await tx.session.updateMany({ where: { userId }, data: { mfaVerifiedAt: null } });
     await recordEvent(tx, { action: "auth.totp_disabled", entityType: "app_user", entityId: userId, global: true });
     return "ok";
   });

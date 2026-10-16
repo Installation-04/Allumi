@@ -11,6 +11,7 @@ export type LoginResult =
   | { status: "ok"; token: string; expiresAt: Date; userId: string; mfaRequired: boolean }
   // Unknown account, wrong password and locked account look the same from the outside.
   | { status: "invalid" }
+  // Only the per-address and per-IP limiters answer this: they count unknown addresses too.
   | { status: "rate_limited" };
 
 type LoginRow = { user_id: string; password_hash: string; totp_enabled: boolean; locked_until: Date | null; disabled: boolean };
@@ -31,9 +32,11 @@ export async function attemptLogin(input: { email: string; password: string; ip:
   if (!user || user.disabled || locked || !passwordOk) {
     if (user && !user.disabled && !locked) {
       await withUser({ userId: user.user_id }, async (tx) => {
+        // A lock that has run out starts a new series of failures: otherwise the counter stays at the
+        // threshold and a single wrong password every 15 minutes would keep the account locked for good.
         const credential = await tx.userCredential.update({
           where: { userId: user.user_id },
-          data: { failedLoginCount: { increment: 1 } },
+          data: user.locked_until != null ? { failedLoginCount: 1, lockedUntil: null } : { failedLoginCount: { increment: 1 } },
         });
         const until = lockedUntil(credential.failedLoginCount, now);
         if (until) await tx.userCredential.update({ where: { userId: user.user_id }, data: { lockedUntil: until } });
@@ -49,7 +52,7 @@ export async function attemptLogin(input: { email: string; password: string; ip:
         data: { reason: !user ? "unknown" : locked ? "locked" : "password" },
       }),
     );
-    return user && locked ? { status: "rate_limited" } : { status: "invalid" };
+    return { status: "invalid" };
   }
 
   const session = await createSession(user.user_id, input.userAgent, now);

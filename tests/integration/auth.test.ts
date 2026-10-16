@@ -9,12 +9,14 @@ import {
   createSession,
   destroySession,
   disableTotp,
+  markMfaVerified,
   resolveSession,
   totpStatus,
   verifySecondFactor,
 } from "@/modules/auth";
 import { SESSION_ABSOLUTE_MS, SESSION_IDLE_MS } from "@/modules/auth/domain/policy";
 import { sha256Hex } from "@/modules/auth/service/crypto";
+import { purgeOldWindows } from "@/modules/auth/service/rate-limit";
 import { owner, PASSWORD, seedUser } from "./helpers";
 
 let db: pg.Client;
@@ -69,12 +71,29 @@ describe("sign-in", () => {
       expect(await login("verrou@exemple.test", "mauvais mot de passe")).toEqual({ status: "invalid" });
     }
     await db.query("DELETE FROM rate_limit");
-    expect(await login("verrou@exemple.test")).toEqual({ status: "rate_limited" }); // right password, still locked
+    expect(await login("verrou@exemple.test")).toEqual({ status: "invalid" }); // right password, still locked
 
     await db.query("UPDATE user_credential SET locked_until = now() - interval '1 minute' WHERE user_id = $1", [userId]);
     await db.query("DELETE FROM rate_limit");
     expect((await login("verrou@exemple.test")).status).toBe("ok");
     expect((await db.query("SELECT failed_login_count, locked_until FROM user_credential WHERE user_id = $1", [userId])).rows[0]).toEqual({ failed_login_count: 0, locked_until: null });
+  });
+
+  it("starts a new series of failures once a lock has run out", async () => {
+    const userId = await seedUser(db, { email: "serie@exemple.test" });
+    await db.query("UPDATE user_credential SET failed_login_count = 10, locked_until = now() - interval '1 minute' WHERE user_id = $1", [userId]);
+    expect(await login("serie@exemple.test", "mauvais mot de passe")).toEqual({ status: "invalid" });
+    // one wrong password after the delay must not lock the account again
+    expect((await db.query("SELECT failed_login_count, locked_until FROM user_credential WHERE user_id = $1", [userId])).rows[0]).toEqual({ failed_login_count: 1, locked_until: null });
+    expect((await login("serie@exemple.test")).status).toBe("ok");
+  });
+
+  it("answers a locked account like an unknown one", async () => {
+    const userId = await seedUser(db, { email: "bloque@exemple.test" });
+    await db.query("UPDATE user_credential SET failed_login_count = 10, locked_until = now() + interval '10 minutes' WHERE user_id = $1", [userId]);
+    const locked = await login("bloque@exemple.test", "mauvais mot de passe");
+    const unknown = await login("fantome@exemple.test", "mauvais mot de passe");
+    expect(locked).toEqual(unknown);
   });
 
   it("rate-limits attempts per e-mail address, even with the right password", async () => {
@@ -87,6 +106,12 @@ describe("sign-in", () => {
     let last = "";
     for (let attempt = 0; attempt < 32; attempt++) last = (await login(`personne${attempt}@exemple.test`, "x", "203.0.113.200")).status;
     expect(last).toBe("rate_limited");
+  });
+
+  it("forgets rate-limit windows that ended long ago", async () => {
+    await db.query("INSERT INTO rate_limit (key, window_start, count) VALUES ('login:ip:old', now() - interval '2 days', 5), ('login:ip:recent', now(), 1)");
+    await purgeOldWindows();
+    expect((await db.query("SELECT key FROM rate_limit ORDER BY key")).rows.map((row) => row.key)).toEqual(["login:ip:recent"]);
   });
 
   it("keys the rate limits with a keyed hash: no address is stored in clear", async () => {
@@ -218,5 +243,14 @@ describe("two-factor authentication", () => {
     expect(await totpStatus(userId)).toEqual({ enabled: false, pending: false, recoveryCodesLeft: 0 });
     const row = (await db.query("SELECT totp_secret_enc FROM user_credential WHERE user_id = $1", [userId])).rows[0];
     expect(row.totp_secret_enc).toBeNull();
+  });
+
+  it("forgets the second-factor proof of every session when it is turned off", async () => {
+    const { userId, secret, enrolledAt } = await enrolledUser("epoque@exemple.test");
+    const session = await createSession(userId, "vitest");
+    await markMfaVerified(userId, session.token);
+    const later = enrolledAt + 30_000;
+    expect(await disableTotp(userId, PASSWORD, totpCode(secret, later), new Date(later))).toBe("ok");
+    expect((await db.query("SELECT mfa_verified_at FROM session WHERE user_id = $1", [userId])).rows[0].mfa_verified_at).toBeNull();
   });
 });

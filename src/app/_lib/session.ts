@@ -30,8 +30,12 @@ export async function setSessionCookie(token: string, expiresAt: Date): Promise<
   });
 }
 
+/**
+ * Browsers ignore a `__Host-` cookie that lacks `Secure`, deletions included, so expire it with the
+ * same attributes it was set with (`cookies().delete()` would omit `Secure`).
+ */
 export async function clearSessionCookie(): Promise<void> {
-  (await cookies()).delete(sessionCookieName());
+  (await cookies()).set(sessionCookieName(), "", { httpOnly: true, secure: isSecureDeployment(), sameSite: "lax", path: "/", maxAge: 0 });
 }
 
 /** Caddy sets X-Forwarded-For and replaces any value sent by the client. */

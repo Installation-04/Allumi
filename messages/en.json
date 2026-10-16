@@ -87,7 +87,7 @@
   "errors": {
     "form": {
       "invalid": "Check the form fields.",
-      "credentials": "Wrong e-mail or password.",
+      "credentials": "Wrong e-mail or password, or account temporarily locked.",
       "rateLimited": "Too many attempts. Try again in a few minutes.",
       "code": "Invalid or already used code.",
       "mismatch": "The passwords do not match.",

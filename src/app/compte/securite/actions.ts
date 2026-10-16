@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { beginTotpEnrollment, codeSchema, confirmTotpEnrollment, disableTotp, getProfile } from "@/modules/auth";
 import { readSessionToken, requireSession } from "@/app/_lib/session";
-import { markMfaVerified } from "@/modules/auth";
+import { destroyOtherSessions, markMfaVerified } from "@/modules/auth";
 import type { FormState } from "@/app/_lib/form-state";
 
 export async function beginEnrollmentAction(): Promise<void> {
@@ -22,7 +22,10 @@ export async function confirmEnrollmentAction(_previous: FormState, formData: Fo
   const recoveryCodes = await confirmTotpEnrollment(session.userId, parsed.data.code);
   if (!recoveryCodes) return { error: "code" };
   // This session just proved the second factor.
-  if (token) await markMfaVerified(session.userId, token);
+  if (token) {
+    await markMfaVerified(session.userId, token);
+    await destroyOtherSessions(session.userId, token);
+  }
   // No revalidation here: re-rendering would switch the page to the "enabled" view and unmount the
   // form that shows the recovery codes, which are displayed only this once.
   return { recoveryCodes };
@@ -30,6 +33,7 @@ export async function confirmEnrollmentAction(_previous: FormState, formData: Fo
 
 export async function disableTotpAction(_previous: FormState, formData: FormData): Promise<FormState> {
   const session = await requireSession();
+  const token = await readSessionToken();
   const parsed = codeSchema.safeParse({ code: formData.get("code") });
   const password = String(formData.get("password") ?? "");
   if (!parsed.success || !password) return { error: "invalid" };
@@ -37,6 +41,7 @@ export async function disableTotpAction(_previous: FormState, formData: FormData
   const result = await disableTotp(session.userId, password, parsed.data.code);
   if (result === "rate_limited") return { error: "rateLimited" };
   if (result === "invalid") return { error: "code" };
+  if (token) await destroyOtherSessions(session.userId, token);
   revalidatePath("/compte/securite");
   return undefined;
 }

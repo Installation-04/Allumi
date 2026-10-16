@@ -2,16 +2,17 @@
 
 ## Connexion
 - Courriel et mot de passe. Les mots de passe sont hachés avec **argon2id** (paramètres recommandés par l'OWASP) et ne sont jamais journalisés.
-- Une adresse inconnue, un mauvais mot de passe et un compte verrouillé donnent la **même réponse** (« Courriel ou mot de passe incorrect »), et prennent le même temps : on ne peut pas deviner quels comptes existent.
+- Une adresse inconnue, un mauvais mot de passe et un compte verrouillé donnent la **même réponse** (« Courriel ou mot de passe incorrect, ou compte temporairement verrouillé »), et prennent le même temps : on ne peut pas deviner quels comptes existent.
 - **Limitation de débit** (dans PostgreSQL, sans service externe) : 8 essais par courriel et 30 par adresse IP en 15 minutes. Les clés sont des empreintes chiffrées : ni les adresses IP ni les courriels ne sont conservés.
-- **Verrouillage** du compte pendant 15 minutes après 10 échecs de suite.
+- **Verrouillage** du compte pendant 15 minutes après 10 échecs de suite. Quand le verrou expire, le compteur repart à zéro. Compromis assumé : quelqu'un qui connaît ton courriel peut te faire attendre quelques minutes, mais personne ne peut deviner ton mot de passe en continu, d'où qu'il vienne.
 - Chaque échec est inscrit à la piste d'audit et visible par la personne visée.
 
 ## Sessions
 - Cookie `httpOnly`, `SameSite=Lax`, et `Secure` en HTTPS. En production (HTTPS), il porte le préfixe `__Host-` : il n'est valable que pour ton domaine exact.
 - La base ne conserve que l'**empreinte SHA-256** du jeton : une fuite de la base ne permet pas de voler des sessions.
 - Fermeture après **8 heures d'inactivité** ou **14 jours** au total.
-- « Se déconnecter » supprime la session côté serveur.
+- « Se déconnecter » supprime la session côté serveur et efface le cookie.
+- Activer ou désactiver la 2FA **déconnecte tous les autres appareils**, et une session vérifiée avant la désactivation ne saute pas la deuxième étape si tu réactives la 2FA.
 
 ## Vérification en deux étapes (TOTP)
 Compatible avec toute application d'authentification (Aegis, Google Authenticator, 1Password, etc.).

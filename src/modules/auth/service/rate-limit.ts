@@ -4,6 +4,8 @@ import { hmacHex } from "./crypto";
 
 export type RateLimit = { max: number; windowSeconds: number };
 
+const PURGE_PROBABILITY = 0.01;
+
 /**
  * Fixed-window counter in PostgreSQL (no Redis). The key is a keyed hash: IPs and e-mail
  * addresses are never stored. Runs in its own transaction so a failed attempt still counts.
@@ -21,6 +23,8 @@ export async function hit(scope: string, subject: string, limit: RateLimit): Pro
       RETURNING count`,
   );
   const count = rows[0]?.count ?? 1;
+  // Housekeeping without a scheduler: about one request in a hundred forgets the old windows.
+  if (Math.random() < PURGE_PROBABILITY) void purgeOldWindows().catch(() => undefined);
   return { allowed: count <= limit.max, count };
 }
 
