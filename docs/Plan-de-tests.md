@@ -52,12 +52,14 @@ Générateurs : montants (1 ¢ à 10⁹ ¢, avec les bornes), écritures équili
 | P13 | Numérotation : N validations concurrentes reçoivent exactement les numéros 1…N | BD |
 | P14 | Pour toute date, un seul taux de taxe s'applique, celui dont la plage contient la date | domaine + BD |
 | P15 | Affectations : pour toute suite d'affectations et de retraits, Σ affectations ≤ montant du paiement et solde ouvert ≥ 0, y compris en concurrence | BD |
+| P16 | Taxes recalculées : pour toute facture valide, la base de données refuse tout écart avec le calcul du domaine (rate × base, arrondi par ligne ou par document) | domaine + BD |
+| P17 | Déclarations : Σ des lignes étiquetées d'une taxe sur une période = montants de la déclaration; aucune ligne ne s'ajoute à une période produite | BD |
 
 ### Test à états (fast-check `commands`)
-Un **modèle en mémoire** (soldes par compte et par contact, statuts des périodes et des documents) est comparé au **service réel sur la vraie base**. Commandes aléatoires : écriture manuelle, contre-passation, facture, avoir, paiement, affectation, annulation, verrouillage, réouverture, rapprochement. Après chaque commande : mêmes soldes, mêmes refus (avec le même code `ALxxx`), et P1, P8 et P10 vérifiées.
+Un **modèle en mémoire** (soldes par compte et par contact, statuts des périodes et des documents) est comparé au **service réel sur la vraie base**. Commandes aléatoires : écriture manuelle, contre-passation, facture, avoir, paiement, dépôt, affectation, retrait d'affectation, annulation, verrouillage, réouverture, rapprochement. Après chaque commande : mêmes soldes, mêmes refus (avec le même code `ALxxx`), et P1, P8 et P10 vérifiées.
 
 ## Tests d'intégration de la base
-La phase 1 a validé le schéma avec 46 cas SQL (tous réussis), à porter en Vitest en phase 3 :
+La phase 1 a validé le schéma avec 58 cas SQL exécutés **connecté en `allumi_app`** (comme l'application) et 4 cas propriétaire, tous réussis. Ils sont à porter en Vitest en phase 3 :
 - partie double (déséquilibre, une ligne, aucune ligne, débit et crédit sur la même ligne);
 - immuabilité : `UPDATE`/`DELETE` refusés au rôle applicatif (privilèges) **et** au propriétaire (triggers), `TRUNCATE` refusé, lignes ajoutées après coup refusées;
 - périodes : verrouillée, date hors période, exercice fermé avec périodes ouvertes, chevauchements (`EXCLUDE`);
@@ -65,15 +67,26 @@ La phase 1 a validé le schéma avec 46 cas SQL (tous réussis), à porter en Vi
 - comptes de contrôle : écriture manuelle refusée, contact obligatoire;
 - documents : montant de ligne = arrondi(quantité × prix), document validé figé (entête, lignes, taxes), suppression d'un brouillon en cascade;
 - paiements : affectation au-delà du solde ou du paiement refusée, annulation avec affectations refusée;
-- isolation : lecture et écriture inter-entreprises refusées, aucune ligne sans contexte, sélecteur d'entreprise limité aux adhésions;
+- isolation : lecture et écriture inter-entreprises refusées, **IDOR** (un non-membre qui désigne une autre entreprise ne voit ni n'écrit rien), aucune ligne sans contexte, sélecteur d'entreprise limité aux adhésions, identités et secrets des autres utilisateurs invisibles;
+- rôles : un membre en lecture seule lit mais n'écrit pas et ne voit pas l'audit; un comptable écrit mais ne gère pas les membres; l'application ne peut pas se donner le rôle d'administrateur d'instance;
+- estampille de transaction : une ligne ne s'ajoute pas à une écriture d'une transaction antérieure, même avec une variable de session falsifiée;
+- imputation : écriture de facture qui débite un autre client, écriture de paiement qui crédite un compte de produits, document sans écriture : tous refusés; taxes d'une facture recalculées (mauvais taux refusé); compte de contrôle refusé comme compte de ligne;
+- dépôts : un paiement déposé une seule fois, annulation d'un paiement déposé refusée;
+- affectations : jamais supprimées (privilège), retrait daté dans une période ouverte seulement, solde « au jour J » reproductible;
+- audit : l'application ne peut pas y écrire, le caviardage Loi 25 retire les renseignements personnels (propriétaire seulement) et se journalise;
+- accès avant contexte : invitation lue par son jeton, recherche de connexion, `/setup` refusé après le premier passage;
 - audit : chaque changement journalisé avec l'acteur, sans secret, en ajout seulement;
 - dernier propriétaire protégé; type d'un compte utilisé figé.
 
 **Test de catalogue** : toute table avec `company_id` a RLS `ENABLE` + `FORCE` et une politique; chaque table d'affaires a son trigger d'audit; `allumi_app` n'a ni `UPDATE`/`DELETE` sur le journal et l'audit, ni `TRUNCATE` nulle part. Ce test attrape une migration future qui oublierait une table.
 
-**Concurrence** (deux connexions) : verrouiller une période pendant qu'une écriture y est en cours (le verrou attend le `COMMIT`, l'écriture suivante est refusée : vérifié en phase 1); deux affectations simultanées sur la même facture; deux validations simultanées (numérotation).
+**Concurrence** (deux connexions), vérifiée en phase 1 : verrouiller une période pendant qu'une écriture y est en cours (le verrou attend le `COMMIT`, l'écriture suivante est refusée); deux affectations simultanées sur la même facture (la seconde est refusée); deux rétrogradations simultanées de propriétaires (la seconde est refusée); suppression d'une ligne de brouillon pendant la validation du document (la validation échoue et le brouillon reste intact). À ajouter : deux validations simultanées (numérotation).
 
 **Dérive Prisma** : `prisma migrate diff --from-migrations … --to-schema … --exit-code` en CI.
+
+**Restauration** : un `pg_dump` restauré sur une grappe neuve (avec création préalable des rôles) retrouve `allumi_app` et ses privilèges; l'application démarre et `/api/health` répond.
+
+**Performance** : une écriture de 2 lignes insérée 8 000 fois dans une transaction se valide en moins de 5 s (index commençant par `company_id`).
 
 ## Non-régression des rapports
 Un scénario fictif figé (une année d'activité d'« Atelier Exemple inc. ») produit la balance de vérification, le bilan, l'état des résultats, le grand livre, l'âge des comptes et le sommaire des taxes. Les sorties CSV sont comparées à des fichiers de référence versionnés. Tout changement de rapport doit être voulu et visible dans le diff.
