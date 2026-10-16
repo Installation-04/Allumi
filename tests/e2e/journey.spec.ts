@@ -44,7 +44,9 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await page.getByRole("button", { name: "Activer la 2FA" }).click();
   const manualKey = await page.locator("code").first().innerText();
   const totp = new TOTP({ secret: Secret.fromBase32(manualKey), digits: 6, period: 30 });
-  await page.getByLabel("Code à 6 chiffres").fill(totp.generate());
+  // Fixed instant: the replay check below must not depend on which 30-second window the test runs in.
+  const enrolledAt = Date.now();
+  await page.getByLabel("Code à 6 chiffres").fill(totp.generate({ timestamp: enrolledAt }));
   await page.getByRole("button", { name: "Confirmer et activer" }).click();
   await expect(page.getByRole("heading", { name: "Codes de récupération" })).toBeVisible();
   const recoveryCodes = await page.locator("li").allInnerTexts();
@@ -66,11 +68,12 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await page.goto("/compte/securite");
   await expect(page).toHaveURL(/\/connexion\/2fa$/);
 
-  // The code that enabled 2FA cannot be replayed; a recovery code works once.
-  await page.getByLabel("Code à 6 chiffres").fill(totp.generate({ timestamp: Date.now() }));
+  // The code that enabled 2FA cannot be replayed (rejected whether or not its window is still open)...
+  await page.getByLabel("Code à 6 chiffres").fill(totp.generate({ timestamp: enrolledAt }));
   await page.getByRole("button", { name: "Vérifier" }).click();
   await expect(page.getByText("Code invalide ou déjà utilisé.")).toBeVisible();
 
+  // ...while a recovery code works.
   await page.getByLabel("Code à 6 chiffres").fill(recoveryCodes[0] ?? "");
   await page.getByRole("button", { name: "Vérifier" }).click();
   await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);

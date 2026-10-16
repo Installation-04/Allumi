@@ -21,12 +21,12 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    // Needs `npm run build` first. Same artifact as the Docker image: the standalone server, with its
-    // static assets copied next to it (this is what the Dockerfile does), so a missing traced file shows up here.
+    // Needs `npm run build` first. Same artifact as the Docker image: the standalone server, with its static
+    // assets copied next to it, run from a directory OUTSIDE the repository so that a traced dependency missing
+    // from the standalone bundle cannot be found in the project's own node_modules (as in the image).
     command:
-      "rm -rf .next/standalone/.next/static .next/standalone/public && " +
-      "cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public && " +
-      "node .next/standalone/server.js",
+      "D=${TMPDIR:-/tmp}/allumi-e2e-standalone && rm -rf $D && mkdir -p $D && cp -r .next/standalone/. $D/ && " +
+      "cp -r .next/static $D/.next/static && cp -r public $D/public && cd $D && node server.js",
     url: `http://127.0.0.1:${PORT}/api/health`,
     reuseExistingServer: false,
     timeout: 60_000,

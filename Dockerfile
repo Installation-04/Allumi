@@ -22,6 +22,7 @@ RUN npx prisma generate && npm run build
 # ---------- migrate (utilisé par le service "migrate") ----------
 # Applique les migrations puis (re)configure le rôle restreint de l'application (prisma/app-role.mjs).
 FROM deps AS migrate
+ENV CHECKPOINT_DISABLE=1 PRISMA_HIDE_UPDATE_MESSAGE=1
 WORKDIR /app
 COPY prisma ./prisma
 COPY prisma.config.ts ./
