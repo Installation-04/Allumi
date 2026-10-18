@@ -14,7 +14,16 @@ export type Action =
   | "fiscalYear.create"
   | "fiscalYear.close"
   | "fiscalYear.reopen"
-  | "audit.read";
+  | "audit.read"
+  | "contact.read"
+  | "contact.manage"
+  | "contact.anonymize"
+  | "item.read"
+  | "item.manage"
+  | "tax.read"
+  | "tax.manage"
+  | "company.read"
+  | "company.manage";
 
 const ALLOWED: Record<Action, readonly Role[]> = {
   "ledger.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
@@ -28,6 +37,17 @@ const ALLOWED: Record<Action, readonly Role[]> = {
   "period.reopen": ["OWNER"],
   "fiscalYear.reopen": ["OWNER"],
   "audit.read": ["OWNER", "ACCOUNTANT"],
+  "contact.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
+  "contact.manage": ["OWNER", "ACCOUNTANT"],
+  // Anonymizing a contact (Law 25) erases personal data for good: owner only.
+  "contact.anonymize": ["OWNER"],
+  "item.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
+  "item.manage": ["OWNER", "ACCOUNTANT"],
+  "tax.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
+  "tax.manage": ["OWNER", "ACCOUNTANT"],
+  "company.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
+  // The company's identity, tax numbers and rounding rule: owner only (the database says so too).
+  "company.manage": ["OWNER"],
 };
 
 export function can(role: Role, action: Action): boolean {

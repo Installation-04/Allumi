@@ -39,6 +39,13 @@ export const SUBTYPES_OF: Record<AccountType, readonly AccountSubtype[]> = {
 
 export const ACCOUNT_CODE = /^[0-9A-Za-z][0-9A-Za-z.-]{0,19}$/;
 
+/** The first code from `wanted` upwards that is not in `taken` (1100 -> 1101 when 1100 is used; "X" -> "X-1" for a non-numeric code). */
+export function nextFreeCode(taken: ReadonlySet<string>, wanted: string): string {
+  let code = wanted;
+  for (let attempt = 0; taken.has(code); attempt++) code = /^[0-9]+$/.test(wanted) ? String(Number(wanted) + attempt + 1) : `${wanted}-${attempt + 1}`;
+  return code;
+}
+
 /**
  * Subtypes an ordinary user cannot create: receivables and payables are control accounts (one per company,
  * created by the system), and sales-tax accounts come with the taxes (phase 4).

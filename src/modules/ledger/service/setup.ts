@@ -1,5 +1,6 @@
 import "server-only";
 import { requireRole } from "@/modules/companies";
+import { nextFreeCode } from "../domain/accounts";
 import { CANADIAN_CHART } from "../domain/chart";
 import { fiscalYearContaining, monthlyPeriods } from "../domain/periods";
 import { toDbDate, todayIso } from "./dates";
@@ -32,13 +33,6 @@ export async function ledgerStatus(actor: Actor): Promise<LedgerStatus> {
   });
 }
 
-/** The first code from `wanted` upwards that no account of the company uses (the template's code may be taken). */
-function freeCode(taken: ReadonlySet<string>, wanted: string): string {
-  let code = wanted;
-  for (let attempt = 0; taken.has(code); attempt++) code = /^[0-9]+$/.test(wanted) ? String(Number(wanted) + attempt + 1) : `${wanted}-${attempt + 1}`;
-  return code;
-}
-
 /**
  * Gives a new company what the engine needs: numbering sequences, the starter chart of accounts and the
  * fiscal year of today with its monthly periods. Safe to run again, and by two requests at once: it only adds
@@ -59,7 +53,7 @@ export async function initializeLedger(actor: Actor, now: Date = new Date()): Pr
     const wanted = existing.length === 0 ? CANADIAN_CHART : CANADIAN_CHART.filter((account) => account.systemKey && !existing.some((row) => row.systemKey === account.systemKey));
     const taken = new Set(existing.map((row) => row.code));
     for (const account of wanted) {
-      const code = freeCode(taken, account.code);
+      const code = nextFreeCode(taken, account.code);
       taken.add(code);
       await tx.account.create({
         data: { companyId, code, nameFr: account.nameFr, nameEn: account.nameEn, type: account.type, subtype: account.subtype, systemKey: account.systemKey ?? null },
