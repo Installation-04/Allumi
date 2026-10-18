@@ -34,8 +34,7 @@ describe("crypto helpers", () => {
         const tampered = Uint8Array.from(payload);
         tampered[tampered.length - 1] = (tampered[tampered.length - 1] ?? 0) ^ 1;
         expect(() => decrypt(tampered)).toThrow();
-      }),
-      { numRuns: 100 },
+      })
     );
   });
 

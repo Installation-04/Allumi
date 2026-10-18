@@ -34,8 +34,7 @@ describe("recovery codes", () => {
           return slice.length === size ? slice : randomBytes(size);
         });
         for (const code of codes) expect(normalizeRecoveryCode(code)).toBe(code);
-      }),
-      { numRuns: 100 },
+      })
     );
   });
 });

@@ -31,16 +31,21 @@ describe("environment validation", () => {
   });
 
   it("lists every invalid variable in one readable message", () => {
-    expect(() => parseEnv({ ...GOOD, APP_URL: undefined, AUTH_SECRET: "short", ENCRYPTION_KEY: "AAAA" })).toThrowError(
-      /APP_URL[\s\S]*AUTH_SECRET[\s\S]*ENCRYPTION_KEY|AUTH_SECRET[\s\S]*ENCRYPTION_KEY[\s\S]*APP_URL|ENCRYPTION_KEY/,
-    );
-    try {
-      parseEnv({});
-    } catch (error) {
-      const message = (error as Error).message;
-      for (const name of ["APP_URL", "APP_DATABASE_URL", "AUTH_SECRET", "ENCRYPTION_KEY"]) expect(message).toContain(name);
-      expect(message).toContain(".env.example");
-    }
+    const failure = (source: Record<string, string | undefined>): string => {
+      try {
+        parseEnv(source);
+      } catch (error) {
+        return (error as Error).message;
+      }
+      throw new Error("parseEnv should have thrown");
+    };
+    const some = failure({ ...GOOD, APP_URL: undefined, AUTH_SECRET: "short", ENCRYPTION_KEY: "AAAA" });
+    for (const name of ["APP_URL", "AUTH_SECRET", "ENCRYPTION_KEY"]) expect(some).toContain(name);
+    expect(some).not.toContain("APP_DATABASE_URL");
+
+    const all = failure({});
+    for (const name of ["APP_URL", "APP_DATABASE_URL", "AUTH_SECRET", "ENCRYPTION_KEY"]) expect(all).toContain(name);
+    expect(all).toContain(".env.example");
   });
 
   it("treats empty values like missing ones", () => {

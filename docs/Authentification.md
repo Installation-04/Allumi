@@ -11,6 +11,7 @@
 - Cookie `httpOnly`, `SameSite=Lax`, et `Secure` en HTTPS. En production (HTTPS), il porte le préfixe `__Host-` : il n'est valable que pour ton domaine exact.
 - La base ne conserve que l'**empreinte SHA-256** du jeton : une fuite de la base ne permet pas de voler des sessions.
 - Fermeture après **8 heures d'inactivité** ou **14 jours** au total.
+- À la connexion, la **langue enregistrée dans ton compte** est appliquée, même depuis un nouveau navigateur.
 - « Se déconnecter » supprime la session côté serveur et efface le cookie.
 - Activer ou désactiver la 2FA **déconnecte tous les autres appareils**, et une session vérifiée avant la désactivation ne saute pas la deuxième étape si tu réactives la 2FA.
 

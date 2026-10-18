@@ -26,15 +26,18 @@ describe("client address behind a reverse proxy", () => {
     expect(clientIpFromForwardedFor("not:an:address", 1)).toBe("not:an:address");
   });
 
-  it("property: addresses of one /64 share a key, other prefixes do not", () => {
-    const group = fc.integer({ min: 0, max: 0xffff }).map((n) => n.toString(16));
+  it("property: addresses of one /64 share a key, addresses of two different /64 do not", () => {
+    const group = fc.integer({ min: 0, max: 0xffff });
+    const hex = (groups: number[]) => groups.map((n) => n.toString(16)).join(":");
+    const four = fc.array(group, { minLength: 4, maxLength: 4 });
     fc.assert(
-      fc.property(fc.array(group, { minLength: 4, maxLength: 4 }), fc.array(group, { minLength: 4, maxLength: 4 }), fc.array(group, { minLength: 4, maxLength: 4 }), (prefix, a, b) => {
-        const first = clientIpFromForwardedFor([...prefix, ...a].join(":"), 1);
-        const second = clientIpFromForwardedFor([...prefix, ...b].join(":"), 1);
-        expect(first).toBe(second);
+      fc.property(four, four, four, four, (prefix, other, a, b) => {
+        // same first 64 bits, any interface identifier: one budget
+        expect(clientIpFromForwardedFor(hex([...prefix, ...a]), 1)).toBe(clientIpFromForwardedFor(hex([...prefix, ...b]), 1));
+        // a different first 64 bits: a different budget
+        fc.pre(hex(prefix) !== hex(other));
+        expect(clientIpFromForwardedFor(hex([...prefix, ...a]), 1)).not.toBe(clientIpFromForwardedFor(hex([...other, ...a]), 1));
       }),
-      { numRuns: 200 },
     );
   });
 });

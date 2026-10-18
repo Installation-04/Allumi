@@ -18,6 +18,7 @@ export default defineConfig({
           name: "unit",
           include: ["src/**/*.test.ts", "tests/unit/**/*.test.ts"],
           environment: "node",
+          setupFiles: ["tests/support/fc.ts"],
         },
       },
       {

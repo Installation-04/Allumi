@@ -39,6 +39,22 @@ export default defineConfig([
       ],
     },
   },
+  // Pages, actions and route handlers reach the database only through a module (or @/platform/health).
+  {
+    files: ["src/app/**/*.{ts,tsx}", "src/proxy.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            { group: ["@/modules/*/*"], message: "Import a module through its public index (@/modules/<name>)." },
+            { group: ["@/generated/*", "@/generated/**"], message: "Use @/platform/db (and Tx from @/platform/tenant)." },
+            { group: ["@/platform/db", "@/platform/tenant"], message: "The app layer reaches the database through a module service." },
+          ],
+        },
+      ],
+    },
+  },
   // Pure domain code: no database, framework or floating-point money.
   {
     files: ["src/modules/*/domain/**/*.ts"],

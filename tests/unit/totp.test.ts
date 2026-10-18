@@ -34,14 +34,13 @@ describe("TOTP", () => {
     expect(uri).toContain("issuer=Allumi");
   });
 
-  it("property: a code generated at t verifies within the window and its step is monotonic in t", () => {
+  it("property: a code generated at t verifies at t, and reports the step of t", () => {
     const secret = newTotpSecret();
     fc.assert(
       fc.property(fc.integer({ min: 1_700_000_000_000, max: 1_900_000_000_000 }), (t) => {
         const found = verifyTotp(secret, code(secret, t), t);
         expect(found).toBe(step(t));
-      }),
-      { numRuns: 200 },
+      })
     );
   });
 });
