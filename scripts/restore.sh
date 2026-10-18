@@ -38,7 +38,8 @@ compose up -d db
 info "Restauration de la base…"
 compose exec -T db psql -U "$PGUSER_" -d postgres -c "DROP DATABASE IF EXISTS \"$PGDB_\" WITH (FORCE);"
 compose exec -T db psql -U "$PGUSER_" -d postgres -c "CREATE DATABASE \"$PGDB_\" OWNER \"$PGUSER_\";"
-# Les rôles sont globaux au serveur PostgreSQL : ils ne sont pas dans la sauvegarde, mais les droits (GRANT) le sont.
+# Les rôles sont globaux au serveur PostgreSQL : ils ne sont pas dans la sauvegarde, mais les droits (GRANT) et les
+# propriétaires le sont. On garde les propriétaires (pas de --no-owner) : la fonction audit_redact doit rester à allumi_redactor.
 # Sur un serveur neuf, il faut les créer avant la restauration; le service migrate leur donne ensuite leur mot de passe.
 compose exec -T db psql -v ON_ERROR_STOP=1 -U "$PGUSER_" -d postgres <<'SQL'
 DO $$
@@ -51,7 +52,7 @@ BEGIN
   END IF;
 END $$;
 SQL
-compose exec -T db pg_restore -U "$PGUSER_" -d "$PGDB_" --no-owner --exit-on-error --single-transaction < "$WORK/db.dump"
+compose exec -T db pg_restore -U "$PGUSER_" -d "$PGDB_" --exit-on-error --single-transaction < "$WORK/db.dump"
 # PostgreSQL ne sauvegarde pas les statistiques : sans elles, les premières vérifications comptables sont lentes.
 compose exec -T db psql -U "$PGUSER_" -d "$PGDB_" -c "ANALYZE;"
 

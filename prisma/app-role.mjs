@@ -30,6 +30,15 @@ try {
        END $$`,
     );
   }
+  // The Law 25 redaction function must belong to its dedicated role (the audit guard checks current_user).
+  // A dump restored with --no-owner would leave it to the database owner: put it back, idempotently.
+  await client.query(
+    `DO $$ BEGIN
+       IF to_regprocedure('audit_redact(text, text, text[])') IS NOT NULL THEN
+         ALTER FUNCTION audit_redact(text, text, text[]) OWNER TO allumi_redactor;
+       END IF;
+     END $$`,
+  );
   const { rows } = await client.query("SELECT format('ALTER ROLE allumi_app LOGIN PASSWORD %L', $1::text) AS sql", [
     appPassword,
   ]);

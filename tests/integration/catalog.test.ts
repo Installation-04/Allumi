@@ -78,6 +78,13 @@ describe("database catalog (guards against a migration that forgets a table)", (
     expect(rows).toEqual([]);
   });
 
+  it("keeps the Law 25 redaction function under its dedicated role (backups must preserve owners)", async () => {
+    const rows = await q<{ owner: string }>(
+      `SELECT pg_get_userbyid(proowner) AS owner FROM pg_proc WHERE proname = 'audit_redact' AND pronamespace = 'public'::regnamespace`,
+    );
+    expect(rows).toEqual([{ owner: "allumi_redactor" }]);
+  });
+
   it("keeps the journal and audit immutable even for the table owner", async () => {
     await expect(db.query("UPDATE journal_line SET debit_cents = debit_cents")).resolves.toBeTruthy(); // no rows: nothing to refuse yet
     await expect(db.query("TRUNCATE journal_line CASCADE")).rejects.toMatchObject({ code: "AL004" });

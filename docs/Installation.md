@@ -40,6 +40,7 @@ Ouvre `https://ton-domaine`. Si aucun utilisateur n'existe, la page `/setup` te 
 cp .env.example .env && chmod 600 .env
 # Remplace tous les CHANGE_ME (openssl rand -hex 24 / -base64 48), domaine, courriel
 # Attention : POSTGRES_PASSWORD doit aussi apparaître dans DATABASE_URL, et APP_DB_PASSWORD dans APP_DATABASE_URL
+# Renseigne aussi SETUP_TOKEN (openssl rand -hex 16) : sans lui, la page /setup reste fermée sur un serveur public en HTTPS
 docker compose up -d --build
 docker compose ps
 ```
