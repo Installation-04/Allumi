@@ -10,6 +10,7 @@ Ces règles sont non négociables : toute contribution qui les contourne est ref
 ## Partie double
 - Chaque écriture a au moins deux lignes; la somme des débits = la somme des crédits.
 - Validé dans l'application **et** en base (contrainte/trigger).
+- Une écriture **manuelle** ([[Journal-et-ecritures]]) refuse aussi les comptes de taxes de vente et les comptes désactivés; elle porte la source `MANUAL` ou `OPENING_BALANCE`, et seules ces écritures se contre-passent à la main (les autres s'annulent avec leur pièce).
 - Les comptes clients et fournisseurs (comptes de contrôle) ne reçoivent que des écritures issues de documents et de paiements, toujours avec un contact. La base vérifie que l'écriture d'une pièce existe pour cette pièce et que ses montants sur les comptes de contrôle égalent le total de la pièce : l'âge des comptes concilie toujours avec le grand livre.
 
 ## Immuabilité
@@ -26,7 +27,8 @@ Ces règles sont non négociables : toute contribution qui les contourne est ref
 
 ## Périodes
 - Une période fermée refuse toute nouvelle écriture.
-- La réouverture est une action privilégiée et auditée.
+- La réouverture est une action privilégiée et auditée : propriétaire seulement, avec la vérification en deux étapes active, un motif écrit d'au moins 10 caractères et un événement d'audit ([[Exercices-et-periodes]]). Ces conditions sont appliquées par l'application (la base garantit l'audit du changement, pas le 2FA).
+- Un exercice se ferme quand toutes ses périodes sont verrouillées; tant qu'il est fermé, ses périodes ne changent pas d'état.
 
 ## Vie privée (Loi 25)
 - La piste d'audit est en ajout seulement. Les renseignements personnels (courriel, téléphone, nom d'un contact anonymisé) peuvent en être caviardés par le propriétaire de l'entreprise; l'opération est elle-même journalisée et ne touche jamais aux champs comptables.

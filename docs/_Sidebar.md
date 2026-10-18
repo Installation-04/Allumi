@@ -13,6 +13,12 @@
 - [[Depannage]]
 - [[FAQ]]
 
+**Utiliser**
+- [[Plan-comptable]]
+- [[Journal-et-ecritures]]
+- [[Exercices-et-periodes]]
+- [[Piste-d-audit]]
+
 **Comprendre**
 - [[Architecture]]
 - [[Regles-comptables]]
