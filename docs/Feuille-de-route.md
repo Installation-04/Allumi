@@ -4,7 +4,7 @@
 |---|---|---|
 | 0 | Infrastructure Docker, scripts, wiki | Fait |
 | 1 | Architecture finale, schéma de base de données, plan de tests ([[Architecture]], [[Schema-de-donnees]], [[Plan-de-tests]]) | Fait |
-| 2 | Squelette : auth, i18n, `/api/health`, `/setup`, build Docker ([[Premier-demarrage]], [[Authentification]]) | En revue |
+| 2 | Squelette : auth, i18n, `/api/health`, `/setup`, build Docker ([[Premier-demarrage]], [[Authentification]]) | Fait |
 | 3 | Moteur comptable : plan comptable, journal, périodes, audit | À faire |
 | 4 | Contacts, taxes (moteur de calcul), factures, paiements, dépenses, pièces jointes | À faire |
 | 5 | Banque (CSV/OFX), rapprochement | À faire |
