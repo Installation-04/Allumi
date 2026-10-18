@@ -190,17 +190,22 @@ async function ledgerJourney(page: Page, totp: TOTP) {
   // An unbalanced entry is flagged on screen and refused with the rule's message.
   await openSection(page, "Journal");
   await page.getByRole("link", { name: "Nouvelle écriture" }).click();
+  // Wait for the destination form: App Router may retain the outgoing route during navigation.
+  const entryForm = page.locator("form").filter({ has: page.getByRole("combobox", { name: "Ligne 1 – Compte", exact: true }) });
+  await expect(entryForm).toBeVisible();
+  const entryControls = entryForm.locator('select, input:not([type="hidden"])');
+  await expect(entryControls).toHaveCount(11);
   // Entry controls must fit the viewport, including small phones, without hiding overflow.
   const originalViewport = page.viewportSize();
   for (const width of [320, 390, 768]) {
     await page.setViewportSize({ width, height: 844 });
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    for (const control of await page.locator('main select, main input:not([type="hidden"])').all()) {
-      const box = await control.boundingBox();
-      expect(box).not.toBeNull();
-      expect(box!.x).toBeGreaterThanOrEqual(0);
-      expect(box!.x + box!.width).toBeLessThanOrEqual(width);
-      expect(box!.height).toBeGreaterThanOrEqual(44);
+    for (const control of await entryControls.all()) {
+      await expect(control).toBeVisible();
+      await expect.poll(async () => {
+        const box = await control.boundingBox();
+        return box !== null && box.x >= 0 && box.x + box.width <= width && box.height >= 44;
+      }).toBe(true);
     }
   }
   if (originalViewport) await page.setViewportSize(originalViewport);
