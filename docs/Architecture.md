@@ -161,7 +161,8 @@ Le rôle `allumi_app` est créé par la migration sans droit de connexion; l'ét
 | Saisir et valider écritures, documents, paiements, opérations bancaires | ✓ | ✓ | — |
 | Plan comptable, taxes, rapprochements | ✓ | ✓ | — |
 | Verrouiller une période | ✓ | ✓ | — |
-| Rouvrir une période, un exercice ou un rapprochement (2FA + motif) | ✓ | ✓ | — |
+| Rouvrir une période ou un exercice (2FA + code saisi + motif) | ✓ | — | — |
+| Rouvrir un rapprochement (phase 5, motif) | ✓ | ✓ | — |
 | Consulter la piste d'audit | ✓ | ✓ | — |
 | Paramètres de l'entreprise, membres, invitations | ✓ | — | — |
 

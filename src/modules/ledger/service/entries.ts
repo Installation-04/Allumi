@@ -140,9 +140,9 @@ export async function postManualEntry(actor: Actor, input: ManualEntryInput): Pr
  */
 export async function reverseEntry(actor: Actor, entryId: string, options: { date?: IsoDate; memo?: string | null; now?: Date } = {}): Promise<{ id: string; number: bigint }> {
   // The same checks as a manual entry: a real calendar date, and a memo of reasonable size (it is kept for good).
-  if (options.date !== undefined && !isValidIsoDate(options.date)) throw new AppError("ledger.invalidEntry");
+  if (options.date !== undefined && !isValidIsoDate(options.date)) throw new AppError("ledger.invalidDate");
   const memo = memoSchema.nullish().safeParse(options.memo);
-  if (!memo.success) throw new AppError("ledger.invalidEntry");
+  if (!memo.success) throw new AppError("ledger.memoTooLong");
 
   return inCompany(actor, async (tx) => {
     await requireRole(tx, "entry.reverse");

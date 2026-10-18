@@ -124,37 +124,43 @@ async function ledgerJourney(page: Page, totp: TOTP) {
   await openSection(page, "Plan comptable");
   await expect(page.getByRole("heading", { name: "Plan comptable" })).toBeVisible();
   await expect(page.getByRole("cell", { name: "Banque – compte courant" })).toBeVisible();
-  await page.getByLabel("Code", { exact: true }).fill("6200");
-  await page.getByLabel("Nom (français)").fill("Frais divers");
-  await page.getByLabel("Nom (anglais)").fill("Sundry expenses");
+  // A petty-cash account: an asset, not the form's default type.
+  await page.getByLabel("Code", { exact: true }).fill("1999");
+  await page.getByLabel("Nom (français)").fill("Caisse secondaire");
+  await page.getByLabel("Nom (anglais)").fill("Petty cash");
+  await page.getByLabel("Type", { exact: true }).selectOption("ASSET");
+  await page.getByLabel("Sous-type").selectOption({ label: "Encaisse" });
   await page.getByRole("button", { name: "Créer le compte" }).click();
-  await expect(page.getByRole("cell", { name: "6200", exact: true })).toBeVisible();
-  // The form is back to its defaults, and the subtypes offered are those of the type it shows (not of the last one chosen).
+  await expect(page.getByRole("cell", { name: "1999", exact: true })).toBeVisible();
+  // The form is back to its defaults, and the subtypes offered are those of the type it shows (not of the one chosen before).
   await expect(page.getByLabel("Type", { exact: true })).toHaveValue("EXPENSE");
   await expect(page.getByLabel("Sous-type")).toContainText("Charges d'exploitation");
+  await expect(page.getByLabel("Sous-type")).not.toContainText("Encaisse");
 
   // A refused account (this code exists) keeps the type that was chosen, and the subtypes that go with it.
-  await page.getByLabel("Code", { exact: true }).fill("6200");
+  await page.getByLabel("Code", { exact: true }).fill("1999");
   await page.getByLabel("Nom (français)").fill("Doublon");
   await page.getByLabel("Nom (anglais)").fill("Duplicate");
-  await page.getByLabel("Type", { exact: true }).selectOption("ASSET");
-  await expect(page.getByLabel("Sous-type")).toContainText("Banque");
+  await page.getByLabel("Type", { exact: true }).selectOption("LIABILITY");
+  await expect(page.getByLabel("Sous-type")).toContainText("Carte de crédit");
   await page.getByRole("button", { name: "Créer le compte" }).click();
   await expect(page.getByText("Ce code de compte existe déjà.")).toBeVisible();
-  await expect(page.getByLabel("Type", { exact: true })).toHaveValue("ASSET");
-  await expect(page.getByLabel("Sous-type")).toContainText("Banque");
+  await expect(page.getByLabel("Type", { exact: true })).toHaveValue("LIABILITY");
+  await expect(page.getByLabel("Sous-type")).toContainText("Carte de crédit");
   await expect(page.getByLabel("Nom (français)")).toHaveValue("Doublon");
 
   // Accounts can be renamed; the type stays.
-  await page.getByRole("link", { name: "Modifier le compte 6200" }).click();
-  await expect(page.getByRole("heading", { name: "Modifier le compte 6200" })).toBeVisible();
-  await page.getByLabel("Nom (français)").fill("Frais divers et imprévus");
+  await page.getByRole("link", { name: "Modifier le compte 1999" }).click();
+  await expect(page.getByRole("heading", { name: "Modifier le compte 1999" })).toBeVisible();
+  await page.getByLabel("Nom (français)").fill("Caisse secondaire (atelier)");
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await expect(page.getByRole("cell", { name: /Frais divers et imprévus/ })).toBeVisible();
+  await expect(page.getByRole("cell", { name: /Caisse secondaire \(atelier\)/ })).toBeVisible();
 
   // An unbalanced entry is flagged on screen and refused with the rule's message.
   await openSection(page, "Journal");
   await page.getByRole("link", { name: "Nouvelle écriture" }).click();
+  const firstOfMonth = `${todayInToronto().slice(0, 7)}-01`;
+  await page.getByLabel("Date", { exact: true }).fill(firstOfMonth);
   await page.getByLabel("Type d'écriture").selectOption("OPENING_BALANCE");
   await page.getByLabel("Description").fill("Capital de départ");
   await page.getByLabel("Ligne 1 – Compte").selectOption({ label: "1000 – Banque – compte courant" });
@@ -168,7 +174,7 @@ async function ledgerJourney(page: Page, totp: TOTP) {
   // accounts are still what was typed, or an entry fixed in haste would be posted as another kind.
   await expect(page.getByLabel("Type d'écriture")).toHaveValue("OPENING_BALANCE");
   await expect(page.getByLabel("Description")).toHaveValue("Capital de départ");
-  await expect(page.getByLabel("Date", { exact: true })).toHaveValue(todayInToronto());
+  await expect(page.getByLabel("Date", { exact: true })).toHaveValue(firstOfMonth);
   await expect(page.getByLabel("Ligne 1 – Compte")).toHaveValue(/.+/);
   await expect(page.getByLabel("Ligne 1 – Débit")).toHaveValue("1 000,00");
 

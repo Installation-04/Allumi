@@ -42,7 +42,10 @@ export function EntryForm({ companyId, accounts, locale, today }: { companyId: s
     return { row, debit, credit };
   });
   const readable = parsed.every((line) => line.debit !== null && line.credit !== null);
-  const used = parsed.filter((line) => line.row.accountId !== "" || (line.debit ?? 0n) !== 0n || (line.credit ?? 0n) !== 0n);
+  // `position` is the row's place on screen ("Ligne N"): a problem reported on the used lines names that row, blank rows or not.
+  const used = parsed
+    .map((line, position) => ({ ...line, position }))
+    .filter((line) => line.row.accountId !== "" || (line.debit ?? 0n) !== 0n || (line.credit ?? 0n) !== 0n);
   const totalDebit = used.reduce((sum, line) => sum + (line.debit ?? 0n), 0n);
   const totalCredit = used.reduce((sum, line) => sum + (line.credit ?? 0n), 0n);
   const problems = checkEntry(used.map((line) => ({ accountId: line.row.accountId || "x", debitCents: line.debit ?? 0n, creditCents: line.credit ?? 0n })));
@@ -58,7 +61,7 @@ export function EntryForm({ companyId, accounts, locale, today }: { companyId: s
       : missingAccount
         ? t("problems.missingAccount")
         : firstProblem
-          ? t(`problems.${firstProblem.code}`, { line: "line" in firstProblem ? firstProblem.line : 0 })
+          ? t(`problems.${firstProblem.code}`, { line: "line" in firstProblem ? (used[firstProblem.line - 1]?.position ?? 0) + 1 : 0 })
           : null;
 
   return (

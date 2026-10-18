@@ -143,7 +143,10 @@
       "reasonRequired": "Un motif d'au moins 10 caractères est requis.",
       "twoFactorRequired": "Active la vérification en deux étapes (Sécurité du compte) pour rouvrir le passé.",
       "codeInvalid": "Le code de vérification est invalide ou déjà utilisé.",
-      "rateLimited": "Trop d'essais : réessaie dans quelques minutes."
+      "rateLimited": "Trop d'essais : réessaie dans quelques minutes.",
+      "invalidDate": "Cette date n'est pas valide.",
+      "dateTooFar": "Cette date est trop loin dans l'avenir : un exercice ne peut être ajouté que pour le passé ou l'exercice qui suit l'exercice en cours.",
+      "memoTooLong": "La description est trop longue (500 caractères au plus)."
     }
   },
   "nav": {

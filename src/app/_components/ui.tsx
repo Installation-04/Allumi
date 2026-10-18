@@ -51,8 +51,9 @@ export function Field(props: {
       <label htmlFor={id} className="mb-1 block text-sm font-medium">
         {label}
       </label>
+      {/* No key here: React rewrites the default of an <input> when it changes, so the reset that follows an action
+          restores the returned value and the field keeps the keyboard focus. Only a <select> must be remounted. */}
       <input
-        key={scope.attempt}
         id={id}
         name={name}
         type={type}

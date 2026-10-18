@@ -264,9 +264,9 @@ describe("reversal", () => {
     const a = await codes(c.actor);
     const original = await postManualEntry(c.actor, entry(`${c.year}-03-10`, [[a["6050"] ?? "", 1_000n, 0n], [a["1000"] ?? "", 0n, 1_000n]]));
     // 30 February would silently become 2 March
-    expect(await refusal(reverseEntry(c.actor, original.id, { date: `${c.year}-02-30` }))).toBe("ledger.invalidEntry");
-    expect(await refusal(reverseEntry(c.actor, original.id, { date: "pas une date" }))).toBe("ledger.invalidEntry");
-    expect(await refusal(reverseEntry(c.actor, original.id, { memo: "x".repeat(501) }))).toBe("ledger.invalidEntry");
+    expect(await refusal(reverseEntry(c.actor, original.id, { date: `${c.year}-02-30` }))).toBe("ledger.invalidDate");
+    expect(await refusal(reverseEntry(c.actor, original.id, { date: "pas une date" }))).toBe("ledger.invalidDate");
+    expect(await refusal(reverseEntry(c.actor, original.id, { memo: "x".repeat(501) }))).toBe("ledger.memoTooLong");
     const ok = await reverseEntry(c.actor, original.id, { date: `${c.year}-03-11`, memo: "  motif  " });
     expect(ok.number).toBe(2n);
     expect((await getEntry(c.actor, ok.id))?.memo).toBe("motif");
@@ -330,22 +330,58 @@ describe("fiscal years and periods", () => {
     await lockPeriod(c.actor, june?.id ?? "");
     expect(await refusal(reopenPeriod(c.actor, june?.id ?? "", why, proof(2)))).toBe("ledger.codeInvalid");
     await reopenPeriod(c.actor, june?.id ?? "", why, proof(3));
-    // a recovery code does the same job, once
+    // a stale form (the period is already open) is a no-op and does not spend the code: the same code still works afterwards
+    await reopenPeriod(c.actor, june?.id ?? "", why, proof(4));
+    await lockPeriod(c.actor, june?.id ?? "");
+    await reopenPeriod(c.actor, june?.id ?? "", why, proof(4));
+    // a recovery code does the same job, once (the attempt counter is cleared: the limit has its own test)
+    await db.query("DELETE FROM rate_limit");
     await lockPeriod(c.actor, june?.id ?? "");
     const recovery = totp.recoveryCodes[0] ?? "";
-    await reopenPeriod(c.actor, june?.id ?? "", why, { code: recovery, now: new Date(at(4)) });
+    await reopenPeriod(c.actor, june?.id ?? "", why, { code: recovery, now: new Date(at(5)) });
     await lockPeriod(c.actor, june?.id ?? "");
-    expect(await refusal(reopenPeriod(c.actor, june?.id ?? "", why, { code: recovery, now: new Date(at(5)) }))).toBe("ledger.codeInvalid");
-    await reopenPeriod(c.actor, june?.id ?? "", why, proof(6));
+    expect(await refusal(reopenPeriod(c.actor, june?.id ?? "", why, { code: recovery, now: new Date(at(6)) }))).toBe("ledger.codeInvalid");
+    await reopenPeriod(c.actor, june?.id ?? "", why, proof(7));
 
     const posted = await postManualEntry(c.actor, entry(`${c.year}-06-15`, lines));
     expect(posted.number).toBe(1n);
 
     // the reopening is on the audit trail, with its reason and its author
     const audit = await listAuditLog(c.actor, { action: "period.reopen" });
-    expect(audit.entries).toHaveLength(4); // one event per reopening: the refused attempts left none
+    expect(audit.entries).toHaveLength(5); // one event per reopening: the refused attempts and the no-op left none
     expect(audit.entries[0]).toMatchObject({ entityType: "fiscal_period", entityId: june?.id });
     expect(JSON.stringify(audit.entries[0]?.after)).toContain("Correction d'une écriture oubliée");
+  });
+
+  it("limits the attempts at the code: a stolen session cannot guess it", async () => {
+    const c = await newCompany("code-limit");
+    const [year] = await listFiscalYears(c.actor);
+    const june = year?.periods.find((period) => period.start === `${c.year}-06-01`);
+    await lockPeriod(c.actor, june?.id ?? "");
+    await enableTotp(c.ownerId, c.ownerEmail);
+    const answers: string[] = [];
+    for (let attempt = 0; attempt < 12; attempt++) {
+      answers.push(await refusal(reopenPeriod(c.actor, june?.id ?? "", "Essai de devinette du code", { code: String(100_000 + attempt * 7).slice(0, 6) })));
+    }
+    expect(answers[0]).toBe("ledger.codeInvalid");
+    expect(answers.at(-1)).toBe("ledger.rateLimited");
+    expect((await listFiscalYears(c.actor))[0]?.periods.find((period) => period.id === june?.id)?.status).toBe("LOCKED");
+  });
+
+  it("does not spend a code on a request that cannot succeed (a period of a closed year, an unknown period)", async () => {
+    const c = await newCompany("code-kept");
+    const [year] = await listFiscalYears(c.actor);
+    for (const period of year?.periods ?? []) await lockPeriod(c.actor, period.id);
+    await closeFiscalYear(c.actor, year?.id ?? "");
+    const totp = await enableTotp(c.ownerId, c.ownerEmail);
+    const proof = { code: totp.code(totp.enrolledAt + 30_000), now: new Date(totp.enrolledAt + 30_000) };
+    const why = "Régularisation demandée par la comptable";
+    const first = year?.periods[0]?.id ?? "";
+    expect(await refusal(reopenPeriod(c.actor, first, why, proof))).toBe("AL003"); // the year is reopened first
+    expect(await refusal(reopenPeriod(c.actor, randomUUID(), why, proof))).toBe("ledger.periodNotFound");
+    // the same code still opens the year
+    await reopenFiscalYear(c.actor, year?.id ?? "", why, proof);
+    expect((await listFiscalYears(c.actor))[0]?.status).toBe("OPEN");
   });
 
   it("closes a year only when every period is locked, and reopens it with the same conditions", async () => {
@@ -377,12 +413,26 @@ describe("fiscal years and periods", () => {
     expect([past.start, past.end]).toEqual([`${Number(c.year) - 1}-01-01`, `${Number(c.year) - 1}-12-31`]);
     expect(await refusal(createFiscalYear(c.actor, { containing: first?.start ?? "" }))).toBe("ledger.fiscalYearExists");
     expect(await refusal(createFiscalYear(c.reader))).toBe("forbidden");
+    // a date that is not a date, or that is decades ahead (nothing deletes a year), is refused with its own message
+    expect(await refusal(createFiscalYear(c.actor, { containing: "2026-02-30" }))).toBe("ledger.invalidDate");
+    expect(await refusal(createFiscalYear(c.actor, { containing: "3000-01-01" }))).toBe("ledger.invalidDate");
+    expect(await refusal(createFiscalYear(c.actor, { containing: `${Number(c.year) + 40}-06-01` }))).toBe("ledger.dateTooFar");
     const years = await listFiscalYears(c.actor);
     expect(years.map((year) => year.start)).toEqual([...years.map((year) => year.start)].sort().reverse());
   });
 });
 
 describe("accounts", () => {
+  it("answers 'code taken' to the loser of two simultaneous creations of the same code", async () => {
+    const c = await newCompany("account-race");
+    const input = { code: "7777", nameFr: "Compte course", nameEn: "Race account", type: "EXPENSE", subtype: "OPERATING_EXPENSE" } as const;
+    const results = await Promise.allSettled([createAccount(c.actor, input), createAccount(c.actor, input)]);
+    expect(results.filter((result) => result.status === "fulfilled")).toHaveLength(1);
+    const lost = results.find((result): result is PromiseRejectedResult => result.status === "rejected");
+    expect((lost?.reason as AppError).key).toBe("ledger.codeTaken");
+    expect((await listAccounts(c.actor)).filter((account) => account.code === "7777")).toHaveLength(1);
+  });
+
   it("creates, renames, deactivates and deletes an unused account; protects the used and the system ones", async () => {
     const c = await newCompany("accounts");
     const created = await createAccount(c.actor, { code: "6200", nameFr: "Frais divers", nameEn: "Sundry expenses", type: "EXPENSE", subtype: "OPERATING_EXPENSE" });

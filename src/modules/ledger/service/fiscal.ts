@@ -46,11 +46,19 @@ export async function listFiscalYears(actor: Actor): Promise<FiscalYearDto[]> {
 export async function createFiscalYear(actor: Actor, options: { containing?: IsoDate; now?: Date } = {}): Promise<FiscalYearDto> {
   const created = await inCompany(actor, async (tx) => {
     await requireRole(tx, "fiscalYear.create");
-    if (options.containing !== undefined && !isValidIsoDate(options.containing)) throw new AppError("ledger.invalidEntry");
+    if (options.containing !== undefined && !isValidIsoDate(options.containing)) throw new AppError("ledger.invalidDate");
     const company = await tx.company.findUniqueOrThrow({ where: { id: actor.companyId }, select: { fiscalYearStartMonth: true } });
     let bounds;
     if (options.containing) {
-      bounds = fiscalYearContaining(options.containing, company.fiscalYearStartMonth);
+      try {
+        bounds = fiscalYearContaining(options.containing, company.fiscalYearStartMonth);
+        // A year can be added for the past (opening balances) or for the coming year, not decades ahead: nothing deletes a year.
+        const horizon = fiscalYearAfter(fiscalYearContaining(todayIso(options.now), company.fiscalYearStartMonth).end).end;
+        if (bounds.start > horizon) throw new AppError("ledger.dateTooFar");
+      } catch (error) {
+        if (error instanceof RangeError) throw new AppError("ledger.invalidDate"); // the calendar's own limits (years 1900 to 2999)
+        throw error;
+      }
     } else {
       const latest = await tx.fiscalYear.findFirst({ where: { companyId: actor.companyId }, orderBy: { endDate: "desc" }, select: { endDate: true } });
       bounds = latest ? fiscalYearAfter(fromDbDate(latest.endDate)) : fiscalYearContaining(todayIso(options.now), company.fiscalYearStartMonth);
@@ -105,24 +113,35 @@ export type ReopenProof = { code: string; now?: Date };
  * Reopening the past is privileged: owner only, two-factor authentication turned on and a code typed now (a session
  * cookie alone is not enough), a written reason, and an audit event on top of the automatic audit of the change itself.
  * A TOTP code works once: reopening two periods in a row takes two codes.
+ *
+ * The cheap checks come first (reason, 2FA on, the target exists and needs reopening) and the code last, right before the
+ * change: a code is spent only by a reopening that is going to happen, not by a stale form or a mistyped target.
  */
-async function requireReopenConditions(actor: Actor, reason: string, proof: ReopenProof): Promise<string> {
+async function requireReopenRequest(actor: Actor, reason: string): Promise<string> {
   const parsed = reasonSchema.safeParse(reason);
   if (!parsed.success) throw new AppError("ledger.reasonRequired");
   if (!(await totpStatus(actor.userId)).enabled) throw new AppError("ledger.twoFactorRequired");
+  return parsed.data;
+}
+
+async function requireFreshCode(actor: Actor, proof: ReopenProof): Promise<void> {
   const verdict = await verifySecondFactor(actor.userId, proof.code, proof.now);
   if (verdict === "rate_limited") throw new AppError("ledger.rateLimited");
   if (verdict !== "ok") throw new AppError("ledger.codeInvalid");
-  return parsed.data;
 }
 
 export async function reopenPeriod(actor: Actor, periodId: string, reason: string, proof: ReopenProof): Promise<void> {
   await inCompany(actor, async (tx) => {
     await requireRole(tx, "period.reopen");
-    const why = await requireReopenConditions(actor, reason, proof);
-    const period = await tx.fiscalPeriod.findFirst({ where: { companyId: actor.companyId, id: periodId }, select: { status: true, periodNumber: true } });
+    const why = await requireReopenRequest(actor, reason);
+    const period = await tx.fiscalPeriod.findFirst({
+      where: { companyId: actor.companyId, id: periodId },
+      select: { status: true, periodNumber: true, fiscalYear: { select: { status: true } } },
+    });
     if (!period) throw new AppError("ledger.periodNotFound");
     if (period.status === "OPEN") return;
+    if (period.fiscalYear.status === "CLOSED") throw new AppError("AL003"); // the year is reopened first (the database says so too)
+    await requireFreshCode(actor, proof);
     await tx.fiscalPeriod.update({
       where: { companyId_id: { companyId: actor.companyId, id: periodId } },
       data: { status: "OPEN", lockedAt: null, lockedById: null },
@@ -149,10 +168,11 @@ export async function closeFiscalYear(actor: Actor, yearId: string): Promise<voi
 export async function reopenFiscalYear(actor: Actor, yearId: string, reason: string, proof: ReopenProof): Promise<void> {
   await inCompany(actor, async (tx) => {
     await requireRole(tx, "fiscalYear.reopen");
-    const why = await requireReopenConditions(actor, reason, proof);
+    const why = await requireReopenRequest(actor, reason);
     const year = await tx.fiscalYear.findFirst({ where: { companyId: actor.companyId, id: yearId }, select: { status: true } });
     if (!year) throw new AppError("ledger.fiscalYearNotFound");
     if (year.status === "OPEN") return;
+    await requireFreshCode(actor, proof);
     await tx.fiscalYear.update({
       where: { companyId_id: { companyId: actor.companyId, id: yearId } },
       data: { status: "OPEN", closedAt: null, closedById: null },

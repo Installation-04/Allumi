@@ -5,6 +5,7 @@ Un **exercice financier** couvre douze mois consécutifs et se divise en **péri
 ## Création
 - Le premier exercice se crée à l'initialisation de la comptabilité : celui qui contient la date du jour, selon le **premier mois de l'exercice** choisi à `/setup` (avril pour un exercice du 1er avril au 31 mars). Il est découpé en douze périodes.
 - **Créer l'exercice suivant** crée l'exercice qui suit le dernier. Les exercices ne se chevauchent jamais (la base le refuse).
+- Une date trop éloignée dans l'avenir est refusée (on peut ajouter le passé ou l'exercice qui suit l'exercice en cours : aucune fonction ne supprime un exercice).
 - Pour des soldes d'ouverture dans le passé, utilise **Créer l'exercice qui contient la date** : entre une date, et l'exercice qui la contient est créé avec ses douze périodes (s'il n'existe pas déjà).
 
 > Fuseau horaire : « aujourd'hui » se calcule à l'heure de Montréal (`America/Toronto`) pour toutes les entreprises. Un réglage par entreprise viendra plus tard.
@@ -20,7 +21,7 @@ Rouvrir une période, ou un exercice fermé, rend le passé modifiable : il est 
 
 1. le rôle **propriétaire** (le comptable ne peut pas rouvrir);
 2. la **vérification en deux étapes** activée sur le compte du propriétaire ([[Authentification]]);
-3. un **code de vérification saisi à ce moment** : le code à six chiffres de l'application d'authentification, ou un code de récupération. Ouvrir la session ne suffit pas : un témoin de connexion volé ne permet pas de rouvrir le passé. Un code ne sert qu'une fois; pour rouvrir deux périodes de suite, attends le code suivant (30 secondes);
+3. un **code de vérification saisi à ce moment** : le code à six chiffres de l'application d'authentification, ou un code de récupération. Ouvrir la session ne suffit pas : un témoin de connexion volé ne permet pas de rouvrir le passé. Un code ne sert qu'une fois; pour rouvrir deux périodes de suite, attends le code suivant (30 secondes). Le code n'est dépensé que par une réouverture qui a lieu : un formulaire périmé (période déjà ouverte) ou une période d'un exercice fermé ne le consomme pas. Chaque essai, accepté ou non, compte dans la limite de **8 essais de code par 15 minutes**, partagée avec la connexion en deux étapes : rouvrir un exercice et plusieurs mois d'un coup peut atteindre la limite (« Trop d'essais »); réessaie après quelques minutes;
 4. un **motif écrit** d'au moins 10 caractères (il reste dans le formulaire si le code est refusé; le code, lui, n'est jamais conservé);
 5. un événement dans la [[Piste-d-audit]] (`period.reopen` ou `fiscal_year.reopen`) qui consigne le motif, en plus de l'audit automatique du changement.
 

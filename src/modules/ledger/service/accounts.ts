@@ -1,6 +1,6 @@
 import "server-only";
 import { requireRole } from "@/modules/companies";
-import { AppError, prismaErrorCode } from "@/platform/errors";
+import { AppError, isConflict, prismaErrorCode } from "@/platform/errors";
 import { accountInputSchema, accountPatchSchema, type AccountInput, type AccountPatch, type AccountSubtype, type AccountType, type SystemAccount } from "../domain/accounts";
 import { inCompany, type Actor } from "./support";
 
@@ -64,11 +64,17 @@ export async function createAccount(actor: Actor, input: AccountInput): Promise<
     if (await tx.account.findFirst({ where: { companyId: actor.companyId, code: parsed.data.code }, select: { id: true } })) {
       throw new AppError("ledger.codeTaken");
     }
-    const row = await tx.account.create({
-      data: { companyId: actor.companyId, ...parsed.data, parentId: parsed.data.parentId ?? null, description: parsed.data.description ?? null },
-      select: SELECT,
-    });
-    return toAccountDto(row);
+    try {
+      const row = await tx.account.create({
+        data: { companyId: actor.companyId, ...parsed.data, parentId: parsed.data.parentId ?? null, description: parsed.data.description ?? null },
+        select: SELECT,
+      });
+      return toAccountDto(row);
+    } catch (error) {
+      // A double submit: both requests passed the check above and the database let only one code through.
+      if (isConflict(error)) throw new AppError("ledger.codeTaken");
+      throw error;
+    }
   });
 }
 
@@ -83,8 +89,13 @@ export async function updateAccount(actor: Actor, accountId: string, patch: Acco
     if (code !== undefined && (await tx.account.findFirst({ where: { companyId: actor.companyId, code, NOT: { id: accountId } }, select: { id: true } }))) {
       throw new AppError("ledger.codeTaken");
     }
-    const row = await tx.account.update({ where: { companyId_id: { companyId: actor.companyId, id: accountId } }, data: parsed.data, select: SELECT });
-    return toAccountDto(row);
+    try {
+      const row = await tx.account.update({ where: { companyId_id: { companyId: actor.companyId, id: accountId } }, data: parsed.data, select: SELECT });
+      return toAccountDto(row);
+    } catch (error) {
+      if (isConflict(error)) throw new AppError("ledger.codeTaken");
+      throw error;
+    }
   });
 }
 
