@@ -18,6 +18,11 @@ trap 'rm -rf "$TMP"' EXIT
 git clone --quiet "$WIKI_URL" "$TMP/wiki"
 find "$TMP/wiki" -mindepth 1 -maxdepth 1 -not -name .git -exec rm -rf {} +
 cp "$ROOT"/docs/*.md "$TMP/wiki/"
+# the pages reference their pictures as images/<name>.png
+if [ -d "$ROOT/docs/images" ]; then
+  mkdir -p "$TMP/wiki/images"
+  cp "$ROOT"/docs/images/* "$TMP/wiki/images/"
+fi
 [ -f "$TMP/wiki/Home.md" ] || { echo "docs/Home.md manquant." >&2; exit 1; }
 
 cd "$TMP/wiki"
