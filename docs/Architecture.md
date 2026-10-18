@@ -68,11 +68,11 @@ Règles de dépendance, vérifiées par ESLint (`no-restricted-imports`) :
 |---|---|---|---|
 | platform | Configuration, journaux, accès BD et contexte d'entreprise, i18n, stockage, courriel | — | 2 |
 | auth | `/setup`, connexion, sessions, 2FA, réinitialisation du mot de passe, limitation de débit | `instance`, `app_user`, `user_credential`, `user_recovery_code`, `session`, `password_reset_token`, `rate_limit` | 2 |
-| companies | Entreprises, membres, rôles, invitations, paramètres | `company`, `membership`, `invitation` | 2 |
+| companies | Entreprises, membres, rôles, invitations, profil et numéros d'inscription (TPS/TVQ/NEQ) | `company`, `membership`, `invitation` | 2 (profil : 4a) |
 | ledger | Plan comptable et gabarit canadien, exercices et périodes, journal, contre-passation, numérotation | `account`, `fiscal_year`, `fiscal_period`, `journal_entry`, `journal_line`, `number_sequence` | 3 |
 | audit | Consultation de la piste d'audit, événements applicatifs | `audit_log` | 3 |
-| contacts | Clients, fournisseurs, produits et services | `contact`, `item` | 4 |
-| taxes | Taxes, taux datés, codes de taxe, moteur de calcul, déclarations | `tax`, `tax_rate`, `tax_code`, `tax_code_component`, `tax_return` | 4 (déclarations : 6) |
+| contacts | Clients, fournisseurs, produits et services, anonymisation (Loi 25) | `contact`, `item` | 4a |
+| taxes | Taxes, taux datés, codes de taxe, moteur de calcul, déclarations | `tax`, `tax_rate`, `tax_code`, `tax_code_component`, `tax_return` | 4a (déclarations : 6) |
 | sales | Factures, avoirs, application des avoirs | `sales_document`, `sales_document_line`, `sales_document_tax`, `sales_credit_application` | 4 |
 | purchases | Factures fournisseurs, crédits fournisseurs, dépenses | `purchase_document`, `purchase_document_line`, `purchase_document_tax`, `purchase_credit_application` | 4 |
 | payments | Encaissements, décaissements, affectations, compensations, dépôts | `payment`, `payment_allocation`, `payment_offset`, `bank_deposit`, `bank_deposit_item` | 4 |
@@ -81,7 +81,7 @@ Règles de dépendance, vérifiées par ESLint (`no-restricted-imports`) :
 | reports | Balance de vérification, bilan, état des résultats, grand livre, âge des comptes, sommaire des taxes | (lecture) | 6 |
 | exports | CSV et PDF de chaque rapport et document | (lecture) | 6 |
 
-Le moteur de taxes passe en phase 4, car les factures en ont besoin. Les rapports de taxes restent en phase 6.
+Le moteur de taxes est livré en phase 4a, car les factures (4b) en ont besoin : `computeTaxes` (domaine pur) calcule les taxes d'un document avec les taux en vigueur à sa date, et la base recalcule la même chose à la validation (`sales_document_taxes_are_exact`). Les montants de ligne, les taux et les quantités sont des entiers mis à l'échelle (cents, millionièmes, 4 et 6 décimales), jamais des nombres à virgule. Les rapports de taxes restent en phase 6.
 
 ## Parcours d'une requête
 1. `proxy.ts` lit le cookie de session et ajoute un identifiant de requête.

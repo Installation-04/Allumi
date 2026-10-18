@@ -41,7 +41,8 @@ Ces règles sont non négociables : toute contribution qui les contourne est ref
 - Un membre en lecture seule ne peut rien modifier, même par erreur de code.
 
 ## Taxes (TPS/TVQ)
-- Taux configurables avec date d'effet (jamais codés en dur).
+- Taux configurables avec date d'effet (jamais codés en dur) : le plan de départ du Québec n'est qu'un point de départ, avec les taux publiés (TPS 5 % depuis 2008, TVQ 9,975 % depuis 2013). Détails : [[Taxes]].
+- Un taux ne s'ajoute que par la fin de son historique (on ne récrit pas le passé).
 - Les rapports de taxes se calculent depuis le grand livre : chaque ligne d'un compte de taxes porte sa taxe et sa case de déclaration (perçue, récupérable, redressement, versement).
 - Une déclaration produite est figée : aucune écriture ne peut plus être datée dans sa période.
 - La base de données recalcule les taxes des ventes à la validation (lignes, codes, taux en vigueur à la date du document, mode d'arrondi figé).
