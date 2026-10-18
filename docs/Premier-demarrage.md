@@ -3,7 +3,7 @@
 Après l'installation ([[Installation]]), ouvre l'adresse de ton instance. Tant qu'aucun utilisateur n'existe, toutes les pages mènent à **`/setup`**.
 
 ## Créer l'entreprise et l'administrateur
-Le formulaire demande d'abord le **jeton d'installation** : `install.sh` l'affiche à la fin et le garde dans `.env` (`SETUP_TOKEN`). Il empêche une autre personne d'atteindre l'adresse avant toi et de créer l'administrateur (les certificats HTTPS sont publics, les robots surveillent les nouveaux domaines). Sans `SETUP_TOKEN` (développement local), le champ n'apparaît pas.
+Le formulaire demande d'abord le **jeton d'installation** : `install.sh` l'affiche à la fin et le garde dans `.env` (`SETUP_TOKEN`). Il empêche une autre personne d'atteindre l'adresse avant toi et de créer l'administrateur (les certificats HTTPS sont publics, les robots surveillent les nouveaux domaines). Sans `SETUP_TOKEN`, le champ n'apparaît pas en développement local; sur un serveur public (production, HTTPS), la page reste **fermée** et t'invite à définir `SETUP_TOKEN` dans `.env`.
 
 Il demande ensuite :
 - le **nom de l'entreprise** et le **premier mois de l'exercice financier** (ex. avril pour un exercice du 1er avril au 31 mars);

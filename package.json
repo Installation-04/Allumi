@@ -20,8 +20,7 @@
     "test:watch": "vitest",
     "test:e2e": "tsx tests/e2e/prepare-db.ts && playwright test",
     "prisma:generate": "prisma generate",
-    "db:migrate": "prisma migrate deploy && node --env-file-if-exists=.env prisma/app-role.mjs",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:migrate": "prisma migrate deploy && node --env-file-if-exists=.env prisma/app-role.mjs"
   },
   "dependencies": {
     "@node-rs/argon2": "2.2.2",

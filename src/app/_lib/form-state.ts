@@ -9,6 +9,7 @@ export type FormErrorKey =
   | "sameAsEmail"
   | "alreadySetUp"
   | "setupToken"
+  | "setupTokenMissing"
   | "generic";
 
 /** Result of a server action used with useActionState. */

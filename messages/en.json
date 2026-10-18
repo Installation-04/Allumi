@@ -23,6 +23,7 @@
   "setup": {
     "title": "Welcome to Allumi",
     "intro": "Create the company and the administrator account. This page is disabled afterwards.",
+    "tokenMissing": "This instance is exposed to the Internet without a setup token: the first visitor could take it over. Add SETUP_TOKEN to the server's .env file (openssl rand -hex 16), then restart with docker compose up -d.",
     "token": "Setup token",
     "tokenHint": "It is in the server's .env file (SETUP_TOKEN) and in the message printed at the end of the installation.",
     "company": "Company",
@@ -92,6 +93,7 @@
       "credentials": "Wrong e-mail or password, or account temporarily locked.",
       "rateLimited": "Too many attempts. Try again in a few minutes.",
       "setupToken": "Wrong setup token.",
+      "setupTokenMissing": "Setup is closed: SETUP_TOKEN is not set on the server.",
       "code": "Invalid or already used code.",
       "mismatch": "The passwords do not match.",
       "tooShort": "The password is too short (at least {min} characters).",

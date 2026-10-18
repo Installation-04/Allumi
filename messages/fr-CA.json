@@ -23,6 +23,7 @@
   "setup": {
     "title": "Bienvenue dans Allumi",
     "intro": "Crée l'entreprise et le compte administrateur. Cette page se désactive ensuite.",
+    "tokenMissing": "Cette instance est exposée sur Internet sans jeton d'installation : la première personne qui l'atteindrait pourrait en prendre le contrôle. Ajoute SETUP_TOKEN dans le fichier .env du serveur (openssl rand -hex 16), puis redémarre avec docker compose up -d.",
     "token": "Jeton d'installation",
     "tokenHint": "Il se trouve dans le fichier .env du serveur (SETUP_TOKEN) et dans le message de fin de l'installation.",
     "company": "Entreprise",
@@ -92,6 +93,7 @@
       "credentials": "Courriel ou mot de passe incorrect, ou compte temporairement verrouillé.",
       "rateLimited": "Trop de tentatives. Réessaie dans quelques minutes.",
       "setupToken": "Jeton d'installation incorrect.",
+      "setupTokenMissing": "L'installation est fermée : SETUP_TOKEN n'est pas défini sur le serveur.",
       "code": "Code invalide ou déjà utilisé.",
       "mismatch": "Les mots de passe ne correspondent pas.",
       "tooShort": "Le mot de passe est trop court (au moins {min} caractères).",
