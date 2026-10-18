@@ -142,6 +142,7 @@ Ajouter une valeur à la fin d'un enum n'a pas ces effets.
 ## Limites connues
 - Pas de multidevise : toutes les colonnes `currency` sont contraintes à `CAD`.
 - Les montants dépassant 10¹⁴ cents par ligne sont refusés.
+- Un propriétaire ne peut pas quitter l'entreprise en supprimant lui-même son adhésion, même s'il reste un autre propriétaire : la vérification « il reste un propriétaire » (`AL009`) s'exécute sous la RLS de la personne qui supprime et ne voit plus l'autre propriétaire. Le refus est du côté sûr (jamais d'entreprise sans propriétaire). Le cas est suivi par un test attendu en échec (`access-rules.test.ts`, OWN1); il sera réglé avec la gestion des membres.
 - Les vérifications différées sont proportionnelles au nombre de lignes de l'écriture; elles restent rapides parce que les index commencent par `company_id`. Après un gros import ou une restauration, lancer `ANALYZE`.
 
 ## Validation faite en phase 1
