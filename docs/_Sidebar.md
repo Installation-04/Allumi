@@ -17,6 +17,10 @@
 - [[Plan-comptable]]
 - [[Journal-et-ecritures]]
 - [[Exercices-et-periodes]]
+- [[Contacts]]
+- [[Produits-et-services]]
+- [[Taxes]]
+- [[Entreprise]]
 - [[Piste-d-audit]]
 
 **Comprendre**

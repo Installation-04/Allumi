@@ -47,3 +47,13 @@ export function nextDay(value: IsoDate): IsoDate {
   if (parsed.day < daysInMonth(parsed.year, parsed.month)) return formatIsoDate(parsed.year, parsed.month, parsed.day + 1);
   return addMonthsFirstDay(value, 1);
 }
+
+/** The day before `value`. */
+export function previousDay(value: IsoDate): IsoDate {
+  const parsed = parseIsoDate(value);
+  if (!parsed) throw new RangeError(`invalid date: ${value}`);
+  if (parsed.day > 1) return formatIsoDate(parsed.year, parsed.month, parsed.day - 1);
+  const month = parsed.month === 1 ? 12 : parsed.month - 1;
+  const year = parsed.month === 1 ? parsed.year - 1 : parsed.year;
+  return formatIsoDate(year, month, daysInMonth(year, month));
+}

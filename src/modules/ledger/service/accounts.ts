@@ -1,7 +1,7 @@
 import "server-only";
 import { requireRole } from "@/modules/companies";
 import { AppError, isConflict, prismaErrorCode } from "@/platform/errors";
-import { accountInputSchema, accountPatchSchema, type AccountInput, type AccountPatch, type AccountSubtype, type AccountType, type SystemAccount } from "../domain/accounts";
+import { accountInputSchema, accountPatchSchema, nextFreeCode, type AccountInput, type AccountPatch, type AccountSubtype, type AccountType, type SystemAccount } from "../domain/accounts";
 import { inCompany, type Actor } from "./support";
 
 export type AccountDto = {
@@ -75,6 +75,27 @@ export async function createAccount(actor: Actor, input: AccountInput): Promise<
       if (isConflict(error)) throw new AppError("ledger.codeTaken");
       throw error;
     }
+  });
+}
+
+/**
+ * The account of a sales tax: the one with this code if it is a sales-tax account of the right type, otherwise a new one
+ * (on the next free code). Reserved to the taxes module: the account form refuses the SALES_TAX subtype, which belongs to a tax.
+ */
+export async function ensureSalesTaxAccount(
+  actor: Actor,
+  wanted: { code: string; nameFr: string; nameEn: string; type: "ASSET" | "LIABILITY" },
+): Promise<AccountDto> {
+  return inCompany(actor, async (tx) => {
+    await requireRole(tx, "account.manage");
+    const existing = await tx.account.findFirst({ where: { companyId: actor.companyId, code: wanted.code, subtype: "SALES_TAX", type: wanted.type }, select: SELECT });
+    if (existing) return toAccountDto(existing);
+    const taken = new Set((await tx.account.findMany({ where: { companyId: actor.companyId }, select: { code: true } })).map((row) => row.code));
+    const row = await tx.account.create({
+      data: { companyId: actor.companyId, code: nextFreeCode(taken, wanted.code), nameFr: wanted.nameFr, nameEn: wanted.nameEn, type: wanted.type, subtype: "SALES_TAX" },
+      select: SELECT,
+    });
+    return toAccountDto(row);
   });
 }
 

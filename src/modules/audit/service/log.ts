@@ -1,5 +1,6 @@
 import "server-only";
 import { requireRole } from "@/modules/companies";
+import { likeText } from "@/platform/search";
 import { withCompany } from "@/platform/tenant";
 
 export type AuditEntryDto = {
@@ -41,7 +42,7 @@ export async function listAuditLog(
         companyId: actor.companyId,
         ...(filter.entityType ? { entityType: filter.entityType } : {}),
         ...(filter.entityId ? { entityId: filter.entityId } : {}),
-        ...(filter.action ? { action: { startsWith: filter.action } } : {}),
+        ...(filter.action ? { action: { startsWith: likeText(filter.action) } } : {}),
         ...(filter.actorUserId ? { actorUserId: filter.actorUserId } : {}),
         ...(cursor !== undefined ? { id: { lt: cursor } } : {}),
       },

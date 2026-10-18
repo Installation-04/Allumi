@@ -110,7 +110,16 @@ Phase 3 (moteur comptable) : `npm test` roule les tests unitaires et d'intégrat
 - `tests/e2e` : `/setup`, tableau de bord, 2FA, bascule en anglais, puis le parcours du moteur : plan de départ, formulaire de compte (type et sous-types, compte refusé, renommage), écriture déséquilibrée refusée avec conservation de ce qui a été saisi, écriture enregistrée, contre-passation, balance, verrouillage d'une période et refus dans celle-ci, réouverture avec un code d'authentification (refusé puis accepté), piste d'audit.
 - Les tests d'intégration qui rouvrent le passé activent la 2FA pour de vrai (`enableTotp` dans `tests/integration/helpers.ts`) et fournissent un code par étape de 30 secondes, comme un propriétaire.
 
-Propriétés du tableau ci-dessus déjà implémentées : P1, P2, P3, P5, P7, P8, P11, P13 (et l'isolation, P12, par des cas d'`isolation.test.ts`). Restent : P4, P6, P14 (domaine des taxes et des imputations), P9, P10, P15 à P17 (documents, taxes, déclarations) : phases 4 et 6.
+Phase 4a (contacts, produits, taxes, entreprise) :
+- `tests/unit/taxes-domain.test.ts` : décimaux mis à l'échelle (analyse et affichage), montant de ligne (arrondi à la demi-unité loin de zéro, comme `round(numeric)` de PostgreSQL), historique des taux (P14 : jamais de chevauchement ni de trou, seul le bout de l'historique s'allonge) et calcul des taxes (P6 : les deux modes d'arrondi, taxe recouvrable, aucun flottant);
+- `tests/unit/registration.test.ts` : numéros de TPS/TVH, de TVQ, NEQ et de l'entreprise (normalisation, refus, format enregistré), code postal;
+- `tests/integration/taxes-service.test.ts` (15 cas) : installation des taxes du Québec (idempotente, sans doublon sous concurrence), création de comptes de taxe, ajout de taux (refus d'un taux antérieur ou qui chevauche), codes de taxe (un code STANDARD exige une composante), rôles, isolation entre entreprises, et accord du domaine avec `round(numeric)` de la base sur des centaines de cas;
+- `tests/integration/contacts-service.test.ts` (10 cas) : création, recherche (les caractères `%` et `_` sont littéraux), désactivation, suppression refusée si le contact sert, anonymisation (renseignements effacés, piste d'audit caviardée, propriétaire seulement), isolation et rôles;
+- `tests/unit/permissions.test.ts` : actions `contact.*`, `item.*`, `tax.*`, `company.*`;
+- `tests/unit/client-boundary.test.ts` : les fichiers `"use server"` n'exportent que des fonctions asynchrones (sinon la construction échoue) et les modules client n'exportent aucune constante;
+- `tests/e2e` : `businessJourney` (numéros d'inscription normalisés et conservés après un refus, installation de la TPS et de la TVQ, changement de taux daté, contact avec code postal normalisé, recherche, produit à « 85,5 » affiché « 85,50 », anonymisation).
+
+Propriétés du tableau ci-dessus déjà implémentées : P1, P2, P3, P5, P6, P7, P8, P11, P13, P14 (et l'isolation, P12, par des cas d'`isolation.test.ts`). Restent : P4 (imputations), P9, P10, P15 à P17 (documents, déclarations) : phases 4b et 6.
 
 Le portage a trouvé un trou dans la base : un dépôt sans élément n'était pas comparé à son total. Il est corrigé par la migration `20261018000000_deposit_needs_items` ([[Schema-de-donnees]]).
 
