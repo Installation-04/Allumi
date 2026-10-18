@@ -18,7 +18,7 @@
 | Bout en bout | Playwright | quelques parcours clés | CI |
 
 ## Environnement de test
-- Une base gabarit `allumi_test_template` reçoit les migrations (`prisma migrate deploy`, rôle propriétaire) une fois par exécution.
+- Une base gabarit `allumi_test_template` reçoit les migrations (`prisma migrate deploy`, rôle propriétaire) une fois par exécution. `ALLUMI_TEST_TEMPLATE=<nom>` change son nom : nécessaire pour lancer deux exécutions en même temps (deux terminaux, deux copies du dépôt), sinon elles se disputent le même gabarit.
 - Chaque worker Vitest clone le gabarit (`CREATE DATABASE … TEMPLATE …`) : tests isolés et parallèles.
 - Les tests se connectent avec le rôle **`allumi_app`**, comme l'application. Quelques tests se connectent en propriétaire pour vérifier que les triggers bloquent même lui.
 - Les fixtures sont fictives (entreprise « Atelier Exemple inc. »), jamais de vraies données.
@@ -59,7 +59,7 @@ Générateurs : montants (1 ¢ à 10⁹ ¢, avec les bornes), écritures équili
 Un **modèle en mémoire** (soldes par compte et par contact, statuts des périodes et des documents) est comparé au **service réel sur la vraie base**. Commandes aléatoires : écriture manuelle, contre-passation, facture, avoir, paiement, dépôt, affectation, retrait d'affectation, annulation, verrouillage, réouverture, rapprochement. Après chaque commande : mêmes soldes, mêmes refus (avec le même code `ALxxx`), et P1, P8 et P10 vérifiées.
 
 ## Tests d'intégration de la base
-La phase 1 a validé le schéma avec 58 cas SQL exécutés **connecté en `allumi_app`** (comme l'application) et 4 cas propriétaire, tous réussis. Ils sont à porter en Vitest en phase 3 :
+La phase 1 a validé le schéma avec 58 cas SQL exécutés **connecté en `allumi_app`** (comme l'application) et 4 cas propriétaire, tous réussis. La phase 3 les porte en Vitest (`ledger-rules.test.ts`, `documents-rules.test.ts`, `access-rules.test.ts`, `concurrency.test.ts`, qui partagent les données de `world.sql` et les aides de `world.ts`) et y ajoute les règles qui n'avaient pas encore de cas. Les familles couvertes :
 - partie double (déséquilibre, une ligne, aucune ligne, débit et crédit sur la même ligne);
 - immuabilité : `UPDATE`/`DELETE` refusés au rôle applicatif (privilèges) **et** au propriétaire (triggers), `TRUNCATE` refusé, lignes ajoutées après coup refusées;
 - périodes : verrouillée, date hors période, exercice fermé avec périodes ouvertes, chevauchements (`EXCLUDE`);
@@ -80,7 +80,7 @@ La phase 1 a validé le schéma avec 58 cas SQL exécutés **connecté en `allum
 
 **Test de catalogue** : toute table avec `company_id` a RLS `ENABLE` + `FORCE` et une politique; chaque table d'affaires a son trigger d'audit; `allumi_app` n'a ni `UPDATE`/`DELETE` sur le journal et l'audit, ni `TRUNCATE` nulle part. Ce test attrape une migration future qui oublierait une table.
 
-**Concurrence** (deux connexions), vérifiée en phase 1 : verrouiller une période pendant qu'une écriture y est en cours (le verrou attend le `COMMIT`, l'écriture suivante est refusée); deux affectations simultanées sur la même facture (la seconde est refusée); deux rétrogradations simultanées de propriétaires (la seconde est refusée); suppression d'une ligne de brouillon pendant la validation du document (la validation échoue et le brouillon reste intact). À ajouter : deux validations simultanées (numérotation).
+**Concurrence** (deux connexions), vérifiée en phase 1 : verrouiller une période pendant qu'une écriture y est en cours (le verrou attend le `COMMIT`, l'écriture suivante est refusée); deux affectations simultanées sur la même facture (la seconde est refusée); deux rétrogradations simultanées de propriétaires (la seconde est refusée); suppression d'une ligne de brouillon pendant la validation du document (la validation échoue et le brouillon reste intact). La numérotation de deux validations simultanées est vérifiée par P13.
 
 **Dérive Prisma** : `prisma migrate diff --from-migrations … --to-schema … --exit-code` en CI.
 
@@ -99,12 +99,19 @@ Un scénario fictif figé (une année d'activité d'« Atelier Exemple inc. ») 
 5. Interface en anglais : aucune chaîne manquante.
 
 ## État d'avancement
-Phase 2 (squelette) : tests unitaires et d'intégration (`npm test`), plus un parcours Playwright (`npm run test:e2e`).
-- `tests/unit` : environnement, mot de passe, TOTP (dont une propriété), codes de récupération, politique de session, détection des erreurs `ALxxx`, chiffrement (propriété aller-retour), parité des catalogues de messages.
-- `tests/integration` (base clonée par fichier, rôle `allumi_app`) : catalogue de la base (RLS partout, aucun `TRUNCATE`, audit non inscriptible, `EXECUTE` retiré à `PUBLIC`), `/setup` (course entre deux requêtes, désactivation, limite), connexion (verrouillage, limitation de débit, réponses identiques), sessions (inactivité, durée absolue, désactivation), 2FA (rejeu refusé, code de récupération à usage unique, désactivation), isolation entre entreprises (IDOR, rôles, audit, caviardage, dernier propriétaire), erreurs `ALxxx` à travers Prisma, `/api/health`.
-- `tests/e2e` : `/setup`, tableau de bord, cookie `httpOnly`, 2FA et codes de récupération, rejeu refusé, bascule en anglais. Le serveur testé est le serveur autonome, comme dans l'image Docker.
+Phase 3 (moteur comptable) : `npm test` roule les tests unitaires et d'intégration; `npm run test:e2e` le parcours Playwright.
 
-Les propriétés du moteur comptable (P1 à P17) et le test à états arrivent avec la phase 3.
+- `tests/unit` : en plus de ceux de la phase 2, argent et arrondi (P5, P7), validation d'écriture (P1, P2, P3, P8), périodes (P11), plan de départ canadien, matrice des rôles.
+- `tests/integration` (base clonée par fichier, rôle `allumi_app`) :
+  - `ledger-service` : initialisation, écritures, refus, rôles, isolation et IDOR, numérotation sans trou (P13), contre-passation, réouverture protégée (2FA, motif, audit), exercices, comptes, audit, P1, P3, P5 et P8 sur la vraie base;
+  - `engine-agreement` : le domaine et la base refusent et acceptent les mêmes écritures (P2) et la contre-passation est le miroir exact;
+  - `ledger-stateful` : le test à états (modèle en mémoire contre les vrais services; écriture, contre-passation, verrouillage, réouverture) vérifie mêmes réponses, mêmes numéros, mêmes soldes, balance à zéro (P1, P8, P11);
+  - `ledger-rules`, `documents-rules`, `access-rules`, `concurrency` : les cas SQL de la phase 1.
+- `tests/e2e` : `/setup`, tableau de bord, 2FA, bascule en anglais, puis le parcours du moteur : plan de départ, écriture déséquilibrée refusée, écriture enregistrée, contre-passation, balance, verrouillage d'une période et refus dans celle-ci, piste d'audit.
+
+Propriétés du tableau ci-dessus déjà implémentées : P1, P2, P3, P5, P7, P8, P11, P13 (et l'isolation, P12, par des cas d'`isolation.test.ts`). Restent : P4, P6, P14 (domaine des taxes et des imputations), P9, P10, P15 à P17 (documents, taxes, déclarations) : phases 4 et 6.
+
+Le portage a trouvé un trou dans la base : un dépôt sans élément n'était pas comparé à son total. Il est corrigé par la migration `20261018000000_deposit_needs_items` ([[Schema-de-donnees]]).
 
 ## Critères de réussite
 - Domaine : ≥ 95 % de couverture des lignes et des branches. Services : ≥ 85 %.

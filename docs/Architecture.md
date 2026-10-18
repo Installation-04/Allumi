@@ -112,7 +112,7 @@ Le rôle `allumi_app` est créé par la migration sans droit de connexion; l'ét
 - **Journal en ajout seulement.** Une écriture est validée dès son insertion : pas de brouillon dans le grand livre. Les brouillons vivent dans les documents (factures, dépenses). Une correction passe par une **contre-passation** (écriture miroir liée par `reverses_entry_id`, unique), puis une nouvelle écriture.
 - **Partie double, vérifiée deux fois.** Le domaine refuse une écriture déséquilibrée avant l'envoi. Un trigger différé (`DEFERRABLE INITIALLY DEFERRED`) la refuse aussi au `COMMIT` : au moins deux lignes, Σ débits = Σ crédits, un seul côté non nul par ligne.
 - **Immuabilité, trois couches** : privilèges du rôle applicatif, triggers qui refusent `UPDATE`/`DELETE`/`TRUNCATE` (même pour le propriétaire), et lignes acceptées seulement dans la transaction qui a créé l'écriture (estampille `created_txid`, posée par trigger, exacte même dans un savepoint).
-- **Périodes.** Chaque exercice est découpé en périodes (mensuelles par défaut). Toute écriture doit tomber dans une période ouverte (verrou `FOR SHARE`, donc pas de course avec une fermeture). Rouvrir une période est une action privilégiée : 2FA active, motif obligatoire, audit. Pour fermer un exercice, toutes ses périodes doivent être verrouillées.
+- **Périodes.** Chaque exercice est découpé en périodes (mensuelles par défaut). Toute écriture doit tomber dans une période ouverte (verrou `FOR SHARE`, donc pas de course avec une fermeture). Rouvrir une période est une action privilégiée : propriétaire, 2FA active, motif obligatoire, audit (conditions appliquées par le service `ledger`; la base impose l'audit du changement et refuse de toucher aux périodes d'un exercice fermé). Pour fermer un exercice, toutes ses périodes doivent être verrouillées.
 - **Comptes de contrôle et imputation exacte.** Les comptes clients et fournisseurs n'acceptent que les écritures issues de documents, de paiements et de contre-passations, toujours avec un contact. De plus, au `COMMIT`, la base vérifie que l'écriture existe pour sa pièce et que ses montants sur les comptes de contrôle et de paiement égalent le total de la pièce. L'âge des comptes concilie donc toujours avec le grand livre.
 - **Deux dates.** Un document a la date de la pièce (échéance, âge des comptes) et une date comptable (l'écriture), ce qui permet les factures reçues après la fermeture d'une période et les documents d'ouverture.
 - **Affectations datées.** Un paiement affecté à une facture, un avoir appliqué, une compensation : jamais supprimés, retirés à une date dans une période ouverte. L'âge des comptes à une date passée reste reproductible. Les remboursements de trop-perçu passent par `payment_offset`, les dépôts de fonds par `bank_deposit`.
@@ -120,6 +120,15 @@ Le rôle `allumi_app` est créé par la migration sans droit de connexion; l'ét
 - **Bénéfices non répartis** : calculés par les rapports (cumul des résultats des exercices antérieurs). Pas d'écriture de clôture.
 - **Numérotation sans trou** par entreprise et par type (`number_sequence`, verrou de ligne).
 - **Soldes d'ouverture** : écriture `OPENING_BALANCE` contre « Capitaux propres – soldes d'ouverture ». Les comptes clients et fournisseurs d'ouverture passent par des factures d'ouverture.
+
+### Réalisation (phase 3)
+- **Domaine pur** (`src/modules/ledger/domain`) : argent et arrondi, dates ISO, périodes, validation d'écriture (`checkEntry`, `reversalLines`), comptes, balances, plan de départ canadien. Il refuse les mêmes cas que la base; `tests/integration/engine-agreement.test.ts` le vérifie sur des écritures aléatoires.
+- **Services** (`src/modules/ledger/service`) : chacun passe par `inCompany`, qui enveloppe `withCompany` et traduit les erreurs de règle de la base (`AL001`…`AL011`) en `AppError`, puis par `requireRole(tx, action)` (module `companies`), qui lit le rôle dans la base (`app_tenant_role()`) et applique la matrice `can(role, action)`. La base reste l'arbitre : la matrice sert à refuser tôt, avec un message clair.
+- **Deux entrées par module.** `index.ts` expose les services (serveur seulement); `client.ts` expose uniquement ce qui est sans danger côté navigateur (domaine pur : `parseMoney`, `formatMoney`, `checkEntry`). Les composants client importent `@/modules/ledger/client`, et ESLint interdit tout autre import profond.
+- **Erreurs.** Une `AppError` porte une clé de message (`errors.ledger.*` ou `errors.ALxxx`); `safeAction` la renvoie à l'écran traduite, sans jamais exposer le texte de la base. Toute autre erreur devient le message générique.
+- **Numérotation.** `UPDATE number_sequence … RETURNING` dans la transaction de l'écriture : le verrou de ligne sérialise les écritures concurrentes, et une écriture refusée ne consomme aucun numéro.
+- **Un seul fuseau horaire.** « Aujourd'hui » se calcule à l'heure de `America/Toronto` (`COMPANY_TIME_ZONE`) pour toutes les entreprises; un réglage par entreprise viendra plus tard.
+- **Pas de codes GIFI** dans le plan de départ : ils seront ajoutés avec les rapports, après vérification de la liste en vigueur.
 
 ## Argent, quantités et arrondi
 - Montants en `BIGINT` (cents) dans le grand livre et les totaux; `bigint` en TypeScript. Jamais de `number` pour l'argent : une règle ESLint interdit `parseFloat` et `Number()` dans `domain/`.
@@ -211,7 +220,7 @@ Ce que l'application garantit à l'infrastructure :
 | L'image `postgres` crée un superuser qui contourne RLS | Isolation inopérante si l'app l'utilise | Rôle `allumi_app` dédié; l'app ne reçoit pas les identifiants propriétaires et refuse de démarrer avec un rôle superuser ou `BYPASSRLS` |
 | Les rôles ne sont pas dans `pg_dump` | Restauration sur une grappe neuve : `GRANT` en échec, l'app ne se connecte plus | `restore.sh` crée les rôles avant `pg_restore`; test de restauration en CI |
 | Changement d'un enum par Prisma | Migration en échec (CHECK, index partiels, fonctions qui dépendent du type) | `CHECK` écrits sur `::text`; recette dans [[Schema-de-donnees]]; toutes les migrations appliquées sur une base vide en CI |
-| Vérifications différées proportionnelles aux lignes | Lenteur d'un gros import sans statistiques | Index commençant par `company_id`; `ANALYZE` après import et restauration; test de performance (8 000 écritures sous 5 s) |
+| Vérifications différées proportionnelles aux lignes | Lenteur d'un gros import sans statistiques | Index commençant par `company_id`; `ANALYZE` après import et restauration; garde de performance (2 000 écritures validées en une transaction, borne large qui attrape un index manquant) |
 | Prisma 7 (configuration, adaptateur, ESM) et étape `migrate` du Dockerfile | Build ou migration en échec | Ajustés en phase 2, validés par le job `docker` de la CI |
 | `bigint` non sérialisable en JSON | Erreurs entre serveur et client | Conversion en chaîne à la frontière, types dédiés |
 | Complexité fiscale (lieu de fourniture, TVH, méthode rapide, CTI partiels) | Déclarations erronées | Codes de taxe configurables, taux datés, avertissements, revue par un comptable; méthode rapide hors MVP |
@@ -224,7 +233,7 @@ Ce que l'application garantit à l'infrastructure :
 | Module natif argon2 dans l'image standalone | Échec au démarrage | `serverExternalPackages`, vérifié par le healthcheck de la CI |
 | Clean-room (gabarit de plan comptable, libellés) | Contenu protégé copié par mégarde | Gabarit original fondé sur la numérotation usuelle et l'IGRF public de l'ARC; revue à chaque PR |
 | Perte d'`ENCRYPTION_KEY` | Secrets 2FA illisibles | Documenté dans [[Configuration]]; codes de récupération; rotation de clé prévue plus tard |
-| Fuseaux horaires | Écriture datée du mauvais jour | Dates comptables en `DATE`, saisie en date locale |
+| Fuseaux horaires | Écriture datée du mauvais jour | Dates comptables en `DATE`, saisie en date locale; « aujourd'hui » à l'heure de Montréal pour toutes les entreprises tant qu'il n'y a pas de réglage par entreprise |
 | Multidevise reportée | Refonte partielle plus tard | Colonnes `currency` présentes, contraintes `CAD` à relâcher par migration |
 | PostgreSQL 16 en session cloud, 17 en production | Écart de comportement | Aucune fonction propre à PG 17; la CI teste sur PG 17 |
 
