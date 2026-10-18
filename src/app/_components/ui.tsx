@@ -1,7 +1,9 @@
 "use client";
 
-import { useId } from "react";
+import { useActionState, useId } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
+import type { FormState } from "@/app/_lib/form-state";
 import { FOCUS } from "./focus";
 
 export function Field(props: {
@@ -80,3 +82,61 @@ export function Card({ title, children }: { title: string; children: React.React
     </section>
   );
 }
+
+/** The error of a form state, whichever catalog it comes from. */
+export function StateError({ state }: { state: FormState }) {
+  const t = useTranslations("errors");
+  if (state?.messageKey) return <FormError message={t(state.messageKey as "forbidden")} />;
+  if (state?.error) return <FormError message={t(`form.${state.error}`, { min: 12 })} />;
+  return null;
+}
+
+const CONTROL = `w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-base shadow-sm dark:border-stone-700 dark:bg-stone-900 ${FOCUS}`;
+
+export function SelectField(props: { name: string; label: string; options: { value: string; label: string }[]; defaultValue?: string; required?: boolean; hint?: string }) {
+  const { name, label, options, defaultValue, required = true, hint } = props;
+  const id = useId();
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1 block text-sm font-medium">
+        {label}
+      </label>
+      <select id={id} name={name} defaultValue={defaultValue} required={required} aria-describedby={hint ? `${id}-hint` : undefined} className={CONTROL}>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      {hint ? (
+        <p id={`${id}-hint`} className="mt-1 text-xs text-stone-600 dark:text-stone-400">
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * A small form around one server action (lock a period, reverse an entry...): its error is shown in place and
+ * the page is refreshed by the action itself. Extra fields (a reason, a date) go in `children`.
+ */
+export function ActionForm(props: {
+  action: (previous: FormState, formData: FormData) => Promise<FormState>;
+  label: string;
+  variant?: "primary" | "secondary";
+  children?: React.ReactNode;
+}) {
+  const [state, formAction] = useActionState(props.action, undefined);
+  return (
+    <form action={formAction} className="space-y-3">
+      <StateError state={state} />
+      {props.children}
+      <SubmitButton variant={props.variant ?? "secondary"}>{props.label}</SubmitButton>
+    </form>
+  );
+}
+
+export const TABLE_CLASS = "w-full border-collapse text-sm";
+export const TH_CLASS = "border-b border-stone-300 px-2 py-2 text-left font-semibold dark:border-stone-700";
+export const TD_CLASS = "border-b border-stone-200 px-2 py-2 align-top dark:border-stone-800";

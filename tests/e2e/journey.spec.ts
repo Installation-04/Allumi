@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { Secret, TOTP } from "otpauth";
 
 const VERSION = (JSON.parse(readFileSync("package.json", "utf8")) as { version: string }).version;
@@ -104,7 +104,77 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await page.getByRole("button", { name: "Vérifier" }).click();
   await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
 
+  await ledgerJourney(page);
+
   // English interface.
+  await page.goto("/");
   await page.getByRole("button", { name: "English" }).click();
   await expect(page.getByText("Your role: Owner")).toBeVisible();
 });
+
+/** Today in the company's time zone (the application uses America/Toronto), as YYYY-MM-DD. */
+const todayInToronto = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
+
+/** A link of the company navigation (the dashboard cards carry the same names). */
+const openSection = (page: Page, name: string) => page.getByRole("navigation", { name: "Navigation de l'entreprise" }).getByRole("link", { name, exact: true }).click();
+
+/** The accounting engine through the screens: chart, entry, reversal, trial balance, period lock, audit trail. */
+async function ledgerJourney(page: Page) {
+  // The starter chart is there since /setup; add an account.
+  await openSection(page, "Plan comptable");
+  await expect(page.getByRole("heading", { name: "Plan comptable" })).toBeVisible();
+  await expect(page.getByRole("cell", { name: "Banque – compte courant" })).toBeVisible();
+  await page.getByLabel("Code", { exact: true }).fill("6200");
+  await page.getByLabel("Nom (français)").fill("Frais divers");
+  await page.getByLabel("Nom (anglais)").fill("Sundry expenses");
+  await page.getByRole("button", { name: "Créer le compte" }).click();
+  await expect(page.getByRole("cell", { name: "6200" })).toBeVisible();
+
+  // An unbalanced entry is flagged on screen and refused with the rule's message.
+  await openSection(page, "Journal");
+  await page.getByRole("link", { name: "Nouvelle écriture" }).click();
+  await page.getByLabel("Ligne 1 – Compte").selectOption({ label: "1000 – Banque – compte courant" });
+  await page.getByLabel("Ligne 1 – Débit").fill("1 000,00");
+  await page.getByLabel("Ligne 2 – Compte").selectOption({ label: "3000 – Capital-actions" });
+  await page.getByLabel("Ligne 2 – Crédit").fill("900,00");
+  await expect(page.getByText(/Écart : 100,00/)).toBeVisible();
+  await page.getByRole("button", { name: "Enregistrer l'écriture" }).click();
+  await expect(page.getByText("Les débits et les crédits ne sont pas égaux.")).toBeVisible();
+
+  // Balanced: posted, numbered, shown.
+  await page.getByLabel("Ligne 2 – Crédit").fill("1000");
+  await expect(page.getByText("L'écriture est équilibrée.")).toBeVisible();
+  await page.getByRole("button", { name: "Enregistrer l'écriture" }).click();
+  await expect(page.getByRole("heading", { name: "Écriture J-00001" })).toBeVisible();
+  await expect(page.getByRole("cell", { name: /3000 – Capital-actions/ })).toBeVisible();
+
+  // Reversal: a mirror entry, nothing is deleted.
+  await page.getByRole("button", { name: "Contre-passer", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Écriture J-00002" })).toBeVisible();
+  await expect(page.getByText("Contre-passation de l'écriture J-00001")).toBeVisible();
+
+  // The trial balance balances, with the accounting equation.
+  await openSection(page, "Balance de vérification");
+  await expect(page.getByText("La balance est équilibrée")).toBeVisible();
+  await expect(page.getByText("Équation comptable vérifiée")).toBeVisible();
+
+  // Locking the period of today closes it to new entries.
+  await openSection(page, "Exercices");
+  const monthStart = `${todayInToronto().slice(0, 7)}-01`;
+  await page.locator("tr", { hasText: `${monthStart} →` }).getByRole("button", { name: "Verrouiller" }).click();
+  await expect(page.locator("tr", { hasText: `${monthStart} →` }).getByText("Verrouillée")).toBeVisible();
+  await openSection(page, "Journal");
+  await page.getByRole("link", { name: "Nouvelle écriture" }).click();
+  await page.getByLabel("Ligne 1 – Compte").selectOption({ label: "1000 – Banque – compte courant" });
+  await page.getByLabel("Ligne 1 – Débit").fill("5");
+  await page.getByLabel("Ligne 2 – Compte").selectOption({ label: "3000 – Capital-actions" });
+  await page.getByLabel("Ligne 2 – Crédit").fill("5");
+  await page.getByRole("button", { name: "Enregistrer l'écriture" }).click();
+  await expect(page.getByText("Cette période est verrouillée.")).toBeVisible();
+
+  // The audit trail knows about everything, written by the database.
+  await openSection(page, "Piste d'audit");
+  await expect(page.getByRole("heading", { name: "Piste d'audit" })).toBeVisible();
+  await expect(page.getByRole("cell", { name: "row.insert" }).first()).toBeVisible();
+  await expect(page.getByText("journal_entry").first()).toBeVisible();
+}
