@@ -1499,6 +1499,38 @@ describe("properties", () => {
 // ---------------------------------------------------------------------------------------------------------
 
 describe("performance", () => {
+  // Timing depends on the runner; the indexes that the checks rely on do not. Without them every deferred check
+  // scans the whole journal and 2000 entries in a transaction become quadratic (the plan asks for indexes that start with company_id).
+  it("keeps an index for each lookup of the entry checks and of the reports", async () => {
+    const a = `company_id = '${W.companyA}'`;
+    const noId = "00000000-0000-7000-8000-0000000fffff"; // no row has it: only the plan matters
+    const lookups: [what: string, column: string, sql: string][] = [
+      ["lines of an entry", "entry_id", `SELECT * FROM journal_line WHERE ${a} AND entry_id = '${noId}'`],
+      ["an entry by id", "id", `SELECT * FROM journal_entry WHERE ${a} AND id = '${noId}'`],
+      ["an entry by number", "entry_number", `SELECT * FROM journal_entry WHERE ${a} AND entry_number = 1`],
+      ["entries by date", "entry_date", `SELECT * FROM journal_entry WHERE ${a} AND entry_date BETWEEN '2026-01-01' AND '2026-01-31'`],
+      ["the entry that reverses another", "reverses_entry_id", `SELECT * FROM journal_entry WHERE ${a} AND reverses_entry_id = '${noId}'`],
+      ["lines of an account", "account_id", `SELECT * FROM journal_line WHERE ${a} AND account_id = '${W.bank}' AND entry_date BETWEEN '2026-01-01' AND '2026-01-31'`],
+      ["lines of a contact", "contact_id", `SELECT * FROM journal_line WHERE ${a} AND contact_id = '${W.customer}' AND entry_date BETWEEN '2026-01-01' AND '2026-01-31'`],
+      ["lines of a tax", "tax_id", `SELECT * FROM journal_line WHERE ${a} AND tax_id = '${W.gst}' AND entry_date BETWEEN '2026-01-01' AND '2026-01-31'`],
+      ["the period of a date", "start_date", `SELECT * FROM fiscal_period WHERE ${a} AND start_date <= '2026-02-10' AND end_date >= '2026-02-10'`],
+    ];
+    /** The index conditions of a plan: what the chosen indexes really search on (the rest is filtered afterwards). */
+    const indexConditions = (node: unknown): string[] => {
+      if (Array.isArray(node)) return node.flatMap(indexConditions);
+      if (node && typeof node === "object") return Object.entries(node).flatMap(([key, value]) => (key === "Index Cond" && typeof value === "string" ? [value] : indexConditions(value)));
+      return [];
+    };
+    await inContext(app, asOwnerA, async () => {
+      await app.query("SET LOCAL enable_seqscan = off"); // with no usable index the plan is still a sequential scan
+      for (const [what, column, sql] of lookups) {
+        const { rows } = await app.query(`EXPLAIN (FORMAT JSON) ${sql}`);
+        const searched = indexConditions(rows).some((condition) => new RegExp(`\\b${column}\\b`).test(condition));
+        expect({ what, searchedByIndex: searched }).toEqual({ what, searchedByIndex: true });
+      }
+    });
+  });
+
   it("validates 2000 two-line entries inserted in one transaction without quadratic slowdown", { timeout: 120_000 }, async () => {
     const count = 2000;
     const base = entryCounter;
