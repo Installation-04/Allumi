@@ -28,7 +28,7 @@ Ni la date, ni les lignes, ni les montants : l'application ne propose aucun bout
 Une écriture ne se contre-passe qu'une seule fois, et on ne contre-passe pas une contre-passation (`AL008`). Les écritures qui viennent d'un document ou d'un paiement (phase 4) se corrigent en **annulant la pièce**, pas à la main.
 
 ## Balance de vérification
-La balance de vérification totalise, par compte, les débits et les crédits jusqu'à une date (par défaut, toutes les dates). Elle confirme à l'écran que le total des débits égale celui des crédits et que l'équation comptable tient :
+La balance de vérification affiche, pour chaque compte, son **solde net** jusqu'à une date (par défaut, toutes les dates) : dans la colonne des débits si le compte est débiteur, dans celle des crédits s'il est créditeur. Un compte débité de 1 000,00 $ et crédité de 250,00 $ affiche donc 750,00 $ au débit. Elle confirme à l'écran que le total des débits égale celui des crédits et que l'équation comptable tient :
 
 > Actif = Passif + Capitaux propres + (Produits − Charges)
 

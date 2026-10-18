@@ -26,6 +26,7 @@ Détails de sécurité :
 - Un code déjà accepté **ne peut pas être rejoué** (RFC 6238, §5.2).
 - Les tentatives de code sont limitées (8 par 15 minutes).
 - Pour **désactiver** la 2FA, il faut le mot de passe et un code actuel.
+- **Rouvrir une période ou un exercice** ([[Exercices-et-periodes]]) demande aussi un code saisi à ce moment, même si la session est déjà vérifiée : un témoin de connexion volé ne suffit pas à rouvrir le passé.
 - Tant que la deuxième étape n'est pas faite, la session ne donne accès qu'à la page de vérification.
 
 ## Ce qui n'est pas encore là

@@ -27,7 +27,7 @@ Ces règles sont non négociables : toute contribution qui les contourne est ref
 
 ## Périodes
 - Une période fermée refuse toute nouvelle écriture.
-- La réouverture est une action privilégiée et auditée : propriétaire seulement, avec la vérification en deux étapes active, un motif écrit d'au moins 10 caractères et un événement d'audit ([[Exercices-et-periodes]]). Ces conditions sont appliquées par l'application (la base garantit l'audit du changement, pas le 2FA).
+- La réouverture est une action privilégiée et auditée : propriétaire seulement, avec la vérification en deux étapes active et un code saisi à ce moment, un motif écrit d'au moins 10 caractères et un événement d'audit ([[Exercices-et-periodes]]). Ces conditions sont appliquées par l'application (la base garantit l'audit du changement, pas le 2FA).
 - Un exercice se ferme quand toutes ses périodes sont verrouillées; tant qu'il est fermé, ses périodes ne changent pas d'état.
 
 ## Vie privée (Loi 25)

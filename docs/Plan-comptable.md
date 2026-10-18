@@ -15,7 +15,7 @@ Le plan comptable est la liste des comptes de l'entreprise : chaque montant d'un
 
 Les noms sont originaux (ni copiés d'un autre logiciel ni tirés d'un barème de produit). Les **codes GIFI** de l'Agence du revenu du Canada ne sont volontairement pas inclus : le rapprochement avec les formulaires T2 viendra avec les rapports (phase 6), après vérification des codes en vigueur.
 
-Le plan est un **point de départ** : ajoute, renomme, désactive des comptes. Une entreprise qui existait avant la phase 3 reçoit le plan, la numérotation et son exercice courant en cliquant sur « Initialiser » sur le tableau de bord; l'opération ne fait qu'ajouter ce qui manque.
+Le plan est un **point de départ** : ajoute, renomme, désactive des comptes. Une entreprise qui existait avant la phase 3 reçoit le plan, la numérotation et son exercice courant en cliquant sur « Initialiser » sur le tableau de bord; l'opération ne fait qu'ajouter ce qui manque. Dans une entreprise qui a déjà ses propres comptes, seuls les cinq comptes système manquants sont ajoutés (sur le code suivant si celui du gabarit est pris), sans imposer le reste du plan.
 
 ## Types et sous-types
 Cinq **types** : actif, passif, capitaux propres, produits, charges. Chacun a des **sous-types** (banque, immobilisation, taxe de vente, charge d'exploitation…). La base de données et l'application refusent les combinaisons incohérentes (un compte de passif ne peut pas être une « immobilisation »).
@@ -28,7 +28,7 @@ Cinq comptes sont créés par le système et ne se suppriment jamais : **Comptes
 
 ## Ce que tu peux faire
 - **Créer** un compte (code, nom français, nom anglais, type, sous-type, description). Le code est unique dans l'entreprise : lettres, chiffres, point et tiret, 20 caractères au plus.
-- **Modifier** le code, les noms, la description.
+- **Modifier** le code, les noms et la description (bouton « Modifier » de la liste, y compris pour un compte système). Le type et le sous-type ne changent pas : ils donnent son sens à l'historique. Pour en changer, supprime le compte s'il n'a jamais servi, puis recrée-le.
 - **Désactiver** un compte : il disparaît des listes de choix, mais son historique reste.
 - **Supprimer** un compte seulement s'il n'a jamais servi. Sinon, désactive-le.
 

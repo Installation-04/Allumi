@@ -101,13 +101,14 @@ Un scénario fictif figé (une année d'activité d'« Atelier Exemple inc. ») 
 ## État d'avancement
 Phase 3 (moteur comptable) : `npm test` roule les tests unitaires et d'intégration; `npm run test:e2e` le parcours Playwright.
 
-- `tests/unit` : en plus de ceux de la phase 2, argent et arrondi (P5, P7), validation d'écriture (P1, P2, P3, P8), périodes (P11), plan de départ canadien, matrice des rôles.
+- `tests/unit` : en plus de ceux de la phase 2, argent et arrondi (P5, P7), validation d'écriture (P1, P2, P3, P8), périodes (P11), plan de départ canadien, matrice des rôles, soldes nets de la balance (P1 telle qu'imprimée), lecture des paramètres d'URL et frontière des modules client (aucune constante exportée d'un fichier "use client").
 - `tests/integration` (base clonée par fichier, rôle `allumi_app`) :
   - `ledger-service` : initialisation, écritures, refus, rôles, isolation et IDOR, numérotation sans trou (P13), contre-passation, réouverture protégée (2FA, motif, audit), exercices, comptes, audit, P1, P3, P5 et P8 sur la vraie base;
   - `engine-agreement` : le domaine et la base refusent et acceptent les mêmes écritures (P2) et la contre-passation est le miroir exact;
   - `ledger-stateful` : le test à états (modèle en mémoire contre les vrais services; écriture, contre-passation, verrouillage, réouverture) vérifie mêmes réponses, mêmes numéros, mêmes soldes, balance à zéro (P1, P8, P11);
   - `ledger-rules`, `documents-rules`, `access-rules`, `concurrency` : les cas SQL de la phase 1.
-- `tests/e2e` : `/setup`, tableau de bord, 2FA, bascule en anglais, puis le parcours du moteur : plan de départ, écriture déséquilibrée refusée, écriture enregistrée, contre-passation, balance, verrouillage d'une période et refus dans celle-ci, piste d'audit.
+- `tests/e2e` : `/setup`, tableau de bord, 2FA, bascule en anglais, puis le parcours du moteur : plan de départ, formulaire de compte (type et sous-types, compte refusé, renommage), écriture déséquilibrée refusée avec conservation de ce qui a été saisi, écriture enregistrée, contre-passation, balance, verrouillage d'une période et refus dans celle-ci, réouverture avec un code d'authentification (refusé puis accepté), piste d'audit.
+- Les tests d'intégration qui rouvrent le passé activent la 2FA pour de vrai (`enableTotp` dans `tests/integration/helpers.ts`) et fournissent un code par étape de 30 secondes, comme un propriétaire.
 
 Propriétés du tableau ci-dessus déjà implémentées : P1, P2, P3, P5, P7, P8, P11, P13 (et l'isolation, P12, par des cas d'`isolation.test.ts`). Restent : P4, P6, P14 (domaine des taxes et des imputations), P9, P10, P15 à P17 (documents, taxes, déclarations) : phases 4 et 6.
 
