@@ -85,6 +85,15 @@ describe("database catalog (guards against a migration that forgets a table)", (
     expect(rows).toEqual([{ owner: "allumi_redactor" }]);
   });
 
+  it("checks the accounting invariants with deferred constraint triggers (balance, completeness, deposits)", async () => {
+    const rows = await q<{ tgname: string; deferrable: boolean; initially: boolean }>(
+      `SELECT tgname, tgdeferrable AS deferrable, tginitdeferred AS initially FROM pg_trigger
+        WHERE tgname IN ('journal_entry_complete', 'journal_line_balanced', 'bank_deposit_item_check', 'bank_deposit_complete')`,
+    );
+    expect(rows.map((row) => row.tgname).sort()).toEqual(["bank_deposit_complete", "bank_deposit_item_check", "journal_entry_complete", "journal_line_balanced"]);
+    for (const row of rows) expect(row, row.tgname).toMatchObject({ deferrable: true, initially: true });
+  });
+
   it("keeps the journal and audit immutable even for the table owner", async () => {
     await expect(db.query("UPDATE journal_line SET debit_cents = debit_cents")).resolves.toBeTruthy(); // no rows: nothing to refuse yet
     await expect(db.query("TRUNCATE journal_line CASCADE")).rejects.toMatchObject({ code: "AL004" });

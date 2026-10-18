@@ -20,12 +20,13 @@ export async function confirmEnrollmentAction(_previous: FormState, formData: Fo
 async function confirmEnrollment(formData: FormData): Promise<FormState> {
   const session = await requireSession();
   const parsed = codeSchema.safeParse({ code: formData.get("code") });
-  if (!parsed.success) return { error: "invalid" };
+  const password = String(formData.get("password") ?? "");
+  if (!parsed.success || !password) return { error: "invalid" };
 
   const keepSessionToken = await readSessionToken();
-  const result = await confirmTotpEnrollment(session.userId, parsed.data.code, { keepSessionToken });
+  const result = await confirmTotpEnrollment(session.userId, parsed.data.code, password, { keepSessionToken });
   if (result.status === "rate_limited") return { error: "rateLimited" };
-  if (result.status === "invalid") return { error: "code" };
+  if (result.status === "invalid") return { error: "passwordOrCode" };
   // The panel keeps showing the codes (its state outlives the refresh); revalidating keeps the cached page,
   // which the browser reuses on Back, in step with the enabled state.
   revalidatePath("/compte/securite");

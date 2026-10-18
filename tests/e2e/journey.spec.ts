@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { Secret, TOTP } from "otpauth";
 
 const VERSION = (JSON.parse(readFileSync("package.json", "utf8")) as { version: string }).version;
@@ -65,6 +65,13 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   // Fixed instant: the replay check below must not depend on which 30-second window the test runs in.
   const enrolledAt = Date.now();
   await page.getByLabel("Code à 6 chiffres").fill(totp.generate({ timestamp: enrolledAt }));
+  // A stolen session cookie is not enough to enroll a device: the account password is asked too.
+  await page.getByLabel("Mot de passe", { exact: true }).fill("mauvais mot de passe");
+  await page.getByRole("button", { name: "Confirmer et activer" }).click();
+  await expect(page.getByText("Mot de passe ou code incorrect.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Codes de récupération" })).toBeHidden();
+  await page.getByLabel("Mot de passe", { exact: true }).fill(PASSWORD);
+  await page.getByLabel("Code à 6 chiffres").fill(totp.generate({ timestamp: enrolledAt }));
   await page.getByRole("button", { name: "Confirmer et activer" }).click();
   await expect(page.getByRole("heading", { name: "Codes de récupération" })).toBeVisible();
   const recoveryCodes = await page.locator("main li").allInnerTexts();
@@ -104,7 +111,129 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await page.getByRole("button", { name: "Vérifier" }).click();
   await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
 
+  await ledgerJourney(page, totp);
+
   // English interface.
+  await page.goto("/");
   await page.getByRole("button", { name: "English" }).click();
   await expect(page.getByText("Your role: Owner")).toBeVisible();
 });
+
+/** Today in the company's time zone (the application uses America/Toronto), as YYYY-MM-DD. */
+const todayInToronto = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
+
+/** A link of the company navigation (the dashboard cards carry the same names). */
+const openSection = (page: Page, name: string) => page.getByRole("navigation", { name: "Navigation de l'entreprise" }).getByRole("link", { name, exact: true }).click();
+
+/** The accounting engine through the screens: chart, entry, reversal, trial balance, period lock, audit trail. */
+async function ledgerJourney(page: Page, totp: TOTP) {
+  // The starter chart is there since /setup; add an account.
+  await openSection(page, "Plan comptable");
+  await expect(page.getByRole("heading", { name: "Plan comptable" })).toBeVisible();
+  await expect(page.getByRole("cell", { name: "Banque – compte courant" })).toBeVisible();
+  // A petty-cash account: an asset, not the form's default type.
+  await page.getByLabel("Code", { exact: true }).fill("1999");
+  await page.getByLabel("Nom (français)").fill("Caisse secondaire");
+  await page.getByLabel("Nom (anglais)").fill("Petty cash");
+  await page.getByLabel("Type", { exact: true }).selectOption("ASSET");
+  await page.getByLabel("Sous-type").selectOption({ label: "Encaisse" });
+  await page.getByRole("button", { name: "Créer le compte" }).click();
+  await expect(page.getByRole("cell", { name: "1999", exact: true })).toBeVisible();
+  // The form is back to its defaults, and the subtypes offered are those of the type it shows (not of the one chosen before).
+  await expect(page.getByLabel("Type", { exact: true })).toHaveValue("EXPENSE");
+  await expect(page.getByLabel("Sous-type")).toContainText("Charges d'exploitation");
+  await expect(page.getByLabel("Sous-type")).not.toContainText("Encaisse");
+
+  // A refused account (this code exists) keeps the type that was chosen, and the subtypes that go with it.
+  await page.getByLabel("Code", { exact: true }).fill("1999");
+  await page.getByLabel("Nom (français)").fill("Doublon");
+  await page.getByLabel("Nom (anglais)").fill("Duplicate");
+  await page.getByLabel("Type", { exact: true }).selectOption("LIABILITY");
+  await expect(page.getByLabel("Sous-type")).toContainText("Carte de crédit");
+  await page.getByRole("button", { name: "Créer le compte" }).click();
+  await expect(page.getByText("Ce code de compte existe déjà.")).toBeVisible();
+  await expect(page.getByLabel("Type", { exact: true })).toHaveValue("LIABILITY");
+  await expect(page.getByLabel("Sous-type")).toContainText("Carte de crédit");
+  await expect(page.getByLabel("Nom (français)")).toHaveValue("Doublon");
+
+  // Accounts can be renamed; the type stays.
+  await page.getByRole("link", { name: "Modifier le compte 1999" }).click();
+  await expect(page.getByRole("heading", { name: "Modifier le compte 1999" })).toBeVisible();
+  await page.getByLabel("Nom (français)").fill("Caisse secondaire (atelier)");
+  await page.getByRole("button", { name: "Enregistrer" }).click();
+  await expect(page.getByRole("cell", { name: /Caisse secondaire \(atelier\)/ })).toBeVisible();
+
+  // An unbalanced entry is flagged on screen and refused with the rule's message.
+  await openSection(page, "Journal");
+  await page.getByRole("link", { name: "Nouvelle écriture" }).click();
+  const firstOfMonth = `${todayInToronto().slice(0, 7)}-01`;
+  await page.getByLabel("Date", { exact: true }).fill(firstOfMonth);
+  await page.getByLabel("Type d'écriture").selectOption("OPENING_BALANCE");
+  await page.getByLabel("Description").fill("Capital de départ");
+  await page.getByLabel("Ligne 1 – Compte").selectOption({ label: "1000 – Banque – compte courant" });
+  await page.getByLabel("Ligne 1 – Débit").fill("1 000,00");
+  await page.getByLabel("Ligne 2 – Compte").selectOption({ label: "3000 – Capital-actions" });
+  await page.getByLabel("Ligne 2 – Crédit").fill("900,00");
+  await expect(page.getByText(/Écart : 100,00/)).toBeVisible();
+  await page.getByRole("button", { name: "Enregistrer l'écriture" }).click();
+  await expect(page.getByText("Les débits et les crédits ne sont pas égaux.")).toBeVisible();
+  // A refusal must not wipe the form (React resets it after every action): the kind, the memo, the date and the
+  // accounts are still what was typed, or an entry fixed in haste would be posted as another kind.
+  await expect(page.getByLabel("Type d'écriture")).toHaveValue("OPENING_BALANCE");
+  await expect(page.getByLabel("Description")).toHaveValue("Capital de départ");
+  await expect(page.getByLabel("Date", { exact: true })).toHaveValue(firstOfMonth);
+  await expect(page.getByLabel("Ligne 1 – Compte")).toHaveValue(/.+/);
+  await expect(page.getByLabel("Ligne 1 – Débit")).toHaveValue("1 000,00");
+
+  // Balanced: posted, numbered, shown.
+  await page.getByLabel("Ligne 2 – Crédit").fill("1000");
+  await expect(page.getByText("L'écriture est équilibrée.")).toBeVisible();
+  await page.getByRole("button", { name: "Enregistrer l'écriture" }).click();
+  await expect(page.getByRole("heading", { name: "Écriture J-00001" })).toBeVisible();
+  await expect(page.getByRole("cell", { name: /3000 – Capital-actions/ })).toBeVisible();
+
+  // Reversal: a mirror entry, nothing is deleted.
+  await page.getByRole("button", { name: "Contre-passer", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Écriture J-00002" })).toBeVisible();
+  await expect(page.getByText("Contre-passation de l'écriture J-00001")).toBeVisible();
+
+  // The trial balance balances, with the accounting equation.
+  await openSection(page, "Balance de vérification");
+  await expect(page.getByText("La balance est équilibrée")).toBeVisible();
+  await expect(page.getByText("Équation comptable vérifiée")).toBeVisible();
+
+  // Locking the period of today closes it to new entries.
+  await openSection(page, "Exercices");
+  const monthStart = `${todayInToronto().slice(0, 7)}-01`;
+  await page.locator("tr", { hasText: `${monthStart} →` }).getByRole("button", { name: "Verrouiller" }).click();
+  await expect(page.locator("tr", { hasText: `${monthStart} →` }).getByText("Verrouillée")).toBeVisible();
+  await openSection(page, "Journal");
+  await page.getByRole("link", { name: "Nouvelle écriture" }).click();
+  await page.getByLabel("Ligne 1 – Compte").selectOption({ label: "1000 – Banque – compte courant" });
+  await page.getByLabel("Ligne 1 – Débit").fill("5");
+  await page.getByLabel("Ligne 2 – Compte").selectOption({ label: "3000 – Capital-actions" });
+  await page.getByLabel("Ligne 2 – Crédit").fill("5");
+  await page.getByRole("button", { name: "Enregistrer l'écriture" }).click();
+  await expect(page.getByText("Cette période est verrouillée.")).toBeVisible();
+
+  // Reopening the past asks for the owner's authenticator code typed now, and a reason.
+  await openSection(page, "Exercices");
+  const row = page.locator("tr", { hasText: `${monthStart} →` });
+  await row.getByLabel(/Motif pour rouvrir la période/).fill("Correction demandée par la comptable");
+  await row.getByLabel(/Code de vérification pour rouvrir la période/).fill("000000");
+  await row.getByRole("button", { name: "Rouvrir" }).click();
+  await expect(page.getByText("Le code de vérification est invalide ou déjà utilisé.")).toBeVisible();
+  // the reason survives the refusal; the one-time code does not come back
+  await expect(row.getByLabel(/Motif pour rouvrir la période/)).toHaveValue("Correction demandée par la comptable");
+  await expect(row.getByLabel(/Code de vérification pour rouvrir la période/)).toHaveValue("");
+  // a code of the next 30-second step: later than the one that enrolled the authenticator
+  await row.getByLabel(/Code de vérification pour rouvrir la période/).fill(totp.generate({ timestamp: Date.now() + 30_000 }));
+  await row.getByRole("button", { name: "Rouvrir" }).click();
+  await expect(row.getByText("Ouverte")).toBeVisible();
+
+  // The audit trail knows about everything, written by the database.
+  await openSection(page, "Piste d'audit");
+  await expect(page.getByRole("heading", { name: "Piste d'audit" })).toBeVisible();
+  await expect(page.getByRole("cell", { name: "row.insert" }).first()).toBeVisible();
+  await expect(page.getByText("journal_entry").first()).toBeVisible();
+}

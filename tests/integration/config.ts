@@ -1,7 +1,8 @@
 import { execFileSync } from "node:child_process";
 import pg from "pg";
 
-export const TEMPLATE_DB = "allumi_test_template";
+// Overridable so that two runs at the same time (for example two worktrees) do not rebuild the same template.
+export const TEMPLATE_DB = process.env.ALLUMI_TEST_TEMPLATE ?? "allumi_test_template";
 
 export function loadEnv(): void {
   try {

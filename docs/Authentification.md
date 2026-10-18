@@ -17,7 +17,7 @@
 
 ## Vérification en deux étapes (TOTP)
 Compatible avec toute application d'authentification (Aegis, Google Authenticator, 1Password, etc.).
-1. **Sécurité du compte → Activer la 2FA**.
+1. **Sécurité du compte → Activer la 2FA**. L'activation demande ton **mot de passe** en plus du code : un témoin de session volé ne suffit pas à enrôler l'appareil de quelqu'un d'autre (la clé en attente reste lisible sur la page tant qu'elle n'est pas confirmée).
 2. Scanne le code QR (ou saisis la clé), puis entre le code à 6 chiffres pour confirmer.
 3. Les **10 codes de récupération** s'affichent **une seule fois** : conserve-les en lieu sûr. Chacun ne sert qu'une fois.
 
@@ -26,6 +26,7 @@ Détails de sécurité :
 - Un code déjà accepté **ne peut pas être rejoué** (RFC 6238, §5.2).
 - Les tentatives de code sont limitées (8 par 15 minutes).
 - Pour **désactiver** la 2FA, il faut le mot de passe et un code actuel.
+- **Rouvrir une période ou un exercice** ([[Exercices-et-periodes]]) demande aussi un code saisi à ce moment, même si la session est déjà vérifiée : un témoin de connexion volé ne suffit pas à rouvrir le passé. Chaque essai de code, à la connexion ou pour rouvrir le passé, compte dans la même limite de 8 essais par 15 minutes.
 - Tant que la deuxième étape n'est pas faite, la session ne donne accès qu'à la page de vérification.
 
 ## Ce qui n'est pas encore là

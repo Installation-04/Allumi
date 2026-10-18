@@ -81,7 +81,7 @@ erDiagram
 - **Paiements** : créés validés, avec leur écriture, sur un compte de banque, d'encaisse, de carte ou de fonds non déposés. Jamais supprimés; annulés par contre-passation une fois toutes leurs affectations retirées et leur dépôt annulé.
 - **Affectations, applications d'avoirs et compensations** (`payment_allocation`, `*_credit_application`, `payment_offset`) : portent une date d'effet et ne s'effacent jamais. On les retire avec `unapplied_date`, dans une période ouverte. Le solde ouvert d'une pièce « au `date` » (âge des comptes d'une date passée) est reproductible. Sens, contact, statut et plafonds sont vérifiés au `COMMIT`, avec des verrous de ligne pris dès l'insertion (aucune course entre deux transactions).
 - **Remboursements** : `payment_offset` compense un encaissement et un décaissement du même contact et du même sous-grand livre (trop-perçu, acompte), sans faux avoir.
-- **Dépôts** : `bank_deposit` regroupe des paiements reçus dans « fonds non déposés ». Chaque paiement n'est déposé qu'une fois; un paiement déposé ne s'annule qu'après l'annulation du dépôt.
+- **Dépôts** : `bank_deposit` regroupe des paiements reçus dans « fonds non déposés ». Un dépôt contient au moins un paiement et son total égale la somme de ses éléments (`AL010`, vérifié au `COMMIT`). Chaque paiement n'est déposé qu'une fois; un paiement déposé ne s'annule qu'après l'annulation du dépôt.
 - **Banque** : `amount_cents` exprime l'effet sur le compte du grand livre (+ débit, − crédit). Une transaction `MATCHED` est égale à la somme des lignes appariées, toutes sur son compte. Un rapprochement complété est figé; son solde pointé doit égaler le solde du relevé. Seul le dernier rapprochement peut être rouvert.
 - **Pièces jointes** : le justificatif d'une pièce validée ne se détache pas, et une pièce jointe est immuable (seul `deleted_at`, une fois détachée).
 
@@ -142,6 +142,7 @@ Ajouter une valeur à la fin d'un enum n'a pas ces effets.
 ## Limites connues
 - Pas de multidevise : toutes les colonnes `currency` sont contraintes à `CAD`.
 - Les montants dépassant 10¹⁴ cents par ligne sont refusés.
+- Un propriétaire ne peut pas quitter l'entreprise en supprimant lui-même son adhésion, même s'il reste un autre propriétaire : la vérification « il reste un propriétaire » (`AL009`) s'exécute sous la RLS de la personne qui supprime et ne voit plus l'autre propriétaire. Le refus est du côté sûr (jamais d'entreprise sans propriétaire). Le cas est suivi par un test attendu en échec (`access-rules.test.ts`, OWN1); il sera réglé avec la gestion des membres.
 - Les vérifications différées sont proportionnelles au nombre de lignes de l'écriture; elles restent rapides parce que les index commencent par `company_id`. Après un gros import ou une restauration, lancer `ANALYZE`.
 
 ## Validation faite en phase 1
@@ -3636,4 +3637,33 @@ GRANT EXECUTE ON FUNCTION
 TO allumi_app;
 GRANT EXECUTE ON FUNCTION app_current_user_id(), app_tenant_id(), app_tenant_role(), app_can_write(),
   app_audit_event(text, text, text, jsonb, boolean, uuid) TO allumi_redactor;
+```
+
+## Migrations suivantes
+La migration initiale n'est jamais modifiée une fois fusionnée : chaque changement du schéma ajoute une migration, et ce document en reprend le SQL. Toute nouvelle fonction retire `EXECUTE` à `PUBLIC` (le test de catalogue le vérifie).
+
+### `20261018000000_deposit_needs_items` (phase 3)
+Trouvé en portant les cas SQL de la phase 1 en tests Vitest : un dépôt sans aucun élément n'était jamais comparé à son total et sortait son montant des fonds non déposés sans déposer de paiement.
+```sql
+-- Un dépôt contient au moins un paiement.
+--
+-- bank_deposit_check ne s'exécute qu'à l'insertion d'un élément de dépôt : un dépôt sans aucun élément n'était
+-- jamais comparé à son total, et sortait son montant des fonds non déposés sans déposer de paiement. Ce
+-- déclencheur différé refuse un dépôt sans élément (la somme des éléments égale alors le total, par
+-- bank_deposit_check).
+CREATE FUNCTION bank_deposit_complete() RETURNS trigger
+LANGUAGE plpgsql SET search_path = public, pg_temp AS $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM bank_deposit_item WHERE company_id = NEW.company_id AND deposit_id = NEW.id) THEN
+    RAISE EXCEPTION 'a deposit contains at least one payment' USING ERRCODE = 'AL010';
+  END IF;
+  RETURN NULL;
+END $$;
+
+CREATE CONSTRAINT TRIGGER bank_deposit_complete
+  AFTER INSERT ON bank_deposit DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW EXECUTE FUNCTION bank_deposit_complete();
+
+-- Comme toutes les fonctions du schéma : rien n'est appelable par PUBLIC.
+REVOKE EXECUTE ON FUNCTION bank_deposit_complete() FROM PUBLIC;
 ```

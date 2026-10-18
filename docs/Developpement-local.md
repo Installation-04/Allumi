@@ -41,10 +41,10 @@ npm test                # unitaires + intégration (base PostgreSQL réelle, rô
 npm run build && npm run test:e2e   # parcours dans un navigateur (Playwright, serveur autonome)
 docker compose build    # vérifier que l'image de prod se construit
 ```
-Les tests d'intégration clonent une base migrée par fichier de test : ils ne touchent pas à ta base de dev. Voir [[Plan-de-tests]].
+Les tests d'intégration clonent une base migrée par fichier de test : ils ne touchent pas à ta base de dev. Voir [[Plan-de-tests]]. Pour lancer deux exécutions en même temps (deux terminaux ou deux copies du dépôt), donne à chacune son gabarit : `ALLUMI_TEST_TEMPLATE=allumi_tpl_b npm test`. `FC_NUM_RUNS` et `FC_SEED` règlent et rejouent les tests de propriétés. Le parcours Playwright accepte `PLAYWRIGHT_CHROMIUM_PATH` pour un Chromium déjà installé.
 
 ## Organisation du code
-`src/modules/<module>/{domain,service}` (règles pures, puis cas d'utilisation), `src/platform` (environnement, base, journaux), `src/app` (pages minces). Un module n'est importé que par son `index.ts`; seul `src/platform/db.ts` touche au client Prisma généré (règles ESLint). Détails : [[Architecture]].
+`src/modules/<module>/{domain,service}` (règles pures, puis cas d'utilisation), `src/platform` (environnement, base, journaux), `src/app` (pages minces). Un module n'est importé que par son `index.ts` (les composants client importent `@/modules/<module>/client`); seul `src/platform/db.ts` touche au client Prisma généré (règles ESLint). Détails : [[Architecture]].
 
 ## Règles
 - Lis [[Regles-comptables]] avant de toucher au moteur comptable.

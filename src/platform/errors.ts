@@ -53,3 +53,31 @@ export function databaseRuleOf(error: unknown): DatabaseRule | null {
   }
   return null;
 }
+
+/** The Prisma error code (P2002 unique violation, P2003 foreign key...) found in an error chain, if any. */
+export function prismaErrorCode(error: unknown): string | null {
+  for (const record of causes(error)) {
+    if (typeof record.code === "string" && /^P\d{4}$/.test(record.code)) return record.code;
+  }
+  return null;
+}
+
+/**
+ * A unique (23505, P2002) or exclusion (23P01) violation found in an error chain: what the loser of two concurrent
+ * check-then-insert requests gets. Callers turn it into the refusal the winner would have caused.
+ */
+export function isConflict(error: unknown): boolean {
+  for (const record of causes(error)) {
+    for (const value of [record.originalCode, record.code, record.sqlState]) {
+      if (value === "23505" || value === "23P01" || value === "P2002") return true;
+    }
+  }
+  return false;
+}
+
+/** A database rule (AL001…AL011) becomes the AppError whose key is the rule code; anything else is returned unchanged. */
+export function toAppError(error: unknown): unknown {
+  if (error instanceof AppError) return error;
+  const rule = databaseRuleOf(error);
+  return rule ? new AppError(rule, `database rule ${rule}`) : error;
+}
