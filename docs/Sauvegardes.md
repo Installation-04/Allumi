@@ -38,7 +38,7 @@ Le script demande confirmation, remplace la base et les pièces jointes, puis re
 
 ### Restaurer sur un nouveau serveur (reprise après sinistre)
 1. Cloner le dépôt (même version si possible) et **mettre ta copie de `.env` en place avant tout** (mêmes `ENCRYPTION_KEY` et `AUTH_SECRET`; `POSTGRES_PASSWORD` doit rester cohérent avec `DATABASE_URL`, et `APP_DB_PASSWORD` avec `APP_DATABASE_URL`). PostgreSQL n'applique `POSTGRES_PASSWORD` qu'à la **première** initialisation de son volume : si `install.sh` tournait d'abord avec un autre `.env`, le mot de passe ne correspondrait plus.
-2. Lancer `sudo ./scripts/install.sh` : il garde les secrets existants et ne change que le domaine et le courriel : [[Installation]].
+2. Lancer `sudo ./scripts/install.sh --domain <domaine> --email <courriel>` : il garde les secrets existants et ne change que le domaine et le courriel : [[Installation]].
 3. Copier la sauvegarde sur le serveur et lancer `restore.sh`.
 
 Les sauvegardes **conservent les propriétaires** des objets (pas de `--no-owner`) : la fonction de caviardage de la Loi 25 appartient à un rôle dédié, et la restaurer sous un autre propriétaire la ferait échouer sans bruit. Le service `migrate` remet de toute façon ce propriétaire en place à chaque démarrage.

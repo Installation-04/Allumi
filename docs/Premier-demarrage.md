@@ -12,7 +12,7 @@ Il demande ensuite :
 
 Une seule transaction crée l'administrateur de l'instance et l'entreprise dont il est propriétaire. Puis la page `/setup` se **désactive pour de bon** : elle renvoie vers la connexion.
 
-> Si deux personnes ouvrent `/setup` en même temps, une seule réussit. Le nombre d'essais par adresse est limité. Une fois la configuration faite, le jeton ne sert plus à rien : tu peux le retirer de `.env`.
+> Si deux personnes ouvrent `/setup` en même temps, une seule réussit. Le nombre d'essais par adresse est limité. Une fois la configuration faite, le jeton ne sert plus à rien : tu peux le laisser dans `.env` (`install.sh` et `update.sh` en remettent un nouveau s'il manque, sans effet une fois `/setup` fermé).
 
 ## Active ensuite la vérification en deux étapes
 Va dans **Sécurité du compte** (lien au bas du tableau de bord) : voir [[Authentification]]. Elle est recommandée pour tous les comptes propriétaire et comptable.

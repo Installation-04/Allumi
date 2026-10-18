@@ -20,13 +20,20 @@ for arg in "$@"; do
   esac
 done
 
+info "Récupération des étiquettes…"
+git fetch --tags origin
+if [ -n "$TARGET" ]; then
+  git rev-parse -q --verify "refs/tags/$TARGET^{commit}" >/dev/null || die "étiquette inconnue : $TARGET"
+  git merge-base --is-ancestor HEAD "$TARGET" 2>/dev/null ||
+    warn "$TARGET n'est pas postérieure à la version installée : si des migrations plus récentes ont déjà été appliquées, restaure la sauvegarde au lieu de mettre à jour (docs/Mise-a-jour.md, « Retour arrière »)."
+fi
+
 if [ "$BACKUP" -eq 1 ]; then
   info "Sauvegarde préalable…"
   "$ALLUMI_DIR/scripts/backup.sh"
 fi
 
 info "Récupération de la nouvelle version…"
-git fetch --tags origin
 if [ -n "$TARGET" ]; then
   git checkout "$TARGET"
 elif git symbolic-ref -q HEAD >/dev/null; then
@@ -34,8 +41,10 @@ elif git symbolic-ref -q HEAD >/dev/null; then
 else
   warn "HEAD détachée (version épinglée) : rien à tirer. Pour changer de version : $0 vX.Y.Z"
 fi
-# Un .env créé par une version plus ancienne reçoit les variables ajoutées depuis.
-env_backfill
+# Un .env créé par une version plus ancienne reçoit les variables ajoutées depuis. On relit lib.sh
+# (celui de la version qui vient d'être récupérée) dans un sous-shell : le lib.sh déjà chargé est l'ancien.
+# shellcheck source=lib.sh
+( . "$ALLUMI_DIR/scripts/lib.sh" && env_backfill )
 
 info "Reconstruction et redémarrage (les migrations passent par le service migrate)…"
 compose up -d --build --remove-orphans

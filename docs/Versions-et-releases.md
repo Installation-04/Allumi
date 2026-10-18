@@ -29,11 +29,9 @@ Tant que la version est `0.x`, le projet est en pré-alpha/bêta : des changemen
 
 ## Installer une version précise
 ```bash
-git fetch --tags
-git checkout v0.4.0
-docker compose up -d --build
+sudo ./scripts/update.sh v0.4.0
 ```
-Voir [[Mise-a-jour]]. Pour la production, utilise toujours une version étiquetée, jamais `main`.
+Le script sauvegarde d'abord, se place sur l'étiquette, complète ton `.env` et reconstruit : voir [[Mise-a-jour]]. Pour la production, utilise toujours une version étiquetée, jamais `main`.
 
 ## Règles pour les contributeurs
 - Chaque PR utile ajoute une ligne sous **[Non publié]** dans `CHANGELOG.md` (Ajouté, Modifié, Corrigé, Sécurité).

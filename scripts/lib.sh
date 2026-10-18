@@ -28,9 +28,11 @@ env_set() {
   local key="$1" val="$2" tmp
   tmp="$(mktemp)"
   if grep -qE "^${key}=" "$ENV_FILE"; then
-    awk -v k="$key" -v v="$val" 'BEGIN{FS=OFS="="} $1==k {print k"="v; next} {print}' "$ENV_FILE" > "$tmp"
+    # Values go through the environment: awk -v would interpret backslash escapes in them.
+    K="$key" V="$val" awk 'BEGIN{FS="="} $1==ENVIRON["K"] {print ENVIRON["K"] "=" ENVIRON["V"]; next} {print}' "$ENV_FILE" > "$tmp"
   else
-    cat "$ENV_FILE" > "$tmp"; printf '%s=%s\n' "$key" "$val" >> "$tmp"
+    # A last line without a newline must not swallow the new key.
+    { cat "$ENV_FILE"; [ -z "$(tail -c1 "$ENV_FILE")" ] || echo; printf '%s=%s\n' "$key" "$val"; } > "$tmp"
   fi
   cat "$tmp" > "$ENV_FILE"; rm -f "$tmp"
 }
