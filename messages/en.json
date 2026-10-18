@@ -18,7 +18,8 @@
     "email": "E-mail",
     "password": "Password",
     "passwordConfirm": "Confirm password",
-    "code": "6-digit code"
+    "code": "6-digit code",
+    "codeOrRecovery": "6-digit code or recovery code"
   },
   "setup": {
     "title": "Welcome to Allumi",
@@ -63,10 +64,10 @@
     "title": "Account security",
     "twoFactor": "Two-step verification (2FA)",
     "twoFactorOff": "Off. Turn it on to protect your accounting data: it is recommended for every owner and accountant account.",
-    "twoFactorOn": "On. You have {count, plural, =0 {no recovery codes} one {# recovery code} other {# recovery codes}} left.",
+    "twoFactorOn": "On. {count, plural, =0 {You have no recovery codes left.} one {You have # recovery code left.} other {You have # recovery codes left.}}",
     "enable": "Turn on 2FA",
     "scan": "Scan this code with an authenticator app (Aegis, Google Authenticator, 1Password…), then enter the 6-digit code.",
-    "manualKey": "Manual setup key",
+    "manualKey": "Manual setup key:",
     "confirm": "Confirm and turn on",
     "recoveryTitle": "Recovery codes",
     "recoveryIntro": "Keep these codes somewhere safe. Each works once and they will not be shown again.",
@@ -76,6 +77,7 @@
   },
   "dashboard": {
     "title": "{company}",
+    "pageTitle": "Dashboard",
     "role": "Your role: {role}",
     "roles": {
       "OWNER": "Owner",
@@ -95,6 +97,7 @@
       "setupToken": "Wrong setup token.",
       "setupTokenMissing": "Setup is closed: SETUP_TOKEN is not set on the server.",
       "code": "Invalid or already used code.",
+      "passwordOrCode": "Wrong password or code.",
       "mismatch": "The passwords do not match.",
       "tooShort": "The password is too short (at least {min} characters).",
       "tooLong": "The password is too long.",
@@ -114,6 +117,8 @@
     "AL010": "The cleared balance does not match the statement.",
     "AL011": "Invalid session: sign in again.",
     "forbidden": "You are not allowed to do this.",
-    "notFound": "Page not found."
+    "notFound": "Page not found.",
+    "page": "Something went wrong. Try again in a moment.",
+    "retry": "Try again"
   }
 }

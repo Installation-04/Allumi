@@ -6,6 +6,10 @@ import { MfaForm } from "./form";
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata() {
+  return { title: (await getTranslations("mfa"))("title") };
+}
+
 export default async function MfaPage() {
   const session = await getSession();
   if (!session) redirect("/connexion");

@@ -6,6 +6,10 @@ import { getCompanyFor } from "@/modules/companies";
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata() {
+  return { title: (await getTranslations("dashboard"))("pageTitle") };
+}
+
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default async function CompanyPage({ params }: { params: Promise<{ companyId: string }> }) {

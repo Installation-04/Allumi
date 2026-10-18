@@ -14,7 +14,7 @@ export function SetupForm({ passwordMin, defaultLocale, tokenRequired }: { passw
       {state?.error ? <FormError message={t(`errors.form.${state.error}`, { min: passwordMin })} /> : null}
 
       {tokenRequired ? (
-        <Field name="setupToken" label={t("setup.token")} hint={t("setup.tokenHint")} autoComplete="off" />
+        <Field name="setupToken" label={t("setup.token")} hint={t("setup.tokenHint")} defaultValue={v.setupToken} autoComplete="off" />
       ) : null}
 
       <fieldset className="space-y-4">
@@ -22,7 +22,9 @@ export function SetupForm({ passwordMin, defaultLocale, tokenRequired }: { passw
         <Field name="companyName" label={t("setup.companyName")} defaultValue={v.companyName} autoComplete="organization" />
         <label className="block">
           <span className="mb-1 block text-sm font-medium">{t("setup.fiscalYearStart")}</span>
+          {/* React keeps the first-render default of a <select> when the form resets after an error: remount it. */}
           <select
+            key={v.fiscalYearStartMonth ?? "initial"}
             name="fiscalYearStartMonth"
             defaultValue={v.fiscalYearStartMonth ?? "1"}
             className="w-full rounded-md border border-stone-300 bg-white px-3 py-2 dark:border-stone-700 dark:bg-stone-900"
@@ -45,6 +47,7 @@ export function SetupForm({ passwordMin, defaultLocale, tokenRequired }: { passw
         <label className="block">
           <span className="mb-1 block text-sm font-medium">{t("setup.locale")}</span>
           <select
+            key={v.locale ?? "initial"}
             name="locale"
             defaultValue={v.locale ?? defaultLocale}
             className="w-full rounded-md border border-stone-300 bg-white px-3 py-2 dark:border-stone-700 dark:bg-stone-900"

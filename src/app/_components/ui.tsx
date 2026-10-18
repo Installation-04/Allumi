@@ -2,6 +2,7 @@
 
 import { useId } from "react";
 import { useFormStatus } from "react-dom";
+import { FOCUS } from "./focus";
 
 export function Field(props: {
   name: string;
@@ -30,7 +31,7 @@ export function Field(props: {
         inputMode={inputMode}
         required={required}
         aria-describedby={hint ? hintId : undefined}
-        className="w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-base shadow-sm focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-stone-700 dark:bg-stone-900"
+        className={`w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-base shadow-sm dark:border-stone-700 dark:bg-stone-900 ${FOCUS}`}
       />
       {hint ? (
         <p id={hintId} className="mt-1 text-xs text-stone-600 dark:text-stone-400">
@@ -45,13 +46,17 @@ export function SubmitButton({ children, variant = "primary" }: { children: Reac
   const { pending } = useFormStatus();
   const styles =
     variant === "primary"
-      ? "bg-brand-600 text-white hover:bg-brand-700"
+      ? "bg-brand-700 text-white hover:bg-brand-800"
       : "border border-stone-300 hover:bg-stone-100 dark:border-stone-700 dark:hover:bg-stone-800";
   return (
+    // aria-disabled rather than disabled: a disabled button drops the keyboard focus when the form is submitted.
     <button
       type="submit"
-      disabled={pending}
-      className={`rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/60 disabled:opacity-60 ${styles}`}
+      aria-disabled={pending}
+      onClick={(event) => {
+        if (pending) event.preventDefault();
+      }}
+      className={`rounded-md px-4 py-2 text-sm font-medium aria-disabled:opacity-60 ${FOCUS} ${styles}`}
     >
       {children}
     </button>

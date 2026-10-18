@@ -40,6 +40,11 @@ export default defineConfig({
       AUTH_SECRET: process.env.AUTH_SECRET ?? "e2e-only-secret-e2e-only-secret-e2e-only",
       ENCRYPTION_KEY: process.env.ENCRYPTION_KEY ?? Buffer.alloc(32, 7).toString("base64"),
       LOG_LEVEL: "warn",
+      // The journey is written for a plain French instance: a developer's .env must not change it.
+      SETUP_TOKEN: "",
+      DEFAULT_LOCALE: "fr-CA",
+      APP_VERSION: "",
+      TRUSTED_PROXY_HOPS: "1",
     },
   },
 });

@@ -7,6 +7,10 @@ import { listCompaniesFor } from "@/modules/companies";
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata() {
+  return { title: (await getTranslations("dashboard"))("pickCompany") };
+}
+
 export default async function HomePage() {
   if (!(await isSetUp())) redirect("/setup");
   const session = await getSession();

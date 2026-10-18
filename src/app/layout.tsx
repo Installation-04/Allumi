@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { Footer, Header } from "./_components/shell";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: { default: "Allumi", template: "%s · Allumi" },
-  description: "Comptabilité libre et auto-hébergeable pour le Québec et le Canada",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app");
+  return { title: { default: "Allumi", template: "%s · Allumi" }, description: t("tagline") };
+}
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();

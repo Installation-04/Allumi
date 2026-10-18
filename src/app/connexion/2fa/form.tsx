@@ -13,7 +13,8 @@ export function MfaForm() {
     <div className="space-y-4">
       <form action={action} className="space-y-4">
         {state?.error ? <FormError message={t(`errors.form.${state.error}`, { min: 12 })} /> : null}
-        <Field name="code" label={t("form.code")} autoComplete="one-time-code" inputMode="numeric" />
+        {/* No numeric keypad here: a recovery code (letters and digits) is accepted too. */}
+        <Field name="code" label={t("form.codeOrRecovery")} autoComplete="one-time-code" />
         <SubmitButton>{t("mfa.submit")}</SubmitButton>
       </form>
       <form action={logoutAction}>

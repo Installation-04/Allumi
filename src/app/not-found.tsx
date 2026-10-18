@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
+export async function generateMetadata() {
+  return { title: (await getTranslations("errors"))("notFound") };
+}
+
 export default async function NotFound() {
   const t = await getTranslations("errors");
   return (
