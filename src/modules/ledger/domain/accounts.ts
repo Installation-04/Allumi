@@ -61,16 +61,26 @@ export function isDebitNormal(type: AccountType): boolean {
 
 const name = z.string().trim().min(1).max(120);
 
-export const accountInputSchema = z
-  .object({
-    code: z.string().trim().regex(ACCOUNT_CODE),
-    nameFr: name,
-    nameEn: name,
-    type: z.enum(ACCOUNT_TYPES),
-    subtype: z.enum(ACCOUNT_SUBTYPES),
-    parentId: z.uuid().nullish(),
-    description: z.string().trim().max(500).nullish(),
-  })
-  .refine((account) => userCreatableSubtypes(account.type).includes(account.subtype), { path: ["subtype"], message: "subtype" });
+const accountFields = z.object({
+  code: z.string().trim().regex(ACCOUNT_CODE),
+  nameFr: name,
+  nameEn: name,
+  type: z.enum(ACCOUNT_TYPES),
+  subtype: z.enum(ACCOUNT_SUBTYPES),
+  parentId: z.uuid().nullish(),
+  description: z.string().trim().max(500).nullish(),
+});
+
+export const accountInputSchema = accountFields.refine((account) => userCreatableSubtypes(account.type).includes(account.subtype), {
+  path: ["subtype"],
+  message: "subtype",
+});
+
+/** What can change on an existing account: type and subtype are frozen once the account has postings. */
+export const accountPatchSchema = accountFields
+  .pick({ code: true, nameFr: true, nameEn: true, parentId: true, description: true })
+  .partial()
+  .extend({ isActive: z.boolean().optional() });
 
 export type AccountInput = z.infer<typeof accountInputSchema>;
+export type AccountPatch = z.infer<typeof accountPatchSchema>;

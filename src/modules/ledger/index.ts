@@ -1,4 +1,4 @@
-// Public API of the ledger module (domain only for now; the services are added with phase 3's later commits).
+// Public API of the ledger module for server code. Client components import "@/modules/ledger/client".
 export * from "./domain/accounts";
 export * from "./domain/balances";
 export * from "./domain/chart";
@@ -8,3 +8,11 @@ export * from "./domain/money";
 export * from "./domain/numbering";
 export * from "./domain/periods";
 export * from "./domain/schemas";
+
+export { createAccount, deleteAccount, listAccounts, updateAccount, type AccountDto } from "./service/accounts";
+export { ENTRIES_PER_PAGE, getEntry, listEntries, postManualEntry, reverseEntry, type EntryDto, type EntryLineDto, type JournalSourceKind } from "./service/entries";
+export { closeFiscalYear, createFiscalYear, listFiscalYears, lockPeriod, reopenFiscalYear, reopenPeriod, type FiscalYearDto, type PeriodDto } from "./service/fiscal";
+export { getTrialBalance, type TrialBalance, type TrialBalanceLine } from "./service/reports";
+export { initializeLedger, ledgerStatus, type LedgerStatus } from "./service/setup";
+export { todayIso } from "./service/dates";
+export type { Actor } from "./service/support";

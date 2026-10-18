@@ -32,7 +32,7 @@ export default defineConfig([
         "error",
         {
           patterns: [
-            { group: ["@/modules/*/*"], message: "Import a module through its public index (@/modules/<name>)." },
+            { group: ["@/modules/*/*", "!@/modules/*/client"], message: "Import a module through its public index (@/modules/<name>); client components use @/modules/<name>/client." },
             { group: ["@/generated/*", "@/generated/**"], message: "Use @/platform/db (and Tx from @/platform/tenant)." },
           ],
         },
@@ -47,7 +47,7 @@ export default defineConfig([
         "error",
         {
           patterns: [
-            { group: ["@/modules/*/*"], message: "Import a module through its public index (@/modules/<name>)." },
+            { group: ["@/modules/*/*", "!@/modules/*/client"], message: "Import a module through its public index (@/modules/<name>); client components use @/modules/<name>/client." },
             { group: ["@/generated/*", "@/generated/**"], message: "Use @/platform/db (and Tx from @/platform/tenant)." },
             { group: ["@/platform/db", "@/platform/tenant"], message: "The app layer reaches the database through a module service." },
           ],
