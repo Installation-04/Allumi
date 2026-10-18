@@ -26,8 +26,9 @@ async function confirmEnrollment(formData: FormData): Promise<FormState> {
   const result = await confirmTotpEnrollment(session.userId, parsed.data.code, { keepSessionToken });
   if (result.status === "rate_limited") return { error: "rateLimited" };
   if (result.status === "invalid") return { error: "code" };
-  // No revalidation here: re-rendering would switch the page to the "enabled" view and unmount the
-  // form that shows the recovery codes, which are displayed only this once.
+  // The panel keeps showing the codes (its state outlives the refresh); revalidating keeps the cached page,
+  // which the browser reuses on Back, in step with the enabled state.
+  revalidatePath("/compte/securite");
   return { recoveryCodes: result.recoveryCodes };
 }
 

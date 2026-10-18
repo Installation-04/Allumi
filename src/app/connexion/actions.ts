@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { attemptLogin, destroySession, getProfile, loginSchema } from "@/modules/auth";
 import { clearSessionCookie, clientIp, getSession, readSessionToken, setSessionCookie, userAgent } from "@/app/_lib/session";
-import { setLocaleCookie } from "@/app/_lib/locale-cookie";
+import { setLocaleCookieIfUnset } from "@/app/_lib/locale-cookie";
 import { textValues, type FormState } from "@/app/_lib/form-state";
 import { safeAction } from "@/app/_lib/safe-action";
 
@@ -18,9 +18,9 @@ export async function loginAction(_previous: FormState, formData: FormData): Pro
     if (result.status === "invalid") return { error: "credentials", values };
 
     await setSessionCookie(result.token, result.expiresAt);
-    // The language chosen in the account follows the user to a new browser or device.
+    // The language chosen in the account follows the user to a new browser or device (never over a choice made here).
     const profile = await getProfile(result.userId);
-    if (profile) await setLocaleCookie(profile.locale);
+    if (profile) await setLocaleCookieIfUnset(profile.locale);
     redirect(result.mfaRequired ? "/connexion/2fa" : "/");
   }, values);
 }

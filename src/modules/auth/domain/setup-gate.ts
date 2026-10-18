@@ -10,5 +10,5 @@ export type SetupGate = "open" | "token_required" | "token_missing";
 
 export function setupGate(config: { nodeEnv: string; appUrl: string; token: string | undefined }): SetupGate {
   if (config.token !== undefined) return "token_required";
-  return config.nodeEnv === "production" && config.appUrl.startsWith("https://") ? "token_missing" : "open";
+  return config.nodeEnv === "production" && /^\s*https:\/\//i.test(config.appUrl) ? "token_missing" : "open";
 }

@@ -8,7 +8,7 @@ const postgresUrl = z
 const schema = z
   .object({
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-    APP_URL: z.url(),
+    APP_URL: z.url().regex(/^https?:\/\//i, "must start with http:// or https://"),
     APP_VERSION: z.string().optional(),
     APP_DATABASE_URL: postgresUrl,
     // Owner credentials are for the migrate service only. When present they must differ.

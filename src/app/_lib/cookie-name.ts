@@ -2,7 +2,7 @@
 
 /** `__Host-` pins the cookie to this exact host over HTTPS; plain HTTP (dev, tests) cannot use it. */
 export function isSecureDeployment(): boolean {
-  return (process.env.APP_URL ?? "").startsWith("https://");
+  return /^\s*https:\/\//i.test(process.env.APP_URL ?? ""); // URL schemes are case-insensitive
 }
 
 export function sessionCookieName(): string {
