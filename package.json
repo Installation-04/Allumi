@@ -19,6 +19,7 @@
     "test:integration": "vitest run --project integration",
     "test:watch": "vitest",
     "test:e2e": "tsx tests/e2e/prepare-db.ts && playwright test",
+    "screenshots": "tsx tests/e2e/prepare-db.ts && SCREENSHOTS=1 playwright test tests/e2e/screenshots.spec.ts",
     "prisma:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy && node --env-file-if-exists=.env prisma/app-role.mjs"
   },
