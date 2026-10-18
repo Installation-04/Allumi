@@ -58,7 +58,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await page.getByLabel("Courriel").fill(EMAIL);
   await page.getByLabel("Mot de passe").fill("mauvais mot de passe");
   await page.getByRole("button", { name: "Se connecter" }).click();
-  await expect(page.getByText("Courriel ou mot de passe incorrect.")).toBeVisible();
+  await expect(page.getByText("Courriel ou mot de passe incorrect, ou compte temporairement verrouillé.")).toBeVisible();
 
   await page.getByLabel("Mot de passe").fill(PASSWORD);
   await page.getByRole("button", { name: "Se connecter" }).click();
