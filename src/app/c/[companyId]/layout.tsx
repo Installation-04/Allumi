@@ -13,6 +13,10 @@ export default async function CompanyLayout({ children, params }: { children: Re
     { href: `${base}/comptes`, label: t("accounts") },
     { href: `${base}/balance`, label: t("trial") },
     { href: `${base}/exercices`, label: t("fiscal") },
+    { href: `${base}/contacts`, label: t("contacts") },
+    { href: `${base}/produits`, label: t("items") },
+    { href: `${base}/taxes`, label: t("taxes") },
+    { href: `${base}/entreprise`, label: t("company") },
     ...(can(company.role, "audit.read") ? [{ href: `${base}/audit`, label: t("audit") }] : []),
   ];
   return (
