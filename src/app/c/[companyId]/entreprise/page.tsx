@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ActionForm, Field, SelectField } from "@/app/_components/ui";
 import { can, FILING_FREQUENCIES, getCompanyProfile, LOCALES, PROVINCES, TAX_ROUNDINGS } from "@/modules/companies";
 import { loadCompany } from "../_lib";
@@ -20,8 +20,11 @@ export default async function CompanyProfilePage({ params }: { params: Promise<{
     await getTranslations("enums.filingFrequency"),
     await getTranslations("months"),
   ];
+  const locale = await getLocale();
   const profile = await getCompanyProfile(actor);
   const manage = can(company.role, "company.manage");
+  // the month names of the messages are for lists ("Janvier"); inside a French sentence they are lower case
+  const monthInSentence = (name: string) => (locale.startsWith("fr") ? name.toLocaleLowerCase("fr-CA") : name);
 
   if (!manage) {
     // Read-only members see the identity that is printed on documents, not a form.
@@ -91,7 +94,7 @@ export default async function CompanyProfilePage({ params }: { params: Promise<{
             <SelectField name="taxRounding" label={t("taxRounding")} hint={t("taxRoundingHint")} defaultValue={profile.taxRounding} options={TAX_ROUNDINGS.map((code) => ({ value: code, label: roundings(code) }))} />
             <SelectField name="taxFilingFrequency" label={t("taxFilingFrequency")} defaultValue={profile.taxFilingFrequency} options={FILING_FREQUENCIES.map((code) => ({ value: code, label: frequencies(code) }))} />
           </div>
-          <p className="text-sm">{t("fiscalYearStart", { month: months(String(profile.fiscalYearStartMonth) as "1") })}</p>
+          <p className="text-sm">{t("fiscalYearStart", { month: monthInSentence(months(String(profile.fiscalYearStartMonth) as "1")) })}</p>
         </fieldset>
       </ActionForm>
     </section>
