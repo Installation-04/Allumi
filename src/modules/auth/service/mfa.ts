@@ -1,14 +1,30 @@
 import "server-only";
 import { recordEvent } from "@/modules/audit";
-import { withUser } from "@/platform/tenant";
+import { withUser, type Tx } from "@/platform/tenant";
 import { generateRecoveryCodes, normalizeRecoveryCode } from "../domain/recovery-codes";
 import { RATE_LIMITS } from "../domain/policy";
 import { newTotpSecret, totpUri, verifyTotp } from "../domain/totp";
-import { decrypt, encrypt, recoveryCodeHash, verifyPassword } from "./crypto";
+import { decrypt, encrypt, recoveryCodeHash, sha256Hex, verifyPassword } from "./crypto";
 import { hit } from "./rate-limit";
 import { randomBytes } from "node:crypto";
 
 export type MfaResult = "ok" | "invalid" | "rate_limited";
+
+export type EnrollmentResult = { status: "ok"; recoveryCodes: string[] } | { status: "invalid" } | { status: "rate_limited" };
+
+type SessionScope = {
+  /** The session the user is acting from: it stays open (and, on enrollment, is marked as verified). */
+  keepSessionToken?: string;
+  now?: Date;
+};
+
+/**
+ * Closes every other session of the user after a change to the second factor, so that a stolen cookie
+ * does not outlive the change. Without a token to keep, every session is closed.
+ */
+async function closeOtherSessions(tx: Tx, userId: string, keepSessionToken: string | undefined): Promise<void> {
+  await tx.session.deleteMany({ where: keepSessionToken ? { userId, NOT: { id: sha256Hex(keepSessionToken) } } : { userId } });
+}
 
 /**
  * Accepts a TOTP code (never twice: its time step must be newer than the last accepted one,
@@ -70,9 +86,13 @@ export async function beginTotpEnrollment(userId: string, email: string): Promis
   return stored ? { secret, uri: totpUri(secret, email) } : null;
 }
 
-/** Confirms enrollment with a first valid code; returns the recovery codes, shown once. */
-export async function confirmTotpEnrollment(userId: string, code: string, now = new Date()): Promise<string[] | null> {
-  if (!(await hit("mfa:user", userId, RATE_LIMITS.mfaUser)).allowed) return null;
+/**
+ * Confirms enrollment with a first valid code; returns the recovery codes, shown once. The session it is
+ * made from proves the second factor right away; the user's other sessions are closed.
+ */
+export async function confirmTotpEnrollment(userId: string, code: string, scope: SessionScope = {}): Promise<EnrollmentResult> {
+  const now = scope.now ?? new Date();
+  if (!(await hit("mfa:user", userId, RATE_LIMITS.mfaUser)).allowed) return { status: "rate_limited" };
   const codes = generateRecoveryCodes((size) => randomBytes(size));
   const confirmed = await withUser({ userId }, async (tx) => {
     const credential = await tx.userCredential.findUnique({ where: { userId } });
@@ -82,14 +102,19 @@ export async function confirmTotpEnrollment(userId: string, code: string, now = 
     await tx.userCredential.update({ where: { userId }, data: { totpEnabledAt: now, totpLastStep: BigInt(step) } });
     await tx.userRecoveryCode.deleteMany({ where: { userId } });
     await tx.userRecoveryCode.createMany({ data: codes.map((value) => ({ userId, codeHash: recoveryCodeHash(value) })) });
+    await closeOtherSessions(tx, userId, scope.keepSessionToken);
+    if (scope.keepSessionToken) {
+      await tx.session.updateMany({ where: { id: sha256Hex(scope.keepSessionToken), userId }, data: { mfaVerifiedAt: now } });
+    }
     await recordEvent(tx, { action: "auth.totp_enabled", entityType: "app_user", entityId: userId, global: true });
     return true;
   });
-  return confirmed ? codes : null;
+  return confirmed ? { status: "ok", recoveryCodes: codes } : { status: "invalid" };
 }
 
-/** Turning 2FA off needs the password and a valid code. */
-export async function disableTotp(userId: string, password: string, code: string, now = new Date()): Promise<MfaResult> {
+/** Turning 2FA off needs the password and a valid code. The user's other sessions are closed. */
+export async function disableTotp(userId: string, password: string, code: string, scope: SessionScope = {}): Promise<MfaResult> {
+  const now = scope.now ?? new Date();
   if (!(await hit("mfa:user", userId, RATE_LIMITS.mfaUser)).allowed) return "rate_limited";
   return withUser({ userId }, async (tx) => {
     const credential = await tx.userCredential.findUnique({ where: { userId } });
@@ -99,8 +124,9 @@ export async function disableTotp(userId: string, password: string, code: string
     if (!stepFresh || !(await verifyPassword(credential.passwordHash, password))) return "invalid";
     await tx.userCredential.update({ where: { userId }, data: { totpSecretEnc: null, totpEnabledAt: null, totpLastStep: null } });
     await tx.userRecoveryCode.deleteMany({ where: { userId } });
-    // A session verified under the old factor must not skip the next one if 2FA is turned back on.
+    // The sessions that stay open must not carry the proof of the old factor into a later one.
     await tx.session.updateMany({ where: { userId }, data: { mfaVerifiedAt: null } });
+    await closeOtherSessions(tx, userId, scope.keepSessionToken);
     await recordEvent(tx, { action: "auth.totp_disabled", entityType: "app_user", entityId: userId, global: true });
     return "ok";
   });

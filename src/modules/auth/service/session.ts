@@ -70,8 +70,3 @@ export async function markMfaVerified(userId: string, token: string, now = new D
 export async function destroySession(userId: string, token: string): Promise<void> {
   await withUser({ userId }, (tx) => tx.session.deleteMany({ where: { id: sha256Hex(token) } }));
 }
-
-/** Sign out everywhere else (after a security change). */
-export async function destroyOtherSessions(userId: string, keepToken: string): Promise<void> {
-  await withUser({ userId }, (tx) => tx.session.deleteMany({ where: { userId, NOT: { id: sha256Hex(keepToken) } } }));
-}

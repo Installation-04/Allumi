@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { beginTotpEnrollment, codeSchema, confirmTotpEnrollment, disableTotp, getProfile } from "@/modules/auth";
 import { readSessionToken, requireSession } from "@/app/_lib/session";
-import { destroyOtherSessions, markMfaVerified } from "@/modules/auth";
 import type { FormState } from "@/app/_lib/form-state";
+import { safeAction } from "@/app/_lib/safe-action";
 
 export async function beginEnrollmentAction(): Promise<void> {
   const session = await requireSession();
@@ -14,34 +14,36 @@ export async function beginEnrollmentAction(): Promise<void> {
 }
 
 export async function confirmEnrollmentAction(_previous: FormState, formData: FormData): Promise<FormState> {
+  return safeAction(() => confirmEnrollment(formData));
+}
+
+async function confirmEnrollment(formData: FormData): Promise<FormState> {
   const session = await requireSession();
-  const token = await readSessionToken();
   const parsed = codeSchema.safeParse({ code: formData.get("code") });
   if (!parsed.success) return { error: "invalid" };
 
-  const recoveryCodes = await confirmTotpEnrollment(session.userId, parsed.data.code);
-  if (!recoveryCodes) return { error: "code" };
-  // This session just proved the second factor.
-  if (token) {
-    await markMfaVerified(session.userId, token);
-    await destroyOtherSessions(session.userId, token);
-  }
+  const keepSessionToken = await readSessionToken();
+  const result = await confirmTotpEnrollment(session.userId, parsed.data.code, { keepSessionToken });
+  if (result.status === "rate_limited") return { error: "rateLimited" };
+  if (result.status === "invalid") return { error: "code" };
   // No revalidation here: re-rendering would switch the page to the "enabled" view and unmount the
   // form that shows the recovery codes, which are displayed only this once.
-  return { recoveryCodes };
+  return { recoveryCodes: result.recoveryCodes };
 }
 
 export async function disableTotpAction(_previous: FormState, formData: FormData): Promise<FormState> {
+  return safeAction(() => disableTotpFor(formData));
+}
+
+async function disableTotpFor(formData: FormData): Promise<FormState> {
   const session = await requireSession();
-  const token = await readSessionToken();
   const parsed = codeSchema.safeParse({ code: formData.get("code") });
   const password = String(formData.get("password") ?? "");
   if (!parsed.success || !password) return { error: "invalid" };
 
-  const result = await disableTotp(session.userId, password, parsed.data.code);
+  const result = await disableTotp(session.userId, password, parsed.data.code, { keepSessionToken: await readSessionToken() });
   if (result === "rate_limited") return { error: "rateLimited" };
-  if (result === "invalid") return { error: "code" };
-  if (token) await destroyOtherSessions(session.userId, token);
+  if (result === "invalid") return { error: "passwordOrCode" };
   revalidatePath("/compte/securite");
   return undefined;
 }

@@ -1,4 +1,4 @@
-// Errors raised by the database rules (SQLSTATE AL001…AL010) and by the services.
+// Errors raised by the database rules (SQLSTATE AL001…AL011) and by the services.
 
 export const DATABASE_RULES = [
   "AL001",
@@ -11,6 +11,7 @@ export const DATABASE_RULES = [
   "AL008",
   "AL009",
   "AL010",
+  "AL011",
 ] as const;
 export type DatabaseRule = (typeof DATABASE_RULES)[number];
 
@@ -36,7 +37,7 @@ function* causes(error: unknown): Generator<Record<string, unknown>> {
   }
 }
 
-/** Finds an Allumi database rule (AL001…AL010) anywhere in a Prisma or driver error chain. */
+/** Finds an Allumi database rule (AL001…AL011) anywhere in a Prisma or driver error chain. */
 export function databaseRuleOf(error: unknown): DatabaseRule | null {
   for (const record of causes(error)) {
     for (const value of [record.originalCode, record.code, record.sqlState]) {
@@ -46,7 +47,7 @@ export function databaseRuleOf(error: unknown): DatabaseRule | null {
     }
     const message = record.message;
     if (typeof message === "string") {
-      const match = /\b(AL0(?:0[1-9]|10))\b/.exec(message);
+      const match = /\b(AL0(?:0[1-9]|1[01]))\b/.exec(message);
       if (match) return match[1] as DatabaseRule;
     }
   }

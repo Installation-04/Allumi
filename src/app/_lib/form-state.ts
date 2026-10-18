@@ -3,6 +3,7 @@ export type FormErrorKey =
   | "credentials"
   | "rateLimited"
   | "code"
+  | "passwordOrCode"
   | "mismatch"
   | "tooShort"
   | "tooLong"

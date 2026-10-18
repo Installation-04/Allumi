@@ -7,6 +7,8 @@ describe("database rule detection", () => {
     expect(databaseRuleOf({ meta: { code: "AL001" } })).toBe("AL001");
     expect(databaseRuleOf({ meta: { driverAdapterError: { cause: { originalCode: "AL008" } } } })).toBe("AL008");
     expect(databaseRuleOf(new Error("Raw query failed. Code: `AL007`. Message: allocation exceeds"))).toBe("AL007");
+    expect(databaseRuleOf({ code: "AL011" })).toBe("AL011");
+    expect(databaseRuleOf(new Error("Raw query failed. Code: `AL011`. Message: invalid session"))).toBe("AL011");
   });
 
   it("ignores other errors", () => {

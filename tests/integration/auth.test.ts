@@ -178,9 +178,9 @@ describe("two-factor authentication", () => {
     const enrollment = await beginTotpEnrollment(userId, email);
     if (!enrollment) throw new Error("no enrollment");
     const now = Date.now();
-    const recoveryCodes = await confirmTotpEnrollment(userId, totpCode(enrollment.secret, now), new Date(now));
-    if (!recoveryCodes) throw new Error("not confirmed");
-    return { userId, email, secret: enrollment.secret, recoveryCodes, enrolledAt: now };
+    const confirmed = await confirmTotpEnrollment(userId, totpCode(enrollment.secret, now), { now: new Date(now) });
+    if (confirmed.status !== "ok") throw new Error(`not confirmed: ${confirmed.status}`);
+    return { userId, email, secret: enrollment.secret, recoveryCodes: confirmed.recoveryCodes, enrolledAt: now };
   }
 
   it("encrypts the secret at rest and shows ten recovery codes once", async () => {
@@ -198,7 +198,7 @@ describe("two-factor authentication", () => {
   it("does not enable anything with a wrong confirmation code", async () => {
     const userId = await seedUser(db, { email: "refus@exemple.test" });
     await beginTotpEnrollment(userId, "refus@exemple.test");
-    expect(await confirmTotpEnrollment(userId, "000000")).toBeNull();
+    expect(await confirmTotpEnrollment(userId, "000000")).toEqual({ status: "invalid" });
     expect((await totpStatus(userId)).enabled).toBe(false);
     expect((await totpStatus(userId)).pending).toBe(true);
   });
@@ -238,19 +238,41 @@ describe("two-factor authentication", () => {
     const { userId, secret, enrolledAt } = await enrolledUser("desactiver@exemple.test");
     const later = enrolledAt + 30_000;
     const code = totpCode(secret, later);
-    expect(await disableTotp(userId, "mauvais mot de passe", code, new Date(later))).toBe("invalid");
-    expect(await disableTotp(userId, PASSWORD, code, new Date(later))).toBe("ok");
+    expect(await disableTotp(userId, "mauvais mot de passe", code, { now: new Date(later) })).toBe("invalid");
+    expect(await disableTotp(userId, PASSWORD, code, { now: new Date(later) })).toBe("ok");
     expect(await totpStatus(userId)).toEqual({ enabled: false, pending: false, recoveryCodesLeft: 0 });
     const row = (await db.query("SELECT totp_secret_enc FROM user_credential WHERE user_id = $1", [userId])).rows[0];
     expect(row.totp_secret_enc).toBeNull();
   });
 
-  it("forgets the second-factor proof of every session when it is turned off", async () => {
+  it("reports a rate-limited confirmation as such, not as a wrong code", async () => {
+    const userId = await seedUser(db, { email: "essais@exemple.test" });
+    await beginTotpEnrollment(userId, "essais@exemple.test");
+    let last: Awaited<ReturnType<typeof confirmTotpEnrollment>> = { status: "invalid" };
+    for (let attempt = 0; attempt < 10; attempt++) last = await confirmTotpEnrollment(userId, "000000");
+    expect(last).toEqual({ status: "rate_limited" });
+  });
+
+  it("closes the user's other sessions when two-factor authentication is turned on, and verifies the current one", async () => {
+    const userId = await seedUser(db, { email: "appareils@exemple.test" });
+    const [current, other] = [await createSession(userId, "ordinateur"), await createSession(userId, "téléphone")];
+    const enrollment = await beginTotpEnrollment(userId, "appareils@exemple.test");
+    if (!enrollment) throw new Error("no enrollment");
+    const now = Date.now();
+    const confirmed = await confirmTotpEnrollment(userId, totpCode(enrollment.secret, now), { keepSessionToken: current.token, now: new Date(now) });
+    expect(confirmed.status).toBe("ok");
+    expect(await resolveSession(other.token)).toBeNull();
+    expect(await resolveSession(current.token)).toMatchObject({ userId, mfaPending: false });
+  });
+
+  it("closes the other sessions and forgets the second-factor proof when it is turned off", async () => {
     const { userId, secret, enrolledAt } = await enrolledUser("epoque@exemple.test");
-    const session = await createSession(userId, "vitest");
-    await markMfaVerified(userId, session.token);
+    const [current, other] = [await createSession(userId, "ordinateur"), await createSession(userId, "téléphone")];
+    await markMfaVerified(userId, current.token);
+    await markMfaVerified(userId, other.token);
     const later = enrolledAt + 30_000;
-    expect(await disableTotp(userId, PASSWORD, totpCode(secret, later), new Date(later))).toBe("ok");
-    expect((await db.query("SELECT mfa_verified_at FROM session WHERE user_id = $1", [userId])).rows[0].mfa_verified_at).toBeNull();
+    expect(await disableTotp(userId, PASSWORD, totpCode(secret, later), { keepSessionToken: current.token, now: new Date(later) })).toBe("ok");
+    const remaining = (await db.query("SELECT id, mfa_verified_at FROM session WHERE user_id = $1", [userId])).rows;
+    expect(remaining).toEqual([{ id: sha256Hex(current.token), mfa_verified_at: null }]);
   });
 });
