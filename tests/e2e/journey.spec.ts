@@ -65,6 +65,13 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   // Fixed instant: the replay check below must not depend on which 30-second window the test runs in.
   const enrolledAt = Date.now();
   await page.getByLabel("Code à 6 chiffres").fill(totp.generate({ timestamp: enrolledAt }));
+  // A stolen session cookie is not enough to enroll a device: the account password is asked too.
+  await page.getByLabel("Mot de passe", { exact: true }).fill("mauvais mot de passe");
+  await page.getByRole("button", { name: "Confirmer et activer" }).click();
+  await expect(page.getByText("Mot de passe ou code incorrect.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Codes de récupération" })).toBeHidden();
+  await page.getByLabel("Mot de passe", { exact: true }).fill(PASSWORD);
+  await page.getByLabel("Code à 6 chiffres").fill(totp.generate({ timestamp: enrolledAt }));
   await page.getByRole("button", { name: "Confirmer et activer" }).click();
   await expect(page.getByRole("heading", { name: "Codes de récupération" })).toBeVisible();
   const recoveryCodes = await page.locator("main li").allInnerTexts();

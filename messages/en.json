@@ -73,7 +73,8 @@
     "recoveryIntro": "Keep these codes somewhere safe. Each works once and they will not be shown again.",
     "disable": "Turn off 2FA",
     "disableHint": "Enter your password and a current code to turn off 2FA.",
-    "backHome": "Back"
+    "backHome": "Back",
+    "enrollPasswordHint": "To turn it on, also enter your password: a stolen session cookie is not enough to enroll another device."
   },
   "dashboard": {
     "title": "{company}",

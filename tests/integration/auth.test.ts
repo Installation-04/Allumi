@@ -178,7 +178,7 @@ describe("two-factor authentication", () => {
     const enrollment = await beginTotpEnrollment(userId, email);
     if (!enrollment) throw new Error("no enrollment");
     const now = Date.now();
-    const confirmed = await confirmTotpEnrollment(userId, totpCode(enrollment.secret, now), { now: new Date(now) });
+    const confirmed = await confirmTotpEnrollment(userId, totpCode(enrollment.secret, now), PASSWORD, { now: new Date(now) });
     if (confirmed.status !== "ok") throw new Error(`not confirmed: ${confirmed.status}`);
     return { userId, email, secret: enrollment.secret, recoveryCodes: confirmed.recoveryCodes, enrolledAt: now };
   }
@@ -198,7 +198,7 @@ describe("two-factor authentication", () => {
   it("does not enable anything with a wrong confirmation code", async () => {
     const userId = await seedUser(db, { email: "refus@exemple.test" });
     await beginTotpEnrollment(userId, "refus@exemple.test");
-    expect(await confirmTotpEnrollment(userId, "000000")).toEqual({ status: "invalid" });
+    expect(await confirmTotpEnrollment(userId, "000000", PASSWORD)).toEqual({ status: "invalid" });
     expect((await totpStatus(userId)).enabled).toBe(false);
     expect((await totpStatus(userId)).pending).toBe(true);
   });
@@ -245,11 +245,26 @@ describe("two-factor authentication", () => {
     expect(row.totp_secret_enc).toBeNull();
   });
 
+  it("asks for the account password to turn two-factor authentication on, not only a valid code", async () => {
+    const userId = await seedUser(db, { email: "motdepasse@exemple.test" });
+    const enrollment = await beginTotpEnrollment(userId, "motdepasse@exemple.test");
+    if (!enrollment) throw new Error("no enrollment");
+    const now = Date.now();
+    const code = totpCode(enrollment.secret, now);
+    // someone who holds only a session cookie can read the pending secret back and compute a valid code: refused
+    expect(await confirmTotpEnrollment(userId, code, "mauvais mot de passe", { now: new Date(now) })).toEqual({ status: "invalid" });
+    expect(await confirmTotpEnrollment(userId, code, "", { now: new Date(now) })).toEqual({ status: "invalid" });
+    expect((await totpStatus(userId)).enabled).toBe(false);
+    // the right password and the same code: accepted (the refused tries did not use up the code)
+    expect((await confirmTotpEnrollment(userId, code, PASSWORD, { now: new Date(now) })).status).toBe("ok");
+    expect((await totpStatus(userId)).enabled).toBe(true);
+  });
+
   it("reports a rate-limited confirmation as such, not as a wrong code", async () => {
     const userId = await seedUser(db, { email: "essais@exemple.test" });
     await beginTotpEnrollment(userId, "essais@exemple.test");
     let last: Awaited<ReturnType<typeof confirmTotpEnrollment>> = { status: "invalid" };
-    for (let attempt = 0; attempt < 10; attempt++) last = await confirmTotpEnrollment(userId, "000000");
+    for (let attempt = 0; attempt < 10; attempt++) last = await confirmTotpEnrollment(userId, "000000", PASSWORD);
     expect(last).toEqual({ status: "rate_limited" });
   });
 
@@ -259,7 +274,7 @@ describe("two-factor authentication", () => {
     const enrollment = await beginTotpEnrollment(userId, "appareils@exemple.test");
     if (!enrollment) throw new Error("no enrollment");
     const now = Date.now();
-    const confirmed = await confirmTotpEnrollment(userId, totpCode(enrollment.secret, now), { keepSessionToken: current.token, now: new Date(now) });
+    const confirmed = await confirmTotpEnrollment(userId, totpCode(enrollment.secret, now), PASSWORD, { keepSessionToken: current.token, now: new Date(now) });
     expect(confirmed.status).toBe("ok");
     expect(await resolveSession(other.token)).toBeNull();
     expect(await resolveSession(current.token)).toMatchObject({ userId, mfaPending: false });

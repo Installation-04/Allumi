@@ -87,16 +87,19 @@ export async function beginTotpEnrollment(userId: string, email: string): Promis
 }
 
 /**
- * Confirms enrollment with a first valid code; returns the recovery codes, shown once. The session it is
+ * Confirms enrollment with the account password and a first valid code; returns the recovery codes, shown once.
+ * The password is asked like the one that turns 2FA off: a stolen session cookie must not be enough to enroll an
+ * authenticator of the thief's own (the pending secret can be read back from the security page). The session it is
  * made from proves the second factor right away; the user's other sessions are closed.
  */
-export async function confirmTotpEnrollment(userId: string, code: string, scope: SessionScope = {}): Promise<EnrollmentResult> {
+export async function confirmTotpEnrollment(userId: string, code: string, password: string, scope: SessionScope = {}): Promise<EnrollmentResult> {
   const now = scope.now ?? new Date();
   if (!(await hit("mfa:user", userId, RATE_LIMITS.mfaUser)).allowed) return { status: "rate_limited" };
   const codes = generateRecoveryCodes((size) => randomBytes(size));
   const confirmed = await withUser({ userId }, async (tx) => {
     const credential = await tx.userCredential.findUnique({ where: { userId } });
     if (!credential?.totpSecretEnc || credential.totpEnabledAt) return false;
+    if (!(await verifyPassword(credential.passwordHash, password))) return false;
     const step = verifyTotp(decrypt(credential.totpSecretEnc), code, now.getTime());
     if (step === null) return false;
     await tx.userCredential.update({ where: { userId }, data: { totpEnabledAt: now, totpLastStep: BigInt(step) } });

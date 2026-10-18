@@ -73,7 +73,8 @@
     "recoveryIntro": "Conserve ces codes dans un endroit sûr. Chacun ne sert qu'une fois et ils ne seront plus affichés.",
     "disable": "Désactiver la 2FA",
     "disableHint": "Entre ton mot de passe et un code actuel pour désactiver la 2FA.",
-    "backHome": "Retour"
+    "backHome": "Retour",
+    "enrollPasswordHint": "Pour l'activer, entre aussi ton mot de passe : un témoin de session volé ne suffit pas à enrôler un autre appareil."
   },
   "dashboard": {
     "title": "{company}",

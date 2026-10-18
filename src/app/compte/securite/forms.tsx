@@ -57,6 +57,8 @@ export function TwoFactorPanel({
           {t("manualKey")} <code className="break-all font-mono">{enrollment.secret}</code>
         </p>
         {state?.error ? <FormError message={tForm(`errors.form.${state.error}`, { min: 12 })} /> : null}
+        <p className="text-sm">{t("enrollPasswordHint")}</p>
+        <Field name="password" type="password" label={tForm("form.password")} autoComplete="current-password" />
         <Field name="code" label={tForm("form.code")} autoComplete="one-time-code" inputMode="numeric" />
         <SubmitButton>{t("confirm")}</SubmitButton>
       </form>

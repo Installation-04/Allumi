@@ -17,7 +17,7 @@
 
 ## Vérification en deux étapes (TOTP)
 Compatible avec toute application d'authentification (Aegis, Google Authenticator, 1Password, etc.).
-1. **Sécurité du compte → Activer la 2FA**.
+1. **Sécurité du compte → Activer la 2FA**. L'activation demande ton **mot de passe** en plus du code : un témoin de session volé ne suffit pas à enrôler l'appareil de quelqu'un d'autre (la clé en attente reste lisible sur la page tant qu'elle n'est pas confirmée).
 2. Scanne le code QR (ou saisis la clé), puis entre le code à 6 chiffres pour confirmer.
 3. Les **10 codes de récupération** s'affichent **une seule fois** : conserve-les en lieu sûr. Chacun ne sert qu'une fois.
 
