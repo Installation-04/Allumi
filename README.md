@@ -49,3 +49,7 @@ Allumi est un outil. Il ne remplace ni un comptable professionnel ni un avis jur
 
 ## Licence
 [MIT](LICENSE)
+
+## Guide et références visuelles
+
+Le [wiki GitHub](https://github.com/Installation-04/Allumi/wiki) regroupe le guide utilisateur, l’installation, l’exploitation, l’architecture et la feuille de route. Voir le [guide utilisateur](docs/Guide-utilisateur.md), les [fonctionnalités et limites](docs/Fonctionnalites-et-limites.md) et les [captures de référence](docs/References-visuelles.md). Les fichiers PNG originaux sont dans [docs/images](docs/images). Les captures de refonte décrivent la branche en revue jusqu’à son intégration.

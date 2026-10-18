@@ -3,11 +3,11 @@
 @theme {
   /* System fonts only: no CDN, nothing leaves the server. */
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --color-brand-50: #fffbeb;
-  --color-brand-500: #f59e0b;
-  --color-brand-600: #d97706;
-  --color-brand-700: #b45309;
-  --color-brand-800: #92400e;
+  --color-brand-50: #ecfdf5;
+  --color-brand-500: #34d399;
+  --color-brand-600: #059669;
+  --color-brand-700: #047857;
+  --color-brand-800: #065f46;
 }
 
 html {
@@ -26,13 +26,38 @@ main {
 @media (pointer: coarse) {
   main button,
   main input:not([type="hidden"]),
-  main select,
-  main a {
+  main select {
     min-height: 2.75rem;
   }
 
-  main a {
-    display: inline-flex;
-    align-items: center;
+}
+
+/* Shared workspace surfaces keep the existing accounting screens consistent. */
+.workspace-content > section > h1 {
+  letter-spacing: -0.025em;
+}
+
+.workspace-content .overflow-x-auto:has(> table) {
+  border: 1px solid var(--color-stone-200);
+  border-radius: 0.875rem;
+  background: white;
+}
+
+.workspace-content table thead {
+  background: var(--color-stone-100);
+}
+
+.workspace-content table tbody tr:hover {
+  background: var(--color-brand-50);
+}
+
+@media (prefers-color-scheme: dark) {
+  .workspace-content .overflow-x-auto:has(> table) {
+    border-color: var(--color-stone-800);
+    background: var(--color-stone-900);
+  }
+  .workspace-content table thead,
+  .workspace-content table tbody tr:hover {
+    background: var(--color-stone-800);
   }
 }

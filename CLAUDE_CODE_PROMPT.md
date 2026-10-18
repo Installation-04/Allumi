@@ -1,5 +1,7 @@
 # Prompt Claude Code — Allumi
 
+> Mandat initial conservé comme référence. Codex reprend le développement; l’ordre de livraison actuel et la priorité de refonte UI sont suivis dans [[Feuille-de-route]] (`docs/Feuille-de-route.md`).
+
 Colle le bloc ci-dessous dans Claude Code, à la racine du dépôt (`cd allumi && claude`).
 
 Modèles conseillés : **Opus 5.5** pour la phase 1 (plan, schéma, moteur comptable), puis **Sonnet 5.5** pour le développement courant.

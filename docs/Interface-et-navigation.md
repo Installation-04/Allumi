@@ -1,0 +1,23 @@
+# Interface et navigation
+
+Allumi propose un espace de travail comptable bilingue. Sur ordinateur, la navigation de l’entreprise se trouve à gauche; sur téléphone et tablette, elle devient une barre horizontale que l’on peut faire défiler. La section active est indiquée visuellement et aux lecteurs d’écran. Les liens conduisent uniquement à des fonctions disponibles.
+
+## Tableau de bord
+
+- **Actif, passif, produits et charges** : soldes nets par type de compte, calculés en cents entiers à partir du grand livre. La période affichée est **toutes les dates enregistrées**, y compris les écritures datées dans le futur. Ce ne sont ni des prévisions, ni le solde bancaire disponible, ni le chiffre d’affaires d’un exercice sélectionné.
+- **Dernières écritures** : les cinq premières écritures selon la date comptable décroissante, puis le numéro décroissant. Chaque ligne ouvre sa pièce; le montant correspond au total d’un côté de l’écriture.
+- **Équilibre des livres** : contrôle de l’égalité débits/crédits et de l’équation comptable. Un échec demande une vérification; aucun graphique ne masque le résultat.
+- **Nouvelle écriture** : accès direct pour les rôles autorisés. Les comptes en lecture seule peuvent consulter les données sans cette action.
+- **Outils** : accès au plan comptable, aux exercices et, selon le rôle, à la piste d’audit.
+
+Les données d’une entreprise ne sont jamais remplacées par des valeurs fictives. Une entreprise sans écriture affiche un état vide explicite et des soldes nuls. Une entreprise dont le grand livre n’est pas initialisé conserve son parcours d’initialisation.
+
+## Direction visuelle
+
+Palette verte et neutre, cartes claires, tableaux lisibles, contrôles tactiles et mode sombre du système. L’organisation reprend les conventions générales des logiciels comptables en ligne; le design, les textes et les icônes sont originaux. Le zoom du navigateur reste disponible, les champs gardent leurs libellés, et les actions sont accessibles au clavier.
+
+Voir [[Feuille-de-route]] pour les prochains modules et [[Journal-et-ecritures]] pour la saisie sur téléphone. Aucune fonction hors ligne n’est annoncée.
+
+## Captures de référence
+
+Voir [[References-visuelles]] pour les écrans sur ordinateur et téléphone, réalisés avec une entreprise fictive.

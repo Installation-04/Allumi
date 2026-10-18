@@ -36,3 +36,7 @@ Un exercice fermé se rouvre avant ses périodes : tant qu'il est fermé, la bas
 | Rouvrir une période ou un exercice | oui (2FA, code, motif) | non | non |
 
 Voir aussi : [[Regles-comptables]] (périodes), [[Schema-de-donnees]] (tables `fiscal_year` et `fiscal_period`).
+
+## Captures de référence
+
+Voir [[References-visuelles]] pour les écrans sur ordinateur et téléphone, réalisés avec une entreprise fictive.

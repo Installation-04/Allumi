@@ -12,8 +12,9 @@ export async function Header() {
   const session = await getSession();
   return (
     <header className="border-b border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
-        <Link href="/" className={`inline-flex min-h-11 items-center rounded-sm text-lg font-semibold text-brand-700 dark:text-brand-500 ${FOCUS}`}>
+      <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:px-6">
+        <Link href="/" className={`inline-flex min-h-11 items-center gap-2 rounded-sm text-xl font-bold text-brand-700 dark:text-brand-500 ${FOCUS}`}>
+          <span aria-hidden="true" className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-700 text-lg text-white">a</span>
           Allumi
         </Link>
         <div className="flex flex-wrap items-center gap-3 text-sm">

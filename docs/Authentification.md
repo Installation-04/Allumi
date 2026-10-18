@@ -39,7 +39,7 @@ Les droits sont appliqués **par la base de données**, pas seulement par l'inte
 |---|:-:|:-:|:-:|
 | Consulter les données | ✓ | ✓ | ✓ |
 | Saisir et valider | ✓ | ✓ | — |
-| Gérer les membres et l'entreprise | ✓ | — | — |
+| Gérer les membres et l'entreprise (prévu, interface non livrée) | ✓ | — | — |
 | Consulter la piste d'audit | ✓ | ✓ | — |
 
 Voir aussi [[Architecture]] et [[Securite-et-Loi-25]].

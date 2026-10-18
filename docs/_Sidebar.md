@@ -14,6 +14,10 @@
 - [[FAQ]]
 
 **Utiliser**
+- [[Guide-utilisateur]]
+- [[Interface-et-navigation]]
+- [[References-visuelles]]
+- [[Fonctionnalites-et-limites]]
 - [[Plan-comptable]]
 - [[Journal-et-ecritures]]
 - [[Exercices-et-periodes]]
@@ -29,3 +33,4 @@
 **Contribuer**
 - [[Developpement-local]]
 - [[Developpement-cloud]]
+- [[Publication-du-wiki]]

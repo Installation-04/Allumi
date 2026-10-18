@@ -17,6 +17,10 @@ Allumi est un logiciel de comptabilité **open source** (MIT) et **auto-héberge
 - [[FAQ]]
 
 ## Pour utiliser l'application
+- [[Guide-utilisateur]] — parcours complet, du premier compte à la fermeture des périodes
+- [[Interface-et-navigation]] — tableau de bord, navigation et web mobile
+- [[References-visuelles]] — captures de référence ordinateur et téléphone
+- [[Fonctionnalites-et-limites]] — fonctions livrées, en revue et planifiées
 - [[Plan-comptable]] — comptes, types, comptes système
 - [[Journal-et-ecritures]] — écritures, contre-passation, balance de vérification
 - [[Exercices-et-periodes]] — exercices, verrouillage, réouverture protégée
@@ -31,7 +35,8 @@ Allumi est un logiciel de comptabilité **open source** (MIT) et **auto-héberge
 
 ## Pour contribuer
 - [[Developpement-local]] — environnement de dev
-- [[Developpement-cloud]] — développer dans Claude Code sur le web
+- [[Developpement-cloud]] — développer en environnement cloud
+- [[Publication-du-wiki]] — publier les pages et renouveler les captures
 - Voir aussi `CONTRIBUTING.md` et `SECURITY.md` dans le dépôt.
 
 ## Avertissement

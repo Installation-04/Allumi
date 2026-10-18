@@ -16,10 +16,10 @@ Un VPS Ubuntu dans une région canadienne est le plus simple ([[Installation]]).
 Docker Compose suffit largement pour une instance de PME et reste simple à exploiter.
 
 **Les taxes (TPS/TVQ) sont-elles à jour ?**
-Les taux sont configurables avec une date d'effet. Vérifie toujours auprès de Revenu Québec et de l'ARC.
+Le moteur de taxes et les taux datés sont prévus pour la phase 4; ils ne sont pas encore disponibles dans l’interface. Vérifie les règles applicables auprès de Revenu Québec et de l’ARC.
 
 **Les données peuvent-elles être exportées ?**
-Oui, c'est un objectif central : exports CSV/PDF et sauvegardes standard PostgreSQL. Pas d'enfermement propriétaire.
+Les sauvegardes PostgreSQL sont disponibles. Les exports utilisateurs CSV/PDF sont prévus pour la phase 6 et ne sont pas encore livrés. Voir [[Fonctionnalites-et-limites]].
 
 **Comment contribuer ?**
 Voir `CONTRIBUTING.md` et [[Developpement-local]].
