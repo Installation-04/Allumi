@@ -48,6 +48,14 @@ export async function listAccounts(actor: Actor, options: { includeInactive?: bo
   });
 }
 
+export async function getAccount(actor: Actor, accountId: string): Promise<AccountDto | null> {
+  return inCompany(actor, async (tx) => {
+    await requireRole(tx, "ledger.read");
+    const row = await tx.account.findFirst({ where: { companyId: actor.companyId, id: accountId }, select: SELECT });
+    return row ? toAccountDto(row) : null;
+  });
+}
+
 export async function createAccount(actor: Actor, input: AccountInput): Promise<AccountDto> {
   const parsed = accountInputSchema.safeParse(input);
   if (!parsed.success) throw new AppError("ledger.invalidAccount");

@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import { ActionForm, Field, TABLE_CLASS, TD_CLASS, TH_CLASS } from "@/app/_components/ui";
+import { ActionForm, Field } from "@/app/_components/ui";
+import { TABLE_CLASS, TD_CLASS, TH_CLASS } from "@/app/_components/table";
 import { can } from "@/modules/companies";
 import { listFiscalYears } from "@/modules/ledger";
 import { loadCompany } from "../_lib";
@@ -22,7 +23,14 @@ export default async function FiscalPage({ params }: { params: Promise<{ company
       <h1 className="text-2xl font-semibold">{t("title")}</h1>
       {can(role, "period.reopen") ? <p className="text-sm text-stone-700 dark:text-stone-300">{t("reopenHint")}</p> : null}
 
-      {can(role, "fiscalYear.create") ? <ActionForm action={createYearAction.bind(null, company.id)} label={t("createNext")} /> : null}
+      {can(role, "fiscalYear.create") ? (
+        <div className="flex flex-wrap items-start gap-6">
+          <ActionForm action={createYearAction.bind(null, company.id)} label={t("createNext")} />
+          <ActionForm action={createYearAction.bind(null, company.id)} label={t("createPast")}>
+            <Field name="containing" type="date" label={t("pastDate")} hint={t("pastHint")} />
+          </ActionForm>
+        </div>
+      ) : null}
 
       {years.map((year) => {
         const locked = year.periods.filter((period) => period.status === "LOCKED").length;
@@ -41,6 +49,7 @@ export default async function FiscalPage({ params }: { params: Promise<{ company
 
             <div className="overflow-x-auto">
               <table className={TABLE_CLASS}>
+                <caption className="sr-only">{t("year", { start: year.start, end: year.end })}</caption>
                 <thead>
                   <tr>
                     <th scope="col" className={TH_CLASS}>{t("period")}</th>
@@ -58,10 +67,13 @@ export default async function FiscalPage({ params }: { params: Promise<{ company
                       </td>
                       <td className={TD_CLASS}>{period.status === "LOCKED" ? t("locked") : t("openPeriod")}</td>
                       <td className={TD_CLASS}>
-                        {period.status === "OPEN" && year.status === "OPEN" && can(role, "period.lock") ? <ActionForm action={lockPeriodAction.bind(null, company.id, period.id)} label={t("lock")} /> : null}
+                        {period.status === "OPEN" && year.status === "OPEN" && can(role, "period.lock") ? (
+                          <ActionForm action={lockPeriodAction.bind(null, company.id, period.id)} label={t("lock")} ariaLabel={t("lockNamed", { number: period.number })} />
+                        ) : null}
                         {period.status === "LOCKED" && year.status === "OPEN" && can(role, "period.reopen") ? (
-                          <ActionForm action={reopenPeriodAction.bind(null, company.id, period.id)} label={t("reopen")}>
-                            <Field name="reason" label={t("reason")} autoComplete="off" />
+                          <ActionForm action={reopenPeriodAction.bind(null, company.id, period.id)} label={t("reopen")} ariaLabel={t("reopenNamed", { number: period.number })}>
+                            <Field name="reason" label={t("reasonFor", { number: period.number })} autoComplete="off" />
+                            <Field name="code" label={t("codeFor", { number: period.number })} hint={t("codeHint")} autoComplete="one-time-code" />
                           </ActionForm>
                         ) : null}
                       </td>
@@ -73,13 +85,14 @@ export default async function FiscalPage({ params }: { params: Promise<{ company
 
             {year.status === "OPEN" && can(role, "fiscalYear.close") ? (
               <div className="space-y-1">
-                <ActionForm action={closeYearAction.bind(null, company.id, year.id)} label={t("close")} />
+                <ActionForm action={closeYearAction.bind(null, company.id, year.id)} label={t("close")} ariaLabel={t("closeNamed", { start: year.start, end: year.end })} />
                 {allLocked ? null : <p className="text-xs text-stone-600 dark:text-stone-400">{t("closeHint")}</p>}
               </div>
             ) : null}
             {year.status === "CLOSED" && can(role, "fiscalYear.reopen") ? (
-              <ActionForm action={reopenYearAction.bind(null, company.id, year.id)} label={t("reopenYear")}>
-                <Field name="reason" label={t("reason")} autoComplete="off" />
+              <ActionForm action={reopenYearAction.bind(null, company.id, year.id)} label={t("reopenYear")} ariaLabel={t("reopenYearNamed", { start: year.start, end: year.end })}>
+                <Field name="reason" label={t("reasonForYear", { start: year.start, end: year.end })} autoComplete="off" />
+                <Field name="code" label={t("codeForYear", { start: year.start, end: year.end })} hint={t("codeHint")} autoComplete="one-time-code" />
               </ActionForm>
             ) : null}
           </article>

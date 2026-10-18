@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { requireSession } from "@/app/_lib/session";
 import { safeAction } from "@/app/_lib/safe-action";
-import type { FormState } from "@/app/_lib/form-state";
+import { textValues, type FormState } from "@/app/_lib/form-state";
 import { AppError } from "@/platform/errors";
 import { parseMoney, postManualEntry, reverseEntry, type Locale } from "@/modules/ledger";
 
@@ -36,7 +36,7 @@ export async function postEntryAction(companyId: string, _previous: FormState, f
     const posted = await postManualEntry({ userId: session.userId, companyId }, { date: String(formData.get("date") ?? ""), kind, memo: memo || null, lines });
     revalidatePath(`/c/${companyId}/journal`);
     redirect(`/c/${companyId}/journal/${posted.id}`);
-  });
+  }, textValues(formData, ["date", "kind", "memo"]));
 }
 
 export async function reverseEntryAction(companyId: string, entryId: string, _previous: FormState, formData: FormData): Promise<FormState> {
@@ -47,5 +47,5 @@ export async function reverseEntryAction(companyId: string, entryId: string, _pr
     const reversal = await reverseEntry({ userId: session.userId, companyId }, entryId, { date: date || undefined, memo: memo || null });
     revalidatePath(`/c/${companyId}/journal`);
     redirect(`/c/${companyId}/journal/${reversal.id}`);
-  });
+  }, textValues(formData, ["date", "memo"]));
 }

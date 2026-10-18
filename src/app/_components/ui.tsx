@@ -1,10 +1,36 @@
 "use client";
 
-import { useActionState, useId } from "react";
+import { createContext, useActionState, useContext, useId, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
 import type { FormState } from "@/app/_lib/form-state";
 import { FOCUS } from "./focus";
+
+/**
+ * What a form was last given back by its action. React 19 resets a form once its action has finished, whatever the
+ * result, so the fields come back with their first values: a refused entry would lose its date, its kind and its
+ * memo without a word. The action returns what was typed (`values`), and the fields of the form are remounted with it.
+ */
+type FormScopeValue = { values: Record<string, string> | undefined; attempt: number };
+const FormScope = createContext<FormScopeValue>({ values: undefined, attempt: 0 });
+
+/** useActionState for a form whose fields keep what was typed after a refusal (see FormScope). */
+export function useScopedAction(action: (previous: FormState, formData: FormData) => Promise<FormState>) {
+  const [state, formAction] = useActionState(action, undefined);
+  const [seen, setSeen] = useState(state);
+  const [attempt, setAttempt] = useState(0);
+  if (state !== seen) {
+    // adjusting state while rendering, the documented way to react to a new result without an effect
+    setSeen(state);
+    setAttempt(attempt + 1);
+  }
+  const scope: FormScopeValue = { values: state?.values, attempt };
+  return { state, formAction, scope };
+}
+
+export function FormScopeProvider({ scope, children }: { scope: FormScopeValue; children: React.ReactNode }) {
+  return <FormScope.Provider value={scope}>{children}</FormScope.Provider>;
+}
 
 export function Field(props: {
   name: string;
@@ -18,6 +44,7 @@ export function Field(props: {
 }) {
   const { name, label, type = "text", defaultValue, autoComplete, hint, inputMode, required = true } = props;
   const id = useId();
+  const scope = useContext(FormScope);
   const hintId = `${id}-hint`;
   return (
     <div>
@@ -25,10 +52,11 @@ export function Field(props: {
         {label}
       </label>
       <input
+        key={scope.attempt}
         id={id}
         name={name}
         type={type}
-        defaultValue={defaultValue}
+        defaultValue={scope.values?.[name] ?? defaultValue}
         autoComplete={autoComplete}
         inputMode={inputMode}
         required={required}
@@ -44,7 +72,7 @@ export function Field(props: {
   );
 }
 
-export function SubmitButton({ children, variant = "primary" }: { children: React.ReactNode; variant?: "primary" | "secondary" }) {
+export function SubmitButton({ children, variant = "primary", ariaLabel }: { children: React.ReactNode; variant?: "primary" | "secondary"; ariaLabel?: string }) {
   const { pending } = useFormStatus();
   const styles =
     variant === "primary"
@@ -54,6 +82,7 @@ export function SubmitButton({ children, variant = "primary" }: { children: Reac
     // aria-disabled rather than disabled: a disabled button drops the keyboard focus when the form is submitted.
     <button
       type="submit"
+      aria-label={ariaLabel}
       aria-disabled={pending}
       onClick={(event) => {
         if (pending) event.preventDefault();
@@ -74,10 +103,11 @@ export function FormError({ message }: { message?: string }) {
   );
 }
 
-export function Card({ title, children }: { title: string; children: React.ReactNode }) {
+export function Card({ title, children, headingLevel = 1 }: { title: string; children: React.ReactNode; headingLevel?: 1 | 2 }) {
+  const Heading = headingLevel === 1 ? "h1" : "h2";
   return (
     <section className="mx-auto w-full max-w-lg rounded-xl border border-stone-200 bg-white p-6 shadow-sm dark:border-stone-800 dark:bg-stone-900">
-      <h1 className="mb-4 text-xl font-semibold">{title}</h1>
+      <Heading className="mb-4 text-xl font-semibold">{title}</Heading>
       <div className="space-y-4">{children}</div>
     </section>
   );
@@ -96,12 +126,13 @@ const CONTROL = `w-full rounded-md border border-stone-300 bg-white px-3 py-2 te
 export function SelectField(props: { name: string; label: string; options: { value: string; label: string }[]; defaultValue?: string; required?: boolean; hint?: string }) {
   const { name, label, options, defaultValue, required = true, hint } = props;
   const id = useId();
+  const scope = useContext(FormScope);
   return (
     <div>
       <label htmlFor={id} className="mb-1 block text-sm font-medium">
         {label}
       </label>
-      <select id={id} name={name} defaultValue={defaultValue} required={required} aria-describedby={hint ? `${id}-hint` : undefined} className={CONTROL}>
+      <select key={scope.attempt} id={id} name={name} defaultValue={scope.values?.[name] ?? defaultValue} required={required} aria-describedby={hint ? `${id}-hint` : undefined} className={CONTROL}>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
@@ -124,19 +155,20 @@ export function SelectField(props: { name: string; label: string; options: { val
 export function ActionForm(props: {
   action: (previous: FormState, formData: FormData) => Promise<FormState>;
   label: string;
+  /** What assistive technology announces for the button, when the visible label alone does not say what it acts on. */
+  ariaLabel?: string;
   variant?: "primary" | "secondary";
   children?: React.ReactNode;
 }) {
-  const [state, formAction] = useActionState(props.action, undefined);
+  const { state, formAction, scope } = useScopedAction(props.action);
   return (
     <form action={formAction} className="space-y-3">
       <StateError state={state} />
-      {props.children}
-      <SubmitButton variant={props.variant ?? "secondary"}>{props.label}</SubmitButton>
+      <FormScopeProvider scope={scope}>{props.children}</FormScopeProvider>
+      <SubmitButton variant={props.variant ?? "secondary"} ariaLabel={props.ariaLabel}>
+        {props.label}
+      </SubmitButton>
     </form>
   );
 }
 
-export const TABLE_CLASS = "w-full border-collapse text-sm";
-export const TH_CLASS = "border-b border-stone-300 px-2 py-2 text-left font-semibold dark:border-stone-700";
-export const TD_CLASS = "border-b border-stone-200 px-2 py-2 align-top dark:border-stone-800";

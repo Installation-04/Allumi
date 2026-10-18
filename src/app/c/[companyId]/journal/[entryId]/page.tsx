@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { FOCUS } from "@/app/_components/focus";
-import { ActionForm, Field, TABLE_CLASS, TD_CLASS, TH_CLASS } from "@/app/_components/ui";
+import { ActionForm, Field } from "@/app/_components/ui";
+import { TABLE_CLASS, TD_CLASS, TH_CLASS } from "@/app/_components/table";
 import { can } from "@/modules/companies";
 import { formatMoney, getEntry, todayIso } from "@/modules/ledger";
 import { accountName, loadCompany } from "../../_lib";
@@ -36,7 +37,7 @@ export default async function EntryPage({ params }: { params: Promise<{ companyI
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold">{t("title", { number: entry.numberLabel })}</h1>
         <p className="text-sm text-stone-700 dark:text-stone-300">
-          {entry.date} · {ts(entry.source)} · {t("createdAt", { date: entry.createdAt.toISOString().slice(0, 10) })}
+          {entry.date} · {ts(entry.source)} · {t("createdAt", { date: todayIso(entry.createdAt) })}
         </p>
         {entry.memo ? <p>{entry.memo}</p> : null}
         {reversedBy ? <p className="font-medium">{t("reversedBy", { number: reversedBy })}</p> : null}
@@ -46,6 +47,7 @@ export default async function EntryPage({ params }: { params: Promise<{ companyI
 
       <div className="overflow-x-auto">
         <table className={TABLE_CLASS}>
+          <caption className="sr-only">{t("title", { number: entry.numberLabel })}</caption>
           <thead>
             <tr>
               <th scope="col" className={TH_CLASS}>{tj("account")}</th>

@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { FOCUS } from "@/app/_components/focus";
-import { TABLE_CLASS, TD_CLASS, TH_CLASS } from "@/app/_components/ui";
-import { formatMoney, getTrialBalance, isValidIsoDate } from "@/modules/ledger";
+import { TABLE_CLASS, TD_CLASS, TH_CLASS } from "@/app/_components/table";
+import { formatMoney, getTrialBalance, isValidIsoDate, netColumns } from "@/modules/ledger";
 import { accountName, loadCompany } from "../_lib";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +15,9 @@ export default async function TrialBalancePage({ params, searchParams }: { param
   const asOf = (await searchParams).au;
   const t = await getTranslations("trial");
   const trial = await getTrialBalance(actor, { asOf: asOf && isValidIsoDate(asOf) ? asOf : undefined });
+  // Each account prints its net balance, in the debit or the credit column; the columns total the same amount.
+  const rows = trial.lines.map((line) => ({ line, ...netColumns(line) }));
+  const [totalDebit, totalCredit] = [rows.reduce((sum, row) => sum + row.debitCents, 0n), rows.reduce((sum, row) => sum + row.creditCents, 0n)];
 
   return (
     <section className="space-y-6">
@@ -29,11 +32,14 @@ export default async function TrialBalancePage({ params, searchParams }: { param
         </button>
       </form>
 
+      <p className="text-sm text-stone-700 dark:text-stone-300">{t("netHint")}</p>
+
       {trial.lines.length === 0 ? (
         <p>{t("empty")}</p>
       ) : (
         <div className="overflow-x-auto">
           <table className={TABLE_CLASS}>
+            <caption className="sr-only">{t("title")}</caption>
             <thead>
               <tr>
                 <th scope="col" className={TH_CLASS}>{t("code")}</th>
@@ -42,21 +48,21 @@ export default async function TrialBalancePage({ params, searchParams }: { param
               </tr>
             </thead>
             <tbody>
-              {trial.lines.map((line) => (
+              {rows.map(({ line, debitCents, creditCents }) => (
                 <tr key={line.accountId}>
                   <td className={TD_CLASS}>
                     <span className="font-mono">{line.code}</span> – {accountName(line, locale)}
                   </td>
-                  <td className={`${TD_CLASS} text-right tabular-nums`}>{line.debitCents > 0n ? formatMoney(line.debitCents, locale) : ""}</td>
-                  <td className={`${TD_CLASS} text-right tabular-nums`}>{line.creditCents > 0n ? formatMoney(line.creditCents, locale) : ""}</td>
+                  <td className={`${TD_CLASS} text-right tabular-nums`}>{debitCents > 0n ? formatMoney(debitCents, locale) : ""}</td>
+                  <td className={`${TD_CLASS} text-right tabular-nums`}>{creditCents > 0n ? formatMoney(creditCents, locale) : ""}</td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
               <tr>
                 <th scope="row" className="px-2 py-2 text-left">{t("totals")}</th>
-                <td className="px-2 py-2 text-right font-semibold tabular-nums">{formatMoney(trial.totalDebitCents, locale)}</td>
-                <td className="px-2 py-2 text-right font-semibold tabular-nums">{formatMoney(trial.totalCreditCents, locale)}</td>
+                <td className="px-2 py-2 text-right font-semibold tabular-nums">{formatMoney(totalDebit, locale)}</td>
+                <td className="px-2 py-2 text-right font-semibold tabular-nums">{formatMoney(totalCredit, locale)}</td>
               </tr>
             </tfoot>
           </table>

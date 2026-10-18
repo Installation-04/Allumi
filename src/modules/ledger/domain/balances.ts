@@ -22,6 +22,12 @@ export function isBalanced(rows: readonly TrialBalanceRow[]): boolean {
   return rows.reduce((sum, row) => sum + row.debitCents - row.creditCents, 0n) === 0n;
 }
 
+/** What a trial balance prints for an account: its net balance, in the debit column or in the credit column. */
+export function netColumns(row: Pick<TrialBalanceRow, "debitCents" | "creditCents">): { debitCents: bigint; creditCents: bigint } {
+  const net = row.debitCents - row.creditCents;
+  return net >= 0n ? { debitCents: net, creditCents: 0n } : { debitCents: 0n, creditCents: -net };
+}
+
 /** Balance in the account's natural direction: positive when it holds what its type normally holds. */
 export function naturalBalance(type: AccountType, row: Pick<TrialBalanceRow, "debitCents" | "creditCents">): bigint {
   return isDebitNormal(type) ? row.debitCents - row.creditCents : row.creditCents - row.debitCents;

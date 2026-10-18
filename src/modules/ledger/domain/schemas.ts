@@ -5,6 +5,9 @@ import { MAX_LINE_CENTS } from "./money";
 
 export const isoDateSchema = z.string().refine(isValidIsoDate, { message: "date" });
 
+/** The free text on an entry (its memo): short, because an entry is never edited or deleted. */
+export const memoSchema = z.string().trim().max(500);
+
 const cents = z.bigint().min(0n).max(MAX_LINE_CENTS);
 
 export const entryLineSchema = z.object({
@@ -19,7 +22,7 @@ export const manualEntrySchema = z.object({
   date: isoDateSchema,
   /** MANUAL, or the opening balances entry (the equity side is part of the lines). */
   kind: z.enum(["MANUAL", "OPENING_BALANCE"]).default("MANUAL"),
-  memo: z.string().trim().max(500).nullish(),
+  memo: memoSchema.nullish(),
   lines: z.array(entryLineSchema).max(MAX_ENTRY_LINES),
 });
 

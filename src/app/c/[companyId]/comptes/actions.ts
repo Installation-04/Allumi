@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { requireSession } from "@/app/_lib/session";
 import { safeAction } from "@/app/_lib/safe-action";
 import type { FormState } from "@/app/_lib/form-state";
@@ -19,6 +20,18 @@ export async function createAccountAction(companyId: string, _previous: FormStat
     );
     revalidatePath(`/c/${companyId}/comptes`);
     return undefined;
+  }, values);
+}
+
+/** Renames an account or changes its code or description; its type and subtype stay (they give meaning to its history). */
+export async function updateAccountAction(companyId: string, accountId: string, _previous: FormState, formData: FormData): Promise<FormState> {
+  const values = Object.fromEntries(["code", "nameFr", "nameEn", "description"].map((name) => [name, field(formData, name)]));
+  return safeAction(async () => {
+    const session = await requireSession();
+    const description = field(formData, "description").trim();
+    await updateAccount({ userId: session.userId, companyId }, accountId, { code: values.code ?? "", nameFr: values.nameFr ?? "", nameEn: values.nameEn ?? "", description: description || null });
+    revalidatePath(`/c/${companyId}/comptes`);
+    redirect(`/c/${companyId}/comptes`);
   }, values);
 }
 

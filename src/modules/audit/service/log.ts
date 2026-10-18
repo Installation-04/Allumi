@@ -6,6 +6,8 @@ export type AuditEntryDto = {
   id: string;
   occurredAt: Date;
   actorKind: "USER" | "SYSTEM";
+  /** The user's id, kept in the trail even once the person is no longer a member (their name is then not visible). */
+  actorUserId: string | null;
   actorName: string | null;
   action: string;
   entityType: string;
@@ -53,6 +55,7 @@ export async function listAuditLog(
         id: row.id.toString(),
         occurredAt: row.occurredAt,
         actorKind: row.actorKind,
+        actorUserId: row.actorUserId,
         actorName: row.actorUser?.displayName ?? null,
         action: row.action,
         entityType: row.entityType,

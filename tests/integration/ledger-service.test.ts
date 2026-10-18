@@ -29,7 +29,7 @@ import {
   type ManualEntryInput,
 } from "@/modules/ledger";
 import { AppError } from "@/platform/errors";
-import { owner, seedCompany, seedUser } from "./helpers";
+import { enableTotp, owner, seedCompany, seedUser } from "./helpers";
 
 let db: pg.Client;
 beforeAll(async () => {
@@ -39,13 +39,14 @@ afterAll(async () => {
   await db.end();
 });
 
-type Company = { companyId: string; ownerId: string; accountantId: string; readerId: string; actor: Actor; accountant: Actor; reader: Actor; year: string };
+type Company = { companyId: string; ownerId: string; ownerEmail: string; accountantId: string; readerId: string; actor: Actor; accountant: Actor; reader: Actor; year: string };
 
 /** A fresh company with its three roles, its chart, its numbering and the fiscal year of today. */
 async function newCompany(label: string): Promise<Company> {
   const tag = randomUUID().slice(0, 8);
+  const ownerEmail = `proprio-${label}-${tag}@exemple.test`;
   const [ownerId, accountantId, readerId] = [
-    await seedUser(db, { email: `proprio-${label}-${tag}@exemple.test` }),
+    await seedUser(db, { email: ownerEmail }),
     await seedUser(db, { email: `comptable-${label}-${tag}@exemple.test` }),
     await seedUser(db, { email: `lecture-${label}-${tag}@exemple.test` }),
   ];
@@ -57,7 +58,7 @@ async function newCompany(label: string): Promise<Company> {
   const actor = { userId: ownerId, companyId };
   await initializeLedger(actor);
   const [latest] = await listFiscalYears(actor);
-  return { companyId, ownerId, accountantId, readerId, actor, accountant: { userId: accountantId, companyId }, reader: { userId: readerId, companyId }, year: (latest?.start ?? todayIso()).slice(0, 4) };
+  return { companyId, ownerId, ownerEmail, accountantId, readerId, actor, accountant: { userId: accountantId, companyId }, reader: { userId: readerId, companyId }, year: (latest?.start ?? todayIso()).slice(0, 4) };
 }
 
 async function codes(actor: Actor): Promise<Record<string, string>> {
@@ -108,6 +109,39 @@ describe("initialization", () => {
   it("is refused to a read-only member", async () => {
     const c = await newCompany("init-ro");
     expect(await refusal(initializeLedger(c.reader))).toBe("forbidden");
+  });
+
+  /** A company that exists but whose ledger was never initialized. */
+  async function bareCompany(label: string): Promise<{ actor: Actor; ownerId: string }> {
+    const tag = randomUUID().slice(0, 8);
+    const ownerId = await seedUser(db, { email: `nu-${label}-${tag}@exemple.test` });
+    const companyId = await seedCompany(db, `Atelier nu ${label} ${tag}`, [{ userId: ownerId, role: "OWNER" }]);
+    return { actor: { userId: ownerId, companyId }, ownerId };
+  }
+
+  it("still adds the system accounts to a company that already has an account, even on the code of the template", async () => {
+    const { actor } = await bareCompany("deja");
+    await createAccount(actor, { code: "1100", nameFr: "Mon compte", nameEn: "My account", type: "ASSET", subtype: "CURRENT_ASSET" });
+    await createAccount(actor, { code: "9999", nameFr: "Autre", nameEn: "Other", type: "EXPENSE", subtype: "OPERATING_EXPENSE" });
+    const status = await initializeLedger(actor);
+    expect(status.initialized).toBe(true);
+    const accounts = await listAccounts(actor, { includeInactive: true });
+    const system = accounts.filter((account) => account.systemKey);
+    expect(system.map((account) => account.systemKey).sort()).toEqual(["ACCOUNTS_PAYABLE", "ACCOUNTS_RECEIVABLE", "OPENING_BALANCE_EQUITY", "RETAINED_EARNINGS", "UNDEPOSITED_FUNDS"]);
+    // the user's account keeps its code; the receivables account takes the next free one
+    expect(accounts.find((account) => account.code === "1100")?.systemKey).toBeNull();
+    expect(system.find((account) => account.systemKey === "ACCOUNTS_RECEIVABLE")?.code).toBe("1101");
+    // the rest of the chart is not forced on a company that organized its own
+    expect(accounts).toHaveLength(2 + 5);
+    expect(await initializeLedger(actor)).toEqual(status);
+  });
+
+  it("gives the same result when two requests initialize at once (a double click)", async () => {
+    const { actor } = await bareCompany("double");
+    const results = await Promise.all([initializeLedger(actor), initializeLedger(actor)]);
+    expect(results[0]).toEqual({ initialized: true, accounts: CANADIAN_CHART.length, fiscalYears: 1 });
+    expect(results[1]).toEqual(results[0]);
+    expect(await listFiscalYears(actor)).toHaveLength(1);
   });
 });
 
@@ -225,6 +259,34 @@ describe("reversal", () => {
     expect(await refusal(reverseEntry(c.actor, reversal.id))).toBe("AL008");
   });
 
+  it("refuses an impossible date and an oversized memo, and does not number anything for them", async () => {
+    const c = await newCompany("reverse-input");
+    const a = await codes(c.actor);
+    const original = await postManualEntry(c.actor, entry(`${c.year}-03-10`, [[a["6050"] ?? "", 1_000n, 0n], [a["1000"] ?? "", 0n, 1_000n]]));
+    // 30 February would silently become 2 March
+    expect(await refusal(reverseEntry(c.actor, original.id, { date: `${c.year}-02-30` }))).toBe("ledger.invalidEntry");
+    expect(await refusal(reverseEntry(c.actor, original.id, { date: "pas une date" }))).toBe("ledger.invalidEntry");
+    expect(await refusal(reverseEntry(c.actor, original.id, { memo: "x".repeat(501) }))).toBe("ledger.invalidEntry");
+    const ok = await reverseEntry(c.actor, original.id, { date: `${c.year}-03-11`, memo: "  motif  " });
+    expect(ok.number).toBe(2n);
+    expect((await getEntry(c.actor, ok.id))?.memo).toBe("motif");
+  });
+
+  it("answers 'already reversed' to the loser of two simultaneous reversals", async () => {
+    const c = await newCompany("reverse-race");
+    const a = await codes(c.actor);
+    const original = await postManualEntry(c.actor, entry(`${c.year}-03-10`, [[a["6050"] ?? "", 1_000n, 0n], [a["1000"] ?? "", 0n, 1_000n]]));
+    const results = await Promise.allSettled([reverseEntry(c.actor, original.id, { date: `${c.year}-03-12` }), reverseEntry(c.actor, original.id, { date: `${c.year}-03-12` })]);
+    expect(results.filter((result) => result.status === "fulfilled")).toHaveLength(1);
+    const lost = results.find((result): result is PromiseRejectedResult => result.status === "rejected");
+    expect(lost?.reason).toBeInstanceOf(AppError);
+    expect((lost?.reason as AppError).key).toBe("ledger.alreadyReversed");
+    const trial = await getTrialBalance(c.actor);
+    expect(trial.balanced).toBe(true);
+    for (const line of trial.lines) expect(line.debitCents - line.creditCents).toBe(0n);
+    expect(await db.query("SELECT count(*)::int AS n FROM journal_entry WHERE company_id = $1", [c.companyId]).then((r) => r.rows[0].n)).toBe(2);
+  });
+
   it("is never dated before the entry, and goes to an open period", async () => {
     const c = await newCompany("reverse-date");
     const a = await codes(c.actor);
@@ -252,19 +314,36 @@ describe("fiscal years and periods", () => {
     expect(await refusal(postManualEntry(c.actor, entry(`${c.year}-06-15`, lines)))).toBe("AL003");
     expect(await refusal(lockPeriod(c.reader, june?.id ?? ""))).toBe("forbidden");
 
-    // privileged: owner only, 2FA on, a real reason
-    expect(await refusal(reopenPeriod(c.accountant, june?.id ?? "", "Correction d'une écriture oubliée"))).toBe("forbidden");
-    expect(await refusal(reopenPeriod(c.actor, june?.id ?? "", "Correction d'une écriture oubliée"))).toBe("ledger.twoFactorRequired");
-    await db.query("UPDATE user_credential SET totp_secret_enc = '\\x00', totp_enabled_at = now() WHERE user_id = $1", [c.ownerId]);
-    expect(await refusal(reopenPeriod(c.actor, june?.id ?? "", "oups"))).toBe("ledger.reasonRequired");
-    await reopenPeriod(c.actor, june?.id ?? "", "Correction d'une écriture oubliée");
+    // privileged: owner only, 2FA on, a code typed now, a real reason
+    const why = "Correction d'une écriture oubliée";
+    expect(await refusal(reopenPeriod(c.accountant, june?.id ?? "", why, { code: "000000" }))).toBe("forbidden");
+    expect(await refusal(reopenPeriod(c.actor, june?.id ?? "", why, { code: "000000" }))).toBe("ledger.twoFactorRequired");
+    const totp = await enableTotp(c.ownerId, c.ownerEmail);
+    const at = (step: number) => totp.enrolledAt + step * 30_000;
+    const proof = (step: number) => ({ code: totp.code(at(step)), now: new Date(at(step)) });
+    expect(await refusal(reopenPeriod(c.actor, june?.id ?? "", "oups", proof(1)))).toBe("ledger.reasonRequired");
+    // a session cookie is not enough: without a valid code nothing reopens
+    expect(await refusal(reopenPeriod(c.actor, june?.id ?? "", why, { code: "000000", now: new Date(at(1)) }))).toBe("ledger.codeInvalid");
+    expect((await listFiscalYears(c.actor))[0]?.periods.find((period) => period.id === june?.id)?.status).toBe("LOCKED");
+    await reopenPeriod(c.actor, june?.id ?? "", why, proof(2));
+    // a code is good once: replaying it is refused, the next step's code works
+    await lockPeriod(c.actor, june?.id ?? "");
+    expect(await refusal(reopenPeriod(c.actor, june?.id ?? "", why, proof(2)))).toBe("ledger.codeInvalid");
+    await reopenPeriod(c.actor, june?.id ?? "", why, proof(3));
+    // a recovery code does the same job, once
+    await lockPeriod(c.actor, june?.id ?? "");
+    const recovery = totp.recoveryCodes[0] ?? "";
+    await reopenPeriod(c.actor, june?.id ?? "", why, { code: recovery, now: new Date(at(4)) });
+    await lockPeriod(c.actor, june?.id ?? "");
+    expect(await refusal(reopenPeriod(c.actor, june?.id ?? "", why, { code: recovery, now: new Date(at(5)) }))).toBe("ledger.codeInvalid");
+    await reopenPeriod(c.actor, june?.id ?? "", why, proof(6));
 
     const posted = await postManualEntry(c.actor, entry(`${c.year}-06-15`, lines));
     expect(posted.number).toBe(1n);
 
     // the reopening is on the audit trail, with its reason and its author
     const audit = await listAuditLog(c.actor, { action: "period.reopen" });
-    expect(audit.entries).toHaveLength(1);
+    expect(audit.entries).toHaveLength(4); // one event per reopening: the refused attempts left none
     expect(audit.entries[0]).toMatchObject({ entityType: "fiscal_period", entityId: june?.id });
     expect(JSON.stringify(audit.entries[0]?.after)).toContain("Correction d'une écriture oubliée");
   });
@@ -278,9 +357,11 @@ describe("fiscal years and periods", () => {
     await closeFiscalYear(c.actor, year?.id ?? "");
     expect((await listFiscalYears(c.actor)).find((candidate) => candidate.id === year?.id)?.status).toBe("CLOSED");
 
-    await db.query("UPDATE user_credential SET totp_secret_enc = '\\x00', totp_enabled_at = now() WHERE user_id = $1", [c.ownerId]);
-    expect(await refusal(reopenFiscalYear(c.actor, year?.id ?? "", "court"))).toBe("ledger.reasonRequired");
-    await reopenFiscalYear(c.actor, year?.id ?? "", "Régularisation demandée par la comptable");
+    const totp = await enableTotp(c.ownerId, c.ownerEmail);
+    const proof = (step: number) => ({ code: totp.code(totp.enrolledAt + step * 30_000), now: new Date(totp.enrolledAt + step * 30_000) });
+    expect(await refusal(reopenFiscalYear(c.actor, year?.id ?? "", "court", proof(1)))).toBe("ledger.reasonRequired");
+    expect(await refusal(reopenFiscalYear(c.actor, year?.id ?? "", "Régularisation demandée par la comptable", { code: "123456", now: new Date(totp.enrolledAt + 30_000) }))).toBe("ledger.codeInvalid");
+    await reopenFiscalYear(c.actor, year?.id ?? "", "Régularisation demandée par la comptable", proof(1));
     expect((await listFiscalYears(c.actor)).find((candidate) => candidate.id === year?.id)?.status).toBe("OPEN");
   });
 
@@ -335,6 +416,12 @@ describe("audit trail", () => {
     expect(insert?.actorName).toContain("comptable-audit");
     expect(JSON.stringify(insert?.after)).toContain(posted.id);
     expect(await refusal(listAuditLog(c.reader))).toBe("forbidden");
+
+    // once the accountant is no longer a member, the trail keeps who did it (id), though their name is out of sight
+    await db.query("DELETE FROM membership WHERE company_id = $1 AND user_id = $2", [c.companyId, c.accountantId]);
+    const later = await listAuditLog(c.actor, { entityType: "journal_entry" });
+    const kept = later.entries.find((row) => row.entityId === posted.id);
+    expect(kept).toMatchObject({ actorKind: "USER", actorUserId: c.accountantId, actorName: null });
 
     // pages: newest first, a cursor continues where the previous page stopped
     const all = await listAuditLog(c.actor);

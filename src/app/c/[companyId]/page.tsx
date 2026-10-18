@@ -49,7 +49,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ compan
           ))}
         </ul>
       ) : (
-        <Card title={ts("title")}>
+        <Card title={ts("title")} headingLevel={2}>
           <p className="text-sm">{ts("intro")}</p>
           {can(company.role, "account.manage") ? <ActionForm action={initializeLedgerAction.bind(null, company.id)} label={ts("submit")} variant="primary" /> : <p className="text-sm">{ts("notAllowed")}</p>}
         </Card>

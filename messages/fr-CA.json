@@ -84,7 +84,6 @@
       "ACCOUNTANT": "Comptable",
       "READ_ONLY": "Lecture seule"
     },
-    "comingSoon": "Le moteur comptable (plan comptable, journal, périodes) arrive à la prochaine phase du développement.",
     "pickCompany": "Choisis une entreprise",
     "noCompany": "Ton compte n'est membre d'aucune entreprise.",
     "security": "Sécurité du compte",
@@ -142,7 +141,9 @@
       "fiscalYearNotFound": "Exercice introuvable.",
       "fiscalYearExists": "Un exercice existe déjà à ces dates.",
       "reasonRequired": "Un motif d'au moins 10 caractères est requis.",
-      "twoFactorRequired": "Active la vérification en deux étapes (Sécurité du compte) pour rouvrir le passé."
+      "twoFactorRequired": "Active la vérification en deux étapes (Sécurité du compte) pour rouvrir le passé.",
+      "codeInvalid": "Le code de vérification est invalide ou déjà utilisé.",
+      "rateLimited": "Trop d'essais : réessaie dans quelques minutes."
     }
   },
   "nav": {
@@ -182,7 +183,16 @@
     "showInactive": "Afficher les comptes inactifs",
     "hideInactive": "Masquer les comptes inactifs",
     "actions": "Actions",
-    "codeHint": "Lettres, chiffres, point ou tiret (20 caractères au plus)."
+    "codeHint": "Lettres, chiffres, point ou tiret (20 caractères au plus).",
+    "edit": "Modifier",
+    "editNamed": "Modifier le compte {code}",
+    "editTitle": "Modifier le compte {code}",
+    "typeFrozen": "Le code, les noms et la description se modifient. Le type et le sous-type restent : ils donnent son sens à l'historique du compte. Pour en changer, supprime le compte s'il n'a jamais servi, puis recrée-le.",
+    "save": "Enregistrer",
+    "backToList": "Retour au plan comptable",
+    "deleteNamed": "Supprimer le compte {code}",
+    "deactivateNamed": "Désactiver le compte {code}",
+    "activateNamed": "Réactiver le compte {code}"
   },
   "journal": {
     "title": "Journal",
@@ -225,7 +235,18 @@
     "balanced": "L'écriture est équilibrée.",
     "submit": "Enregistrer l'écriture",
     "immutable": "Une écriture enregistrée ne se modifie pas : on la contre-passe, puis on en saisit une nouvelle.",
-    "openingHint": "Pour les soldes d'ouverture, saisis tous les comptes et équilibre avec « Capitaux propres – soldes d'ouverture ». Les clients et fournisseurs passent par des factures d'ouverture."
+    "openingHint": "Pour les soldes d'ouverture, saisis tous les comptes et équilibre avec « Capitaux propres – soldes d'ouverture ». Les clients et fournisseurs passent par des factures d'ouverture.",
+    "actions": "Actions",
+    "problems": {
+      "unreadable": "Un montant n'est pas lisible : au plus deux décimales.",
+      "missingAccount": "Choisis un compte pour chaque ligne qui a un montant.",
+      "tooFewLines": "Il faut au moins deux lignes avec un montant.",
+      "tooManyLines": "Une écriture compte au plus 500 lignes.",
+      "negativeAmount": "Un montant ne peut pas être négatif.",
+      "tooLarge": "Un montant dépasse le maximum permis.",
+      "bothSides": "La ligne {line} a un débit et un crédit : un seul côté par ligne.",
+      "noAmount": "La ligne {line} n'a aucun montant."
+    }
   },
   "entryDetail": {
     "title": "Écriture {number}",
@@ -255,13 +276,25 @@
     "lock": "Verrouiller",
     "reopen": "Rouvrir la période",
     "reason": "Motif (au moins 10 caractères)",
-    "reopenHint": "Rouvrir le passé est une action privilégiée : propriétaire seulement, 2FA active, motif obligatoire. Elle est inscrite à la piste d'audit.",
+    "reopenHint": "Rouvrir le passé est une action privilégiée : propriétaire seulement, vérification en deux étapes active, un code de ton application d'authentification saisi à ce moment, et un motif obligatoire. Elle est inscrite à la piste d'audit.",
     "createNext": "Créer l'exercice suivant",
     "close": "Fermer l'exercice",
     "closeHint": "Toutes les périodes doivent être verrouillées.",
     "reopenYear": "Rouvrir l'exercice",
     "lockedPeriods": "{locked} sur {total} périodes verrouillées",
-    "actions": "Actions"
+    "actions": "Actions",
+    "createPast": "Créer l'exercice qui contient la date",
+    "pastDate": "Une date de l'exercice à créer",
+    "pastHint": "Pour saisir des soldes d'ouverture dans le passé : l'exercice qui contient cette date est créé.",
+    "lockNamed": "Verrouiller la période {number}",
+    "reopenNamed": "Rouvrir la période {number}",
+    "reasonFor": "Motif pour rouvrir la période {number} (au moins 10 caractères)",
+    "codeFor": "Code de vérification pour rouvrir la période {number}",
+    "codeHint": "Le code à six chiffres de ton application d'authentification, ou un code de récupération. Un code ne sert qu'une fois.",
+    "closeNamed": "Fermer l'exercice du {start} au {end}",
+    "reopenYearNamed": "Rouvrir l'exercice du {start} au {end}",
+    "reasonForYear": "Motif pour rouvrir l'exercice du {start} au {end} (au moins 10 caractères)",
+    "codeForYear": "Code de vérification pour rouvrir l'exercice du {start} au {end}"
   },
   "trial": {
     "title": "Balance de vérification",
@@ -275,7 +308,8 @@
     "notBalanced": "ALERTE : la balance n'est pas équilibrée. Contacte un administrateur : ce n'est pas censé arriver.",
     "equation": "Équation comptable vérifiée : actif = passif + capitaux propres + (produits − charges).",
     "equationBroken": "ALERTE : l'équation comptable n'est pas vérifiée.",
-    "empty": "Aucune écriture pour l'instant."
+    "empty": "Aucune écriture pour l'instant.",
+    "netHint": "Chaque compte affiche son solde net, au débit ou au crédit."
   },
   "audit": {
     "title": "Piste d'audit",
@@ -292,7 +326,8 @@
     "older": "Plus anciens",
     "empty": "Rien à afficher.",
     "before": "Avant",
-    "after": "Après"
+    "after": "Après",
+    "formerMember": "Ancien membre"
   },
   "enums": {
     "accountType": {

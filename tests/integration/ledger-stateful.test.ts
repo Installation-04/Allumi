@@ -14,7 +14,7 @@ import {
   type Actor,
 } from "@/modules/ledger";
 import { AppError } from "@/platform/errors";
-import { owner, seedCompany, seedUser } from "./helpers";
+import { enableTotp, owner, seedCompany, seedUser } from "./helpers";
 
 /**
  * State-based test of the accounting engine (docs/Plan-de-tests.md, "Test à états"): random sequences of commands run
@@ -35,7 +35,7 @@ type Code = (typeof CODES)[number];
 
 type ModelEntry = { id: number; realId: string; date: string; source: "MANUAL" | "REVERSAL"; reversedBy: number | null; lines: Map<Code, bigint> };
 type Model = { next: bigint; entries: ModelEntry[]; locked: boolean[]; net: Map<Code, bigint> };
-type Real = { actor: Actor; ids: Record<string, string>; year: string; periods: string[] };
+type Real = { actor: Actor; ids: Record<string, string>; year: string; periods: string[]; totp: Awaited<ReturnType<typeof enableTotp>>; step: number };
 
 const date = (real: Real, month: number, day: number) => `${real.year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 const monthOf = (isoDate: string) => Number(isoDate.slice(5, 7));
@@ -145,7 +145,11 @@ class ReopenCommand implements fc.AsyncCommand<Model, Real> {
   constructor(readonly month: number) {}
   check = () => true;
   async run(model: Model, real: Real) {
-    expect(await outcome(() => reopenPeriod(real.actor, real.periods[this.month - 1] ?? "", "Réouverture de test (propriété P11)"))).toBe("ok");
+    // a fresh code of the authenticator each time, as the owner would type it (the attempt counter is cleared: a run can reopen often)
+    await db.query("DELETE FROM rate_limit");
+    real.step += 1;
+    const at = real.totp.enrolledAt + real.step * 30_000;
+    expect(await outcome(() => reopenPeriod(real.actor, real.periods[this.month - 1] ?? "", "Réouverture de test (propriété P11)", { code: real.totp.code(at), now: new Date(at) }))).toBe("ok");
     model.locked[this.month - 1] = false;
     await compareWithModel(model, real);
   }
@@ -159,17 +163,18 @@ const day = fc.integer({ min: 1, max: 28 });
 
 async function freshWorld(): Promise<{ model: Model; real: Real }> {
   const tag = randomUUID().slice(0, 8);
-  const ownerId = await seedUser(db, { email: `etat-${tag}@exemple.test` });
+  const email = `etat-${tag}@exemple.test`;
+  const ownerId = await seedUser(db, { email });
   const companyId = await seedCompany(db, `Atelier état ${tag}`, [{ userId: ownerId, role: "OWNER" }]);
-  // reopening a period needs two-factor authentication on the owner's account
-  await db.query("UPDATE user_credential SET totp_secret_enc = '\\x00', totp_enabled_at = now() WHERE user_id = $1", [ownerId]);
+  // reopening a period needs two-factor authentication on the owner's account, and a code each time
+  const totp = await enableTotp(ownerId, email);
   const actor = { userId: ownerId, companyId };
   await initializeLedger(actor);
   const accounts = await listAccounts(actor);
   const [year] = await listFiscalYears(actor);
   return {
     model: { next: 1n, entries: [], locked: Array.from({ length: 12 }, () => false), net: new Map() },
-    real: { actor, ids: Object.fromEntries(accounts.map((account) => [account.code, account.id])), year: (year?.start ?? "").slice(0, 4), periods: (year?.periods ?? []).map((period) => period.id) },
+    real: { actor, ids: Object.fromEntries(accounts.map((account) => [account.code, account.id])), year: (year?.start ?? "").slice(0, 4), periods: (year?.periods ?? []).map((period) => period.id), totp, step: 0 },
   };
 }
 

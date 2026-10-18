@@ -1,12 +1,12 @@
 import "server-only";
 import { requireRole } from "@/modules/companies";
-import { AppError } from "@/platform/errors";
+import { AppError, isConflict } from "@/platform/errors";
 import type { Tx } from "@/platform/tenant";
 import { acceptsManualEntries } from "../domain/accounts";
-import type { IsoDate } from "../domain/dates";
+import { isValidIsoDate, type IsoDate } from "../domain/dates";
 import { checkEntry, reversalLines, type EntryLine, type EntryProblem } from "../domain/entry";
 import { formatNumber } from "../domain/numbering";
-import { manualEntrySchema, type ManualEntryInput } from "../domain/schemas";
+import { manualEntrySchema, memoSchema, type ManualEntryInput } from "../domain/schemas";
 import { fromDbDate, toDbDate, todayIso } from "./dates";
 import { inCompany, type Actor } from "./support";
 
@@ -139,6 +139,11 @@ export async function postManualEntry(actor: Actor, input: ManualEntryInput): Pr
  * entry). Entries of documents, payments and deposits are corrected by voiding them (AL008).
  */
 export async function reverseEntry(actor: Actor, entryId: string, options: { date?: IsoDate; memo?: string | null; now?: Date } = {}): Promise<{ id: string; number: bigint }> {
+  // The same checks as a manual entry: a real calendar date, and a memo of reasonable size (it is kept for good).
+  if (options.date !== undefined && !isValidIsoDate(options.date)) throw new AppError("ledger.invalidEntry");
+  const memo = memoSchema.nullish().safeParse(options.memo);
+  if (!memo.success) throw new AppError("ledger.invalidEntry");
+
   return inCompany(actor, async (tx) => {
     await requireRole(tx, "entry.reverse");
     const original = await tx.journalEntry.findFirst({
@@ -164,7 +169,13 @@ export async function reverseEntry(actor: Actor, entryId: string, options: { dat
       taxId: line.taxId,
       taxBox: line.taxBox,
     }));
-    return insertEntry(tx, actor, { date, source: "REVERSAL", memo: options.memo ?? null, lines: reversalLines(lines), reversesEntryId: entryId });
+    try {
+      return await insertEntry(tx, actor, { date, source: "REVERSAL", memo: memo.data || null, lines: reversalLines(lines), reversesEntryId: entryId });
+    } catch (error) {
+      // Two requests reversed the same entry at once: the second hits the unique link, the first one won.
+      if (isConflict(error)) throw new AppError("ledger.alreadyReversed");
+      throw error;
+    }
   });
 }
 

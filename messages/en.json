@@ -84,7 +84,6 @@
       "ACCOUNTANT": "Accountant",
       "READ_ONLY": "Read-only"
     },
-    "comingSoon": "The accounting engine (chart of accounts, journal, periods) arrives in the next development phase.",
     "pickCompany": "Choose a company",
     "noCompany": "Your account is not a member of any company.",
     "security": "Account security",
@@ -142,7 +141,9 @@
       "fiscalYearNotFound": "Fiscal year not found.",
       "fiscalYearExists": "A fiscal year already exists on these dates.",
       "reasonRequired": "A reason of at least 10 characters is required.",
-      "twoFactorRequired": "Turn on two-factor authentication (Account security) to reopen the past."
+      "twoFactorRequired": "Turn on two-factor authentication (Account security) to reopen the past.",
+      "codeInvalid": "The verification code is invalid or was already used.",
+      "rateLimited": "Too many attempts: try again in a few minutes."
     }
   },
   "nav": {
@@ -182,7 +183,16 @@
     "showInactive": "Show inactive accounts",
     "hideInactive": "Hide inactive accounts",
     "actions": "Actions",
-    "codeHint": "Letters, digits, dot or hyphen (20 characters at most)."
+    "codeHint": "Letters, digits, dot or hyphen (20 characters at most).",
+    "edit": "Edit",
+    "editNamed": "Edit account {code}",
+    "editTitle": "Edit account {code}",
+    "typeFrozen": "The code, names and description can change. The type and subtype stay: they give meaning to the account's history. To change them, delete the account if it was never used, then create it again.",
+    "save": "Save",
+    "backToList": "Back to the chart of accounts",
+    "deleteNamed": "Delete account {code}",
+    "deactivateNamed": "Deactivate account {code}",
+    "activateNamed": "Reactivate account {code}"
   },
   "journal": {
     "title": "Journal",
@@ -225,7 +235,18 @@
     "balanced": "The entry is balanced.",
     "submit": "Post the entry",
     "immutable": "A posted entry cannot be edited: it is reversed and a new one is entered.",
-    "openingHint": "For opening balances, enter every account and balance with “Equity – opening balances”. Customers and suppliers go through opening invoices."
+    "openingHint": "For opening balances, enter every account and balance with “Equity – opening balances”. Customers and suppliers go through opening invoices.",
+    "actions": "Actions",
+    "problems": {
+      "unreadable": "An amount cannot be read: at most two decimals.",
+      "missingAccount": "Choose an account for every line that has an amount.",
+      "tooFewLines": "At least two lines with an amount are needed.",
+      "tooManyLines": "An entry has at most 500 lines.",
+      "negativeAmount": "An amount cannot be negative.",
+      "tooLarge": "An amount is above the maximum.",
+      "bothSides": "Line {line} has a debit and a credit: one side per line.",
+      "noAmount": "Line {line} has no amount."
+    }
   },
   "entryDetail": {
     "title": "Entry {number}",
@@ -255,13 +276,25 @@
     "lock": "Lock",
     "reopen": "Reopen the period",
     "reason": "Reason (at least 10 characters)",
-    "reopenHint": "Reopening the past is privileged: owner only, two-factor authentication on, a reason required. It is written to the audit trail.",
+    "reopenHint": "Reopening the past is a privileged action: owner only, two-step verification on, a code from your authenticator app typed now, and a reason. It is written to the audit trail.",
     "createNext": "Create the next fiscal year",
     "close": "Close the fiscal year",
     "closeHint": "Every period must be locked.",
     "reopenYear": "Reopen the fiscal year",
     "lockedPeriods": "{locked} of {total} periods locked",
-    "actions": "Actions"
+    "actions": "Actions",
+    "createPast": "Create the year that contains the date",
+    "pastDate": "A date within the year to create",
+    "pastHint": "For opening balances in the past: the year that contains this date is created.",
+    "lockNamed": "Lock period {number}",
+    "reopenNamed": "Reopen period {number}",
+    "reasonFor": "Reason for reopening period {number} (at least 10 characters)",
+    "codeFor": "Verification code to reopen period {number}",
+    "codeHint": "The six-digit code from your authenticator app, or a recovery code. A code works only once.",
+    "closeNamed": "Close the fiscal year from {start} to {end}",
+    "reopenYearNamed": "Reopen the fiscal year from {start} to {end}",
+    "reasonForYear": "Reason for reopening the fiscal year from {start} to {end} (at least 10 characters)",
+    "codeForYear": "Verification code to reopen the fiscal year from {start} to {end}"
   },
   "trial": {
     "title": "Trial balance",
@@ -275,7 +308,8 @@
     "notBalanced": "ALERT: the trial balance is not balanced. Contact an administrator: this should never happen.",
     "equation": "Accounting equation checked: assets = liabilities + equity + (revenue − expenses).",
     "equationBroken": "ALERT: the accounting equation does not hold.",
-    "empty": "No entries yet."
+    "empty": "No entries yet.",
+    "netHint": "Each account shows its net balance, in the debit or the credit column."
   },
   "audit": {
     "title": "Audit trail",
@@ -292,7 +326,8 @@
     "older": "Older",
     "empty": "Nothing to show.",
     "before": "Before",
-    "after": "After"
+    "after": "After",
+    "formerMember": "Former member"
   },
   "enums": {
     "accountType": {

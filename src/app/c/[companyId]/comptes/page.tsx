@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { ActionForm, TABLE_CLASS, TD_CLASS, TH_CLASS } from "@/app/_components/ui";
+import { ActionForm } from "@/app/_components/ui";
+import { TABLE_CLASS, TD_CLASS, TH_CLASS } from "@/app/_components/table";
 import { FOCUS } from "@/app/_components/focus";
 import { can } from "@/modules/companies";
 import { listAccounts } from "@/modules/ledger";
@@ -32,6 +33,7 @@ export default async function AccountsPage({ params, searchParams }: { params: P
 
       <div className="overflow-x-auto">
         <table className={TABLE_CLASS}>
+          <caption className="sr-only">{t("title")}</caption>
           <thead>
             <tr>
               <th scope="col" className={TH_CLASS}>{t("code")}</th>
@@ -55,12 +57,25 @@ export default async function AccountsPage({ params, searchParams }: { params: P
                 <td className={TD_CLASS}>{account.isActive ? t("active") : t("inactive")}</td>
                 {manage ? (
                   <td className={TD_CLASS}>
-                    {account.systemKey ? null : (
-                      <div className="flex flex-wrap gap-2">
-                        <ActionForm action={setAccountActiveAction.bind(null, company.id, account.id, !account.isActive)} label={account.isActive ? t("deactivate") : t("activate")} />
-                        <ActionForm action={deleteAccountAction.bind(null, company.id, account.id)} label={t("delete")} />
-                      </div>
-                    )}
+                    <div className="flex flex-wrap items-start gap-2">
+                      <Link
+                        href={`${base}/${account.id}`}
+                        aria-label={t("editNamed", { code: account.code })}
+                        className={`rounded-md border border-stone-300 px-4 py-2 text-sm font-medium hover:bg-stone-100 dark:border-stone-700 dark:hover:bg-stone-800 ${FOCUS}`}
+                      >
+                        {t("edit")}
+                      </Link>
+                      {account.systemKey ? null : (
+                        <>
+                          <ActionForm
+                            action={setAccountActiveAction.bind(null, company.id, account.id, !account.isActive)}
+                            label={account.isActive ? t("deactivate") : t("activate")}
+                            ariaLabel={t(account.isActive ? "deactivateNamed" : "activateNamed", { code: account.code })}
+                          />
+                          <ActionForm action={deleteAccountAction.bind(null, company.id, account.id)} label={t("delete")} ariaLabel={t("deleteNamed", { code: account.code })} />
+                        </>
+                      )}
+                    </div>
                   </td>
                 ) : null}
               </tr>

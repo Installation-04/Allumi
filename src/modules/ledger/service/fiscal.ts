@@ -1,9 +1,9 @@
 import "server-only";
 import { requireRole } from "@/modules/companies";
 import { recordEvent } from "@/modules/audit";
-import { totpStatus } from "@/modules/auth";
-import { AppError } from "@/platform/errors";
-import type { IsoDate } from "../domain/dates";
+import { totpStatus, verifySecondFactor } from "@/modules/auth";
+import { AppError, isConflict } from "@/platform/errors";
+import { isValidIsoDate, type IsoDate } from "../domain/dates";
 import { fiscalYearAfter, fiscalYearContaining, monthlyPeriods } from "../domain/periods";
 import { reasonSchema } from "../domain/schemas";
 import { fromDbDate, toDbDate, todayIso } from "./dates";
@@ -46,6 +46,7 @@ export async function listFiscalYears(actor: Actor): Promise<FiscalYearDto[]> {
 export async function createFiscalYear(actor: Actor, options: { containing?: IsoDate; now?: Date } = {}): Promise<FiscalYearDto> {
   const created = await inCompany(actor, async (tx) => {
     await requireRole(tx, "fiscalYear.create");
+    if (options.containing !== undefined && !isValidIsoDate(options.containing)) throw new AppError("ledger.invalidEntry");
     const company = await tx.company.findUniqueOrThrow({ where: { id: actor.companyId }, select: { fiscalYearStartMonth: true } });
     let bounds;
     if (options.containing) {
@@ -59,7 +60,14 @@ export async function createFiscalYear(actor: Actor, options: { containing?: Iso
       select: { id: true },
     });
     if (overlapping) throw new AppError("ledger.fiscalYearExists");
-    const year = await tx.fiscalYear.create({ data: { companyId: actor.companyId, startDate: toDbDate(bounds.start), endDate: toDbDate(bounds.end) } });
+    let year;
+    try {
+      year = await tx.fiscalYear.create({ data: { companyId: actor.companyId, startDate: toDbDate(bounds.start), endDate: toDbDate(bounds.end) } });
+    } catch (error) {
+      // A double click: both requests compute the same dates and the database lets only one through.
+      if (isConflict(error)) throw new AppError("ledger.fiscalYearExists");
+      throw error;
+    }
     await tx.fiscalPeriod.createMany({
       data: monthlyPeriods(bounds).map((period) => ({
         companyId: actor.companyId,
@@ -90,21 +98,28 @@ export async function lockPeriod(actor: Actor, periodId: string): Promise<void> 
   });
 }
 
+/** The proof that the owner is there right now: a fresh code of their authenticator (or a recovery code). */
+export type ReopenProof = { code: string; now?: Date };
+
 /**
- * Reopening the past is privileged: owner only, two-factor authentication turned on, a written reason, and an
- * audit event on top of the automatic audit of the change itself.
+ * Reopening the past is privileged: owner only, two-factor authentication turned on and a code typed now (a session
+ * cookie alone is not enough), a written reason, and an audit event on top of the automatic audit of the change itself.
+ * A TOTP code works once: reopening two periods in a row takes two codes.
  */
-async function requireReopenConditions(actor: Actor, reason: string): Promise<string> {
+async function requireReopenConditions(actor: Actor, reason: string, proof: ReopenProof): Promise<string> {
   const parsed = reasonSchema.safeParse(reason);
   if (!parsed.success) throw new AppError("ledger.reasonRequired");
   if (!(await totpStatus(actor.userId)).enabled) throw new AppError("ledger.twoFactorRequired");
+  const verdict = await verifySecondFactor(actor.userId, proof.code, proof.now);
+  if (verdict === "rate_limited") throw new AppError("ledger.rateLimited");
+  if (verdict !== "ok") throw new AppError("ledger.codeInvalid");
   return parsed.data;
 }
 
-export async function reopenPeriod(actor: Actor, periodId: string, reason: string): Promise<void> {
+export async function reopenPeriod(actor: Actor, periodId: string, reason: string, proof: ReopenProof): Promise<void> {
   await inCompany(actor, async (tx) => {
     await requireRole(tx, "period.reopen");
-    const why = await requireReopenConditions(actor, reason);
+    const why = await requireReopenConditions(actor, reason, proof);
     const period = await tx.fiscalPeriod.findFirst({ where: { companyId: actor.companyId, id: periodId }, select: { status: true, periodNumber: true } });
     if (!period) throw new AppError("ledger.periodNotFound");
     if (period.status === "OPEN") return;
@@ -131,10 +146,10 @@ export async function closeFiscalYear(actor: Actor, yearId: string): Promise<voi
   });
 }
 
-export async function reopenFiscalYear(actor: Actor, yearId: string, reason: string): Promise<void> {
+export async function reopenFiscalYear(actor: Actor, yearId: string, reason: string, proof: ReopenProof): Promise<void> {
   await inCompany(actor, async (tx) => {
     await requireRole(tx, "fiscalYear.reopen");
-    const why = await requireReopenConditions(actor, reason);
+    const why = await requireReopenConditions(actor, reason, proof);
     const year = await tx.fiscalYear.findFirst({ where: { companyId: actor.companyId, id: yearId }, select: { status: true } });
     if (!year) throw new AppError("ledger.fiscalYearNotFound");
     if (year.status === "OPEN") return;

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { FOCUS } from "@/app/_components/focus";
-import { TABLE_CLASS, TD_CLASS, TH_CLASS } from "@/app/_components/ui";
+import { TABLE_CLASS, TD_CLASS, TH_CLASS } from "@/app/_components/table";
 import { can } from "@/modules/companies";
 import { formatMoney, isValidIsoDate, listAccounts, listEntries } from "@/modules/ledger";
 import { accountName, loadCompany } from "../_lib";
@@ -81,6 +81,7 @@ export default async function JournalPage({ params, searchParams }: { params: Pr
       ) : (
         <div className="overflow-x-auto">
           <table className={TABLE_CLASS}>
+            <caption className="sr-only">{t("title")}</caption>
             <thead>
               <tr>
                 <th scope="col" className={TH_CLASS}>{t("number")}</th>

@@ -1,5 +1,7 @@
 import { randomUUID } from "node:crypto";
 import pg from "pg";
+import { Secret, TOTP } from "otpauth";
+import { beginTotpEnrollment, confirmTotpEnrollment } from "@/modules/auth";
 import { hashPassword } from "@/modules/auth/service/crypto";
 
 /** Direct owner connection to this file's database (fixtures and low-level checks only). */
@@ -46,4 +48,18 @@ export async function thrown(fn: () => Promise<unknown>): Promise<unknown> {
     return error;
   }
   throw new Error("expected the call to throw");
+}
+
+/**
+ * Turns two-factor authentication on for a user, for real (encrypted secret, recovery codes), at the instant `at`.
+ * `code(t)` is the code that the authenticator shows at time `t`. A code works once, and only for a later 30 s step
+ * than the last accepted one: to use several, ask for them at instants `at + 30 s`, `at + 60 s`...
+ */
+export async function enableTotp(userId: string, email: string, at: number = Date.now()): Promise<{ code: (timestamp: number) => string; enrolledAt: number; recoveryCodes: string[] }> {
+  const enrollment = await beginTotpEnrollment(userId, email);
+  if (!enrollment) throw new Error("no enrollment");
+  const code = (timestamp: number) => new TOTP({ secret: Secret.fromBase32(enrollment.secret), digits: 6, period: 30 }).generate({ timestamp });
+  const confirmed = await confirmTotpEnrollment(userId, code(at), { now: new Date(at) });
+  if (confirmed.status !== "ok") throw new Error(`2FA not confirmed: ${confirmed.status}`);
+  return { code, enrolledAt: at, recoveryCodes: confirmed.recoveryCodes };
 }
