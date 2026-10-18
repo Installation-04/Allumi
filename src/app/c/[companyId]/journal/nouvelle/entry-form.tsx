@@ -11,7 +11,7 @@ type Row = { key: number; accountId: string; debit: string; credit: string; note
 export type AccountOption = { id: string; label: string };
 
 const blank = (key: number): Row => ({ key, accountId: "", debit: "", credit: "", note: "" });
-const CELL = `w-full rounded-md border border-stone-300 bg-white px-2 py-1.5 text-base dark:border-stone-700 dark:bg-stone-900 ${FOCUS}`;
+const CELL = `min-h-11 min-w-0 w-full rounded-md border border-stone-300 bg-white px-2 py-1.5 text-base dark:border-stone-700 dark:bg-stone-900 ${FOCUS}`;
 
 export function EntryForm({ companyId, accounts, locale, today }: { companyId: string; accounts: AccountOption[]; locale: Locale; today: string }) {
   const t = useTranslations("entry");
@@ -85,77 +85,68 @@ export function EntryForm({ companyId, accounts, locale, today }: { companyId: s
       </FormScopeProvider>
       <p className="text-sm text-stone-700 dark:text-stone-300">{t("openingHint")}</p>
 
-      <fieldset className="space-y-3">
+      <fieldset className="min-w-0 space-y-3">
         <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-stone-600 dark:text-stone-400">{t("lines")}</legend>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[40rem] border-collapse text-sm">
-            <caption className="sr-only">{t("lines")}</caption>
-            <thead>
-              <tr>
-                <th scope="col" className="px-1 py-1 text-left font-medium">{t("account")}</th>
-                <th scope="col" className="px-1 py-1 text-left font-medium">{t("debit")}</th>
-                <th scope="col" className="px-1 py-1 text-left font-medium">{t("credit")}</th>
-                <th scope="col" className="px-1 py-1 text-left font-medium">{t("note")}</th>
-                <th scope="col" className="px-1 py-1"><span className="sr-only">{t("actions")}</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, index) => (
-                <tr key={row.key}>
-                  <td className="px-1 py-1">
-                    <select key={`${row.key}-${scope.attempt}`} id={accountId(row.key)} aria-label={`${t("line", { number: index + 1 })} – ${t("account")}`} name="lineAccount" defaultValue={row.accountId} onChange={(event) => update(row.key, { accountId: event.target.value })} className={CELL}>
-                      <option value="">{t("choose")}</option>
-                      {accounts.map((account) => (
-                        <option key={account.id} value={account.id}>
-                          {account.label}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td className="px-1 py-1">
-                    <input aria-invalid={parsed[index]?.debit === null} aria-label={`${t("line", { number: index + 1 })} – ${t("debit")}`} name="lineDebit" inputMode="decimal" autoComplete="off" value={row.debit} onChange={(event) => update(row.key, { debit: event.target.value })} className={`${CELL} text-right tabular-nums`} />
-                  </td>
-                  <td className="px-1 py-1">
-                    <input aria-invalid={parsed[index]?.credit === null} aria-label={`${t("line", { number: index + 1 })} – ${t("credit")}`} name="lineCredit" inputMode="decimal" autoComplete="off" value={row.credit} onChange={(event) => update(row.key, { credit: event.target.value })} className={`${CELL} text-right tabular-nums`} />
-                  </td>
-                  <td className="px-1 py-1">
-                    <input aria-label={`${t("line", { number: index + 1 })} – ${t("note")}`} name="lineNote" autoComplete="off" value={row.note} onChange={(event) => update(row.key, { note: event.target.value })} className={CELL} />
-                  </td>
-                  <td className="px-1 py-1">
-                    {rows.length > 2 ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setRows((current) => current.filter((candidate) => candidate.key !== row.key));
-                          addButton.current?.focus();
-                        }}
-                        className={`rounded-md border border-stone-300 px-2 py-1 dark:border-stone-700 ${FOCUS}`}
-                      >
-                        <span aria-hidden="true">×</span>
-                        <span className="sr-only">{t("removeLine", { number: index + 1 })}</span>
-                      </button>
-                    ) : null}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-            <tfoot>
-              <tr>
-                <th scope="row" className="px-1 py-2 text-left">{t("totals")}</th>
-                <td className="px-1 py-2 text-right tabular-nums">{formatMoney(totalDebit, locale)}</td>
-                <td className="px-1 py-2 text-right tabular-nums">{formatMoney(totalCredit, locale)}</td>
-                <td colSpan={2} className="px-1 py-2" aria-live="polite">
-                  {ready
-                    ? t("balanced")
-                    : hint
-                      ? hint
-                      : difference !== 0n
-                        ? t("difference", { amount: formatMoney(difference < 0n ? -difference : difference, locale) })
-                        : null}
-                </td>
-              </tr>
-            </tfoot>
-          </table>
+        <div className="space-y-4">
+          {rows.map((row, index) => (
+            <fieldset key={row.key} className="min-w-0 rounded-lg border border-stone-200 p-3 dark:border-stone-700">
+              <legend className="px-1 text-sm font-semibold">{t("line", { number: index + 1 })}</legend>
+              <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_2fr_auto]">
+                <label className="min-w-0 space-y-1">
+                  <span className="block text-sm font-medium">{t("account")}</span>
+                  <select key={`${row.key}-${scope.attempt}`} id={accountId(row.key)} aria-label={`${t("line", { number: index + 1 })} – ${t("account")}`} name="lineAccount" defaultValue={row.accountId} onChange={(event) => update(row.key, { accountId: event.target.value })} className={CELL}>
+                    <option value="">{t("choose")}</option>
+                    {accounts.map((account) => (
+                      <option key={account.id} value={account.id}>
+                        {account.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="min-w-0 space-y-1">
+                  <span className="block text-sm font-medium">{t("debit")}</span>
+                  <input aria-invalid={parsed[index]?.debit === null} aria-label={`${t("line", { number: index + 1 })} – ${t("debit")}`} name="lineDebit" inputMode="decimal" autoComplete="off" value={row.debit} onChange={(event) => update(row.key, { debit: event.target.value })} className={`${CELL} text-right tabular-nums`} />
+                </label>
+                <label className="min-w-0 space-y-1">
+                  <span className="block text-sm font-medium">{t("credit")}</span>
+                  <input aria-invalid={parsed[index]?.credit === null} aria-label={`${t("line", { number: index + 1 })} – ${t("credit")}`} name="lineCredit" inputMode="decimal" autoComplete="off" value={row.credit} onChange={(event) => update(row.key, { credit: event.target.value })} className={`${CELL} text-right tabular-nums`} />
+                </label>
+                <label className="min-w-0 space-y-1">
+                  <span className="block text-sm font-medium">{t("note")}</span>
+                  <input aria-label={`${t("line", { number: index + 1 })} – ${t("note")}`} name="lineNote" autoComplete="off" value={row.note} onChange={(event) => update(row.key, { note: event.target.value })} className={CELL} />
+                </label>
+                <div className="flex items-end">
+                  {rows.length > 2 ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRows((current) => current.filter((candidate) => candidate.key !== row.key));
+                        addButton.current?.focus();
+                      }}
+                      className={`min-h-11 min-w-11 rounded-md border border-stone-300 px-2 py-1 dark:border-stone-700 ${FOCUS}`}
+                    >
+                      <span aria-hidden="true">×</span>
+                      <span className="sr-only">{t("removeLine", { number: index + 1 })}</span>
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            </fieldset>
+          ))}
+          <div className="flex flex-wrap gap-4 rounded-lg bg-stone-100 p-3 text-sm dark:bg-stone-900">
+            <h2 className="w-full font-semibold">{t("totals")}</h2>
+            <p className="tabular-nums">{t("debit")}: {formatMoney(totalDebit, locale)}</p>
+            <p className="tabular-nums">{t("credit")}: {formatMoney(totalCredit, locale)}</p>
+            <p className="w-full" aria-live="polite">
+              {ready
+                ? t("balanced")
+                : hint
+                  ? hint
+                  : difference !== 0n
+                    ? t("difference", { amount: formatMoney(difference < 0n ? -difference : difference, locale) })
+                    : null}
+            </p>
+          </div>
         </div>
         <button
           ref={addButton}
@@ -165,7 +156,7 @@ export function EntryForm({ companyId, accounts, locale, today }: { companyId: s
             focusRow.current = key;
             setRows((current) => [...current, blank(key)]);
           }}
-          className={`rounded-md border border-stone-300 px-3 py-1.5 text-sm hover:bg-stone-100 dark:border-stone-700 dark:hover:bg-stone-800 ${FOCUS}`}
+          className={`min-h-11 rounded-md border border-stone-300 px-3 py-1.5 text-sm hover:bg-stone-100 dark:border-stone-700 dark:hover:bg-stone-800 ${FOCUS}`}
         >
           {t("addLine")}
         </button>

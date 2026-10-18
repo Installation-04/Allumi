@@ -17,3 +17,22 @@ html {
 body {
   @apply bg-stone-50 text-stone-900 antialiased dark:bg-stone-950 dark:text-stone-100;
 }
+
+/* Keep long company names and narrow flex/grid children within the viewport. */
+main {
+  overflow-wrap: anywhere;
+}
+
+@media (pointer: coarse) {
+  main button,
+  main input:not([type="hidden"]),
+  main select,
+  main a {
+    min-height: 2.75rem;
+  }
+
+  main a {
+    display: inline-flex;
+    align-items: center;
+  }
+}

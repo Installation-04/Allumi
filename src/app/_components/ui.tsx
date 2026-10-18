@@ -62,7 +62,7 @@ export function Field(props: {
         inputMode={inputMode}
         required={required}
         aria-describedby={hint ? hintId : undefined}
-        className={`w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-base shadow-sm dark:border-stone-700 dark:bg-stone-900 ${FOCUS}`}
+        className={`min-h-11 min-w-0 w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-base shadow-sm dark:border-stone-700 dark:bg-stone-900 ${FOCUS}`}
       />
       {hint ? (
         <p id={hintId} className="mt-1 text-xs text-stone-600 dark:text-stone-400">
@@ -88,7 +88,7 @@ export function SubmitButton({ children, variant = "primary", ariaLabel }: { chi
       onClick={(event) => {
         if (pending) event.preventDefault();
       }}
-      className={`rounded-md px-4 py-2 text-sm font-medium aria-disabled:opacity-60 ${FOCUS} ${styles}`}
+      className={`min-h-11 rounded-md px-4 py-2 text-sm font-medium aria-disabled:opacity-60 ${FOCUS} ${styles}`}
     >
       {children}
     </button>
@@ -107,7 +107,7 @@ export function FormError({ message }: { message?: string }) {
 export function Card({ title, children, headingLevel = 1 }: { title: string; children: React.ReactNode; headingLevel?: 1 | 2 }) {
   const Heading = headingLevel === 1 ? "h1" : "h2";
   return (
-    <section className="mx-auto w-full max-w-lg rounded-xl border border-stone-200 bg-white p-6 shadow-sm dark:border-stone-800 dark:bg-stone-900">
+    <section className="mx-auto w-full max-w-lg rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:p-6 dark:border-stone-800 dark:bg-stone-900">
       <Heading className="mb-4 text-xl font-semibold">{title}</Heading>
       <div className="space-y-4">{children}</div>
     </section>
@@ -122,7 +122,7 @@ export function StateError({ state }: { state: FormState }) {
   return null;
 }
 
-const CONTROL = `w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-base shadow-sm dark:border-stone-700 dark:bg-stone-900 ${FOCUS}`;
+const CONTROL = `min-h-11 min-w-0 w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-base shadow-sm dark:border-stone-700 dark:bg-stone-900 ${FOCUS}`;
 
 export function SelectField(props: { name: string; label: string; options: { value: string; label: string }[]; defaultValue?: string; required?: boolean; hint?: string }) {
   const { name, label, options, defaultValue, required = true, hint } = props;

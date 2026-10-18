@@ -19,7 +19,11 @@ export default defineConfig({
       executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
     },
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  // Run separately because the journey starts from a fresh database and creates the first owner.
+  projects: [{
+    name: process.env.E2E_MOBILE === "1" ? "mobile-chromium" : "chromium",
+    use: { ...devices[process.env.E2E_MOBILE === "1" ? "Pixel 7" : "Desktop Chrome"] },
+  }],
   webServer: {
     // Needs `npm run build` first. Same artifact as the Docker image: the standalone server, with its static
     // assets copied next to it, run from a directory OUTSIDE the repository so that a traced dependency missing

@@ -166,6 +166,24 @@ async function ledgerJourney(page: Page, totp: TOTP) {
   // An unbalanced entry is flagged on screen and refused with the rule's message.
   await openSection(page, "Journal");
   await page.getByRole("link", { name: "Nouvelle écriture" }).click();
+  // Entry controls must fit the viewport, including small phones, without hiding overflow.
+  const originalViewport = page.viewportSize();
+  for (const width of [320, 390, 768]) {
+    await page.setViewportSize({ width, height: 844 });
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    for (const control of await page.locator('main select, main input:not([type="hidden"])').all()) {
+      const box = await control.boundingBox();
+      expect(box).not.toBeNull();
+      expect(box!.x).toBeGreaterThanOrEqual(0);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+      expect(box!.height).toBeGreaterThanOrEqual(44);
+    }
+  }
+  if (originalViewport) await page.setViewportSize(originalViewport);
+  await page.getByRole("button", { name: "Ajouter une ligne" }).click();
+  await expect(page.getByLabel("Ligne 3 – Compte")).toBeFocused();
+  await page.getByRole("button", { name: /.*ligne 3/i }).click();
+  await expect(page.getByRole("button", { name: "Ajouter une ligne" })).toBeFocused();
   const firstOfMonth = `${todayInToronto().slice(0, 7)}-01`;
   await page.getByLabel("Date", { exact: true }).fill(firstOfMonth);
   await page.getByLabel("Type d'écriture").selectOption("OPENING_BALANCE");

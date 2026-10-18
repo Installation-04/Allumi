@@ -79,6 +79,8 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Parcours dans un navigateur (serveur autonome, base neuve)
         run: npm run test:e2e
+      - name: Parcours mobile tactile (base neuve)
+        run: E2E_MOBILE=1 npm run test:e2e
 
   docker:
     runs-on: ubuntu-24.04
