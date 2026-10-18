@@ -20,11 +20,15 @@ COPY . .
 RUN npx prisma generate && npm run build
 
 # ---------- migrate (utilisé par le service "migrate") ----------
+# Applique les migrations puis (re)configure le rôle restreint de l'application (prisma/app-role.mjs).
 FROM deps AS migrate
+# No network call at startup: neither Prisma's version check nor npm's update notifier.
+ENV CHECKPOINT_DISABLE=1 PRISMA_HIDE_UPDATE_MESSAGE=1 npm_config_update_notifier=false
 WORKDIR /app
 COPY prisma ./prisma
+COPY prisma.config.ts ./
 USER node
-CMD ["npx", "prisma", "migrate", "deploy"]
+CMD ["npm", "run", "db:migrate"]
 
 # ---------- runner ----------
 FROM node:${NODE_VERSION}-bookworm-slim AS runner

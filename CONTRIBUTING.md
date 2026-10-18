@@ -12,7 +12,7 @@ Ne soumets **aucun** code, texte, icône, capture ou design provenant de QuickBo
 ## Processus
 1. Fork, puis une branche par sujet (`feat/...`, `fix/...`, `docs/...`).
 2. Commits en [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `test:`, `chore:`).
-3. Avant la PR : lint, typecheck, tests, build Docker, docs et CHANGELOG à jour, traductions fr-CA et en.
+3. Avant la PR : `make test` (lint, typecheck, tests), build Docker, docs et CHANGELOG à jour, traductions fr-CA et en.
 4. Ouvre la PR en décrivant le *pourquoi*. Petites PR, un sujet à la fois.
 
 ## Versions

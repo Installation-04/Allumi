@@ -1,0 +1,124 @@
+{
+  "app": {
+    "name": "Allumi",
+    "tagline": "Free accounting software for Quebec and Canada",
+    "version": "Version {version}",
+    "license": "Free software under the MIT license"
+  },
+  "common": {
+    "language": "Language",
+    "french": "Français",
+    "english": "English",
+    "signOut": "Sign out",
+    "continue": "Continue",
+    "save": "Save",
+    "required": "Required"
+  },
+  "form": {
+    "email": "E-mail",
+    "password": "Password",
+    "passwordConfirm": "Confirm password",
+    "code": "6-digit code",
+    "codeOrRecovery": "6-digit code or recovery code"
+  },
+  "setup": {
+    "title": "Welcome to Allumi",
+    "intro": "Create the company and the administrator account. This page is disabled afterwards.",
+    "tokenMissing": "This instance is exposed to the Internet without a setup token: the first visitor could take it over. Add SETUP_TOKEN to the server's .env file (openssl rand -hex 16), then restart with docker compose up -d.",
+    "token": "Setup token",
+    "tokenHint": "It is in the server's .env file (SETUP_TOKEN) and in the message printed at the end of the installation.",
+    "company": "Company",
+    "companyName": "Company name",
+    "fiscalYearStart": "First month of the fiscal year",
+    "admin": "Administrator",
+    "displayName": "Your name",
+    "locale": "Interface language",
+    "passwordHint": "At least {min} characters. A long passphrase beats a complicated password.",
+    "submit": "Create the company and get started"
+  },
+  "months": {
+    "1": "January",
+    "2": "February",
+    "3": "March",
+    "4": "April",
+    "5": "May",
+    "6": "June",
+    "7": "July",
+    "8": "August",
+    "9": "September",
+    "10": "October",
+    "11": "November",
+    "12": "December"
+  },
+  "login": {
+    "title": "Sign in",
+    "submit": "Sign in"
+  },
+  "mfa": {
+    "title": "Two-step verification",
+    "intro": "Enter the code from your authenticator app, or a recovery code.",
+    "submit": "Verify",
+    "cancel": "Use another account"
+  },
+  "security": {
+    "title": "Account security",
+    "twoFactor": "Two-step verification (2FA)",
+    "twoFactorOff": "Off. Turn it on to protect your accounting data: it is recommended for every owner and accountant account.",
+    "twoFactorOn": "On. {count, plural, =0 {You have no recovery codes left.} one {You have # recovery code left.} other {You have # recovery codes left.}}",
+    "enable": "Turn on 2FA",
+    "scan": "Scan this code with an authenticator app (Aegis, Google Authenticator, 1Password…), then enter the 6-digit code.",
+    "manualKey": "Manual setup key:",
+    "confirm": "Confirm and turn on",
+    "recoveryTitle": "Recovery codes",
+    "recoveryIntro": "Keep these codes somewhere safe. Each works once and they will not be shown again.",
+    "disable": "Turn off 2FA",
+    "disableHint": "Enter your password and a current code to turn off 2FA.",
+    "backHome": "Back"
+  },
+  "dashboard": {
+    "title": "{company}",
+    "pageTitle": "Dashboard",
+    "role": "Your role: {role}",
+    "roles": {
+      "OWNER": "Owner",
+      "ACCOUNTANT": "Accountant",
+      "READ_ONLY": "Read-only"
+    },
+    "comingSoon": "The accounting engine (chart of accounts, journal, periods) arrives in the next development phase.",
+    "pickCompany": "Choose a company",
+    "noCompany": "Your account is not a member of any company.",
+    "security": "Account security"
+  },
+  "errors": {
+    "form": {
+      "invalid": "Check the form fields.",
+      "credentials": "Wrong e-mail or password, or account temporarily locked.",
+      "rateLimited": "Too many attempts. Try again in a few minutes.",
+      "setupToken": "Wrong setup token.",
+      "setupTokenMissing": "Setup is closed: SETUP_TOKEN is not set on the server.",
+      "code": "Invalid or already used code.",
+      "passwordOrCode": "Wrong password or code.",
+      "mismatch": "The passwords do not match.",
+      "tooShort": "The password is too short (at least {min} characters).",
+      "tooLong": "The password is too long.",
+      "sameAsEmail": "The password cannot be your e-mail address.",
+      "alreadySetUp": "This instance is already set up. Sign in.",
+      "generic": "Something went wrong. Try again."
+    },
+    "AL001": "Debits and credits are not equal.",
+    "AL002": "An entry needs at least two lines.",
+    "AL003": "This period is locked.",
+    "AL004": "A posted entry cannot be changed: reverse it.",
+    "AL005": "This account or line does not accept this operation.",
+    "AL006": "This document is posted: issue a credit note or void it.",
+    "AL007": "The amount exceeds the available balance.",
+    "AL008": "To correct this record, void it.",
+    "AL009": "At least one owner must remain.",
+    "AL010": "The cleared balance does not match the statement.",
+    "AL011": "Invalid session: sign in again.",
+    "forbidden": "You are not allowed to do this.",
+    "notFound": "Page not found.",
+    "page": "Something went wrong. Try again in a moment.",
+    "retry": "Try again"
+  }
+}

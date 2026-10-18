@@ -5,19 +5,18 @@
 cd /opt/allumi
 sudo ./scripts/update.sh
 ```
-Le script : sauvegarde, `git pull --ff-only`, reconstruit les images, applique les migrations (service `migrate`) et vérifie le healthcheck. Lis le `CHANGELOG.md` avant, surtout pour les versions majeures.
+Le script : sauvegarde, récupère la nouvelle version (`git pull --ff-only` sur une branche), complète ton `.env` des variables ajoutées depuis (sans toucher aux existantes), reconstruit les images, applique les migrations (service `migrate`) et vérifie le healthcheck. Lis le `CHANGELOG.md` avant, surtout pour les versions majeures.
 
-Option : `--no-backup` (déconseillé).
+Options : `--no-backup` (déconseillé) et une version, par exemple `sudo ./scripts/update.sh v0.3.0` (voir ci-dessous).
 
 ## Épingler une version
 Les numéros et le processus de publication sont décrits dans [[Versions-et-releases]].
 
 Pour la production, utilise une version étiquetée plutôt que `main` :
 ```bash
-git fetch --tags
-git checkout v0.3.0
-docker compose up -d --build
+sudo ./scripts/update.sh v0.3.0
 ```
+Le script sauvegarde, se place sur l'étiquette, reconstruit et vérifie le healthcheck. Sur une version épinglée (HEAD détachée), lancer `update.sh` sans version ne tire rien : il reconstruit seulement.
 
 ## Retour arrière
 Les migrations de base de données ne sont pas toujours réversibles. Le retour arrière sûr est donc :

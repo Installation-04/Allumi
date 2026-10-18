@@ -34,12 +34,14 @@ sudo ./scripts/backup.sh
 ```bash
 sudo ./scripts/restore.sh /var/backups/allumi/allumi-20260101-023000.tar.age ~/allumi-backup.key
 ```
-Le script demande confirmation, remplace la base et les pièces jointes, puis redémarre.
+Le script demande confirmation, remplace la base et les pièces jointes, puis redémarre. Il crée d'abord les rôles PostgreSQL de l'application s'ils manquent (les rôles appartiennent au serveur, pas à la base : ils ne sont pas dans la sauvegarde, alors que leurs droits y sont), restaure en une seule transaction qui s'arrête à la première erreur, recalcule les statistiques (`ANALYZE`), puis le service `migrate` redonne son mot de passe au rôle de l'application.
 
 ### Restaurer sur un nouveau serveur (reprise après sinistre)
-1. Installer Allumi : [[Installation]] (même version si possible).
-2. Remplacer `.env` par ta copie de sauvegarde (mêmes `ENCRYPTION_KEY` et `AUTH_SECRET`; l'ancien mot de passe PostgreSQL doit rester cohérent avec `DATABASE_URL`).
+1. Cloner le dépôt (même version si possible) et **mettre ta copie de `.env` en place avant tout** (mêmes `ENCRYPTION_KEY` et `AUTH_SECRET`; `POSTGRES_PASSWORD` doit rester cohérent avec `DATABASE_URL`, et `APP_DB_PASSWORD` avec `APP_DATABASE_URL`). PostgreSQL n'applique `POSTGRES_PASSWORD` qu'à la **première** initialisation de son volume : si `install.sh` tournait d'abord avec un autre `.env`, le mot de passe ne correspondrait plus.
+2. Lancer `sudo ./scripts/install.sh --domain <domaine> --email <courriel>` : il garde les secrets existants et ne change que le domaine et le courriel : [[Installation]].
 3. Copier la sauvegarde sur le serveur et lancer `restore.sh`.
+
+Les sauvegardes **conservent les propriétaires** des objets (pas de `--no-owner`) : la fonction de caviardage de la Loi 25 appartient à un rôle dédié, et la restaurer sous un autre propriétaire la ferait échouer sans bruit. Le service `migrate` remet de toute façon ce propriétaire en place à chaque démarrage.
 
 ## Test de restauration
 Tous les trimestres, restaure une sauvegarde récente sur un serveur de test et vérifie que la balance de vérification correspond.

@@ -1,0 +1,124 @@
+{
+  "app": {
+    "name": "Allumi",
+    "tagline": "Comptabilité libre pour le Québec et le Canada",
+    "version": "Version {version}",
+    "license": "Logiciel libre sous licence MIT"
+  },
+  "common": {
+    "language": "Langue",
+    "french": "Français",
+    "english": "English",
+    "signOut": "Se déconnecter",
+    "continue": "Continuer",
+    "save": "Enregistrer",
+    "required": "Obligatoire"
+  },
+  "form": {
+    "email": "Courriel",
+    "password": "Mot de passe",
+    "passwordConfirm": "Confirmation du mot de passe",
+    "code": "Code à 6 chiffres",
+    "codeOrRecovery": "Code à 6 chiffres ou code de récupération"
+  },
+  "setup": {
+    "title": "Bienvenue dans Allumi",
+    "intro": "Crée l'entreprise et le compte administrateur. Cette page se désactive ensuite.",
+    "tokenMissing": "Cette instance est exposée sur Internet sans jeton d'installation : la première personne qui l'atteindrait pourrait en prendre le contrôle. Ajoute SETUP_TOKEN dans le fichier .env du serveur (openssl rand -hex 16), puis redémarre avec docker compose up -d.",
+    "token": "Jeton d'installation",
+    "tokenHint": "Il se trouve dans le fichier .env du serveur (SETUP_TOKEN) et dans le message de fin de l'installation.",
+    "company": "Entreprise",
+    "companyName": "Nom de l'entreprise",
+    "fiscalYearStart": "Premier mois de l'exercice financier",
+    "admin": "Administrateur",
+    "displayName": "Ton nom",
+    "locale": "Langue de l'interface",
+    "passwordHint": "Au moins {min} caractères. Une phrase de passe longue vaut mieux qu'un mot de passe compliqué.",
+    "submit": "Créer l'entreprise et commencer"
+  },
+  "months": {
+    "1": "Janvier",
+    "2": "Février",
+    "3": "Mars",
+    "4": "Avril",
+    "5": "Mai",
+    "6": "Juin",
+    "7": "Juillet",
+    "8": "Août",
+    "9": "Septembre",
+    "10": "Octobre",
+    "11": "Novembre",
+    "12": "Décembre"
+  },
+  "login": {
+    "title": "Connexion",
+    "submit": "Se connecter"
+  },
+  "mfa": {
+    "title": "Vérification en deux étapes",
+    "intro": "Entre le code de ton application d'authentification, ou un code de récupération.",
+    "submit": "Vérifier",
+    "cancel": "Utiliser un autre compte"
+  },
+  "security": {
+    "title": "Sécurité du compte",
+    "twoFactor": "Vérification en deux étapes (2FA)",
+    "twoFactorOff": "Désactivée. Active-la pour protéger les données comptables : elle est recommandée pour tous les comptes propriétaire et comptable.",
+    "twoFactorOn": "Activée. {count, plural, =0 {Il ne te reste aucun code de récupération.} one {Il te reste # code de récupération.} other {Il te reste # codes de récupération.}}",
+    "enable": "Activer la 2FA",
+    "scan": "Scanne ce code avec une application d'authentification (Aegis, Google Authenticator, 1Password…), puis entre le code à 6 chiffres.",
+    "manualKey": "Clé de configuration manuelle :",
+    "confirm": "Confirmer et activer",
+    "recoveryTitle": "Codes de récupération",
+    "recoveryIntro": "Conserve ces codes dans un endroit sûr. Chacun ne sert qu'une fois et ils ne seront plus affichés.",
+    "disable": "Désactiver la 2FA",
+    "disableHint": "Entre ton mot de passe et un code actuel pour désactiver la 2FA.",
+    "backHome": "Retour"
+  },
+  "dashboard": {
+    "title": "{company}",
+    "pageTitle": "Tableau de bord",
+    "role": "Ton rôle : {role}",
+    "roles": {
+      "OWNER": "Propriétaire",
+      "ACCOUNTANT": "Comptable",
+      "READ_ONLY": "Lecture seule"
+    },
+    "comingSoon": "Le moteur comptable (plan comptable, journal, périodes) arrive à la prochaine phase du développement.",
+    "pickCompany": "Choisis une entreprise",
+    "noCompany": "Ton compte n'est membre d'aucune entreprise.",
+    "security": "Sécurité du compte"
+  },
+  "errors": {
+    "form": {
+      "invalid": "Vérifie les champs du formulaire.",
+      "credentials": "Courriel ou mot de passe incorrect, ou compte temporairement verrouillé.",
+      "rateLimited": "Trop de tentatives. Réessaie dans quelques minutes.",
+      "setupToken": "Jeton d'installation incorrect.",
+      "setupTokenMissing": "L'installation est fermée : SETUP_TOKEN n'est pas défini sur le serveur.",
+      "code": "Code invalide ou déjà utilisé.",
+      "passwordOrCode": "Mot de passe ou code incorrect.",
+      "mismatch": "Les mots de passe ne correspondent pas.",
+      "tooShort": "Le mot de passe est trop court (au moins {min} caractères).",
+      "tooLong": "Le mot de passe est trop long.",
+      "sameAsEmail": "Le mot de passe ne peut pas être ton courriel.",
+      "alreadySetUp": "Cette instance est déjà configurée. Connecte-toi.",
+      "generic": "Une erreur est survenue. Réessaie."
+    },
+    "AL001": "Les débits et les crédits ne sont pas égaux.",
+    "AL002": "Une écriture doit compter au moins deux lignes.",
+    "AL003": "Cette période est verrouillée.",
+    "AL004": "Une écriture validée ne se modifie pas : contre-passe-la.",
+    "AL005": "Ce compte ou cette ligne n'accepte pas cette opération.",
+    "AL006": "Ce document est validé : émets un avoir ou annule-le.",
+    "AL007": "Le montant dépasse le solde disponible.",
+    "AL008": "Pour corriger cette pièce, annule-la.",
+    "AL009": "Il doit rester au moins un propriétaire.",
+    "AL010": "Le solde pointé ne correspond pas au relevé.",
+    "AL011": "Session invalide : reconnecte-toi.",
+    "forbidden": "Tu n'as pas les droits pour faire cela.",
+    "notFound": "Page introuvable.",
+    "page": "Une erreur est survenue. Réessaie dans un instant.",
+    "retry": "Réessayer"
+  }
+}

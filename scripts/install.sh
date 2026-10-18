@@ -72,6 +72,8 @@ else
   env_set ENCRYPTION_KEY "$(openssl rand -base64 32 | tr -d '\n')"
 fi
 chmod 600 "$ENV_FILE"
+# Rôle PostgreSQL restreint de l'application et jeton de /setup (aussi pour un .env plus ancien).
+env_backfill
 env_set ALLUMI_DOMAIN "$DOMAIN"
 env_set ACME_EMAIL "$EMAIL"
 env_set APP_URL "https://${DOMAIN}"
@@ -102,11 +104,18 @@ EOF
   chmod 644 /etc/cron.d/allumi-backup
 fi
 
+SETUP_TOKEN_VALUE="$(env_get SETUP_TOKEN)"
+SETUP_HINT=""
+if [ -n "$SETUP_TOKEN_VALUE" ]; then
+  SETUP_HINT="
+  Jeton    : ${SETUP_TOKEN_VALUE}  (demandé une seule fois par la page /setup)"
+fi
+
 cat <<EOF
 
 $(printf '%s' "$c_grn")Allumi est installé.$(printf '%s' "$c_off")
   Adresse  : https://${DOMAIN}   (le certificat HTTPS peut prendre une minute)
-  Étape    : ouvre l'adresse et crée l'entreprise + l'administrateur (page /setup)
+  Étape    : ouvre l'adresse et crée l'entreprise + l'administrateur (page /setup)${SETUP_HINT}
   Secrets  : ${ENV_FILE}  (chmod 600 — sauvegarde-le dans un gestionnaire de mots de passe)
   Sauvegarde : configure BACKUP_AGE_RECIPIENT et BACKUP_RCLONE_REMOTE dans .env, puis lance
                ./scripts/backup.sh pour tester.  Voir docs/Sauvegardes.md

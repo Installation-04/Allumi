@@ -10,3 +10,7 @@ coverage/
 *.tar.age
 *.dump
 .DS_Store
+*.tsbuildinfo
+next-env.d.ts
+src/generated/
+test-results/

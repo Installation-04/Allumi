@@ -38,7 +38,23 @@ compose up -d db
 info "Restauration de la base…"
 compose exec -T db psql -U "$PGUSER_" -d postgres -c "DROP DATABASE IF EXISTS \"$PGDB_\" WITH (FORCE);"
 compose exec -T db psql -U "$PGUSER_" -d postgres -c "CREATE DATABASE \"$PGDB_\" OWNER \"$PGUSER_\";"
-compose exec -T db pg_restore -U "$PGUSER_" -d "$PGDB_" --no-owner < "$WORK/db.dump"
+# Les rôles sont globaux au serveur PostgreSQL : ils ne sont pas dans la sauvegarde, mais les droits (GRANT) et les
+# propriétaires le sont. On garde les propriétaires (pas de --no-owner) : la fonction audit_redact doit rester à allumi_redactor.
+# Sur un serveur neuf, il faut les créer avant la restauration; le service migrate leur donne ensuite leur mot de passe.
+compose exec -T db psql -v ON_ERROR_STOP=1 -U "$PGUSER_" -d postgres <<'SQL'
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'allumi_app') THEN
+    CREATE ROLE allumi_app NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'allumi_redactor') THEN
+    CREATE ROLE allumi_redactor NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+  END IF;
+END $$;
+SQL
+compose exec -T db pg_restore -U "$PGUSER_" -d "$PGDB_" --exit-on-error --single-transaction < "$WORK/db.dump"
+# PostgreSQL ne sauvegarde pas les statistiques : sans elles, les premières vérifications comptables sont lentes.
+compose exec -T db psql -U "$PGUSER_" -d "$PGDB_" -c "ANALYZE;"
 
 if [ -f "$WORK/storage.tar.gz" ]; then
   info "Restauration des pièces jointes…"
@@ -46,6 +62,6 @@ if [ -f "$WORK/storage.tar.gz" ]; then
     sh -c 'rm -rf /app/storage/* && tar -xzf /in/storage.tar.gz -C /app'
 fi
 
-info "Redémarrage…"
+info "Redémarrage (le service migrate reconfigure le rôle de l'application)…"
 compose up -d
 info "Restauration terminée. Vérifie https://$(env_get ALLUMI_DOMAIN)"

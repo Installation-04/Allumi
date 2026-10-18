@@ -14,6 +14,12 @@ Allumi est un logiciel de comptabilité open source (MIT), auto-hébergeable, po
 - Piste d'audit sur toute modification.
 - Toute requête est filtrée par company_id.
 
+## Code
+- Next.js 16 : `middleware.ts` s'appelle `proxy.ts`, `params` et `cookies()` sont asynchrones. Lis `node_modules/next/dist/docs` avant d'écrire du code Next.
+- L'app se connecte avec le rôle `allumi_app` (jamais le propriétaire). Tout accès à la base passe par `withCompany`, `withUser` ou `withAnonymous` (`src/platform/tenant.ts`); seul `src/platform/db.ts` importe le client Prisma généré.
+- Un module n'est importé que par son `index.ts`. Les règles comptables vivent dans `domain/` (pur) **et** dans la base (triggers); les deux doivent refuser les mêmes cas.
+- Toute modification du schéma : migration + `docs/Schema-de-donnees.md` + test de catalogue (`tests/integration/catalog.test.ts`).
+
 ## Infrastructure
 - Le contrat d'infra est dans Dockerfile, docker-compose.yml, .env.example et scripts/. Les modifier en même temps que le code qui l'exige.
 - /api/health doit répondre 200 si la base répond.

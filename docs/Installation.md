@@ -25,21 +25,22 @@ Options : `--no-firewall` (ne touche pas à ufw), `--no-cron` (pas de sauvegarde
 ### Ce que fait le script
 1. Installe Docker Engine et le plugin Compose (dépôt officiel Docker).
 2. Configure le pare-feu ufw : SSH, 80, 443.
-3. Crée `.env` (permissions 600) avec des secrets aléatoires.
-4. Construit les images et démarre PostgreSQL, les migrations, l'application et Caddy.
+3. Crée `.env` (permissions 600) avec des secrets aléatoires, dont le mot de passe du rôle restreint de l'application.
+4. Construit les images et démarre PostgreSQL, les migrations (qui configurent aussi ce rôle), l'application et Caddy.
 5. Attend que l'application soit « healthy ».
 6. Planifie une sauvegarde quotidienne à 02 h 30 (`/etc/cron.d/allumi-backup`).
 
 Le script est **idempotent** : le relancer ne régénère pas les secrets existants.
 
 ## Premier démarrage
-Ouvre `https://ton-domaine`. Si aucun utilisateur n'existe, la page `/setup` te demande de créer l'entreprise et le compte administrateur, puis se désactive. Active ensuite la 2FA.
+Ouvre `https://ton-domaine`. Si aucun utilisateur n'existe, la page `/setup` te demande de créer l'entreprise et le compte administrateur, puis se désactive : voir [[Premier-demarrage]]. Active ensuite la 2FA ([[Authentification]]).
 
 ## Installation manuelle
 ```bash
 cp .env.example .env && chmod 600 .env
 # Remplace tous les CHANGE_ME (openssl rand -hex 24 / -base64 48), domaine, courriel
-# Attention : POSTGRES_PASSWORD doit aussi apparaître dans DATABASE_URL
+# Attention : POSTGRES_PASSWORD doit aussi apparaître dans DATABASE_URL, et APP_DB_PASSWORD dans APP_DATABASE_URL
+# Renseigne aussi SETUP_TOKEN (openssl rand -hex 16) : sans lui, la page /setup reste fermée sur un serveur public en HTTPS
 docker compose up -d --build
 docker compose ps
 ```

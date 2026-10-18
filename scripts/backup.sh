@@ -21,7 +21,7 @@ WORK="$(mktemp -d "$BACKUP_DIR/.work.XXXXXX")"
 trap 'rm -rf "$WORK"' EXIT
 
 info "Dump PostgreSQL…"
-compose exec -T db pg_dump -U "$PGUSER_" -d "$PGDB_" --format=custom --no-owner > "$WORK/db.dump"
+compose exec -T db pg_dump -U "$PGUSER_" -d "$PGDB_" --format=custom > "$WORK/db.dump"
 
 info "Archive des pièces jointes…"
 APP_CID="$(compose ps -q app || true)"

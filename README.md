@@ -2,7 +2,7 @@
 
 Logiciel de comptabilité **open source** et **auto-hébergeable** pour les PME et les travailleurs autonomes du Québec et du Canada. Une alternative libre aux logiciels de comptabilité infonuagiques propriétaires.
 
-> **État : pré-alpha.** Ce dépôt contient pour l'instant l'infrastructure (Docker, scripts d'installation, sauvegardes) et le wiki. Le code de l'application est développé avec Claude Code à partir de [`CLAUDE_CODE_PROMPT.md`](CLAUDE_CODE_PROMPT.md). N'utilise pas Allumi pour de la comptabilité réelle avant une version stable.
+> **État : pré-alpha.** Le squelette fonctionne (premier démarrage, connexion, vérification en deux étapes, interface FR/EN, Docker); le moteur comptable est en développement ([feuille de route](docs/Feuille-de-route.md)). N'utilise pas Allumi pour de la comptabilité réelle avant une version stable.
 
 *English summary: Allumi is an open-source, self-hostable accounting app for Canadian small businesses (QST/GST aware, French-first, bilingual). The repo ships a Docker Compose stack, an Ubuntu install script, encrypted backups and a full wiki in `docs/`. Application code is in pre-alpha.*
 
@@ -31,8 +31,9 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 ## Développement local
 
 ```bash
-cp .env.example .env
+cp .env.example .env                              # puis adapte-le (voir la page ci-dessous)
 docker compose -f docker-compose.dev.yml up -d   # PostgreSQL + Mailpit
+npm install && npm run db:migrate && npm run dev
 ```
 
 Voir [`docs/Developpement-local.md`](docs/Developpement-local.md). Pour développer dans le cloud (Claude Code sur le web, sans Docker) : [`docs/Developpement-cloud.md`](docs/Developpement-cloud.md).
