@@ -39,7 +39,7 @@ export function Field(props: {
   defaultValue?: string;
   autoComplete?: string;
   hint?: string;
-  inputMode?: "numeric" | "text";
+  inputMode?: "numeric" | "decimal" | "text";
   required?: boolean;
 }) {
   const { name, label, type = "text", defaultValue, autoComplete, hint, inputMode, required = true } = props;
@@ -114,6 +114,89 @@ export function Card({ title, children, headingLevel = 1 }: { title: string; chi
   );
 }
 
+export function CheckboxField(props: { name: string; label: string; defaultChecked?: boolean; hint?: string; required?: boolean }) {
+  const { name, label, defaultChecked = false, hint, required = false } = props;
+  const id = useId();
+  const scope = useContext(FormScope);
+  const checked = scope.values ? scope.values[name] === "on" : defaultChecked;
+  return (
+    <div>
+      <label htmlFor={id} className="flex items-center gap-2 text-sm font-medium">
+        <input key={scope.attempt} id={id} name={name} type="checkbox" defaultChecked={checked} required={required} aria-describedby={hint ? `${id}-hint` : undefined} className={`h-4 w-4 rounded border-stone-400 ${FOCUS}`} />
+        {label}
+      </label>
+      {hint ? (
+        <p id={`${id}-hint`} className="mt-1 text-xs text-stone-600 dark:text-stone-400">
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+/** Several checkboxes under one name; the returned value is the list joined by commas (see `listValues`). */
+export function CheckboxGroup(props: { name: string; legend: string; options: { value: string; label: string }[]; defaultValues?: string[]; hint?: string }) {
+  const { name, legend, options, defaultValues = [], hint } = props;
+  const id = useId();
+  const scope = useContext(FormScope);
+  const selected = new Set(scope.values ? (scope.values[name] ?? "").split(",").filter(Boolean) : defaultValues);
+  return (
+    <fieldset aria-describedby={hint ? `${id}-hint` : undefined}>
+      <legend className="mb-1 text-sm font-medium">{legend}</legend>
+      <div className="flex flex-wrap gap-x-5 gap-y-2">
+        {options.map((option) => (
+          <label key={`${scope.attempt}-${option.value}`} className="flex items-center gap-2 text-sm">
+            <input type="checkbox" name={name} value={option.value} defaultChecked={selected.has(option.value)} className={`h-4 w-4 rounded border-stone-400 ${FOCUS}`} />
+            {option.label}
+          </label>
+        ))}
+      </div>
+      {hint ? (
+        <p id={`${id}-hint`} className="mt-1 text-xs text-stone-600 dark:text-stone-400">
+          {hint}
+        </p>
+      ) : null}
+    </fieldset>
+  );
+}
+
+export function TextAreaField(props: { name: string; label: string; defaultValue?: string; rows?: number; hint?: string }) {
+  const { name, label, defaultValue, rows = 3, hint } = props;
+  const id = useId();
+  const scope = useContext(FormScope);
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1 block text-sm font-medium">
+        {label}
+      </label>
+      <textarea
+        id={id}
+        name={name}
+        rows={rows}
+        defaultValue={scope.values?.[name] ?? defaultValue}
+        aria-describedby={hint ? `${id}-hint` : undefined}
+        className={`w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-base shadow-sm dark:border-stone-700 dark:bg-stone-900 ${FOCUS}`}
+      />
+      {hint ? (
+        <p id={`${id}-hint`} className="mt-1 text-xs text-stone-600 dark:text-stone-400">
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+/** The confirmation of a form state (a message under `notices`), announced politely. */
+export function StateNotice({ state }: { state: FormState }) {
+  const t = useTranslations("notices");
+  if (!state?.notice) return null;
+  return (
+    <p role="status" className="rounded-md border border-green-300 bg-green-50 px-3 py-2 text-sm text-green-900 dark:border-green-800 dark:bg-green-950 dark:text-green-200">
+      {t(state.notice as "saved")}
+    </p>
+  );
+}
+
 /** The error of a form state, whichever catalog it comes from. */
 export function StateError({ state }: { state: FormState }) {
   const t = useTranslations("errors");
@@ -165,6 +248,7 @@ export function ActionForm(props: {
   return (
     <form action={formAction} className="space-y-3">
       <StateError state={state} />
+      <StateNotice state={state} />
       <FormScopeProvider scope={scope}>{props.children}</FormScopeProvider>
       <SubmitButton variant={props.variant ?? "secondary"} ariaLabel={props.ariaLabel}>
         {props.label}
