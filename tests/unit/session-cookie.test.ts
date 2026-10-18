@@ -26,6 +26,8 @@ describe("session cookie", () => {
   it("is pinned to the exact host (__Host- prefix) over HTTPS, and plain over HTTP", async () => {
     vi.stubEnv("APP_URL", "https://compta.exemple.ca");
     expect((await load()).names.sessionCookieName()).toBe("__Host-allumi_session");
+    vi.stubEnv("APP_URL", "HTTPS://compta.exemple.ca");
+    expect((await load()).names.sessionCookieName()).toBe("__Host-allumi_session");
     vi.stubEnv("APP_URL", "http://localhost:3000");
     expect((await load()).names.sessionCookieName()).toBe("allumi_session");
   });

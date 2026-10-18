@@ -17,6 +17,13 @@ describe("environment validation", () => {
     expect(env.SMTP_PORT).toBe(587);
   });
 
+  it("accepts only an http(s) APP_URL, whatever the case of the scheme", () => {
+    expect(parseEnv({ ...GOOD, APP_URL: "HTTPS://compta.exemple.ca" }).APP_URL).toBe("HTTPS://compta.exemple.ca");
+    for (const bad of ["ftp://compta.exemple.ca", "javascript:alert(1)", "compta.exemple.ca"]) {
+      expect(() => parseEnv({ ...GOOD, APP_URL: bad })).toThrowError(/APP_URL/);
+    }
+  });
+
   it("trusts one proxy by default, and checks the bounds", () => {
     expect(parseEnv(GOOD).TRUSTED_PROXY_HOPS).toBe(1);
     expect(parseEnv({ ...GOOD, TRUSTED_PROXY_HOPS: "2" }).TRUSTED_PROXY_HOPS).toBe(2);
