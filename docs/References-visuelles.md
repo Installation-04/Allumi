@@ -134,7 +134,7 @@ Répertoire et saisie d’un client/fournisseur fictif, voir [[Contacts]].
 
 ## Domaines d’activité et menu complet
 
-Les sections donnent accès aux outils existants et indiquent ce qui reste à livrer. Voir [[Suivi-du-developpement]].
+Les sections donnent accès aux outils existants et indiquent ce qui reste à livrer. Voir [[Fonctionnalites-et-limites]].
 
 ![Espace Ventes — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/espace-ventes-desktop.png)
 

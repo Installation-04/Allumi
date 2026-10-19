@@ -43,5 +43,3 @@ Allumi est un logiciel de comptabilité **open source** (MIT) et **auto-héberge
 Allumi ne remplace pas un comptable. Vérifie les taux et règles de taxes auprès de Revenu Québec et de l'Agence du revenu du Canada.
 
 Le répertoire clients et fournisseurs (lot 4.1 en revue) est décrit dans [[Contacts]].
-
-- [[Suivi-du-developpement]] — plan de reprise, notes d’avancement et checklists.

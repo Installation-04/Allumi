@@ -36,6 +36,7 @@ Allumi est un logiciel de comptabilité open source (MIT), auto-hébergeable, po
 - Chaque PR ajoute une ligne sous [Non publié] dans CHANGELOG.md.
 
 ## Documentation
+- Le plan de travail, les notes d’avancement et les checklists de suivi sont maintenus dans Notion uniquement, à la demande de l’utilisateur. Ne pas les publier dans docs/, le README ou le wiki GitHub. GitHub conserve les guides utilisateur, la documentation technique, les captures et la feuille de route publique.
 - docs/ est le wiki. Mettre à jour la page concernée dans le même commit que la fonctionnalité.
 - Liens internes au format [[Nom-de-page]].
 

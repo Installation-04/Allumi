@@ -35,5 +35,3 @@
 - [[Developpement-local]]
 - [[Developpement-cloud]]
 - [[Publication-du-wiki]]
-
-- [[Suivi-du-developpement]] — plan de reprise, notes d’avancement et checklists.
