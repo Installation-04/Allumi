@@ -498,8 +498,7 @@
     },
     "comptabilite": {
       "title": "Accounting",
-      "description": "Your accounts, journal, trial balance and fiscal years in one place.",
-      "planned": ""
+      "description": "Your accounts, journal, trial balance and fiscal years in one place."
     },
     "projets": {
       "title": "Projects",

@@ -498,8 +498,7 @@
     },
     "comptabilite": {
       "title": "Comptabilité",
-      "description": "Votre plan comptable, journal, balance et exercices au même endroit.",
-      "planned": ""
+      "description": "Votre plan comptable, journal, balance et exercices au même endroit."
     },
     "projets": {
       "title": "Projets",

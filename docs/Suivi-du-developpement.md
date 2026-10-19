@@ -24,7 +24,7 @@ Objectif : retrouver les domaines visibles dans la référence de l’utilisateu
 - [x] Prévoir fermeture du menu au clavier et restauration du focus.
 - [x] Vérifier lint, types, build et parcours navigateur après modifications.
 - [x] Actualiser les captures ordinateur/téléphone et le README (25 images, 30 pages de wiki).
-- [ ] Publier et vérifier la synchronisation de ce nouveau lot dans le wiki.
+- [x] Publier et vérifier la synchronisation de ce nouveau lot dans le wiki (55 fichiers identiques).
 - [ ] Vérifier la CI sur le nouveau commit, notamment Docker.
 
 ## Prochains lots, dans l’ordre
@@ -60,3 +60,5 @@ Fusion des PR #5 et #6. Création de la PR #7 pour les clients/fournisseurs. Val
 ### 19 octobre 2026 — Menu et suivi
 
 Demande utilisateur : compléter les options du menu latéral et maintenir un plan, des notes et une checklist. Ajout des domaines d’activité, de pages indiquant les outils utilisables et les fonctions prévues, et d’un menu complet sur téléphone. Aucun solde, graphique ou bouton de facturation fictif ajouté. Lint, types, build et parcours Chromium ordinateur/téléphone réussis. Les tests vérifient aussi la navigation vers Ventes, l’état non disponible, le menu complet et le retour du focus après Échap. Captures mises à jour : 25 images. CI du nouveau commit à confirmer.
+
+La CI du menu a détecté une clé de traduction vide, sans usage dans la page Comptabilité. La clé a été supprimée dans les deux langues; nouvelle validation en cours.
