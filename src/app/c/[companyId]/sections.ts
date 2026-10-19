@@ -1,0 +1,15 @@
+/** Product areas and real shortcuts; planned capabilities are described separately in the hub. */
+export const AREAS = {
+  ventes: { icon: "contacts", links: ["contacts", "journal"] },
+  depenses: { icon: "journal", links: ["contacts", "journal"] },
+  banque: { icon: "accounts", links: ["comptes", "journal"] },
+  tresorerie: { icon: "trial", links: ["balance", "journal"] },
+  rapports: { icon: "trial", links: ["balance"] },
+  taxes: { icon: "fiscal", links: ["comptes"] },
+  comptabilite: { icon: "accounts", links: ["comptes", "journal", "balance", "exercices"] },
+  projets: { icon: "overview", links: [] },
+  paie: { icon: "contacts", links: [] },
+  kilometrage: { icon: "arrow", links: [] },
+  applications: { icon: "overview", links: [] },
+} as const;
+export type Area = keyof typeof AREAS;

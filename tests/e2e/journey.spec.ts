@@ -143,6 +143,20 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
 
   await ledgerJourney(page, totp);
   await contactsJourney(page);
+  await openSection(page, "Ventes");
+  await expect(page.getByRole("heading", { name: "Ventes", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "À venir — non disponible" })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "espace-ventes");
+  if ((page.viewportSize()?.width ?? 1280) < 1024) {
+    const nav = page.getByRole("navigation", { name: "Navigation de l'entreprise", exact: true });
+    await nav.getByRole("button", { name: "Menu", exact: true }).click();
+    await expect(nav.getByRole("link", { name: "Paie", exact: true })).toBeVisible();
+    await captureReference(page, "menu-complet");
+    await page.keyboard.press("Escape");
+    await expect(nav.getByRole("button", { name: "Menu", exact: true })).toBeFocused();
+    await expect(nav.getByRole("button", { name: "Menu", exact: true })).toHaveAttribute("aria-expanded", "false");
+  }
 
   // English interface.
   await page.goto("/");
@@ -155,7 +169,12 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
 const todayInToronto = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
 
 /** A link of the company navigation (the dashboard cards carry the same names). */
-const openSection = (page: Page, name: string) => page.getByRole("navigation", { name: "Navigation de l'entreprise" }).getByRole("link", { name, exact: true }).click();
+const openSection = async (page: Page, name: string) => {
+  const nav = page.getByRole("navigation", { name: "Navigation de l'entreprise", exact: true });
+  const link = nav.getByRole("link", { name, exact: true });
+  if (!(await link.isVisible())) await nav.getByRole("button", { name: "Menu", exact: true }).click();
+  await link.click();
+};
 
 /** The accounting engine through the screens: chart, entry, reversal, trial balance, period lock, audit trail. */
 async function ledgerJourney(page: Page, totp: TOTP) {

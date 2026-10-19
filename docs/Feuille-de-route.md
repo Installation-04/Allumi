@@ -43,3 +43,5 @@ Chaque lot doit livrer un parcours réel complet sur ordinateur et téléphone. 
 Les phases 5 (imports et rapprochement), 6 (rapports et exports) et 7 (bêta) suivent ces lots. Avant la bêta, vérifier aussi les parcours d’administration prévus mais non encore livrés : invitations, gestion multi-entreprise et récupération de mot de passe; compléter les essais sur appareils physiques et Safari iOS. Le schéma existant ne constitue pas à lui seul une fonctionnalité livrée.
 
 Lot 4.1 : implémentation en revue sur `feat/contacts`, guide [[Contacts]].
+
+- [[Suivi-du-developpement]] — plan de reprise, notes d’avancement et checklists.

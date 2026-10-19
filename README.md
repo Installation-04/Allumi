@@ -70,4 +70,16 @@ Captures réelles de l’entreprise fictive des tests, sur Chromium (19 octobre 
 
 <img src="docs/images/contacts-mobile.png" alt="Répertoire des contacts sur téléphone" width="360">
 
-Les [22 captures de la galerie](https://github.com/Installation-04/Allumi/wiki/References-visuelles) montrent aussi la saisie, le journal, la balance, les exercices et la piste d’audit.
+Les [25 captures de la galerie](https://github.com/Installation-04/Allumi/wiki/References-visuelles) montrent aussi la saisie, le journal, la balance, les exercices et la piste d’audit.
+
+## Plan et avancement
+
+Le [carnet de développement](docs/Suivi-du-developpement.md) contient le plan ordonné, les notes de reprise et les checklists de livraison. Version publiée : [wiki de suivi](https://github.com/Installation-04/Allumi/wiki/Suivi-du-developpement).
+
+### Navigation par activité
+
+![Espace Ventes et navigation latérale](docs/images/espace-ventes-desktop.png)
+
+<img src="docs/images/menu-complet-mobile.png" alt="Menu complet Allumi sur téléphone" width="360">
+
+Les pages des domaines non encore livrés indiquent leur état; elles ne simulent ni facturation, ni banque connectée, ni paie.

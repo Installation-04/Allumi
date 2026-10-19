@@ -1,3 +1,4 @@
+import { AREAS, type Area } from "./sections";
 import Link from "next/link";
 import { Header } from "@/app/_components/shell";
 import { Icon } from "@/app/_components/icon";
@@ -9,6 +10,7 @@ import { CompanyNav, type NavLink } from "./nav";
 export default async function CompanyLayout({ children, params }: { children: React.ReactNode; params: Promise<{ companyId: string }> }) {
   const { company } = await loadCompany(params);
   const t = await getTranslations("nav");
+  const ta = await getTranslations("areas");
   const td = await getTranslations("dashboard");
   const base = `/c/${company.id}`;
   const links: NavLink[] = [
@@ -20,6 +22,7 @@ export default async function CompanyLayout({ children, params }: { children: Re
     { href: `${base}/exercices`, label: t("fiscal"), icon: "fiscal" },
     ...(can(company.role, "audit.read") ? [{ href: `${base}/audit`, label: t("audit"), shortLabel: t("short.audit"), icon: "audit" as const }] : []),
   ];
+  const areaLinks: NavLink[] = (Object.keys(AREAS) as Area[]).map((area) => ({ href: `${base}/espace/${area}`, label: ta(`${area}.title`), icon: AREAS[area].icon }));
   return (
     <div className="company-workspace grid min-w-0 lg:grid-cols-[208px_minmax(0,1fr)]">
       <aside className="workspace-sidebar contents min-w-0 text-white lg:bg-[#34373b] lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col lg:self-start">
@@ -29,7 +32,7 @@ export default async function CompanyLayout({ children, params }: { children: Re
           </Link>
           {can(company.role, "entry.post") ? <Link href={`${base}/journal/nouvelle`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-stone-400 px-4 text-sm font-semibold hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white lg:mt-5 lg:w-full"><Icon name="plus" />{td("create")}</Link> : null}
         </div>
-        <CompanyNav links={links} label={t("label")} />
+        <CompanyNav links={[...links.slice(0, 3), ...areaLinks, ...links.slice(3)]} label={t("label")} />
         <Link href="/compte/securite" className="hidden min-h-11 items-center gap-2 border-t border-white/15 px-5 py-4 text-sm text-stone-200 hover:bg-black/20 focus-visible:outline-2 focus-visible:outline-white lg:mt-auto lg:flex"><Icon name="audit" />{td("security")}</Link>
       </aside>
       <div className="min-w-0">

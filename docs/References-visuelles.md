@@ -131,3 +131,13 @@ Répertoire et saisie d’un client/fournisseur fictif, voir [[Contacts]].
 ![Saisie du contact — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contact-form-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contact-form-mobile.png" alt="Saisie du contact — téléphone" width="412">
+
+## Domaines d’activité et menu complet
+
+Les sections donnent accès aux outils existants et indiquent ce qui reste à livrer. Voir [[Suivi-du-developpement]].
+
+![Espace Ventes — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/espace-ventes-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/espace-ventes-mobile.png" alt="Espace Ventes — téléphone" width="412">
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/menu-complet-mobile.png" alt="Menu complet sur téléphone" width="412">

@@ -21,3 +21,7 @@ Voir [[Feuille-de-route]] pour les prochains modules et [[Journal-et-ecritures]]
 ## Captures de référence
 
 Voir [[References-visuelles]] pour les écrans sur ordinateur et téléphone, réalisés avec une entreprise fictive.
+
+## Domaines d’activité
+
+Le menu latéral regroupe aussi Ventes, Dépenses, Banque et transactions, Trésorerie, Rapports, Taxes et Comptabilité. Chaque page propose les outils existants et décrit les fonctions encore prévues. Projets, Paie, Kilométrage et Applications indiquent explicitement leur périmètre futur. Sur téléphone, trois raccourcis et le bouton **Menu** donnent accès à toutes les sections; Échap ferme le menu et rend le focus au bouton. La barre latérale défile indépendamment pour garder toutes les entrées accessibles sur un petit écran.

@@ -190,7 +190,9 @@
       "accounts": "Comptes",
       "trial": "Balance",
       "audit": "Audit"
-    }
+    },
+    "menu": "Menu",
+    "closeMenu": "Fermer le menu"
   },
   "ledgerSetup": {
     "title": "Initialiser la comptabilité",
@@ -461,6 +463,73 @@
       "ACTIVE": "Actifs",
       "ARCHIVED": "Archivés",
       "ALL": "Tous"
+    }
+  },
+  "areas": {
+    "ventes": {
+      "title": "Ventes",
+      "description": "Retrouvez vos clients et les écritures liées à vos ventes.",
+      "planned": "Factures, avoirs et encaissements : lots 4.3 et 4.5. La facturation n’est pas encore disponible."
+    },
+    "depenses": {
+      "title": "Dépenses",
+      "description": "Retrouvez vos fournisseurs et consultez le journal.",
+      "planned": "Factures fournisseurs, dépenses et décaissements : lots 4.4 et 4.5."
+    },
+    "banque": {
+      "title": "Banque et transactions",
+      "description": "Accédez au plan comptable et aux écritures enregistrées.",
+      "planned": "Import CSV/OFX, connexion des opérations et rapprochement bancaire : phase 5. Aucun flux bancaire automatique actuellement."
+    },
+    "tresorerie": {
+      "title": "Trésorerie",
+      "description": "Consultez les soldes comptables et les mouvements du journal.",
+      "planned": "Rapport de flux de trésorerie et suivi des paiements : lots 4.5 et phase 6. Aucune prévision de trésorerie actuellement."
+    },
+    "rapports": {
+      "title": "Rapports",
+      "description": "Consultez les rapports disponibles pour votre entreprise.",
+      "planned": "Bilan, état des résultats, grand livre, âges des comptes et exports : phase 6."
+    },
+    "taxes": {
+      "title": "Taxes",
+      "description": "Retrouvez les comptes de taxes dans votre plan comptable.",
+      "planned": "Moteur TPS/TVQ, codes et taux datés : lot 4.2. Sommaire fiscal : phase 6. Aucune déclaration automatisée actuellement."
+    },
+    "comptabilite": {
+      "title": "Comptabilité",
+      "description": "Votre plan comptable, journal, balance et exercices au même endroit.",
+      "planned": ""
+    },
+    "projets": {
+      "title": "Projets",
+      "description": "Le suivi comptable par projet est une évolution envisagée.",
+      "planned": "Périmètre et priorité à définir; aucun suivi par projet disponible actuellement."
+    },
+    "paie": {
+      "title": "Paie",
+      "description": "La gestion de la paie est une évolution envisagée.",
+      "planned": "Hors MVP : calcul des salaires, retenues et remises non disponibles."
+    },
+    "kilometrage": {
+      "title": "Kilométrage",
+      "description": "Le suivi des déplacements est une évolution envisagée.",
+      "planned": "Périmètre à définir; aucun journal de déplacements ni calcul d’indemnité actuellement."
+    },
+    "applications": {
+      "title": "Applications",
+      "description": "Les intégrations étendront les possibilités d’Allumi.",
+      "planned": "API publique et connecteurs : après le MVP, périmètre à définir. Aucun catalogue d’applications installables actuellement."
+    },
+    "available": "Disponible maintenant",
+    "planned": "À venir — non disponible",
+    "progress": "Plan et avancement du développement",
+    "links": {
+      "contacts": "Contacts",
+      "journal": "Journal",
+      "comptes": "Plan comptable",
+      "balance": "Balance de vérification",
+      "exercices": "Exercices"
     }
   }
 }
