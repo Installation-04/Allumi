@@ -52,4 +52,22 @@ Allumi est un outil. Il ne remplace ni un comptable professionnel ni un avis jur
 
 ## Guide et références visuelles
 
-Le [wiki GitHub](https://github.com/Installation-04/Allumi/wiki) regroupe le guide utilisateur, l’installation, l’exploitation, l’architecture et la feuille de route. Voir le [guide utilisateur](docs/Guide-utilisateur.md), les [fonctionnalités et limites](docs/Fonctionnalites-et-limites.md) et les [captures de référence](docs/References-visuelles.md). Les fichiers PNG originaux sont dans [docs/images](docs/images). Les captures de refonte décrivent la branche en revue jusqu’à son intégration.
+Le [wiki GitHub](https://github.com/Installation-04/Allumi/wiki) regroupe le guide utilisateur, l’installation, l’exploitation, l’architecture et la feuille de route. Voir le [guide utilisateur](docs/Guide-utilisateur.md), les [fonctionnalités et limites](docs/Fonctionnalites-et-limites.md) et les [captures de référence](docs/References-visuelles.md). Les fichiers PNG originaux sont dans [docs/images](docs/images). La refonte est intégrée; les captures du lot contacts décrivent la branche `feat/contacts` en revue.
+
+Captures réelles de l’entreprise fictive des tests, sur Chromium (19 octobre 2026). Les vues mobiles sont émulées à 412 × 839 px; elles ne remplacent pas les essais sur appareil physique.
+
+### Tableau de bord — ordinateur
+
+![Tableau de bord Allumi sur ordinateur](docs/images/tableau-de-bord-desktop.png)
+
+### Tableau de bord — téléphone
+
+<img src="docs/images/tableau-de-bord-mobile.png" alt="Tableau de bord Allumi sur téléphone" width="360">
+
+### Clients et fournisseurs — ordinateur et téléphone
+
+![Répertoire des contacts sur ordinateur](docs/images/contacts-desktop.png)
+
+<img src="docs/images/contacts-mobile.png" alt="Répertoire des contacts sur téléphone" width="360">
+
+Les [22 captures de la galerie](https://github.com/Installation-04/Allumi/wiki/References-visuelles) montrent aussi la saisie, le journal, la balance, les exercices et la piste d’audit.

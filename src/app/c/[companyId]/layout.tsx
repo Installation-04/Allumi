@@ -12,12 +12,13 @@ export default async function CompanyLayout({ children, params }: { children: Re
   const td = await getTranslations("dashboard");
   const base = `/c/${company.id}`;
   const links: NavLink[] = [
-    { href: base, label: t("overview"), icon: "overview" },
+    { href: base, label: t("overview"), shortLabel: t("short.overview"), icon: "overview" },
+    { href: `${base}/contacts`, label: t("contacts"), icon: "contacts" },
     { href: `${base}/journal`, label: t("journal"), icon: "journal" },
-    { href: `${base}/comptes`, label: t("accounts"), icon: "accounts" },
-    { href: `${base}/balance`, label: t("trial"), icon: "trial" },
+    { href: `${base}/comptes`, label: t("accounts"), shortLabel: t("short.accounts"), icon: "accounts" },
+    { href: `${base}/balance`, label: t("trial"), shortLabel: t("short.trial"), icon: "trial" },
     { href: `${base}/exercices`, label: t("fiscal"), icon: "fiscal" },
-    ...(can(company.role, "audit.read") ? [{ href: `${base}/audit`, label: t("audit"), icon: "audit" as const }] : []),
+    ...(can(company.role, "audit.read") ? [{ href: `${base}/audit`, label: t("audit"), shortLabel: t("short.audit"), icon: "audit" as const }] : []),
   ];
   return (
     <div className="company-workspace grid min-w-0 lg:grid-cols-[208px_minmax(0,1fr)]">

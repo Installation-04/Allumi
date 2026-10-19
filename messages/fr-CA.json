@@ -167,6 +167,11 @@
       "invalidDate": "Cette date n'est pas valide.",
       "dateTooFar": "Cette date est trop loin dans l'avenir : un exercice ne peut être ajouté que pour le passé ou l'exercice qui suit l'exercice en cours.",
       "memoTooLong": "La description est trop longue (500 caractères au plus)."
+    },
+    "contacts": {
+      "invalid": "Vérifiez les champs du contact, notamment le courriel, le pays et le délai de paiement.",
+      "invalidFilter": "Les filtres de contacts sont invalides.",
+      "notFound": "Ce contact est introuvable ou anonymisé."
     }
   },
   "nav": {
@@ -178,7 +183,14 @@
     "audit": "Piste d'audit",
     "label": "Navigation de l'entreprise",
     "workspace": "Votre espace",
-    "sections": "Sections comptables"
+    "sections": "Sections comptables",
+    "contacts": "Contacts",
+    "short": {
+      "overview": "Accueil",
+      "accounts": "Comptes",
+      "trial": "Balance",
+      "audit": "Audit"
+    }
   },
   "ledgerSetup": {
     "title": "Initialiser la comptabilité",
@@ -392,6 +404,63 @@
       "BANK": "Banque",
       "TAX_SETTLEMENT": "Versement de taxes",
       "REVERSAL": "Contre-passation"
+    }
+  },
+  "contacts": {
+    "title": "Contacts",
+    "intro": "Vos clients et fournisseurs, dans un seul répertoire.",
+    "new": "Nouveau contact",
+    "details": "Fiche du contact",
+    "back": "Retour aux contacts",
+    "kind": "Type de contact",
+    "displayName": "Nom affiché",
+    "legalName": "Raison sociale",
+    "email": "Courriel",
+    "phone": "Téléphone",
+    "addressLine1": "Adresse",
+    "addressLine2": "Complément d’adresse",
+    "city": "Ville",
+    "province": "Province ou territoire",
+    "postalCode": "Code postal",
+    "country": "Pays",
+    "countryHint": "Code de pays à deux lettres, par exemple CA.",
+    "locale": "Langue du contact",
+    "paymentTermsDays": "Délai de paiement (jours)",
+    "termsHint": "De 0 à 365 jours.",
+    "notes": "Notes",
+    "unspecified": "Non précisé",
+    "create": "Créer le contact",
+    "save": "Enregistrer le contact",
+    "active": "Actif",
+    "archived": "Archivé",
+    "archive": "Archiver le contact",
+    "restore": "Restaurer le contact",
+    "archiveHint": "L’archivage masque le contact de la liste active et conserve ses références comptables. Il peut être restauré; aucune donnée n’est supprimée.",
+    "status": "État",
+    "search": "Rechercher un nom, un courriel ou un téléphone",
+    "apply": "Rechercher",
+    "typesLabel": "Types de contacts",
+    "pagination": "Pagination des contacts",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {page} sur {count}",
+    "count": "{count, plural, =0 {Aucun contact} one {# contact} other {# contacts}}",
+    "empty": "Aucun contact dans cette vue",
+    "emptyHint": "Modifiez les filtres ou créez un contact si vous avez les droits nécessaires.",
+    "kinds": {
+      "CUSTOMER": "Client",
+      "SUPPLIER": "Fournisseur",
+      "BOTH": "Client et fournisseur"
+    },
+    "filters": {
+      "ALL": "Tous",
+      "CUSTOMER": "Clients",
+      "SUPPLIER": "Fournisseurs"
+    },
+    "statuses": {
+      "ACTIVE": "Actifs",
+      "ARCHIVED": "Archivés",
+      "ALL": "Tous"
     }
   }
 }

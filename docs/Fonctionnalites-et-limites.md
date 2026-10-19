@@ -1,14 +1,14 @@
 # Fonctionnalités et limites
 
-Cette page distingue les parcours livrés du schéma et des fonctionnalités planifiées. La branche de refonte UI est une référence de développement tant que sa PR n’est pas intégrée; installer la branche principale ne garantit pas encore le même aspect.
+Cette page distingue les parcours livrés du schéma et des fonctionnalités planifiées. Les PR #5 et #6 sont intégrées à `main`. Le lot contacts 4.1 est en revue sur `feat/contacts`.
 
 | Domaine | Disponible actuellement | À venir |
 |---|---|---|
 | Installation | Docker Compose, configuration, migrations, santé, sauvegarde/restauration | Validation bêta et retours d’exploitation |
 | Accès | Premier compte/entreprise, connexion, sessions, 2FA, récupération 2FA, FR/EN | Réinitialisation du mot de passe, invitations, administration des membres/entreprises |
 | Comptabilité | Plan comptable, journal, soldes d’ouverture, contre-passation, périodes, balance, audit | Autres rapports détaillés |
-| Interface | Web adaptatif; refonte du tableau de bord et navigation en revue | Essais supplémentaires sur Safari iOS et appareils physiques |
-| Contacts et catalogue | Schéma prévu | Clients, fournisseurs, produits/services : phase 4 |
+| Interface | Web adaptatif; tableau de bord et navigation intégrés | Essais supplémentaires sur Safari iOS et appareils physiques |
+| Contacts et catalogue | Clients et fournisseurs : lot 4.1 en revue, voir [[Contacts]] | Produits/services : lot 4.2 |
 | Taxes | Schéma prévu | Moteur TPS/TVQ et taux datés : phase 4; déclarations : phase 6 |
 | Ventes et achats | Contraintes de base préparées | Factures, avoirs, dépenses : phase 4 |
 | Paiements et fichiers | Contraintes de base préparées | Paiements, dépôts, pièces jointes : phase 4 |

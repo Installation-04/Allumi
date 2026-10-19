@@ -167,6 +167,11 @@
       "invalidDate": "This date is not valid.",
       "dateTooFar": "This date is too far ahead: a fiscal year can only be added for the past or for the year after the current one.",
       "memoTooLong": "The description is too long (500 characters at most)."
+    },
+    "contacts": {
+      "invalid": "Check the contact fields, including email, country and payment terms.",
+      "invalidFilter": "Invalid contact filters.",
+      "notFound": "This contact was not found or has been anonymized."
     }
   },
   "nav": {
@@ -178,7 +183,14 @@
     "audit": "Audit trail",
     "label": "Company navigation",
     "workspace": "Your workspace",
-    "sections": "Accounting sections"
+    "sections": "Accounting sections",
+    "contacts": "Contacts",
+    "short": {
+      "overview": "Home",
+      "accounts": "Accounts",
+      "trial": "Balance",
+      "audit": "Audit"
+    }
   },
   "ledgerSetup": {
     "title": "Set up the books",
@@ -392,6 +404,63 @@
       "BANK": "Bank",
       "TAX_SETTLEMENT": "Tax settlement",
       "REVERSAL": "Reversal"
+    }
+  },
+  "contacts": {
+    "title": "Contacts",
+    "intro": "Your customers and suppliers in one directory.",
+    "new": "New contact",
+    "details": "Contact details",
+    "back": "Back to contacts",
+    "kind": "Contact type",
+    "displayName": "Display name",
+    "legalName": "Legal name",
+    "email": "Email",
+    "phone": "Phone",
+    "addressLine1": "Address",
+    "addressLine2": "Address line 2",
+    "city": "City",
+    "province": "Province or territory",
+    "postalCode": "Postal code",
+    "country": "Country",
+    "countryHint": "Two-letter country code, for example CA.",
+    "locale": "Contact language",
+    "paymentTermsDays": "Payment terms (days)",
+    "termsHint": "From 0 to 365 days.",
+    "notes": "Notes",
+    "unspecified": "Not specified",
+    "create": "Create contact",
+    "save": "Save contact",
+    "active": "Active",
+    "archived": "Archived",
+    "archive": "Archive contact",
+    "restore": "Restore contact",
+    "archiveHint": "Archiving hides this contact from the active list and preserves accounting references. It can be restored; no data is deleted.",
+    "status": "Status",
+    "search": "Search name, email or phone",
+    "apply": "Search",
+    "typesLabel": "Contact types",
+    "pagination": "Contact pagination",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {count}",
+    "count": "{count, plural, =0 {No contacts} one {# contact} other {# contacts}}",
+    "empty": "No contacts in this view",
+    "emptyHint": "Change the filters or create a contact if your role permits it.",
+    "kinds": {
+      "CUSTOMER": "Customer",
+      "SUPPLIER": "Supplier",
+      "BOTH": "Customer and supplier"
+    },
+    "filters": {
+      "ALL": "All",
+      "CUSTOMER": "Customers",
+      "SUPPLIER": "Suppliers"
+    },
+    "statuses": {
+      "ACTIVE": "Active",
+      "ARCHIVED": "Archived",
+      "ALL": "All"
     }
   }
 }

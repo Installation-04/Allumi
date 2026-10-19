@@ -3,8 +3,8 @@ import { ACTIONS, can, type Role } from "@/modules/companies";
 
 describe("role matrix", () => {
   it("lets everybody read the ledger, and only the owner and the accountant write", () => {
-    for (const role of ["OWNER", "ACCOUNTANT", "READ_ONLY"] as const) expect(can(role, "ledger.read")).toBe(true);
-    for (const action of ["entry.post", "entry.reverse", "account.manage", "period.lock", "fiscalYear.create"] as const) {
+    for (const role of ["OWNER", "ACCOUNTANT", "READ_ONLY"] as const) { expect(can(role, "ledger.read")).toBe(true); expect(can(role, "contact.read")).toBe(true); }
+    for (const action of ["contact.manage", "entry.post", "entry.reverse", "account.manage", "period.lock", "fiscalYear.create"] as const) {
       expect(can("OWNER", action), action).toBe(true);
       expect(can("ACCOUNTANT", action), action).toBe(true);
       expect(can("READ_ONLY", action), action).toBe(false);

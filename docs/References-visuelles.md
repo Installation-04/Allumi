@@ -1,6 +1,6 @@
 # Références visuelles
 
-Captures réelles de la branche de refonte Allumi, réalisées avec Chromium le 18 octobre 2026. Elles montrent uniquement **Atelier Exemple inc.**, entreprise fictive créée par les tests. L’interface reste en revue tant que la PR de refonte n’est pas intégrée. Les montants, les dates et les événements illustrent un parcours de test.
+Captures réelles d’Allumi avec le lot contacts 4.1, réalisées avec Chromium le 19 octobre 2026. Elles montrent uniquement **Atelier Exemple inc.**, entreprise fictive créée par les tests. La refonte est intégrée à `main`; le lot contacts reste en revue. Les montants, les dates et les événements illustrent un parcours de test.
 
 Ordinateur : 1280 × 720 px (capture pleine page). Téléphone : émulation Pixel 7, 412 × 839 px CSS (zone visible du téléphone, navigation inférieure comprise). Ces images ne constituent pas une validation Safari ou sur appareil physique. Sur téléphone, les tableaux larges se font défiler horizontalement; la capture en montre le début.
 
@@ -115,3 +115,19 @@ Même parcours traduit en anglais; cette capture est prise après la contre-pass
 ## Actualiser les références
 
 La procédure de génération et de publication se trouve dans [[Publication-du-wiki]]. Les fichiers originaux sont versionnés dans `docs/images/` du dépôt.
+
+## Contacts
+
+Répertoire et saisie d’un client/fournisseur fictif, voir [[Contacts]].
+
+### Répertoire
+
+![Répertoire — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contacts-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contacts-mobile.png" alt="Répertoire — téléphone" width="412">
+
+### Saisie du contact
+
+![Saisie du contact — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contact-form-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contact-form-mobile.png" alt="Saisie du contact — téléphone" width="412">
