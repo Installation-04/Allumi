@@ -21,3 +21,7 @@ Va dans **Sécurité du compte** (lien au bas du tableau de bord) : voir [[Authe
 L'application est en pré-alpha ([[Feuille-de-route]]). À la fin de `/setup`, Allumi installe le plan comptable de départ, la numérotation et l'exercice en cours : le menu de l'entreprise donne accès au [[Plan-comptable]], au journal ([[Journal-et-ecritures]]), aux [[Exercices-et-periodes]], à la balance de vérification et à la [[Piste-d-audit]]. Si l'installation vient d'une version plus ancienne, le tableau de bord propose « Initialiser ». Les contacts, taxes, factures et paiements arrivent à la phase 4.
 
 Besoin d'aide ? [[Depannage]].
+
+## Captures de référence
+
+Voir [[References-visuelles]] pour les écrans sur ordinateur et téléphone, réalisés avec une entreprise fictive.

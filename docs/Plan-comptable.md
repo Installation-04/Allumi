@@ -38,3 +38,7 @@ Les comptes **clients** et **fournisseurs** (comptes de contrôle) ne reçoivent
 Le propriétaire et le comptable gèrent les comptes; le membre en lecture seule les consulte. Voir [[Authentification]].
 
 Voir aussi : [[Schema-de-donnees]] (table `account`), [[Exercices-et-periodes]].
+
+## Captures de référence
+
+Voir [[References-visuelles]] pour les écrans sur ordinateur et téléphone, réalisés avec une entreprise fictive.

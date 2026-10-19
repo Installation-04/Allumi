@@ -6,16 +6,19 @@ import { appVersion } from "@/platform/version";
 import { FOCUS } from "./focus";
 import { getSession } from "@/app/_lib/session";
 
-export async function Header() {
+export async function Header({ global = false, companyName }: { global?: boolean; companyName?: string }) {
   const t = await getTranslations("common");
   const locale = await getLocale();
   const session = await getSession();
   return (
-    <header className="border-b border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
-        <Link href="/" className={`inline-flex min-h-11 items-center rounded-sm text-lg font-semibold text-brand-700 dark:text-brand-500 ${FOCUS}`}>
+    <header className={`${global ? "global-header" : "workspace-header"} border-b border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900`}>
+      <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-1 sm:px-6">
+        {companyName ? <Link href="/" className={`min-w-0 max-w-full rounded py-3 text-sm font-medium ${FOCUS}`}>{companyName}</Link> : (
+        <Link href="/" className={`inline-flex min-h-11 items-center gap-2 rounded-sm text-xl font-bold text-brand-700 dark:text-brand-500 ${FOCUS}`}>
+          <span aria-hidden="true" className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-700 text-lg text-white">a</span>
           Allumi
         </Link>
+        )}
         <div className="flex flex-wrap items-center gap-3 text-sm">
         <nav aria-label={t("language")} className="flex items-center gap-3">
           {(["fr-CA", "en"] as const).map((code) => (

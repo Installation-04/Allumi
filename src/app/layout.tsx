@@ -16,8 +16,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang={locale === "en" ? "en" : "fr-CA"}>
       <body className="flex min-h-dvh flex-col font-sans">
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <Header />
-          <main className="mx-auto min-w-0 w-full max-w-5xl flex-1 px-4 py-5 sm:py-8">{children}</main>
+          <Header global />
+          <main className="mx-auto min-w-0 w-full max-w-[1440px] flex-1 px-4 py-5 sm:px-6 sm:py-8">{children}</main>
           <Footer />
         </NextIntlClientProvider>
       </body>

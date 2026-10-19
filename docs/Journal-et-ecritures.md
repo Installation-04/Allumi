@@ -49,3 +49,7 @@ Tout est consigné dans la [[Piste-d-audit]].
 
 ## Messages d'erreur de la base
 Les règles comptables de la base portent un code stable (`AL001` écriture déséquilibrée, `AL002` moins de deux lignes, `AL003` période verrouillée, `AL004` écriture figée, `AL005` compte ou ligne non permis, `AL008` correction par annulation). L'interface les affiche en message clair; la liste complète est dans [[Schema-de-donnees]].
+
+## Captures de référence
+
+Voir [[References-visuelles]] pour les écrans sur ordinateur et téléphone, réalisés avec une entreprise fictive.

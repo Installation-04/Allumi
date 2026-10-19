@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 import { Secret, TOTP } from "otpauth";
 
@@ -7,12 +7,29 @@ const VERSION = (JSON.parse(readFileSync("package.json", "utf8")) as { version: 
 const EMAIL = "admin@exemple.test";
 const PASSWORD = "une phrase de passe très longue 2026";
 
+/** Optional wiki references from the isolated, fictional browser-test company only. */
+async function captureReference(page: Page, name: string) {
+  if (process.env.ALLUMI_SCREENSHOTS !== "1") return;
+  mkdirSync("docs/images", { recursive: true });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({ scale: "css", path: `docs/images/${name}-${process.env.E2E_MOBILE === "1" ? "mobile" : "desktop"}.png`, fullPage: process.env.E2E_MOBILE !== "1", animations: "disabled" });
+}
+
+async function expectNoPageOverflow(page: Page) {
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+}
+
+
 test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ page, browser }) => {
+  // This complete journey covers setup, MFA, accounting, both locales and optional reference captures.
+  test.setTimeout(90_000);
   // Fresh instance: everything leads to /setup.
   await page.goto("/");
   await expect(page).toHaveURL(/\/setup$/);
   await expect(page.getByRole("heading", { name: "Bienvenue dans Allumi" })).toBeVisible();
   await expect(page.getByText(`Version ${VERSION}`)).toBeVisible();
+
+  await captureReference(page, "premier-demarrage");
 
   await page.getByLabel("Nom de l'entreprise").fill("Atelier Exemple inc.");
   await page.getByLabel("Premier mois de l'exercice financier").selectOption("4");
@@ -40,6 +57,19 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
   await expect(page.getByRole("heading", { name: "Atelier Exemple inc." })).toBeVisible();
   await expect(page.getByText("Ton rôle : Propriétaire")).toBeVisible();
+
+  await expect(page.getByTestId("dashboard-assets")).toContainText("0,00");
+  await expect(page.getByText("Un nouveau départ pour vos livres")).toBeVisible();
+  await expectNoPageOverflow(page);
+  const companyNavigation = page.getByRole("navigation", { name: "Navigation de l'entreprise", exact: true });
+  await expect(companyNavigation.getByRole("link", { name: "Tableau de bord", exact: true })).toHaveAttribute("aria-current", "page");
+  if ((page.viewportSize()?.width ?? 1280) < 1024) {
+    await expect.poll(async () => {
+      const box = await companyNavigation.boundingBox();
+      const height = await page.evaluate(() => window.innerHeight);
+      return box !== null && Math.abs(box.y + box.height - height) <= 1;
+    }).toBe(true);
+  }
 
   // /setup is disabled for good: a visitor without a session is sent to the sign-in page...
   const visitor = await browser.newContext();
@@ -117,6 +147,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await page.goto("/");
   await page.getByRole("button", { name: "English" }).click();
   await expect(page.getByText("Your role: Owner")).toBeVisible();
+  await captureReference(page, "dashboard-en");
 });
 
 /** Today in the company's time zone (the application uses America/Toronto), as YYYY-MM-DD. */
@@ -131,6 +162,8 @@ async function ledgerJourney(page: Page, totp: TOTP) {
   await openSection(page, "Plan comptable");
   await expect(page.getByRole("heading", { name: "Plan comptable" })).toBeVisible();
   await expect(page.getByRole("cell", { name: "Banque – compte courant" })).toBeVisible();
+  await captureReference(page, "plan-comptable");
+  await expectNoPageOverflow(page);
   // A petty-cash account: an asset, not the form's default type.
   await page.getByLabel("Code", { exact: true }).fill("1999");
   await page.getByLabel("Nom (français)").fill("Caisse secondaire");
@@ -166,17 +199,22 @@ async function ledgerJourney(page: Page, totp: TOTP) {
   // An unbalanced entry is flagged on screen and refused with the rule's message.
   await openSection(page, "Journal");
   await page.getByRole("link", { name: "Nouvelle écriture" }).click();
+  // Wait for the destination form: App Router may retain the outgoing route during navigation.
+  const entryForm = page.locator("form").filter({ has: page.getByRole("combobox", { name: "Ligne 1 – Compte", exact: true }) });
+  await expect(entryForm).toBeVisible();
+  const entryControls = entryForm.locator('select, input:not([type="hidden"])');
+  await expect(entryControls).toHaveCount(11);
   // Entry controls must fit the viewport, including small phones, without hiding overflow.
   const originalViewport = page.viewportSize();
   for (const width of [320, 390, 768]) {
     await page.setViewportSize({ width, height: 844 });
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    for (const control of await page.locator('main select, main input:not([type="hidden"])').all()) {
-      const box = await control.boundingBox();
-      expect(box).not.toBeNull();
-      expect(box!.x).toBeGreaterThanOrEqual(0);
-      expect(box!.x + box!.width).toBeLessThanOrEqual(width);
-      expect(box!.height).toBeGreaterThanOrEqual(44);
+    for (const control of await entryControls.all()) {
+      await expect(control).toBeVisible();
+      await expect.poll(async () => {
+        const box = await control.boundingBox();
+        return box !== null && box.x >= 0 && box.x + box.width <= width && box.height >= 44;
+      }).toBe(true);
     }
   }
   if (originalViewport) await page.setViewportSize(originalViewport);
@@ -191,6 +229,9 @@ async function ledgerJourney(page: Page, totp: TOTP) {
   await page.getByLabel("Ligne 1 – Compte").selectOption({ label: "1000 – Banque – compte courant" });
   await page.getByLabel("Ligne 1 – Débit").fill("1 000,00");
   await page.getByLabel("Ligne 2 – Compte").selectOption({ label: "3000 – Capital-actions" });
+  await page.getByLabel("Ligne 2 – Crédit").fill("1000");
+  await expect(page.getByText("L'écriture est équilibrée.")).toBeVisible();
+  await captureReference(page, "nouvelle-ecriture");
   await page.getByLabel("Ligne 2 – Crédit").fill("900,00");
   await expect(page.getByText(/Écart : 100,00/)).toBeVisible();
   await page.getByRole("button", { name: "Enregistrer l'écriture" }).click();
@@ -210,6 +251,27 @@ async function ledgerJourney(page: Page, totp: TOTP) {
   await expect(page.getByRole("heading", { name: "Écriture J-00001" })).toBeVisible();
   await expect(page.getByRole("cell", { name: /3000 – Capital-actions/ })).toBeVisible();
 
+  const postedEntryUrl = page.url();
+  await page.goto("/");
+  await expect(page.getByTestId("dashboard-assets")).toContainText("1 000,00");
+  await expect(page.getByTestId("dashboard-liabilities")).toContainText("0,00");
+  await expect(page.getByRole("link", { name: /Capital de départ/ })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "tableau-de-bord");
+  const dashboardViewport = page.viewportSize();
+  for (const width of [320, 390, 768]) {
+    await page.setViewportSize({ width, height: 844 });
+    await expectNoPageOverflow(page);
+  }
+  if (dashboardViewport) await page.setViewportSize(dashboardViewport);
+  await openSection(page, "Journal");
+  await captureReference(page, "journal");
+  await expectNoPageOverflow(page);
+  await openSection(page, "Balance de vérification");
+  await captureReference(page, "balance");
+  await expectNoPageOverflow(page);
+  await page.goto(postedEntryUrl);
+
   // Reversal: a mirror entry, nothing is deleted.
   await page.getByRole("button", { name: "Contre-passer", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Écriture J-00002" })).toBeVisible();
@@ -220,8 +282,13 @@ async function ledgerJourney(page: Page, totp: TOTP) {
   await expect(page.getByText("La balance est équilibrée")).toBeVisible();
   await expect(page.getByText("Équation comptable vérifiée")).toBeVisible();
 
+  await page.goto("/");
+  await expect(page.getByTestId("dashboard-assets")).toContainText("0,00");
+
   // Locking the period of today closes it to new entries.
   await openSection(page, "Exercices");
+  await captureReference(page, "exercices");
+  await expectNoPageOverflow(page);
   const monthStart = `${todayInToronto().slice(0, 7)}-01`;
   await page.locator("tr", { hasText: `${monthStart} →` }).getByRole("button", { name: "Verrouiller" }).click();
   await expect(page.locator("tr", { hasText: `${monthStart} →` }).getByText("Verrouillée")).toBeVisible();
@@ -254,4 +321,6 @@ async function ledgerJourney(page: Page, totp: TOTP) {
   await expect(page.getByRole("heading", { name: "Piste d'audit" })).toBeVisible();
   await expect(page.getByRole("cell", { name: "row.insert" }).first()).toBeVisible();
   await expect(page.getByText("journal_entry").first()).toBeVisible();
+  await captureReference(page, "audit");
+  await expectNoPageOverflow(page);
 }

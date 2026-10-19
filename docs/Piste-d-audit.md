@@ -17,3 +17,7 @@ La piste d'audit répond à « qui a fait quoi, quand, et qu'est-ce qui a chang�
 L'écran liste les entrées de la plus récente à la plus ancienne, 50 à la fois, avec un lien « Plus anciens ». On peut filtrer par type d'objet ou par début d'action (`period.`, `row.insert`…). Pour une période rouverte, l'entrée `period.reopen` affiche le motif donné. Quand la personne qui a fait un changement a quitté l'entreprise, l'écran affiche « Ancien membre » avec son identifiant plutôt que son nom : le nom n'est visible que des membres actuels.
 
 Voir aussi : [[Regles-comptables]] (piste d'audit), [[Schema-de-donnees]] (table `audit_log`).
+
+## Captures de référence
+
+Voir [[References-visuelles]] pour les écrans sur ordinateur et téléphone, réalisés avec une entreprise fictive.

@@ -17,7 +17,7 @@ trap 'rm -rf "$TMP"' EXIT
 
 git clone --quiet "$WIKI_URL" "$TMP/wiki"
 find "$TMP/wiki" -mindepth 1 -maxdepth 1 -not -name .git -exec rm -rf {} +
-cp "$ROOT"/docs/*.md "$TMP/wiki/"
+cp -R "$ROOT"/docs/. "$TMP/wiki/"
 [ -f "$TMP/wiki/Home.md" ] || { echo "docs/Home.md manquant." >&2; exit 1; }
 
 cd "$TMP/wiki"

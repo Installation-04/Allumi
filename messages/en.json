@@ -92,7 +92,26 @@
     "journalHint": "Every entry, manual entries and reversals.",
     "fiscalHint": "Fiscal years and their periods: locking and reopening.",
     "trialHint": "Totals by account, with the balance check.",
-    "auditHint": "Who did what and when, without exception."
+    "auditHint": "Who did what and when, without exception.",
+    "newEntry": "New entry",
+    "financialOverview": "Your finances at a glance",
+    "allDates": "All recorded dates · CAD",
+    "assets": "Assets",
+    "liabilities": "Liabilities",
+    "revenue": "Revenue",
+    "expenses": "Expenses",
+    "ledgerBalance": "Net ledger balance",
+    "recentEntries": "Latest journal entries",
+    "viewJournal": "View journal",
+    "emptyTitle": "A fresh start for your books",
+    "emptyHint": "Posted entries will appear here. Start with an opening balance or a manual entry.",
+    "ledgerHealth": "Your books, in balance",
+    "balanced": "Accounting equation verified",
+    "needsReview": "Your ledger needs review",
+    "healthHint": "Total debits equal total credits, and assets equal liabilities plus equity and net income when both checks pass.",
+    "postedEntries": "Posted entries",
+    "tools": "Manage your books",
+    "create": "Create"
   },
   "errors": {
     "form": {
@@ -157,7 +176,9 @@
     "fiscal": "Fiscal years",
     "trial": "Trial balance",
     "audit": "Audit trail",
-    "label": "Company navigation"
+    "label": "Company navigation",
+    "workspace": "Your workspace",
+    "sections": "Accounting sections"
   },
   "ledgerSetup": {
     "title": "Set up the books",

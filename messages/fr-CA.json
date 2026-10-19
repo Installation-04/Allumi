@@ -92,7 +92,26 @@
     "journalHint": "Toutes les écritures, la saisie manuelle et les contre-passations.",
     "fiscalHint": "Les exercices et leurs périodes : verrouillage et réouverture.",
     "trialHint": "Les totaux par compte, avec la vérification de l'équilibre.",
-    "auditHint": "Qui a fait quoi et quand, sans exception."
+    "auditHint": "Qui a fait quoi et quand, sans exception.",
+    "newEntry": "Nouvelle écriture",
+    "financialOverview": "Vos finances en un coup d’œil",
+    "allDates": "Toutes les dates enregistrées · CAD",
+    "assets": "Actif",
+    "liabilities": "Passif",
+    "revenue": "Produits",
+    "expenses": "Charges",
+    "ledgerBalance": "Solde net du grand livre",
+    "recentEntries": "Dernières écritures du journal",
+    "viewJournal": "Voir le journal",
+    "emptyTitle": "Un nouveau départ pour vos livres",
+    "emptyHint": "Les écritures enregistrées apparaîtront ici. Commencez par un solde d’ouverture ou une écriture manuelle.",
+    "ledgerHealth": "L’équilibre de vos livres",
+    "balanced": "Équation comptable vérifiée",
+    "needsReview": "Votre grand livre doit être vérifié",
+    "healthHint": "Les débits égalent les crédits, et l’actif égale le passif plus les capitaux propres et le résultat net lorsque les deux contrôles réussissent.",
+    "postedEntries": "Écritures enregistrées",
+    "tools": "Gérer votre comptabilité",
+    "create": "Créer"
   },
   "errors": {
     "form": {
@@ -157,7 +176,9 @@
     "fiscal": "Exercices",
     "trial": "Balance de vérification",
     "audit": "Piste d'audit",
-    "label": "Navigation de l'entreprise"
+    "label": "Navigation de l'entreprise",
+    "workspace": "Votre espace",
+    "sections": "Sections comptables"
   },
   "ledgerSetup": {
     "title": "Initialiser la comptabilité",
