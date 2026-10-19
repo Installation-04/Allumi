@@ -23,7 +23,7 @@ Codex reprend le mandat de développement décrit dans `CLAUDE_CODE_PROMPT.md`. 
 Avant les fonctionnalités de phase 4 :
 
 1. **Web mobile** : PR #5, parcours tactile et saisie adaptative validés; intégration à `main` en attente de revue.
-2. **Espace comptable** : refonte de l’interface, navigation latérale sur ordinateur, navigation horizontale sur téléphone, palette verte et neutre, tableau de bord alimenté par le grand livre. Voir [[Interface-et-navigation]]. Cette refonte conserve les contrôles et permissions du moteur existant.
+2. **Espace comptable** : refonte de l’interface, navigation latérale sur ordinateur, navigation inférieure sur téléphone, palette verte et neutre, tableau de bord alimenté par le grand livre. Voir [[Interface-et-navigation]]. Cette refonte conserve les contrôles et permissions du moteur existant.
 
 La référence produit est l’ergonomie familière d’un logiciel de comptabilité en ligne comme QuickBooks Online. Allumi conserve une identité, des composants, des icônes et des textes originaux.
 

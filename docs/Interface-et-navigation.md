@@ -1,6 +1,6 @@
 # Interface et navigation
 
-Allumi propose un espace de travail comptable bilingue. Sur ordinateur, la navigation de l’entreprise se trouve à gauche; sur téléphone et tablette, elle devient une barre horizontale que l’on peut faire défiler. La section active est indiquée visuellement et aux lecteurs d’écran. Les liens conduisent uniquement à des fonctions disponibles.
+Allumi propose un espace de travail comptable bilingue. Sur ordinateur, une barre latérale sombre occupe toute la hauteur, avec une action Créer et les modules comptables. Une barre supérieure compacte affiche l’entreprise et les contrôles de session; des onglets soulignent la section active. Sur téléphone et tablette, une barre de navigation fixe au bas de l’écran donne accès aux sections, tandis que les résumés et les écritures s’empilent. La section active est indiquée visuellement et aux lecteurs d’écran. Les liens conduisent uniquement à des fonctions disponibles.
 
 ## Tableau de bord
 
@@ -14,7 +14,7 @@ Les données d’une entreprise ne sont jamais remplacées par des valeurs ficti
 
 ## Direction visuelle
 
-Palette verte et neutre, cartes claires, tableaux lisibles, contrôles tactiles et mode sombre du système. L’organisation reprend les conventions générales des logiciels comptables en ligne; le design, les textes et les icônes sont originaux. Le zoom du navigateur reste disponible, les champs gardent leurs libellés, et les actions sont accessibles au clavier.
+Organisation de bureau dense : barre latérale anthracite, surfaces planes, onglets, bande de soldes colorée et tableaux lisibles. Sur téléphone : cartes blanches compactes, soldes regroupés par deux, navigation inférieure et contrôles tactiles. Le mode sombre suit le système. L’organisation reprend les conventions générales des logiciels comptables en ligne; le design, les textes et les icônes sont originaux. Le zoom du navigateur reste disponible, les champs gardent leurs libellés, et les actions sont accessibles au clavier.
 
 Voir [[Feuille-de-route]] pour les prochains modules et [[Journal-et-ecritures]] pour la saisie sur téléphone. Aucune fonction hors ligne n’est annoncée.
 

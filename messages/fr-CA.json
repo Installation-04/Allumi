@@ -110,7 +110,8 @@
     "needsReview": "Votre grand livre doit être vérifié",
     "healthHint": "Les débits égalent les crédits, et l’actif égale le passif plus les capitaux propres et le résultat net lorsque les deux contrôles réussissent.",
     "postedEntries": "Écritures enregistrées",
-    "tools": "Gérer votre comptabilité"
+    "tools": "Gérer votre comptabilité",
+    "create": "Créer"
   },
   "errors": {
     "form": {
@@ -176,7 +177,8 @@
     "trial": "Balance de vérification",
     "audit": "Piste d'audit",
     "label": "Navigation de l'entreprise",
-    "workspace": "Votre espace"
+    "workspace": "Votre espace",
+    "sections": "Sections comptables"
   },
   "ledgerSetup": {
     "title": "Initialiser la comptabilité",

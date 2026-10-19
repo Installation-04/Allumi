@@ -12,7 +12,7 @@ Active la vérification en deux étapes dans **Sécurité du compte**, accessibl
 
 Le nom de l’entreprise et ton rôle apparaissent en haut. Les cartes Actif, Passif, Produits et Charges reflètent les soldes nets du grand livre pour toutes les dates enregistrées. Elles ne représentent pas les flux de trésorerie du mois. Les dernières écritures ouvrent leur détail; **Voir le journal** ouvre l’historique complet. Voir [[Interface-et-navigation]].
 
-Sur téléphone, fais défiler horizontalement la barre de navigation de l’entreprise. Les tableaux de consultation défilent dans leur propre zone; les formulaires de saisie s’empilent.
+Sur téléphone, utilise la barre de navigation fixe au bas de l’écran. Les tableaux de consultation défilent dans leur propre zone; les formulaires de saisie s’empilent.
 
 ## 3. Préparer le plan comptable
 

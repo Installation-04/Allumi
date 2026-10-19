@@ -14,7 +14,7 @@ export async function generateMetadata() {
   return { title: (await getTranslations("dashboard"))("pageTitle") };
 }
 
-const PANEL = "rounded-2xl border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-800 dark:bg-stone-900 sm:p-6";
+const PANEL = "rounded-lg lg:rounded-none border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900 sm:p-5";
 
 export default async function CompanyPage({ params }: { params: Promise<{ companyId: string }> }) {
   const { company, actor, locale } = await loadCompany(params);
@@ -37,14 +37,11 @@ export default async function CompanyPage({ params }: { params: Promise<{ compan
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-brand-700 dark:text-brand-500">{t("pageTitle")}</p>
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t("title", { company: company.name })}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-2xl">{t("title", { company: company.name })}</h1>
           <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">{t("role", { role: t(`roles.${company.role}`) })}</p>
         </div>
-        {status.initialized && can(company.role, "entry.post") ? (
-          <Link href={`${base}/journal/nouvelle`} className={`inline-flex min-h-11 items-center gap-2 rounded-full bg-brand-700 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brand-800 ${FOCUS}`}>
-            <Icon name="plus" />{t("newEntry")}
-          </Link>
-        ) : null}
+
+        {status.initialized && can(company.role, "entry.post") ? <Link href={`${base}/journal/nouvelle`} className={`inline-flex min-h-11 items-center gap-2 rounded-full bg-brand-700 px-4 py-2 text-sm font-semibold text-white lg:hidden ${FOCUS}`}><Icon name="plus" />{t("newEntry")}</Link> : null}
       </div>
 
       {totals && journal ? (
@@ -54,15 +51,15 @@ export default async function CompanyPage({ params }: { params: Promise<{ compan
               <h2 className="text-lg font-semibold">{t("financialOverview")}</h2>
               <p className="text-xs text-stone-500 dark:text-stone-400">{t("allDates")}</p>
             </div>
-            <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <dl className="grid grid-cols-2 gap-3 lg:gap-1 lg:grid-cols-4">
               {([
                 ["assets", totals.ASSET], ["liabilities", totals.LIABILITY],
                 ["revenue", totals.REVENUE], ["expenses", totals.EXPENSE],
               ] as const).map(([label, amount]) => (
-                <div key={label} className={`${PANEL} border-t-4 border-t-brand-600`}>
-                  <dt className="text-sm text-stone-600 dark:text-stone-400">{t(label)}</dt>
-                  <dd className="mt-3 text-2xl font-semibold tracking-tight tabular-nums" data-testid={`dashboard-${label}`}>{formatMoney(amount, locale)}</dd>
-                  <dd className="mt-2 text-xs text-stone-500 dark:text-stone-400">{t("ledgerBalance")}</dd>
+                <div key={label} className={`summary-tile summary-${label} min-w-0 rounded-lg border border-stone-200 px-4 py-4 lg:rounded-none lg:border-0`}>
+                  <dt className="text-xs font-semibold uppercase tracking-wide">{t(label)}</dt>
+                  <dd className="mt-2 text-xl font-semibold tracking-tight tabular-nums" data-testid={`dashboard-${label}`}>{formatMoney(amount, locale)}</dd>
+                  <dd className="mt-1 text-xs">{t("ledgerBalance")}</dd>
                 </div>
               ))}
             </dl>
@@ -80,7 +77,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ compan
                 <ul className="mt-2 divide-y divide-stone-100 dark:divide-stone-800">
                   {journal.entries.slice(0, 5).map((entry) => (
                     <li key={entry.id}>
-                      <Link href={`${base}/journal/${entry.id}`} className={`flex min-h-11 flex-wrap items-center justify-between gap-3 rounded-lg py-4 hover:bg-stone-50 dark:hover:bg-stone-800 ${FOCUS}`}>
+                      <Link href={`${base}/journal/${entry.id}`} className={`flex min-h-11 flex-wrap items-center justify-between gap-3 py-3 hover:bg-stone-50 dark:hover:bg-stone-800 ${FOCUS}`}>
                         <span className="min-w-0 flex-1">
                           <span className="block text-sm font-semibold">{entry.memo || entry.numberLabel}</span>
                           <span className="mt-1 block text-xs text-stone-500 dark:text-stone-400">{entry.numberLabel} · <time dateTime={entry.date}>{entry.date}</time></span>
@@ -91,7 +88,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ compan
                   ))}
                 </ul>
               ) : (
-                <div className="my-6 rounded-xl border border-dashed border-stone-300 px-5 py-8 text-center dark:border-stone-700">
+                <div className="my-6 border border-dashed border-stone-300 px-5 py-8 text-center dark:border-stone-700">
                   <Icon name="journal" className="mx-auto mb-3 h-8 w-8 text-brand-700 dark:text-brand-500" />
                   <p className="font-semibold">{t("emptyTitle")}</p>
                   <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">{t("emptyHint")}</p>
@@ -99,13 +96,13 @@ export default async function CompanyPage({ params }: { params: Promise<{ compan
               )}
             </section>
             <section className={PANEL}>
-              <div className="mb-5 flex items-center gap-3">
+              <div className="mb-3 flex items-center gap-3">
                 <span className="rounded-xl bg-brand-50 p-3 text-brand-700 dark:bg-brand-800 dark:text-white"><Icon name="trial" /></span>
                 <h2 className="text-lg font-semibold">{t("ledgerHealth")}</h2>
               </div>
               <p className={`text-sm font-semibold ${healthy ? "text-brand-700 dark:text-brand-500" : "text-red-700 dark:text-red-400"}`}>{healthy ? t("balanced") : t("needsReview")}</p>
               <p className="mt-2 text-sm leading-relaxed text-stone-500 dark:text-stone-400">{t("healthHint")}</p>
-              <dl className="my-5 space-y-3 border-y border-stone-100 py-4 text-sm dark:border-stone-800">
+              <dl className="my-3 space-y-3 border-y border-stone-100 py-4 text-sm dark:border-stone-800">
                 <div className="flex justify-between gap-3"><dt>{t("postedEntries")}</dt><dd className="font-semibold tabular-nums">{journal.total}</dd></div>
                 <div className="flex justify-between gap-3"><dt>{tn("accounts")}</dt><dd className="font-semibold tabular-nums">{status.accounts}</dd></div>
               </dl>

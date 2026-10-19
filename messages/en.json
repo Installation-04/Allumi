@@ -110,7 +110,8 @@
     "needsReview": "Your ledger needs review",
     "healthHint": "Total debits equal total credits, and assets equal liabilities plus equity and net income when both checks pass.",
     "postedEntries": "Posted entries",
-    "tools": "Manage your books"
+    "tools": "Manage your books",
+    "create": "Create"
   },
   "errors": {
     "form": {
@@ -176,7 +177,8 @@
     "trial": "Trial balance",
     "audit": "Audit trail",
     "label": "Company navigation",
-    "workspace": "Your workspace"
+    "workspace": "Your workspace",
+    "sections": "Accounting sections"
   },
   "ledgerSetup": {
     "title": "Set up the books",

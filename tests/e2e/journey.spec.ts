@@ -12,7 +12,7 @@ async function captureReference(page: Page, name: string) {
   if (process.env.ALLUMI_SCREENSHOTS !== "1") return;
   mkdirSync("docs/images", { recursive: true });
   await page.evaluate(() => window.scrollTo(0, 0));
-  await page.screenshot({ scale: "css", path: `docs/images/${name}-${process.env.E2E_MOBILE === "1" ? "mobile" : "desktop"}.png`, fullPage: true, animations: "disabled" });
+  await page.screenshot({ scale: "css", path: `docs/images/${name}-${process.env.E2E_MOBILE === "1" ? "mobile" : "desktop"}.png`, fullPage: process.env.E2E_MOBILE !== "1", animations: "disabled" });
 }
 
 async function expectNoPageOverflow(page: Page) {
@@ -61,6 +61,15 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await expect(page.getByTestId("dashboard-assets")).toContainText("0,00");
   await expect(page.getByText("Un nouveau départ pour vos livres")).toBeVisible();
   await expectNoPageOverflow(page);
+  const companyNavigation = page.getByRole("navigation", { name: "Navigation de l'entreprise", exact: true });
+  await expect(companyNavigation.getByRole("link", { name: "Tableau de bord", exact: true })).toHaveAttribute("aria-current", "page");
+  if ((page.viewportSize()?.width ?? 1280) < 1024) {
+    await expect.poll(async () => {
+      const box = await companyNavigation.boundingBox();
+      const height = await page.evaluate(() => window.innerHeight);
+      return box !== null && Math.abs(box.y + box.height - height) <= 1;
+    }).toBe(true);
+  }
 
   // /setup is disabled for good: a visitor without a session is sent to the sign-in page...
   const visitor = await browser.newContext();

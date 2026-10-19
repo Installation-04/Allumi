@@ -2,7 +2,7 @@
 
 Captures réelles de la branche de refonte Allumi, réalisées avec Chromium le 18 octobre 2026. Elles montrent uniquement **Atelier Exemple inc.**, entreprise fictive créée par les tests. L’interface reste en revue tant que la PR de refonte n’est pas intégrée. Les montants, les dates et les événements illustrent un parcours de test.
 
-Ordinateur : 1280 × 720 px (capture pleine page). Téléphone : émulation Pixel 7, 412 × 839 px CSS (capture pleine page). Ces images ne constituent pas une validation Safari ou sur appareil physique. Sur téléphone, les tableaux larges se font défiler horizontalement; la capture en montre le début.
+Ordinateur : 1280 × 720 px (capture pleine page). Téléphone : émulation Pixel 7, 412 × 839 px CSS (zone visible du téléphone, navigation inférieure comprise). Ces images ne constituent pas une validation Safari ou sur appareil physique. Sur téléphone, les tableaux larges se font défiler horizontalement; la capture en montre le début.
 
 ## Tableau de bord
 

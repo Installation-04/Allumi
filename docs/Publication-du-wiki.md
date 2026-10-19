@@ -31,3 +31,5 @@ ALLUMI_SCREENSHOTS=1 E2E_MOBILE=1 npm run test:e2e
 Si Chromium est installé par le système, ajouter `PLAYWRIGHT_CHROMIUM_PATH=/usr/bin/chromium`. Chaque exécution recrée la base dédiée `allumi_e2e` et capture les pages de test. Ne jamais définir `DATABASE_URL` vers une base de production pour ces commandes. Les deux parcours s’exécutent séparément.
 
 Les images ne montrent aucun secret d’installation, QR code 2FA, code de récupération ni identifiant de connexion. Le nom d’entreprise et les montants sont fictifs. La date comptable suit le mois du test; il s’agit de références visuelles, pas de comparaisons pixel à pixel. Refaire les captures après chaque modification visible majeure.
+
+Les captures ordinateur montrent la page complète; les captures téléphone montrent uniquement le viewport, pour que la navigation fixe reste à sa position réelle. Faire défiler l’application permet d’atteindre le reste des formulaires et tableaux.

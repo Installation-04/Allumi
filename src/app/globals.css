@@ -39,7 +39,7 @@ main {
 
 .workspace-content .overflow-x-auto:has(> table) {
   border: 1px solid var(--color-stone-200);
-  border-radius: 0.875rem;
+  border-radius: 0;
   background: white;
 }
 
@@ -60,4 +60,41 @@ main {
   .workspace-content table tbody tr:hover {
     background: var(--color-stone-800);
   }
+}
+
+/* A continuous accounting shell, with navigation separate from the work surface. */
+body:has(.company-workspace) .global-header { display: none; }
+main:has(> .company-workspace) { max-width: none; padding: 0; }
+.company-workspace { min-height: 100dvh; background: #f3f4f6; }
+.summary-assets { --tile-color: #087f9c; }
+.summary-liabilities { --tile-color: #526779; }
+.summary-revenue { --tile-color: #287a37; }
+.summary-expenses { --tile-color: #a85a08; }
+.workspace-content table thead { font-size: 0.75rem; }
+@media (min-width: 1024px) {
+  body:has(.company-workspace) > footer { padding-left: 208px; }
+}
+@media (prefers-color-scheme: dark) {
+  .company-workspace { background: var(--color-stone-950); }
+}
+
+.summary-tile { background: white; color: var(--color-stone-900); border-top: 3px solid var(--tile-color); }
+.mobile-navigation { padding-bottom: env(safe-area-inset-bottom); }
+@media (max-width: 1023px) {
+  body:has(.company-workspace) { padding-bottom: calc(5rem + env(safe-area-inset-bottom)); }
+  .workspace-header > div { gap: 0; padding-top: 0.25rem; padding-bottom: 0.25rem; }
+  .workspace-header > div > a { width: 100%; padding-bottom: 0; }
+  .workspace-header > div > div { width: 100%; justify-content: space-between; }
+}
+@media (min-width: 1024px) {
+  .company-workspace { background: linear-gradient(to right, #34373b 208px, #f3f4f6 208px); }
+  .summary-tile { background: var(--tile-color); color: white; }
+  .mobile-navigation { padding-bottom: 0; }
+}
+@media (prefers-color-scheme: dark) and (max-width: 1023px) {
+  .summary-tile { background: var(--color-stone-900); color: white; }
+}
+
+@media (prefers-color-scheme: dark) and (min-width: 1024px) {
+  .company-workspace { background: linear-gradient(to right, #34373b 208px, var(--color-stone-950) 208px); }
 }
