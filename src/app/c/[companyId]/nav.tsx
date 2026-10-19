@@ -18,7 +18,7 @@ export function CompanyNav({ links, label }: { links: NavLink[]; label: string }
             key={link.href}
             href={link.href}
             aria-current={current ? "page" : undefined}
-            className={`rounded-sm px-1 py-1 ${FOCUS} ${current ? "font-semibold underline decoration-2 underline-offset-4" : "text-stone-700 hover:underline dark:text-stone-300"}`}
+            className={`inline-flex min-h-11 items-center rounded-md px-2 py-2 ${FOCUS} ${current ? "font-semibold underline decoration-2 underline-offset-4" : "text-stone-700 hover:underline dark:text-stone-300"}`}
           >
             {link.label}
           </Link>

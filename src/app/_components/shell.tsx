@@ -13,7 +13,7 @@ export async function Header() {
   return (
     <header className="border-b border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
-        <Link href="/" className={`rounded-sm text-lg font-semibold text-brand-700 dark:text-brand-500 ${FOCUS}`}>
+        <Link href="/" className={`inline-flex min-h-11 items-center rounded-sm text-lg font-semibold text-brand-700 dark:text-brand-500 ${FOCUS}`}>
           Allumi
         </Link>
         <div className="flex flex-wrap items-center gap-3 text-sm">
@@ -24,7 +24,7 @@ export async function Header() {
                 type="submit"
                 lang={code}
                 aria-current={locale === code ? "true" : undefined}
-                className={`rounded-sm ${FOCUS} ${locale === code ? "font-semibold underline" : "text-stone-600 hover:underline dark:text-stone-400"}`}
+                className={`min-h-11 rounded-sm px-1 ${FOCUS} ${locale === code ? "font-semibold underline" : "text-stone-600 hover:underline dark:text-stone-400"}`}
               >
                 {code === "fr-CA" ? t("french") : t("english")}
               </button>
@@ -33,7 +33,7 @@ export async function Header() {
         </nav>
           {session && !session.mfaPending ? (
             <form action={logoutAction}>
-              <button type="submit" className={`rounded-md border border-stone-300 px-3 py-1 hover:bg-stone-100 dark:border-stone-700 dark:hover:bg-stone-800 ${FOCUS}`}>
+              <button type="submit" className={`min-h-11 rounded-md border border-stone-300 px-3 py-1 hover:bg-stone-100 dark:border-stone-700 dark:hover:bg-stone-800 ${FOCUS}`}>
                 {t("signOut")}
               </button>
             </form>

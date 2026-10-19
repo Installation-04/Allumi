@@ -2,6 +2,10 @@
 
 Le **journal** est la liste de toutes les écritures de l'entreprise, la balance de vérification en est le résumé par compte. Écrans : **Journal** (`/c/<entreprise>/journal`) et **Balance de vérification** (`/c/<entreprise>/balance`).
 
+## Sur téléphone
+
+Ouvre la même adresse HTTPS que sur ordinateur dans le navigateur du téléphone. Les lignes de saisie s’empilent sur un petit écran, avec leurs libellés et le clavier décimal pour les montants. Les totaux et les erreurs restent visibles sous les lignes. Les tableaux de consultation se font défiler horizontalement si nécessaire. Une connexion au serveur est requise; la saisie hors ligne n’est pas prise en charge.
+
 ## Une écriture
 Une écriture a une **date**, une description facultative et **au moins deux lignes**. Chaque ligne porte sur un compte ([[Plan-comptable]]) et inscrit un montant au **débit** ou au **crédit**, jamais aux deux. La somme des débits doit égaler la somme des crédits : l'écran affiche l'écart en direct et n'enregistre pas une écriture déséquilibrée.
 
