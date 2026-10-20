@@ -174,6 +174,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await page.getByRole("button", { name: "English" }).click();
   await expect(page.getByText("Your role: Owner")).toBeVisible();
   await captureReference(page, "dashboard-en");
+  await appearanceJourney(page);
 });
 
 /** Today in the company's time zone (the application uses America/Toronto), as YYYY-MM-DD. */
@@ -388,4 +389,55 @@ async function contactsJourney(page: Page) {
   await expect(page.getByRole("link", { name: /Atelier Boréal/ })).toBeVisible();
   await expectNoPageOverflow(page);
   await captureReference(page, "contacts");
+}
+
+
+async function appearanceJourney(page: Page) {
+  const companyUrl = page.url();
+  const manifestResponse = await page.request.get("/manifest.webmanifest");
+  expect(await manifestResponse.json()).toMatchObject({ lang: "en", description: "Free accounting software for Quebec and Canada" });
+  await page.emulateMedia({ colorScheme: "light" });
+  const lightBackground = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  await page.getByRole("combobox", { name: "Appearance", exact: true }).focus();
+  await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption("dark");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.getByRole("combobox", { name: "Appearance", exact: true })).toBeFocused();
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).colorScheme)).toBe("dark");
+  const darkBackground = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  expect(darkBackground).not.toBe(lightBackground);
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expectNoPageOverflow(page);
+  await captureReference(page, "dashboard-en-dark");
+
+  await page.goto(`${companyUrl}/contacts`);
+  await expect(page.getByRole("heading", { name: "Contacts", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: /^Atelier Boréal/ })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "contacts-en-dark");
+  await page.getByRole("link", { name: "New contact", exact: true }).click();
+  await expect(page.getByLabel("Payment terms (days)")).toBeVisible();
+  await expect(page.getByLabel("Display name", { exact: true })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "contact-form-en-dark");
+
+  await page.goto(`${companyUrl}/comptes`);
+  await expect(page.getByRole("heading", { name: "Chart of accounts", exact: true })).toBeVisible();
+  await expect(page.getByRole("cell", { name: "Petty cash", exact: true })).toBeVisible();
+  await captureReference(page, "accounts-en-dark");
+  await expectNoPageOverflow(page);
+
+  // Explicit light wins even when the device is dark; system follows changes live.
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption("light");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(lightBackground);
+  await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption("system");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "system");
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(darkBackground);
+  await page.emulateMedia({ colorScheme: "light" });
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(lightBackground);
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await expect(page.getByRole("combobox", { name: "Apparence", exact: true })).toHaveValue("system");
 }

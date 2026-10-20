@@ -29,7 +29,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.2.0-alpha.1 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.2.0-alpha.2 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -90,3 +90,11 @@ Les pages des domaines non encore livrés indiquent leur état; elles ne simulen
 ![Versions et mises à jour](docs/images/versions-desktop.png)
 
 Capture du serveur de test, agent non activé. Le [guide des mises à jour](docs/Mise-a-jour.md) explique son installation facultative.
+
+### English and dark mode
+
+Choose **English** in the header and use **Appearance** to select **Light theme**, **Dark theme** or **System theme**. Both preferences persist in your browser. See the [English appearance and language guide](docs/Appearance-and-language.md).
+
+![Allumi English dashboard in dark mode](docs/images/dashboard-en-dark-desktop.png)
+
+<img src="docs/images/contacts-en-dark-mobile.png" alt="Allumi contacts in English and dark mode on a phone" width="360">

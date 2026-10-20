@@ -25,3 +25,9 @@ Voir [[References-visuelles]] pour les écrans sur ordinateur et téléphone, r�
 ## Domaines d’activité
 
 Le menu latéral regroupe aussi Ventes, Dépenses, Banque et transactions, Trésorerie, Rapports, Taxes et Comptabilité. Chaque page propose les outils existants et décrit les fonctions encore prévues. Projets, Paie, Kilométrage et Applications indiquent explicitement leur périmètre futur. Sur téléphone, trois raccourcis et le bouton **Menu** donnent accès à toutes les sections; Échap ferme le menu et rend le focus au bouton. La barre latérale défile indépendamment pour garder toutes les entrées accessibles sur un petit écran.
+
+## Langue et apparence
+
+L’en-tête permet de choisir **Français** ou **English**, ainsi que **Thème clair**, **Thème sombre** ou **Thème du système**. Le dernier suit les changements de l’appareil automatiquement. Le choix explicite clair ou sombre prend priorité sur le système; il est conservé dans un cookie du navigateur pendant un an et appliqué au chargement de la page.
+
+Ces préférences sont propres au navigateur ou au client : le client Windows et l’app iOS peuvent avoir leur propre choix. Effacer les cookies rétablit le thème système. Les noms d’entreprises, contacts et notes saisis par les utilisateurs ne sont pas traduits. Guide anglais et captures : [[Appearance-and-language]].

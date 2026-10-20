@@ -149,3 +149,13 @@ Les sections donnent accès aux outils existants et indiquent ce qui reste à li
 ![Versions sur téléphone](images/versions-mobile.png)
 
 Captures du serveur de test : l’agent hôte est désactivé et la consultation GitHub peut être indisponible dans l’environnement isolé. Elles ne représentent pas une mise à jour réelle de Proxmox. Voir [[Mise-a-jour]] et [[Application-mobile]].
+
+## Interface anglaise et thème sombre
+
+![Tableau de bord anglais sombre](images/dashboard-en-dark-desktop.png)
+
+![Contacts anglais sombres sur téléphone](images/contacts-en-dark-mobile.png)
+
+![Plan comptable anglais sombre](images/accounts-en-dark-desktop.png)
+
+Voir [[Appearance-and-language]] pour le choix de langue et les modes clair, sombre et système.
