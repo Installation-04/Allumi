@@ -22,7 +22,7 @@ async function expectNoPageOverflow(page: Page) {
 
 test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ page, browser }) => {
   // This complete journey covers setup, MFA, accounting, both locales and optional reference captures.
-  test.setTimeout(90_000);
+  test.setTimeout(120_000);
   // Fresh instance: everything leads to /setup.
   await page.goto("/");
   await expect(page).toHaveURL(/\/setup$/);
@@ -142,6 +142,21 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
 
   await ledgerJourney(page, totp);
+  await contactsJourney(page);
+  await openSection(page, "Ventes");
+  await expect(page.getByRole("heading", { name: "Ventes", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "À venir — non disponible" })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "espace-ventes");
+  if ((page.viewportSize()?.width ?? 1280) < 1024) {
+    const nav = page.getByRole("navigation", { name: "Navigation de l'entreprise", exact: true });
+    await nav.getByRole("button", { name: "Menu", exact: true }).click();
+    await expect(nav.getByRole("link", { name: "Paie", exact: true })).toBeVisible();
+    await captureReference(page, "menu-complet");
+    await page.keyboard.press("Escape");
+    await expect(nav.getByRole("button", { name: "Menu", exact: true })).toBeFocused();
+    await expect(nav.getByRole("button", { name: "Menu", exact: true })).toHaveAttribute("aria-expanded", "false");
+  }
 
   // English interface.
   await page.goto("/");
@@ -154,7 +169,12 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
 const todayInToronto = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
 
 /** A link of the company navigation (the dashboard cards carry the same names). */
-const openSection = (page: Page, name: string) => page.getByRole("navigation", { name: "Navigation de l'entreprise" }).getByRole("link", { name, exact: true }).click();
+const openSection = async (page: Page, name: string) => {
+  const nav = page.getByRole("navigation", { name: "Navigation de l'entreprise", exact: true });
+  const link = nav.getByRole("link", { name, exact: true });
+  if (!(await link.isVisible())) await nav.getByRole("button", { name: "Menu", exact: true }).click();
+  await link.click();
+};
 
 /** The accounting engine through the screens: chart, entry, reversal, trial balance, period lock, audit trail. */
 async function ledgerJourney(page: Page, totp: TOTP) {
@@ -323,4 +343,38 @@ async function ledgerJourney(page: Page, totp: TOTP) {
   await expect(page.getByText("journal_entry").first()).toBeVisible();
   await captureReference(page, "audit");
   await expectNoPageOverflow(page);
+}
+
+async function contactsJourney(page: Page) {
+  await openSection(page, "Contacts");
+  await page.getByRole("link", { name: "Nouveau contact" }).click();
+  await page.getByLabel("Nom affiché").fill("Atelier Boréal");
+  await page.getByLabel("Type de contact").selectOption("BOTH");
+  await page.getByLabel("Courriel", { exact: true }).fill("bonjour@boreal.example");
+  await page.getByLabel("Téléphone", { exact: true }).fill("514 555-0142");
+  await page.getByLabel("Délai de paiement (jours)").fill("-1");
+  await page.getByRole("button", { name: "Créer le contact" }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "Vérifiez les champs du contact" })).toBeVisible();
+  await expect(page.getByLabel("Nom affiché")).toHaveValue("Atelier Boréal");
+  await expect(page.getByLabel("Type de contact")).toHaveValue("BOTH");
+  await page.getByLabel("Délai de paiement (jours)").fill("30");
+  await page.getByRole("button", { name: "Créer le contact" }).click();
+  await expect(page.getByRole("heading", { name: "Atelier Boréal" })).toBeVisible();
+  await captureReference(page, "contact-form");
+  await page.getByLabel("Téléphone", { exact: true }).fill("514 555-0199");
+  await page.getByRole("button", { name: "Enregistrer le contact" }).click();
+  await expect(page.getByLabel("Téléphone", { exact: true })).toHaveValue("514 555-0199");
+  await page.getByRole("button", { name: "Archiver le contact" }).click();
+  await expect(page.getByRole("button", { name: "Restaurer le contact" })).toBeVisible();
+  await page.getByRole("link", { name: "Retour aux contacts" }).click();
+  await expect(page.getByRole("link", { name: /Atelier Boréal/ })).toHaveCount(0);
+  await page.getByRole("combobox", { name: /État/ }).selectOption("ARCHIVED");
+  await page.getByRole("button", { name: "Rechercher", exact: true }).click();
+  await page.getByRole("link", { name: /Atelier Boréal/ }).click();
+  await page.getByRole("button", { name: "Restaurer le contact" }).click();
+  await expect(page.getByRole("button", { name: "Archiver le contact" })).toBeVisible();
+  await openSection(page, "Contacts");
+  await expect(page.getByRole("link", { name: /Atelier Boréal/ })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "contacts");
 }

@@ -167,6 +167,11 @@
       "invalidDate": "This date is not valid.",
       "dateTooFar": "This date is too far ahead: a fiscal year can only be added for the past or for the year after the current one.",
       "memoTooLong": "The description is too long (500 characters at most)."
+    },
+    "contacts": {
+      "invalid": "Check the contact fields, including email, country and payment terms.",
+      "invalidFilter": "Invalid contact filters.",
+      "notFound": "This contact was not found or has been anonymized."
     }
   },
   "nav": {
@@ -178,7 +183,16 @@
     "audit": "Audit trail",
     "label": "Company navigation",
     "workspace": "Your workspace",
-    "sections": "Accounting sections"
+    "sections": "Accounting sections",
+    "contacts": "Contacts",
+    "short": {
+      "overview": "Home",
+      "accounts": "Accounts",
+      "trial": "Balance",
+      "audit": "Audit"
+    },
+    "menu": "Menu",
+    "closeMenu": "Close menu"
   },
   "ledgerSetup": {
     "title": "Set up the books",
@@ -392,6 +406,129 @@
       "BANK": "Bank",
       "TAX_SETTLEMENT": "Tax settlement",
       "REVERSAL": "Reversal"
+    }
+  },
+  "contacts": {
+    "title": "Contacts",
+    "intro": "Your customers and suppliers in one directory.",
+    "new": "New contact",
+    "details": "Contact details",
+    "back": "Back to contacts",
+    "kind": "Contact type",
+    "displayName": "Display name",
+    "legalName": "Legal name",
+    "email": "Email",
+    "phone": "Phone",
+    "addressLine1": "Address",
+    "addressLine2": "Address line 2",
+    "city": "City",
+    "province": "Province or territory",
+    "postalCode": "Postal code",
+    "country": "Country",
+    "countryHint": "Two-letter country code, for example CA.",
+    "locale": "Contact language",
+    "paymentTermsDays": "Payment terms (days)",
+    "termsHint": "From 0 to 365 days.",
+    "notes": "Notes",
+    "unspecified": "Not specified",
+    "create": "Create contact",
+    "save": "Save contact",
+    "active": "Active",
+    "archived": "Archived",
+    "archive": "Archive contact",
+    "restore": "Restore contact",
+    "archiveHint": "Archiving hides this contact from the active list and preserves accounting references. It can be restored; no data is deleted.",
+    "status": "Status",
+    "search": "Search name, email or phone",
+    "apply": "Search",
+    "typesLabel": "Contact types",
+    "pagination": "Contact pagination",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {count}",
+    "count": "{count, plural, =0 {No contacts} one {# contact} other {# contacts}}",
+    "empty": "No contacts in this view",
+    "emptyHint": "Change the filters or create a contact if your role permits it.",
+    "kinds": {
+      "CUSTOMER": "Customer",
+      "SUPPLIER": "Supplier",
+      "BOTH": "Customer and supplier"
+    },
+    "filters": {
+      "ALL": "All",
+      "CUSTOMER": "Customers",
+      "SUPPLIER": "Suppliers"
+    },
+    "statuses": {
+      "ACTIVE": "Active",
+      "ARCHIVED": "Archived",
+      "ALL": "All"
+    }
+  },
+  "areas": {
+    "ventes": {
+      "title": "Sales",
+      "description": "Find your customers and recorded sales entries.",
+      "planned": "Invoices, credit notes and receipts: batches 4.3 and 4.5. Invoicing is not available yet."
+    },
+    "depenses": {
+      "title": "Expenses",
+      "description": "Find suppliers and consult the journal.",
+      "planned": "Supplier bills, expenses and disbursements: batches 4.4 and 4.5."
+    },
+    "banque": {
+      "title": "Banking and transactions",
+      "description": "Open your chart of accounts and recorded entries.",
+      "planned": "CSV/OFX import and bank reconciliation: phase 5. No automatic bank feed currently."
+    },
+    "tresorerie": {
+      "title": "Cash flow",
+      "description": "Consult accounting balances and journal movements.",
+      "planned": "Cash flow reporting and payment tracking: batch 4.5 and phase 6. No cash forecasts currently."
+    },
+    "rapports": {
+      "title": "Reports",
+      "description": "Consult the reports available for your company.",
+      "planned": "Balance sheet, profit and loss, general ledger, aging and exports: phase 6."
+    },
+    "taxes": {
+      "title": "Taxes",
+      "description": "Find tax accounts in your chart of accounts.",
+      "planned": "GST/QST calculations, tax codes and dated rates: batch 4.2. Tax summary: phase 6. No automated filing currently."
+    },
+    "comptabilite": {
+      "title": "Accounting",
+      "description": "Your accounts, journal, trial balance and fiscal years in one place."
+    },
+    "projets": {
+      "title": "Projects",
+      "description": "Project accounting is a possible future addition.",
+      "planned": "Scope and priority to be defined; project tracking is not available currently."
+    },
+    "paie": {
+      "title": "Payroll",
+      "description": "Payroll management is a possible future addition.",
+      "planned": "Outside the MVP: salaries, deductions and remittances are not available."
+    },
+    "kilometrage": {
+      "title": "Mileage",
+      "description": "Travel tracking is a possible future addition.",
+      "planned": "Scope to be defined; no trip log or allowance calculation currently."
+    },
+    "applications": {
+      "title": "Apps",
+      "description": "Integrations will extend Allumi’s capabilities.",
+      "planned": "Public API and connectors: after the MVP, scope to be defined. No installable app catalogue currently."
+    },
+    "available": "Available now",
+    "planned": "Planned — not available",
+    "progress": "Features and limitations",
+    "links": {
+      "contacts": "Contacts",
+      "journal": "Journal",
+      "comptes": "Chart of accounts",
+      "balance": "Trial balance",
+      "exercices": "Fiscal years"
     }
   }
 }

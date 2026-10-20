@@ -124,3 +124,7 @@ Le portage a trouvé un trou dans la base : un dépôt sans élément n'était p
 Après `npm run build`, lancer `E2E_MOBILE=1 npm run test:e2e` pour rejouer le parcours complet en émulation Chromium tactile (Pixel 7). Lancer séparément le parcours ordinateur : chaque exécution recrée sa base. La saisie est aussi vérifiée aux largeurs 320, 390 et 768 px : aucun débordement de page, champs entièrement visibles, cibles de 44 px et gestion du focus lors de l’ajout/retrait d’une ligne. Une vérification sur Safari iOS et appareils physiques reste recommandée avant publication.
 
 Le parcours vérifie aussi les cartes du tableau de bord : actif nul à l’initialisation, actif de 1 000,00 $ après l’écriture d’ouverture fictive, puis retour à zéro après contre-passation. L’absence de débordement de page est vérifiée sur le tableau de bord, le plan comptable, le journal, la balance, les exercices et l’audit. Les captures de référence sont facultatives (`ALLUMI_SCREENSHOTS=1`) et documentées dans [[Publication-du-wiki]].
+
+## Contacts (lot 4.1)
+
+Les tests du service vérifient les rôles, l’isolation interentreprises, le refus de réactiver une fiche anonymisée, l’audit, la conservation des références lors de l’archivage, la recherche littérale et la pagination. La validation couvre les bornes du délai de paiement et les coordonnées. Le parcours navigateur crée, modifie, archive, retrouve et restaure un contact; il s’exécute séparément sur ordinateur et téléphone et produit les captures du wiki.

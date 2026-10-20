@@ -1,6 +1,7 @@
-export type IconName = "overview" | "journal" | "accounts" | "trial" | "fiscal" | "audit" | "plus" | "arrow";
+export type IconName = "contacts" | "overview" | "journal" | "accounts" | "trial" | "fiscal" | "audit" | "plus" | "arrow";
 
 const paths: Record<IconName, string> = {
+  contacts: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8 M18 4a4 4 0 0 1 0 7 M22 21v-2a4 4 0 0 0-3-4",
   overview: "M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z",
   journal: "M5 3h14v18H5z M8 7h8 M8 11h8 M8 15h5",
   accounts: "M3 20h18 M5 20V10 M10 20V10 M14 20V10 M19 20V10 M3 7l9-4 9 4v3H3z",

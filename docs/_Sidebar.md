@@ -18,6 +18,7 @@
 - [[Interface-et-navigation]]
 - [[References-visuelles]]
 - [[Fonctionnalites-et-limites]]
+- [[Contacts]]
 - [[Plan-comptable]]
 - [[Journal-et-ecritures]]
 - [[Exercices-et-periodes]]
