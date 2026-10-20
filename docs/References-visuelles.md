@@ -1,6 +1,6 @@
 # Références visuelles
 
-Captures réelles d’Allumi avec le lot contacts 4.1, réalisées avec Chromium le 19 octobre 2026. Elles montrent uniquement **Atelier Exemple inc.**, entreprise fictive créée par les tests. La refonte est intégrée à `main`; le lot contacts reste en revue. Les montants, les dates et les événements illustrent un parcours de test.
+Captures réelles d’Allumi avec le lot contacts 4.1, réalisées avec Chromium le 19 octobre 2026. Elles montrent uniquement **Atelier Exemple inc.**, entreprise fictive créée par les tests. La refonte et le lot contacts sont intégrés à `main`. Les montants, les dates et les événements illustrent un parcours de test.
 
 Ordinateur : 1280 × 720 px (capture pleine page). Téléphone : émulation Pixel 7, 412 × 839 px CSS (zone visible du téléphone, navigation inférieure comprise). Ces images ne constituent pas une validation Safari ou sur appareil physique. Sur téléphone, les tableaux larges se font défiler horizontalement; la capture en montre le début.
 

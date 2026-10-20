@@ -4,6 +4,9 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+### Documentation
+- Guides alignés sur la préversion v0.2.0-alpha.1 : contacts intégrés, installation Proxmox épinglée et liens clients.
+
 ## [0.2.0-alpha.1] - 2026-10-20
 ### Modifié
 - Suivi du développement transféré dans Notion; retrait du carnet et de ses liens du wiki, du README et de l’interface.

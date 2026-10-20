@@ -1,6 +1,6 @@
 # Clients et fournisseurs
 
-Le lot 4.1 ajoute le répertoire **Contacts** à la navigation de l’entreprise, sur ordinateur et téléphone. Cette fonctionnalité est en cours de revue sur la branche `feat/contacts`; les PR #5 et #6 (web mobile et espace comptable) sont intégrées à `main`.
+Le lot 4.1 ajoute le répertoire **Contacts** à la navigation de l’entreprise, sur ordinateur et téléphone. Cette fonctionnalité est intégrée à `main` avec les PR #5 et #6 (web mobile et espace comptable) et la PR #7 (contacts).
 
 ## Créer et modifier
 
