@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { Footer, Header } from "./_components/shell";
@@ -6,8 +6,10 @@ import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("app");
-  return { title: { default: "Allumi", template: "%s · Allumi" }, description: t("tagline") };
+  return { title: { default: "Allumi", template: "%s · Allumi" }, description: t("tagline"), other: { "apple-mobile-web-app-capable": "yes" }, appleWebApp: { capable: true, title: "Allumi", statusBarStyle: "default" }, icons: { apple: "/icons/allumi-180.png" } };
 }
+
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#007f5f" };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();

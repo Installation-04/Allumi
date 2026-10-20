@@ -172,6 +172,14 @@
       "invalid": "Check the contact fields, including email, country and payment terms.",
       "invalidFilter": "Invalid contact filters.",
       "notFound": "This contact was not found or has been anonymized."
+    },
+    "updates": {
+      "unavailable": "Update check unavailable. Try again later.",
+      "forbidden": "Instance administrator required.",
+      "disabled": "Update agent not enabled. Follow the VM installation guide.",
+      "invalid": "Requested version is no longer the new published release.",
+      "pending": "Request queued. The VM agent will process it; reload this page after restart.",
+      "confirm": "I have saved my work. Updating creates a backup and interrupts service for all users."
     }
   },
   "nav": {
@@ -529,6 +537,29 @@
       "comptes": "Chart of accounts",
       "balance": "Trial balance",
       "exercices": "Fiscal years"
+    }
+  },
+  "updates": {
+    "title": "Versions and updates",
+    "back": "Back to Allumi",
+    "current": "Server version: {version}",
+    "web": "The web UI updates with the server. Reload the page after a restart. Windows clients have their own update menu.",
+    "available": "New version: {version}",
+    "upToDate": "Up to date for this channel ({version}).",
+    "unavailable": "Update check unavailable. Try again later.",
+    "noRelease": "No published release for this channel.",
+    "downloads": "Windows downloads and release notes",
+    "server": "Server update",
+    "install": "Request update",
+    "confirm": "I have saved my work. Updating creates a backup and interrupts service for all users.",
+    "guide": "Update and recovery guide",
+    "status": {
+      "disabled": "Update agent not enabled. Follow the VM installation guide.",
+      "pending": "Request queued. The VM agent will process it; reload this page after restart.",
+      "running": "Update in progress.",
+      "success": "Last update succeeded.",
+      "failed": "Last attempt failed. Check the agent logs in the VM before retrying.",
+      "ready": "Agent configured. Verify its service is running in the VM."
     }
   }
 }

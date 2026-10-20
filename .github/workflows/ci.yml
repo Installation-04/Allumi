@@ -31,6 +31,7 @@ jobs:
       - name: Scripts shell
         run: |
           bash -n scripts/*.sh
+          python3 scripts/test-update-agent.py
           shellcheck -x -P SCRIPTDIR -S warning scripts/*.sh
       - uses: actions/setup-node@v4
         with:
@@ -103,3 +104,25 @@ jobs:
       - name: Journaux en cas d'échec
         if: failure()
         run: docker compose logs migrate app
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+      - run: npm ci
+        working-directory: desktop
+      - run: npm test
+        working-directory: desktop
+      - run: npm run dist -- --win --x64
+        working-directory: desktop
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-test-installer
+          path: desktop/dist/*.exe

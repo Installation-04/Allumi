@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { sessionCookieName } from "@/app/_lib/cookie-name";
 
 // Paths reachable without a session cookie. The real check (database lookup) happens in the pages.
-const PUBLIC_PREFIXES = ["/connexion", "/setup", "/api/health"];
+const PUBLIC_PREFIXES = ["/connexion", "/setup", "/api/health", "/manifest.webmanifest"];
 
 export function proxy(request: NextRequest) {
   const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();

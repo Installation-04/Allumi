@@ -51,7 +51,7 @@ export async function Footer() {
   const t = await getTranslations("app");
   return (
     <footer className="border-t border-stone-200 py-4 text-center text-xs text-stone-600 dark:border-stone-800 dark:text-stone-400">
-      {t("name")} · {t("version", { version: appVersion() })} · {t("license")}
+      {t("name")} · {t("license")} · <Link className="inline-flex min-h-11 items-center underline" href="/versions">{t("version", { version: appVersion() })} ↗</Link>
     </footer>
   );
 }

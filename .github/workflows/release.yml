@@ -2,45 +2,101 @@ name: Release
 on:
   push:
     tags: ["v*.*.*"]
-
 permissions:
   contents: write
   packages: write
-
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
-  release:
-    runs-on: ubuntu-latest
+  prepare:
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      prerelease: ${{ steps.meta.outputs.prerelease }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Version et notes
+      - name: Validate versions and create draft
         id: meta
-        run: |
-          V="${GITHUB_REF_NAME#v}"
-          echo "version=$V" >> "$GITHUB_OUTPUT"
-          case "$V" in *-*) echo "prerelease=true" >> "$GITHUB_OUTPUT";; *) echo "prerelease=false" >> "$GITHUB_OUTPUT";; esac
-          awk -v h="## [$V]" 'index($0,h)==1{f=1;next} /^## \[/{f=0} f' CHANGELOG.md > notes.md
-          [ -s notes.md ] || echo "Voir CHANGELOG.md" > notes.md
-
-      - name: Release GitHub
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          FLAGS=""; [ "${{ steps.meta.outputs.prerelease }}" = "true" ] && FLAGS="--prerelease"
-          gh release create "$GITHUB_REF_NAME" --title "Allumi $GITHUB_REF_NAME" --notes-file notes.md $FLAGS
+          V="${GITHUB_REF_NAME#v}"
+          node -e 'const fs=require("fs"); for(const p of ["package.json","desktop/package.json"]) if(JSON.parse(fs.readFileSync(p)).version!==process.argv[1]) process.exit(1)' "$V"
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          case "$V" in *-*) echo 'prerelease=true' >> "$GITHUB_OUTPUT";; *) echo 'prerelease=false' >> "$GITHUB_OUTPUT";; esac
+          awk -v h="## [$V]" 'index($0,h)==1{f=1;next} /^## \[/{f=0} f' CHANGELOG.md > notes.md
+          cat >> notes.md <<'NOTES'
 
+          Windows : installateur EXE de test non signé. SmartScreen peut afficher un avertissement. Vérifiez SHA256SUMS.txt. Client connecté à votre serveur HTTPS; aucun mode hors ligne.
+          iOS : Safari → Partager → Sur l’écran d’accueil. macOS hors périmètre de cette version.
+          Serveur : voir le guide Proxmox et le guide des mises à jour dans le wiki. Préversion pour données fictives uniquement.
+          NOTES
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" --draft --title "Allumi $GITHUB_REF_NAME" --notes-file notes.md
+  windows:
+    needs: prepare
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+      - run: npm ci
+        working-directory: desktop
+      - run: npm test
+        working-directory: desktop
+      - run: npm run dist -- --win --x64
+        working-directory: desktop
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: |
+            desktop/dist/*.exe
+            desktop/dist/*.blockmap
+            desktop/dist/*.yml
+          if-no-files-found: error
+  images:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
-        if: hashFiles('package.json') != ''
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
-
-      - name: Image Docker (GHCR)
-        if: hashFiles('package.json') != ''
+      - name: Publish versioned application and migration images
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+          PRERELEASE: ${{ needs.prepare.outputs.prerelease }}
         run: |
           IMG="ghcr.io/${GITHUB_REPOSITORY,,}"
-          TAGS="-t $IMG:${{ steps.meta.outputs.version }}"
-          [ "${{ steps.meta.outputs.prerelease }}" = "false" ] && TAGS="$TAGS -t $IMG:latest"
-          docker buildx build --target runner --build-arg APP_VERSION=${{ steps.meta.outputs.version }} $TAGS --push .
+          docker buildx build --target runner --build-arg APP_VERSION="$VERSION" -t "$IMG:$VERSION" --push .
+          docker buildx build --target migrate -t "$IMG-migrate:$VERSION" --push .
+          if [ "$PRERELEASE" = false ]; then
+            docker buildx imagetools create -t "$IMG:latest" "$IMG:$VERSION"
+          fi
+  publish:
+    needs: [prepare, windows, images]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-release
+          path: release-assets
+      - name: Checksums and publication
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRERELEASE: ${{ needs.prepare.outputs.prerelease }}
+        run: |
+          rm -f release-assets/builder-debug.yml release-assets/builder-effective-config.yaml
+          tar --exclude=.git --exclude=node_modules --exclude=desktop/node_modules --exclude=desktop/dist --exclude=.env --exclude=.next --exclude=release-assets -czf "release-assets/Allumi-${GITHUB_REF_NAME}-server.tar.gz" .
+          (cd release-assets && sha256sum ./* > SHA256SUMS.txt)
+          gh release upload "$GITHUB_REF_NAME" release-assets/* --clobber
+          gh release edit "$GITHUB_REF_NAME" --draft=false --prerelease="$PRERELEASE" --latest="$([ "$PRERELEASE" = false ] && echo true || echo false)"

@@ -24,10 +24,10 @@ info "Dump PostgreSQL…"
 compose exec -T db pg_dump -U "$PGUSER_" -d "$PGDB_" --format=custom > "$WORK/db.dump"
 
 info "Archive des pièces jointes…"
-APP_CID="$(compose ps -q app || true)"
+APP_CID="$(compose ps -aq app || true)"
 if [ -n "$APP_CID" ]; then
   docker run --rm --volumes-from "$APP_CID" -v "$WORK":/out alpine:3 \
-    tar -czf /out/storage.tar.gz -C /app storage
+    tar -czf /out/storage.tar.gz --exclude=storage/update-control -C /app storage
 else
   warn "service app arrêté : pièces jointes ignorées."
 fi
