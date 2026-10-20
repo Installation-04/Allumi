@@ -3,6 +3,8 @@
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versionnage [SemVer](https://semver.org/lang/fr/).
 
 ## [Non publié]
+
+## [0.2.0-alpha.1] - 2026-10-20
 ### Modifié
 - Suivi du développement transféré dans Notion; retrait du carnet et de ses liens du wiki, du README et de l’interface.
 - Interface affinée selon les références visuelles : barre latérale sombre pleine hauteur, en-tête et onglets compacts sur ordinateur; navigation fixe en bas et résumés en cartes sur téléphone.
