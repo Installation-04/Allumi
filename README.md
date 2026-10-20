@@ -84,3 +84,9 @@ Les [25 captures de la galerie](https://github.com/Installation-04/Allumi/wiki/R
 <img src="docs/images/menu-complet-mobile.png" alt="Menu complet Allumi sur téléphone" width="360">
 
 Les pages des domaines non encore livrés indiquent leur état; elles ne simulent ni facturation, ni banque connectée, ni paie.
+
+### Versions du serveur
+
+![Versions et mises à jour](docs/images/versions-desktop.png)
+
+Capture du serveur de test, agent non activé. Le [guide des mises à jour](docs/Mise-a-jour.md) explique son installation facultative.
