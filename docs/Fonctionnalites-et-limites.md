@@ -1,6 +1,6 @@
 # Fonctionnalités et limites
 
-Cette page distingue les parcours livrés du schéma et des fonctionnalités planifiées. Les PR #5 et #6 sont intégrées à `main`. Le lot contacts 4.1 est en revue sur `feat/contacts`.
+Cette page distingue les parcours livrés du schéma et des fonctionnalités planifiées. Les PR #5, #6 et #7 sont intégrées à `main`. Le lot contacts 4.1 est disponible dans la préversion v0.2.0-alpha.1.
 
 | Domaine | Disponible actuellement | À venir |
 |---|---|---|
@@ -8,7 +8,7 @@ Cette page distingue les parcours livrés du schéma et des fonctionnalités pla
 | Accès | Premier compte/entreprise, connexion, sessions, 2FA, récupération 2FA, FR/EN | Réinitialisation du mot de passe, invitations, administration des membres/entreprises |
 | Comptabilité | Plan comptable, journal, soldes d’ouverture, contre-passation, périodes, balance, audit | Autres rapports détaillés |
 | Interface | Web adaptatif; tableau de bord et navigation intégrés | Essais supplémentaires sur Safari iOS et appareils physiques |
-| Contacts et catalogue | Clients et fournisseurs : lot 4.1 en revue, voir [[Contacts]] | Produits/services : lot 4.2 |
+| Contacts et catalogue | Clients et fournisseurs : lot 4.1 livré, voir [[Contacts]] | Produits/services : lot 4.2 |
 | Taxes | Schéma prévu | Moteur TPS/TVQ et taux datés : phase 4; déclarations : phase 6 |
 | Ventes et achats | Contraintes de base préparées | Factures, avoirs, dépenses : phase 4 |
 | Paiements et fichiers | Contraintes de base préparées | Paiements, dépôts, pièces jointes : phase 4 |

@@ -17,8 +17,8 @@ sudo apt update
 sudo apt install -y git
 sudo git clone https://github.com/Installation-04/Allumi.git /opt/allumi
 cd /opt/allumi
-# Remplacer VERSION par le tag exact affiché dans GitHub Releases.
-sudo git checkout VERSION
+# Préversion de test; utiliser uniquement des données fictives.
+sudo git checkout v0.2.0-alpha.1
 sudo ./scripts/install.sh --domain compta.exemple.ca --email admin@exemple.ca
 ```
 

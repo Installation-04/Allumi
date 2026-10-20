@@ -47,4 +47,4 @@ Les propriétaires et comptables accèdent à **Piste d’audit** pour examiner 
 
 L’administrateur doit tester les [[Sauvegardes]], suivre les [[Mise-a-jour]] et vérifier la [[Configuration]]. La pré-alpha ne remplace pas encore un logiciel de production : les ventes, achats, paiements, imports et exports restent planifiés. Pour un problème, consulter [[Depannage]] et [[FAQ]].
 
-Le répertoire clients et fournisseurs (lot 4.1 en revue) est décrit dans [[Contacts]].
+Le répertoire clients et fournisseurs (lot 4.1 livré) est décrit dans [[Contacts]].
