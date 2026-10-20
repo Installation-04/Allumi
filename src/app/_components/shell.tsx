@@ -1,3 +1,6 @@
+import { cookies } from "next/headers";
+import { isTheme } from "@/app/_lib/theme";
+import { ThemePicker } from "./theme-picker";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { logoutAction } from "@/app/connexion/actions";
@@ -10,6 +13,7 @@ export async function Header({ global = false, companyName }: { global?: boolean
   const t = await getTranslations("common");
   const locale = await getLocale();
   const session = await getSession();
+  const preference = (await cookies()).get("allumi_theme")?.value;
   return (
     <header className={`${global ? "global-header" : "workspace-header"} border-b border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900`}>
       <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-1 sm:px-6">
@@ -34,6 +38,7 @@ export async function Header({ global = false, companyName }: { global?: boolean
             </form>
           ))}
         </nav>
+          <ThemePicker value={isTheme(preference) ? preference : "system"} />
           {session && !session.mfaPending ? (
             <form action={logoutAction}>
               <button type="submit" className={`min-h-11 rounded-md border border-stone-300 px-3 py-1 hover:bg-stone-100 dark:border-stone-700 dark:hover:bg-stone-800 ${FOCUS}`}>

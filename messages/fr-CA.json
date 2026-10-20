@@ -561,5 +561,12 @@
       "failed": "Échec de la dernière tentative. Consultez le journal de l’agent dans la VM avant de réessayer.",
       "ready": "Agent configuré. Vérifiez que son service fonctionne dans la VM."
     }
+  },
+  "appearance": {
+    "label": "Apparence",
+    "system": "Thème du système",
+    "light": "Thème clair",
+    "dark": "Thème sombre",
+    "apply": "Appliquer le thème"
   }
 }

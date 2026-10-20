@@ -28,9 +28,9 @@ export default async function ContactPage({ params }: { params: Promise<{ compan
         <ContactForm companyId={company.id} contactId={contact.id} initial={initial} />
         <div className="space-y-3 rounded-lg border border-stone-200 p-4 dark:border-stone-800"><p className="text-sm">{t("archiveHint")}</p><ActionForm action={setContactActiveAction.bind(null, company.id, contact.id, !contact.isActive)} label={contact.isActive ? t("archive") : t("restore")} /></div>
       </> : <dl className="grid gap-4 rounded-lg border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-900 sm:grid-cols-2">
-        <div><dt className="text-sm text-stone-500">{t("locale")}</dt><dd>{contact.locale === "en" ? "English" : "Français"}</dd></div>
-        <div><dt className="text-sm text-stone-500">{t("kind")}</dt><dd>{t(`kinds.${initial.kind as "CUSTOMER" | "SUPPLIER" | "BOTH"}`)}</dd></div>
-        {(["legalName", "email", "phone", "addressLine1", "addressLine2", "city", "province", "postalCode", "country", "paymentTermsDays", "notes"] as const).map((field) => <div key={field}><dt className="text-sm text-stone-500">{t(field)}</dt><dd className="whitespace-pre-wrap">{initial[field] || "—"}</dd></div>)}
+        <div><dt className="text-sm text-stone-500 dark:text-stone-400">{t("locale")}</dt><dd>{contact.locale === "en" ? "English" : "Français"}</dd></div>
+        <div><dt className="text-sm text-stone-500 dark:text-stone-400">{t("kind")}</dt><dd>{t(`kinds.${initial.kind as "CUSTOMER" | "SUPPLIER" | "BOTH"}`)}</dd></div>
+        {(["legalName", "email", "phone", "addressLine1", "addressLine2", "city", "province", "postalCode", "country", "paymentTermsDays", "notes"] as const).map((field) => <div key={field}><dt className="text-sm text-stone-500 dark:text-stone-400">{t(field)}</dt><dd className="whitespace-pre-wrap">{initial[field] || "—"}</dd></div>)}
       </dl>}
     </section>
   );

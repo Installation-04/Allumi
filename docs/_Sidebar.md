@@ -19,6 +19,7 @@
 **Utiliser**
 - [[Guide-utilisateur]]
 - [[Interface-et-navigation]]
+- [[Appearance-and-language]]
 - [[References-visuelles]]
 - [[Fonctionnalites-et-limites]]
 - [[Contacts]]

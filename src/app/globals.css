@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* Explicit preferences override the operating system; system follows it live. */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) { @slot; }
+  @media (prefers-color-scheme: dark) {
+    &:where([data-theme="system"], [data-theme="system"] *) { @slot; }
+  }
+}
+
 @theme {
   /* System fonts only: no CDN, nothing leaves the server. */
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -11,7 +19,8 @@
 }
 
 html {
-  color-scheme: light dark;
+  color-scheme: light;
+  @variant dark { color-scheme: dark; }
 }
 
 body {
@@ -51,7 +60,7 @@ main {
   background: var(--color-brand-50);
 }
 
-@media (prefers-color-scheme: dark) {
+@variant dark {
   .workspace-content .overflow-x-auto:has(> table) {
     border-color: var(--color-stone-800);
     background: var(--color-stone-900);
@@ -74,7 +83,7 @@ main:has(> .company-workspace) { max-width: none; padding: 0; }
 @media (min-width: 1024px) {
   body:has(.company-workspace) > footer { padding-left: 208px; }
 }
-@media (prefers-color-scheme: dark) {
+@variant dark {
   .company-workspace { background: var(--color-stone-950); }
 }
 
@@ -91,10 +100,10 @@ main:has(> .company-workspace) { max-width: none; padding: 0; }
   .summary-tile { background: var(--tile-color); color: white; }
   .mobile-navigation { padding-bottom: 0; }
 }
-@media (prefers-color-scheme: dark) and (max-width: 1023px) {
-  .summary-tile { background: var(--color-stone-900); color: white; }
+@media (max-width: 1023px) {
+  .summary-tile { @variant dark { background: var(--color-stone-900); color: white; } }
 }
 
-@media (prefers-color-scheme: dark) and (min-width: 1024px) {
-  .company-workspace { background: linear-gradient(to right, #34373b 208px, var(--color-stone-950) 208px); }
+@media (min-width: 1024px) {
+  .company-workspace { @variant dark { background: linear-gradient(to right, #34373b 208px, var(--color-stone-950) 208px); } }
 }

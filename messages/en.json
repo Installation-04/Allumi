@@ -561,5 +561,12 @@
       "failed": "Last attempt failed. Check the agent logs in the VM before retrying.",
       "ready": "Agent configured. Verify its service is running in the VM."
     }
+  },
+  "appearance": {
+    "label": "Appearance",
+    "system": "System theme",
+    "light": "Light theme",
+    "dark": "Dark theme",
+    "apply": "Apply theme"
   }
 }
