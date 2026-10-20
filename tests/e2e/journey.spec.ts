@@ -23,12 +23,18 @@ async function expectNoPageOverflow(page: Page) {
 test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ page, browser }) => {
   // This complete journey covers setup, MFA, accounting, both locales and optional reference captures.
   test.setTimeout(120_000);
+  // Install metadata must be public, including before the first session.
+  const manifestResponse = await page.request.get('/manifest.webmanifest');
+  expect(manifestResponse.status()).toBe(200);
+  expect(await manifestResponse.json()).toMatchObject({ name: 'Allumi', display: 'standalone', start_url: '/' });
   // Fresh instance: everything leads to /setup.
   await page.goto("/");
   await expect(page).toHaveURL(/\/setup$/);
   await expect(page.getByRole("heading", { name: "Bienvenue dans Allumi" })).toBeVisible();
   await expect(page.getByText(`Version ${VERSION}`)).toBeVisible();
 
+  await expect(page.locator('meta[name="apple-mobile-web-app-capable"]')).toHaveAttribute('content', 'yes');
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute('href', '/icons/allumi-180.png');
   await captureReference(page, "premier-demarrage");
 
   await page.getByLabel("Nom de l'entreprise").fill("Atelier Exemple inc.");
@@ -143,6 +149,11 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
 
   await ledgerJourney(page, totp);
   await contactsJourney(page);
+  await page.goto('/versions');
+  await expect(page.getByRole('heading', { name: 'Versions et mises à jour' })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, 'versions');
+  await page.goto('/');
   await openSection(page, "Ventes");
   await expect(page.getByRole("heading", { name: "Ventes", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "À venir — non disponible" })).toBeVisible();

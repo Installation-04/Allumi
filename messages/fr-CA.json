@@ -172,6 +172,14 @@
       "invalid": "Vérifiez les champs du contact, notamment le courriel, le pays et le délai de paiement.",
       "invalidFilter": "Les filtres de contacts sont invalides.",
       "notFound": "Ce contact est introuvable ou anonymisé."
+    },
+    "updates": {
+      "unavailable": "Vérification indisponible. Réessayez plus tard.",
+      "forbidden": "Administrateur d’instance requis.",
+      "disabled": "Agent de mise à jour non activé. Suivez le guide d’installation dans la VM.",
+      "invalid": "La version demandée n’est plus la nouvelle version publiée.",
+      "pending": "Demande enregistrée. L’agent de la VM la traitera; rechargez cette page après le redémarrage.",
+      "confirm": "J’ai enregistré mon travail. La mise à jour déclenche une sauvegarde et une interruption du service pour tous les utilisateurs."
     }
   },
   "nav": {
@@ -529,6 +537,29 @@
       "comptes": "Plan comptable",
       "balance": "Balance de vérification",
       "exercices": "Exercices"
+    }
+  },
+  "updates": {
+    "title": "Versions et mises à jour",
+    "back": "Retour à Allumi",
+    "current": "Version serveur : {version}",
+    "web": "L’interface web est mise à jour avec le serveur. Après un redémarrage, rechargez la page. Les clients Windows ont leur propre menu de mise à jour.",
+    "available": "Nouvelle version : {version}",
+    "upToDate": "À jour pour ce canal ({version}).",
+    "unavailable": "Vérification indisponible. Réessayez plus tard.",
+    "noRelease": "Aucune version publiée pour ce canal.",
+    "downloads": "Téléchargements Windows et notes de version",
+    "server": "Mise à jour du serveur",
+    "install": "Demander la mise à jour",
+    "confirm": "J’ai enregistré mon travail. La mise à jour déclenche une sauvegarde et une interruption du service pour tous les utilisateurs.",
+    "guide": "Guide de mise à jour et de restauration",
+    "status": {
+      "disabled": "Agent de mise à jour non activé. Suivez le guide d’installation dans la VM.",
+      "pending": "Demande enregistrée. L’agent de la VM la traitera; rechargez cette page après le redémarrage.",
+      "running": "Mise à jour en cours.",
+      "success": "Dernière mise à jour réussie.",
+      "failed": "Échec de la dernière tentative. Consultez le journal de l’agent dans la VM avant de réessayer.",
+      "ready": "Agent configuré. Vérifiez que son service fonctionne dans la VM."
     }
   }
 }

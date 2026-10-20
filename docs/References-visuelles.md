@@ -141,3 +141,11 @@ Les sections donnent accès aux outils existants et indiquent ce qui reste à li
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/espace-ventes-mobile.png" alt="Espace Ventes — téléphone" width="412">
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/menu-complet-mobile.png" alt="Menu complet sur téléphone" width="412">
+
+## Versions et mises à jour
+
+![Versions sur ordinateur](images/versions-desktop.png)
+
+![Versions sur téléphone](images/versions-mobile.png)
+
+Captures du serveur de test : l’agent hôte est désactivé et la consultation GitHub peut être indisponible dans l’environnement isolé. Elles ne représentent pas une mise à jour réelle de Proxmox. Voir [[Mise-a-jour]] et [[Application-mobile]].

@@ -29,6 +29,11 @@ if [ -f package.json ]; then
   [ -f package-lock.json ] && git add package-lock.json
 fi
 
+if [ -f desktop/package.json ]; then
+  (cd desktop && npm version "$V" --no-git-tag-version --allow-same-version >/dev/null)
+  git add desktop/package.json desktop/package-lock.json
+fi
+
 git add CHANGELOG.md
 git commit -q -m "chore(release): $TAG"
 git tag -a "$TAG" -m "Allumi $TAG"

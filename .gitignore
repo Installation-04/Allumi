@@ -14,3 +14,10 @@ coverage/
 next-env.d.ts
 src/generated/
 test-results/
+
+/desktop/node_modules/
+/desktop/dist/
+
+/compose.override.yaml
+
+__pycache__/

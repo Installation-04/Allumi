@@ -9,3 +9,5 @@ scripts
 *.md
 coverage
 src/generated
+
+desktop

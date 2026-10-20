@@ -1,0 +1,62 @@
+{
+  "name": "allumi-desktop",
+  "productName": "Allumi",
+  "version": "0.2.0-alpha.1",
+  "private": true,
+  "description": "Client Allumi pour serveur auto-hébergé",
+  "author": "Allumi contributors",
+  "license": "MIT",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --publish never",
+    "test": "node --test test.cjs"
+  },
+  "dependencies": {
+    "electron-updater": "6.8.9"
+  },
+  "devDependencies": {
+    "electron": "44.9.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "ca.allumi.desktop",
+    "productName": "Allumi",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "policy.cjs",
+      "launcher.html",
+      "launcher.js",
+      "launcher.css"
+    ],
+    "artifactName": "Allumi-${version}-${os}-${arch}.${ext}",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Installation-04",
+        "repo": "Allumi"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "verifyUpdateCodeSignature": false,
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "linux": {
+      "target": [
+        "dir"
+      ]
+    }
+  }
+}
