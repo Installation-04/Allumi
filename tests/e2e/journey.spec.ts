@@ -150,6 +150,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await ledgerJourney(page, totp);
   await contactsJourney(page);
   await catalogJourney(page);
+  await companyJourney(page);
   await page.goto('/versions');
   await expect(page.getByRole('heading', { name: 'Versions et mises à jour' })).toBeVisible();
   await expectNoPageOverflow(page);
@@ -367,7 +368,7 @@ async function contactsJourney(page: Page) {
   await page.getByLabel("Téléphone", { exact: true }).fill("514 555-0142");
   await page.getByLabel("Délai de paiement (jours)").fill("-1");
   await page.getByRole("button", { name: "Créer le contact" }).click();
-  await expect(page.getByRole("alert").filter({ hasText: "Vérifiez les champs du contact" })).toBeVisible();
+  await expect(page.locator("form").getByRole("alert").filter({ hasText: "Vérifiez les champs du contact" })).toBeVisible();
   await expect(page.getByLabel("Nom affiché")).toHaveValue("Atelier Boréal");
   await expect(page.getByLabel("Type de contact")).toHaveValue("BOTH");
   await page.getByLabel("Délai de paiement (jours)").fill("30");
@@ -429,7 +430,7 @@ async function appearanceJourney(page: Page) {
   await captureReference(page, "accounts-en-dark");
   await expectNoPageOverflow(page);
 
-  for (const [route, heading] of [["catalogue", "Products and services"], ["taxes", "Taxes and rates"]]) {
+  for (const [route, heading] of [["catalogue", "Products and services"], ["taxes", "Taxes and rates"], ["entreprise", "Company"]]) {
     await page.goto(`${companyUrl}/${route}`);
     await expect(page.getByRole("heading", { name: heading, exact: true })).toBeVisible();
     await expectNoPageOverflow(page);
@@ -502,4 +503,26 @@ async function catalogJourney(page: Page) {
   await expect(page.getByText(/125[,.]123456/)).toBeVisible();
   await expectNoPageOverflow(page);
   await captureReference(page, "catalogue");
+}
+
+async function companyJourney(page: Page) {
+  await openSection(page, "Entreprise");
+  await page.getByLabel("Nom légal", { exact: true }).fill("Atelier Exemple inc.");
+  await page.getByLabel("Adresse", { exact: true }).fill("123 rue Exemple");
+  await page.getByLabel("Ville", { exact: true }).fill("Montréal");
+  await page.getByLabel("Code postal", { exact: true }).fill("h2x1y4");
+  await page.getByLabel("Numéro de TPS/TVH", { exact: true }).fill("invalid");
+  await page.getByRole("button", { name: "Enregistrer", exact: true }).click();
+  await expect(page.locator("form").getByRole("alert")).toBeVisible();
+  await expect(page.getByLabel("Adresse", { exact: true })).toHaveValue("123 rue Exemple");
+  await page.getByLabel("Numéro de TPS/TVH", { exact: true }).fill("123 456 789 rt 0001");
+  await page.getByLabel("Numéro de TVQ", { exact: true }).fill("1234567890 tq 0001");
+  await page.getByRole("button", { name: "Enregistrer", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("Réglages enregistrés.");
+  await expect(page.locator("form").getByRole("alert")).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByLabel("Numéro de TPS/TVH", { exact: true })).toHaveValue("123456789RT0001");
+  await expect(page.getByLabel("Code postal", { exact: true })).toHaveValue("H2X 1Y4");
+  await expectNoPageOverflow(page);
+  await captureReference(page, "entreprise");
 }

@@ -8,6 +8,7 @@ Cette page distingue les parcours livrés du schéma et des fonctionnalités pla
 | Accès | Premier compte/entreprise, connexion, sessions, 2FA, récupération 2FA, FR/EN | Réinitialisation du mot de passe, invitations, administration des membres/entreprises |
 | Comptabilité | Plan comptable, journal, soldes d’ouverture, contre-passation, périodes, balance, audit | Autres rapports détaillés |
 | Interface | Web adaptatif; tableau de bord et navigation intégrés | Essais supplémentaires sur Safari iOS et appareils physiques |
+| Entreprise | Identité, coordonnées et numéros fiscaux : [[Entreprise]] | Formats vérifiés, sans consultation des registres fiscaux |
 | Contacts et catalogue | Clients/fournisseurs et produits/services : [[Contacts]], [[Taxes-et-catalogue]] | Pas de suivi des stocks |
 | Taxes | Taux datés, codes, simulation et calcul exact : [[Taxes-et-catalogue]] | Facturation : prochain lot; déclarations : phase 6 |
 | Ventes et achats | Contraintes de base préparées | Factures, avoirs, dépenses : phase 4 |

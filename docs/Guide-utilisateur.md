@@ -52,3 +52,7 @@ Le répertoire clients et fournisseurs (lot 4.1 livré) est décrit dans [[Conta
 ## Taxes et produits/services
 
 Ouvrir **Taxes** pour configurer les taux et codes, puis **Produits et services** pour préparer les articles. Voir [[Taxes-et-catalogue]] pour la simulation, les comptes, les droits et les limites.
+
+## Identité de l’entreprise
+
+Le propriétaire renseigne les coordonnées et numéros fiscaux dans **Entreprise**. Les autres membres consultent la fiche. Voir [[Entreprise]] pour les formats acceptés et les limites.

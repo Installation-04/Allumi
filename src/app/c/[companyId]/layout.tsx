@@ -21,6 +21,7 @@ export default async function CompanyLayout({ children, params }: { children: Re
     { href: `${base}/comptes`, label: t("accounts"), shortLabel: t("short.accounts"), icon: "accounts" },
     { href: `${base}/balance`, label: t("trial"), shortLabel: t("short.trial"), icon: "trial" },
     { href: `${base}/exercices`, label: t("fiscal"), icon: "fiscal" },
+    { href: `${base}/entreprise`, label: t("company"), icon: "accounts" },
     ...(can(company.role, "audit.read") ? [{ href: `${base}/audit`, label: t("audit"), shortLabel: t("short.audit"), icon: "audit" as const }] : []),
   ];
   const areaLinks: NavLink[] = (Object.keys(AREAS) as Area[]).map((area) => ({ href: area === "taxes" ? `${base}/taxes` : `${base}/espace/${area}`, label: ta(`${area}.title`), icon: AREAS[area].icon }));

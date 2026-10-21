@@ -19,7 +19,8 @@
     "password": "Mot de passe",
     "passwordConfirm": "Confirmation du mot de passe",
     "code": "Code à 6 chiffres",
-    "codeOrRecovery": "Code à 6 chiffres ou code de récupération"
+    "codeOrRecovery": "Code à 6 chiffres ou code de récupération",
+    "saved": "Réglages enregistrés."
   },
   "setup": {
     "title": "Bienvenue dans Allumi",
@@ -187,6 +188,18 @@
       "conflict": "Ce code existe déjà ou les périodes de taux se chevauchent.",
       "notFound": "Cet article ou code est introuvable.",
       "futureRate": "Choisissez une date future après le dernier taux, sans document déjà validé à cette date ou après."
+    },
+    "company": {
+      "invalidProfile": "Les renseignements de l'entreprise sont invalides : vérifie les champs.",
+      "invalid": {
+        "name": "Le nom de l'entreprise est obligatoire (120 caractères au plus).",
+        "gstNumber": "Le numéro de TPS/TVH doit avoir neuf chiffres, « RT » et quatre chiffres (ex. 123456789 RT 0001).",
+        "qstNumber": "Le numéro de TVQ doit avoir dix chiffres, « TQ » et quatre chiffres (ex. 1234567890 TQ 0001).",
+        "neq": "Le NEQ compte dix chiffres.",
+        "businessNumber": "Le numéro d'entreprise fédéral compte neuf chiffres.",
+        "postalCode": "Le code postal n'est pas valide (ex. H2X 1Y4).",
+        "email": "Le courriel n'est pas valide."
+      }
     }
   },
   "nav": {
@@ -208,7 +221,8 @@
     },
     "menu": "Menu",
     "closeMenu": "Fermer le menu",
-    "catalog": "Produits et services"
+    "catalog": "Produits et services",
+    "company": "Entreprise"
   },
   "ledgerSetup": {
     "title": "Initialiser la comptabilité",
@@ -422,6 +436,34 @@
       "BANK": "Banque",
       "TAX_SETTLEMENT": "Versement de taxes",
       "REVERSAL": "Contre-passation"
+    },
+    "province": {
+      "AB": "Alberta",
+      "BC": "Colombie-Britannique",
+      "MB": "Manitoba",
+      "NB": "Nouveau-Brunswick",
+      "NL": "Terre-Neuve-et-Labrador",
+      "NS": "Nouvelle-Écosse",
+      "NT": "Territoires du Nord-Ouest",
+      "NU": "Nunavut",
+      "ON": "Ontario",
+      "PE": "Île-du-Prince-Édouard",
+      "QC": "Québec",
+      "SK": "Saskatchewan",
+      "YT": "Yukon"
+    },
+    "locale": {
+      "fr_CA": "Français (Canada)",
+      "en": "Anglais"
+    },
+    "taxRounding": {
+      "PER_LINE": "Par ligne",
+      "PER_DOCUMENT": "Sur le total du document"
+    },
+    "filingFrequency": {
+      "MONTHLY": "Mensuelle",
+      "QUARTERLY": "Trimestrielle",
+      "ANNUAL": "Annuelle"
     }
   },
   "contacts": {
@@ -636,5 +678,36 @@
     "subtotal": "Sous-total",
     "total": "Total",
     "previewUnavailable": "Choisissez un code et des valeurs valides, avec un taux disponible à cette date pour chaque taxe."
+  },
+  "companyPage": {
+    "title": "Entreprise",
+    "intro": "Configurez l’identité et les coordonnées qui serviront à vos documents. Seul le propriétaire peut les modifier. La facturation n’est pas encore disponible.",
+    "readOnly": "Seul le propriétaire peut modifier ces renseignements.",
+    "identity": "Identité et numéros d'inscription",
+    "name": "Nom de l'entreprise",
+    "legalName": "Nom légal",
+    "neq": "NEQ",
+    "neqHint": "Numéro d'entreprise du Québec, dix chiffres.",
+    "businessNumber": "Numéro d'entreprise fédéral",
+    "businessNumberHint": "Neuf chiffres.",
+    "gstNumber": "Numéro de TPS/TVH",
+    "gstNumberHint": "123456789 RT 0001. Imprimé sur les factures.",
+    "qstNumber": "Numéro de TVQ",
+    "qstNumberHint": "1234567890 TQ 0001. Imprimé sur les factures.",
+    "address": "Adresse et coordonnées",
+    "addressLine1": "Adresse",
+    "addressLine2": "Adresse (suite)",
+    "city": "Ville",
+    "province": "Province ou territoire",
+    "postalCode": "Code postal",
+    "email": "Courriel",
+    "phone": "Téléphone",
+    "settings": "Réglages",
+    "defaultLocale": "Langue des documents",
+    "taxRounding": "Arrondi des taxes",
+    "taxRoundingHint": "Recopié sur chaque document à sa création : le changer ne touche pas les documents existants.",
+    "taxFilingFrequency": "Fréquence des déclarations de taxes",
+    "fiscalYearStart": "L'exercice financier commence en {month}. Il se fixe à la création de l'entreprise.",
+    "save": "Enregistrer"
   }
 }
