@@ -23,6 +23,7 @@
 - [[References-visuelles]]
 - [[Fonctionnalites-et-limites]]
 - [[Contacts]]
+- [[Taxes-et-catalogue]]
 - [[Plan-comptable]]
 - [[Journal-et-ecritures]]
 - [[Exercices-et-periodes]]

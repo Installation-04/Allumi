@@ -2,7 +2,7 @@
 
 Logiciel de comptabilité **open source** et **auto-hébergeable** pour les PME et les travailleurs autonomes du Québec et du Canada. Une alternative libre aux logiciels de comptabilité infonuagiques propriétaires.
 
-> **État : pré-alpha.** Le squelette fonctionne (premier démarrage, connexion, vérification en deux étapes, interface FR/EN, Docker); le moteur comptable (plan comptable, journal, périodes, audit) est en place, les contacts sont disponibles; taxes, factures et paiements arrivent ensuite ([feuille de route](docs/Feuille-de-route.md)). N'utilise pas Allumi pour de la comptabilité réelle avant une version stable.
+> **État : pré-alpha.** Le squelette fonctionne (premier démarrage, connexion, vérification en deux étapes, interface FR/EN, Docker); le moteur comptable (plan comptable, journal, périodes, audit) est en place, les contacts, taxes configurables et produits/services sont disponibles; factures et paiements arrivent ensuite ([feuille de route](docs/Feuille-de-route.md)). N'utilise pas Allumi pour de la comptabilité réelle avant une version stable.
 
 *English summary: Allumi is an open-source, self-hostable accounting app for Canadian small businesses (QST/GST aware, French-first, bilingual). The repo ships a Docker Compose stack, an Ubuntu install script, encrypted backups and a full wiki in `docs/`. Application code is in pre-alpha.*
 
@@ -29,7 +29,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.2.0-alpha.2 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.3.0-alpha.1 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -57,9 +57,9 @@ Allumi est un outil. Il ne remplace ni un comptable professionnel ni un avis jur
 
 ## Guide et références visuelles
 
-Le [wiki GitHub](https://github.com/Installation-04/Allumi/wiki) regroupe le guide utilisateur, l’installation, l’exploitation, l’architecture et la feuille de route. Voir le [guide utilisateur](docs/Guide-utilisateur.md), les [fonctionnalités et limites](docs/Fonctionnalites-et-limites.md) et les [captures de référence](docs/References-visuelles.md). Les fichiers PNG originaux sont dans [docs/images](docs/images). La refonte est intégrée; les captures présentent les contacts intégrés.
+Le [wiki GitHub](https://github.com/Installation-04/Allumi/wiki) regroupe le guide utilisateur, l’installation, l’exploitation, l’architecture et la feuille de route. Voir le [guide utilisateur](docs/Guide-utilisateur.md), les [fonctionnalités et limites](docs/Fonctionnalites-et-limites.md) et les [captures de référence](docs/References-visuelles.md). Les fichiers PNG originaux sont dans [docs/images](docs/images). La refonte est intégrée; les captures présentent les contacts, taxes et produits/services.
 
-Captures réelles de l’entreprise fictive des tests, sur Chromium (19 octobre 2026). Les vues mobiles sont émulées à 412 × 839 px; elles ne remplacent pas les essais sur appareil physique.
+Captures réelles de l’entreprise fictive des tests, générées avec Chromium. Les vues mobiles sont émulées à 412 × 839 px; elles ne remplacent pas les essais sur appareil physique.
 
 ### Tableau de bord — ordinateur
 
@@ -98,3 +98,13 @@ Choose **English** in the header and use **Appearance** to select **Light theme*
 ![Allumi English dashboard in dark mode](docs/images/dashboard-en-dark-desktop.png)
 
 <img src="docs/images/contacts-en-dark-mobile.png" alt="Allumi contacts in English and dark mode on a phone" width="360">
+
+### Taxes et catalogue
+
+[Guide des taxes et du catalogue](docs/Taxes-et-catalogue.md), avec simulation et archivage.
+
+![Taxes Allumi sur ordinateur](docs/images/taxes-desktop.png)
+
+<img src="docs/images/catalogue-mobile.png" alt="Catalogue Allumi sur téléphone" width="360">
+
+![Catalogue anglais sombre](docs/images/catalogue-en-dark-desktop.png)

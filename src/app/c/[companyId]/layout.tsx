@@ -17,12 +17,13 @@ export default async function CompanyLayout({ children, params }: { children: Re
     { href: base, label: t("overview"), shortLabel: t("short.overview"), icon: "overview" },
     { href: `${base}/contacts`, label: t("contacts"), icon: "contacts" },
     { href: `${base}/journal`, label: t("journal"), icon: "journal" },
+    { href: `${base}/catalogue`, label: t("catalog"), icon: "accounts" },
     { href: `${base}/comptes`, label: t("accounts"), shortLabel: t("short.accounts"), icon: "accounts" },
     { href: `${base}/balance`, label: t("trial"), shortLabel: t("short.trial"), icon: "trial" },
     { href: `${base}/exercices`, label: t("fiscal"), icon: "fiscal" },
     ...(can(company.role, "audit.read") ? [{ href: `${base}/audit`, label: t("audit"), shortLabel: t("short.audit"), icon: "audit" as const }] : []),
   ];
-  const areaLinks: NavLink[] = (Object.keys(AREAS) as Area[]).map((area) => ({ href: `${base}/espace/${area}`, label: ta(`${area}.title`), icon: AREAS[area].icon }));
+  const areaLinks: NavLink[] = (Object.keys(AREAS) as Area[]).map((area) => ({ href: area === "taxes" ? `${base}/taxes` : `${base}/espace/${area}`, label: ta(`${area}.title`), icon: AREAS[area].icon }));
   return (
     <div className="company-workspace grid min-w-0 lg:grid-cols-[208px_minmax(0,1fr)]">
       <aside className="workspace-sidebar contents min-w-0 text-white lg:bg-[#34373b] lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col lg:self-start">

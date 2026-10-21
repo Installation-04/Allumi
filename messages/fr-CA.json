@@ -180,6 +180,13 @@
       "invalid": "La version demandée n’est plus la nouvelle version publiée.",
       "pending": "Demande enregistrée. L’agent de la VM la traitera; rechargez cette page après le redémarrage.",
       "confirm": "J’ai enregistré mon travail. La mise à jour déclenche une sauvegarde et une interruption du service pour tous les utilisateurs."
+    },
+    "catalog": {
+      "invalid": "Vérifiez les champs, les montants, les dates et les taxes du traitement choisi.",
+      "reference": "Choisissez des comptes et codes actifs appartenant à cette entreprise, du type demandé.",
+      "conflict": "Ce code existe déjà ou les périodes de taux se chevauchent.",
+      "notFound": "Cet article ou code est introuvable.",
+      "futureRate": "Choisissez une date future après le dernier taux, sans document déjà validé à cette date ou après."
     }
   },
   "nav": {
@@ -200,7 +207,8 @@
       "audit": "Audit"
     },
     "menu": "Menu",
-    "closeMenu": "Fermer le menu"
+    "closeMenu": "Fermer le menu",
+    "catalog": "Produits et services"
   },
   "ledgerSetup": {
     "title": "Initialiser la comptabilité",
@@ -502,7 +510,7 @@
     "taxes": {
       "title": "Taxes",
       "description": "Retrouvez les comptes de taxes dans votre plan comptable.",
-      "planned": "Moteur TPS/TVQ, codes et taux datés : lot 4.2. Sommaire fiscal : phase 6. Aucune déclaration automatisée actuellement."
+      "planned": "Déclarations, sommaires et versements de TPS/TVQ dans un prochain lot."
     },
     "comptabilite": {
       "title": "Comptabilité",
@@ -536,7 +544,9 @@
       "journal": "Journal",
       "comptes": "Plan comptable",
       "balance": "Balance de vérification",
-      "exercices": "Exercices"
+      "exercices": "Exercices",
+      "catalogue": "Produits et services",
+      "taxes": "Taxes et taux"
     }
   },
   "updates": {
@@ -568,5 +578,63 @@
     "light": "Thème clair",
     "dark": "Thème sombre",
     "apply": "Appliquer le thème"
+  },
+  "catalog": {
+    "items": "Produits et services",
+    "itemIntro": "Définissez les prix, comptes et taxes de vos produits et services. Le suivi de stock n’est pas disponible.",
+    "newItem": "Nouvel article",
+    "saveItem": "Enregistrer l’article",
+    "name": "Nom de l’article",
+    "code": "Code",
+    "nameFr": "Nom français",
+    "nameEn": "Nom anglais",
+    "description": "Description",
+    "unitPrice": "Prix unitaire (CAD)",
+    "priceHint": "Montant positif ou nul, jusqu’à six décimales, sans séparateur de milliers.",
+    "income": "Compte de revenus",
+    "expense": "Compte de charges",
+    "taxCode": "Code de taxe par défaut",
+    "none": "Aucun",
+    "noTaxCode": "Aucun code de taxe choisi",
+    "back": "Retour au catalogue",
+    "active": "Actif",
+    "archived": "Archivé",
+    "archive": "Archiver",
+    "restore": "Restaurer",
+    "search": "Rechercher",
+    "includeArchived": "Inclure les articles archivés",
+    "truncated": "Les 100 premiers résultats sont affichés. Précisez votre recherche.",
+    "emptyItems": "Aucun article trouvé.",
+    "taxes": "Taxes et taux",
+    "taxIntro": "Configurez les taxes applicables à votre entreprise et leurs dates d’effet. Les taux sont saisis en pourcentage; aucune taxe n’est appliquée automatiquement. Les déclarations fiscales ne sont pas encore disponibles.",
+    "emptyTaxes": "Aucune taxe configurée.",
+    "taxCodes": "Codes de taxe",
+    "newTax": "Créer une taxe",
+    "newCode": "Créer un code de taxe",
+    "percent": "Taux (%)",
+    "percentHint": "Exemples de saisie : 5 ou 9,975. Vérifiez le taux et la date applicables.",
+    "from": "Date d’effet",
+    "payable": "Compte de taxe à payer",
+    "recoverable": "Compte de taxe récupérable",
+    "ongoing": "sans date de fin",
+    "treatment": "Traitement fiscal",
+    "tax1": "Première taxe",
+    "tax2": "Deuxième taxe",
+    "tax": "Taxe",
+    "schedule": "Planifier un taux futur",
+    "scheduleHint": "La date doit être après aujourd’hui et après le dernier taux. Le taux précédent se termine la veille; les périodes passées ne sont pas modifiées.",
+    "treatments": {
+      "STANDARD": "Taxable",
+      "ZERO_RATED": "Détaxé",
+      "EXEMPT": "Exonéré",
+      "OUT_OF_SCOPE": "Hors champ"
+    },
+    "preview": "Simuler une ligne",
+    "previewHint": "Calcul indicatif avec les taux à la date choisie. Aucune écriture ni facture n’est créée.",
+    "previewDate": "Date du calcul",
+    "quantity": "Quantité",
+    "subtotal": "Sous-total",
+    "total": "Total",
+    "previewUnavailable": "Choisissez un code et des valeurs valides, avec un taux disponible à cette date pour chaque taxe."
   }
 }

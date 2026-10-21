@@ -8,8 +8,8 @@ Cette page distingue les parcours livrés du schéma et des fonctionnalités pla
 | Accès | Premier compte/entreprise, connexion, sessions, 2FA, récupération 2FA, FR/EN | Réinitialisation du mot de passe, invitations, administration des membres/entreprises |
 | Comptabilité | Plan comptable, journal, soldes d’ouverture, contre-passation, périodes, balance, audit | Autres rapports détaillés |
 | Interface | Web adaptatif; tableau de bord et navigation intégrés | Essais supplémentaires sur Safari iOS et appareils physiques |
-| Contacts et catalogue | Clients et fournisseurs : lot 4.1 livré, voir [[Contacts]] | Produits/services : lot 4.2 |
-| Taxes | Schéma prévu | Moteur TPS/TVQ et taux datés : phase 4; déclarations : phase 6 |
+| Contacts et catalogue | Clients/fournisseurs et produits/services : [[Contacts]], [[Taxes-et-catalogue]] | Pas de suivi des stocks |
+| Taxes | Taux datés, codes, simulation et calcul exact : [[Taxes-et-catalogue]] | Facturation : prochain lot; déclarations : phase 6 |
 | Ventes et achats | Contraintes de base préparées | Factures, avoirs, dépenses : phase 4 |
 | Paiements et fichiers | Contraintes de base préparées | Paiements, dépôts, pièces jointes : phase 4 |
 | Banque | Planification | Import CSV/OFX, appariement, rapprochement : phase 5 |

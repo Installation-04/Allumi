@@ -4,6 +4,12 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.3.0-alpha.1] - 2026-10-21
+
+### Ajouté
+- Taxes et catalogue bilingues et adaptatifs : taux datés, codes fiscaux, simulation exacte, fiches produits/services, recherche et archivage, droits par rôle et audit.
+- Migration de protection des prix et des types de comptes des articles et taxes; sauvegarder avant la mise à jour. Les anciennes données incompatibles doivent être corrigées explicitement.
+
 ## [0.2.0-alpha.2] - 2026-10-20
 
 ### Ajouté

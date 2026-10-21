@@ -6,7 +6,7 @@
 | 1 | Architecture finale, schéma de base de données, plan de tests ([[Architecture]], [[Schema-de-donnees]], [[Plan-de-tests]]) | Fait |
 | 2 | Squelette : auth, i18n, `/api/health`, `/setup`, build Docker ([[Premier-demarrage]], [[Authentification]]) | Fait |
 | 3 | Moteur comptable : plan comptable, journal, périodes, audit ([[Plan-comptable]], [[Journal-et-ecritures]], [[Exercices-et-periodes]], [[Piste-d-audit]]) | Fait (PR #2 intégrée) |
-| 4 | Contacts, taxes (moteur de calcul), factures, paiements, dépenses, pièces jointes | À faire |
+| 4 | Contacts, taxes (moteur de calcul), factures, paiements, dépenses, pièces jointes | Contacts et taxes/catalogue disponibles; ventes à venir |
 | 5 | Banque (CSV/OFX), rapprochement | À faire |
 | 6 | Rapports (dont le sommaire TPS/TVQ), exports CSV/PDF | À faire |
 | 7 | Version bêta publique | À faire |
@@ -43,3 +43,5 @@ Chaque lot doit livrer un parcours réel complet sur ordinateur et téléphone. 
 Les phases 5 (imports et rapprochement), 6 (rapports et exports) et 7 (bêta) suivent ces lots. Avant la bêta, vérifier aussi les parcours d’administration prévus mais non encore livrés : invitations, gestion multi-entreprise et récupération de mot de passe; compléter les essais sur appareils physiques et Safari iOS. Le schéma existant ne constitue pas à lui seul une fonctionnalité livrée.
 
 Lot 4.1 : implémentation intégrée à `main`, guide [[Contacts]].
+
+Lot 4.2 : taxes configurables, moteur de calcul exact et catalogue, guide [[Taxes-et-catalogue]].
