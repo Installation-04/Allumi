@@ -29,7 +29,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.3.0-alpha.1 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.3.0-alpha.2 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -108,3 +108,11 @@ Choose **English** in the header and use **Appearance** to select **Light theme*
 <img src="docs/images/catalogue-mobile.png" alt="Catalogue Allumi sur téléphone" width="360">
 
 ![Catalogue anglais sombre](docs/images/catalogue-en-dark-desktop.png)
+
+### Réglages de l’entreprise
+
+Identité, coordonnées et numéros fiscaux : [guide](docs/Entreprise.md).
+
+![Entreprise en anglais sombre](docs/images/entreprise-en-dark-desktop.png)
+
+<img src="docs/images/entreprise-mobile.png" alt="Réglages de l’entreprise sur téléphone" width="360">

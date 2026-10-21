@@ -19,7 +19,8 @@
     "password": "Password",
     "passwordConfirm": "Confirm password",
     "code": "6-digit code",
-    "codeOrRecovery": "6-digit code or recovery code"
+    "codeOrRecovery": "6-digit code or recovery code",
+    "saved": "Settings saved."
   },
   "setup": {
     "title": "Welcome to Allumi",
@@ -187,6 +188,18 @@
       "conflict": "This code already exists or rate periods overlap.",
       "notFound": "This item or code was not found.",
       "futureRate": "Choose a future date after the latest rate, without an already posted document on or after that date."
+    },
+    "company": {
+      "invalidProfile": "The company details are invalid: check the fields.",
+      "invalid": {
+        "name": "The company name is required (120 characters at most).",
+        "gstNumber": "The GST/HST number must be nine digits, \"RT\" and four digits (e.g. 123456789 RT 0001).",
+        "qstNumber": "The QST number must be ten digits, \"TQ\" and four digits (e.g. 1234567890 TQ 0001).",
+        "neq": "The NEQ has ten digits.",
+        "businessNumber": "The federal business number has nine digits.",
+        "postalCode": "The postal code is not valid (e.g. H2X 1Y4).",
+        "email": "The email address is not valid."
+      }
     }
   },
   "nav": {
@@ -208,7 +221,8 @@
     },
     "menu": "Menu",
     "closeMenu": "Close menu",
-    "catalog": "Products and services"
+    "catalog": "Products and services",
+    "company": "Company"
   },
   "ledgerSetup": {
     "title": "Set up the books",
@@ -422,6 +436,34 @@
       "BANK": "Bank",
       "TAX_SETTLEMENT": "Tax settlement",
       "REVERSAL": "Reversal"
+    },
+    "province": {
+      "AB": "Alberta",
+      "BC": "British Columbia",
+      "MB": "Manitoba",
+      "NB": "New Brunswick",
+      "NL": "Newfoundland and Labrador",
+      "NS": "Nova Scotia",
+      "NT": "Northwest Territories",
+      "NU": "Nunavut",
+      "ON": "Ontario",
+      "PE": "Prince Edward Island",
+      "QC": "Québec",
+      "SK": "Saskatchewan",
+      "YT": "Yukon"
+    },
+    "locale": {
+      "fr_CA": "French (Canada)",
+      "en": "English"
+    },
+    "taxRounding": {
+      "PER_LINE": "Per line",
+      "PER_DOCUMENT": "On the document total"
+    },
+    "filingFrequency": {
+      "MONTHLY": "Monthly",
+      "QUARTERLY": "Quarterly",
+      "ANNUAL": "Annual"
     }
   },
   "contacts": {
@@ -636,5 +678,36 @@
     "subtotal": "Subtotal",
     "total": "Total",
     "previewUnavailable": "Choose a code and valid values, with an effective rate for every tax on this date."
+  },
+  "companyPage": {
+    "title": "Company",
+    "intro": "Set the identity and contact details for your documents. Only the owner can edit them. Invoicing is not yet available.",
+    "readOnly": "Only the owner can change these details.",
+    "identity": "Identity and registration numbers",
+    "name": "Company name",
+    "legalName": "Legal name",
+    "neq": "NEQ",
+    "neqHint": "Québec enterprise number, ten digits.",
+    "businessNumber": "Federal business number",
+    "businessNumberHint": "Nine digits.",
+    "gstNumber": "GST/HST number",
+    "gstNumberHint": "123456789 RT 0001. Printed on invoices.",
+    "qstNumber": "QST number",
+    "qstNumberHint": "1234567890 TQ 0001. Printed on invoices.",
+    "address": "Address and contact",
+    "addressLine1": "Address",
+    "addressLine2": "Address (line 2)",
+    "city": "City",
+    "province": "Province or territory",
+    "postalCode": "Postal code",
+    "email": "Email",
+    "phone": "Phone",
+    "settings": "Settings",
+    "defaultLocale": "Language of documents",
+    "taxRounding": "Tax rounding",
+    "taxRoundingHint": "Copied onto each document when it is created: changing it does not affect existing documents.",
+    "taxFilingFrequency": "Tax filing frequency",
+    "fiscalYearStart": "The fiscal year starts in {month}. It is set when the company is created.",
+    "save": "Save"
   }
 }

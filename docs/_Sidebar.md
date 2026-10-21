@@ -22,6 +22,7 @@
 - [[Appearance-and-language]]
 - [[References-visuelles]]
 - [[Fonctionnalites-et-limites]]
+- [[Entreprise]]
 - [[Contacts]]
 - [[Taxes-et-catalogue]]
 - [[Plan-comptable]]

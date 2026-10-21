@@ -4,6 +4,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.3.0-alpha.2] - 2026-10-21
+
+### Ajouté
+- Fiche Entreprise FR/EN et mobile : identité, coordonnées, numéros fiscaux normalisés et réglages de documents; propriétaire seul en modification, consultation par les membres, audit et captures documentées. Reprise adaptée du travail de Claude dans la PR #4.
+
 ## [0.3.0-alpha.1] - 2026-10-21
 
 ### Ajouté

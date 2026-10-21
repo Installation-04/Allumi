@@ -5,6 +5,8 @@
 export type Role = "OWNER" | "ACCOUNTANT" | "READ_ONLY";
 
 export type Action =
+  | "company.read"
+  | "company.manage"
   | "catalog.read"
   | "catalog.manage"
   | "contact.read"
@@ -21,6 +23,8 @@ export type Action =
   | "audit.read";
 
 const ALLOWED: Record<Action, readonly Role[]> = {
+  "company.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
+  "company.manage": ["OWNER"],
   "catalog.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
   "catalog.manage": ["OWNER", "ACCOUNTANT"],
   "contact.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
