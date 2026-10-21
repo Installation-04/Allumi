@@ -100,3 +100,9 @@ describe("database catalog (guards against a migration that forgets a table)", (
     await expect(db.query("TRUNCATE audit_log")).rejects.toMatchObject({ code: "AL004" });
   });
 });
+
+
+it("installs catalogue price and account guards", async () => {
+  expect(await q("SELECT conname FROM pg_constraint WHERE conname = 'item_price_range'")).toHaveLength(1);
+  expect(await q("SELECT tgname FROM pg_trigger WHERE tgname IN ('item_account_guard', 'tax_account_types_guard') AND NOT tgisinternal")).toHaveLength(2);
+});

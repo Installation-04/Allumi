@@ -159,3 +159,11 @@ Captures du serveur de test : l’agent hôte est désactivé et la consultation
 ![Plan comptable anglais sombre](images/accounts-en-dark-desktop.png)
 
 Voir [[Appearance-and-language]] pour le choix de langue et les modes clair, sombre et système.
+
+## Taxes et catalogue
+
+![Taxes ordinateur](images/taxes-desktop.png)
+![Catalogue mobile](images/catalogue-mobile.png)
+![Taxes anglaises sombres](images/taxes-en-dark-desktop.png)
+
+Parcours Chromium avec données fictives; voir [[Taxes-et-catalogue]].

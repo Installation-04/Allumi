@@ -180,6 +180,13 @@
       "invalid": "Requested version is no longer the new published release.",
       "pending": "Request queued. The VM agent will process it; reload this page after restart.",
       "confirm": "I have saved my work. Updating creates a backup and interrupts service for all users."
+    },
+    "catalog": {
+      "invalid": "Check the fields, amounts, dates and taxes for the selected treatment.",
+      "reference": "Choose active accounts and codes belonging to this company, of the requested type.",
+      "conflict": "This code already exists or rate periods overlap.",
+      "notFound": "This item or code was not found.",
+      "futureRate": "Choose a future date after the latest rate, without an already posted document on or after that date."
     }
   },
   "nav": {
@@ -200,7 +207,8 @@
       "audit": "Audit"
     },
     "menu": "Menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "catalog": "Products and services"
   },
   "ledgerSetup": {
     "title": "Set up the books",
@@ -502,7 +510,7 @@
     "taxes": {
       "title": "Taxes",
       "description": "Find tax accounts in your chart of accounts.",
-      "planned": "GST/QST calculations, tax codes and dated rates: batch 4.2. Tax summary: phase 6. No automated filing currently."
+      "planned": "Returns, summaries and GST/QST remittances in a later release."
     },
     "comptabilite": {
       "title": "Accounting",
@@ -536,7 +544,9 @@
       "journal": "Journal",
       "comptes": "Chart of accounts",
       "balance": "Trial balance",
-      "exercices": "Fiscal years"
+      "exercices": "Fiscal years",
+      "catalogue": "Products and services",
+      "taxes": "Taxes and rates"
     }
   },
   "updates": {
@@ -568,5 +578,63 @@
     "light": "Light theme",
     "dark": "Dark theme",
     "apply": "Apply theme"
+  },
+  "catalog": {
+    "items": "Products and services",
+    "itemIntro": "Set prices, accounts and taxes for your products and services. Inventory tracking is not available.",
+    "newItem": "New item",
+    "saveItem": "Save item",
+    "name": "Item name",
+    "code": "Code",
+    "nameFr": "French name",
+    "nameEn": "English name",
+    "description": "Description",
+    "unitPrice": "Unit price (CAD)",
+    "priceHint": "Nonnegative amount, up to six decimals, without thousands separators.",
+    "income": "Revenue account",
+    "expense": "Expense account",
+    "taxCode": "Default tax code",
+    "none": "None",
+    "noTaxCode": "No tax code selected",
+    "back": "Back to catalogue",
+    "active": "Active",
+    "archived": "Archived",
+    "archive": "Archive",
+    "restore": "Restore",
+    "search": "Search",
+    "includeArchived": "Include archived items",
+    "truncated": "Showing the first 100 results. Refine your search.",
+    "emptyItems": "No items found.",
+    "taxes": "Taxes and rates",
+    "taxIntro": "Configure the taxes applicable to your business and their effective dates. Enter rates as percentages; no tax is applied automatically. Tax returns will be added in a later release.",
+    "emptyTaxes": "No taxes configured.",
+    "taxCodes": "Tax codes",
+    "newTax": "Create tax",
+    "newCode": "Create tax code",
+    "percent": "Rate (%)",
+    "percentHint": "Input examples: 5 or 9.975. Verify the applicable rate and date.",
+    "from": "Effective date",
+    "payable": "Tax payable account",
+    "recoverable": "Recoverable tax account",
+    "ongoing": "no end date",
+    "treatment": "Tax treatment",
+    "tax1": "First tax",
+    "tax2": "Second tax",
+    "tax": "Tax",
+    "schedule": "Schedule a future rate",
+    "scheduleHint": "The date must be after today and after the latest rate. The previous rate ends the day before; past periods stay unchanged.",
+    "treatments": {
+      "STANDARD": "Taxable",
+      "ZERO_RATED": "Zero-rated",
+      "EXEMPT": "Exempt",
+      "OUT_OF_SCOPE": "Out of scope"
+    },
+    "preview": "Preview a line",
+    "previewHint": "Preview using the rates on the selected date. No journal entry or invoice is created.",
+    "previewDate": "Calculation date",
+    "quantity": "Quantity",
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "previewUnavailable": "Choose a code and valid values, with an effective rate for every tax on this date."
   }
 }

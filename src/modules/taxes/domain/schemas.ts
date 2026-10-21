@@ -1,0 +1,11 @@
+import { z } from "zod";
+import { isValidIsoDate } from "@/modules/ledger/client";
+import { percentageRate } from "./calculation";
+const name = z.string().trim().min(1).max(200);
+const date = z.string().refine(isValidIsoDate);
+const optionalId = z.union([z.uuid(), z.literal("")]).transform((value) => value || null);
+const percent = z.string().refine((value) => { try { percentageRate(value); return true; } catch { return false; } });
+export const taxSchema = z.object({ code: z.string().regex(/^[A-Z0-9][A-Z0-9-]{0,15}$/), nameFr: name, nameEn: name, payableAccountId: z.uuid(), recoverableAccountId: optionalId, percent, from: date });
+export const rateSchema = z.object({ taxId: z.uuid(), percent, from: date });
+export const codeSchema = z.object({ code: z.string().regex(/^[A-Z0-9][A-Z0-9+-]{0,23}$/), nameFr: name, nameEn: name, treatment: z.enum(["STANDARD", "ZERO_RATED", "EXEMPT", "OUT_OF_SCOPE"]), taxIds: z.array(z.uuid()).max(10) }).refine((v) => new Set(v.taxIds).size === v.taxIds.length && (v.treatment === "STANDARD" ? v.taxIds.length > 0 : v.taxIds.length === 0));
+export const itemSchema = z.object({ code: z.string().trim().max(64).transform((v) => v || null), name, description: z.string().trim().max(2000).transform((v) => v || null), unitPrice: z.string().trim().transform((v) => v.replace(",", ".")).pipe(z.string().regex(/^\d{1,12}(?:\.\d{1,6})?$/)), incomeAccountId: optionalId, expenseAccountId: optionalId, defaultTaxCodeId: optionalId });

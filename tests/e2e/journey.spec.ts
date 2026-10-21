@@ -22,7 +22,7 @@ async function expectNoPageOverflow(page: Page) {
 
 test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ page, browser }) => {
   // This complete journey covers setup, MFA, accounting, both locales and optional reference captures.
-  test.setTimeout(120_000);
+  test.setTimeout(180_000);
   // Install metadata must be public, including before the first session.
   const manifestResponse = await page.request.get('/manifest.webmanifest');
   expect(manifestResponse.status()).toBe(200);
@@ -149,6 +149,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
 
   await ledgerJourney(page, totp);
   await contactsJourney(page);
+  await catalogJourney(page);
   await page.goto('/versions');
   await expect(page.getByRole('heading', { name: 'Versions et mises à jour' })).toBeVisible();
   await expectNoPageOverflow(page);
@@ -428,6 +429,13 @@ async function appearanceJourney(page: Page) {
   await captureReference(page, "accounts-en-dark");
   await expectNoPageOverflow(page);
 
+  for (const [route, heading] of [["catalogue", "Products and services"], ["taxes", "Taxes and rates"]]) {
+    await page.goto(`${companyUrl}/${route}`);
+    await expect(page.getByRole("heading", { name: heading, exact: true })).toBeVisible();
+    await expectNoPageOverflow(page);
+    await captureReference(page, `${route}-en-dark`);
+  }
+
   // Explicit light wins even when the device is dark; system follows changes live.
   await page.emulateMedia({ colorScheme: "dark" });
   await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption("light");
@@ -440,4 +448,58 @@ async function appearanceJourney(page: Page) {
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(lightBackground);
   await page.getByRole("button", { name: "Français", exact: true }).click();
   await expect(page.getByRole("combobox", { name: "Apparence", exact: true })).toHaveValue("system");
+}
+
+async function catalogJourney(page: Page) {
+  await openSection(page, "Taxes");
+  const taxForm = page.getByRole("heading", { name: "Créer une taxe", exact: true }).locator("..");
+  for (const [code, name, rate, payable, recoverable] of [["TPS", "GST", "5", "2100", "1200"], ["TVQ", "QST", "9,975", "2110", "1210"]]) {
+    await taxForm.getByLabel("Code", { exact: true }).fill(code!);
+    await taxForm.getByLabel("Nom français").fill(code!);
+    await taxForm.getByLabel("Nom anglais").fill(name!);
+    await taxForm.getByLabel("Taux (%)").fill(rate!);
+    await taxForm.getByLabel("Date d’effet").fill("2020-01-01");
+    await taxForm.getByLabel("Compte de taxe à payer").selectOption({ label: `${payable} — ${code} à payer` });
+    await taxForm.getByLabel("Compte de taxe récupérable").selectOption({ label: `${recoverable} — ${code} à recevoir` });
+    await taxForm.getByRole("button", { name: "Créer une taxe", exact: true }).click();
+    await expect(page.getByRole("heading", { name: `${code} — ${code}`, exact: true })).toBeVisible();
+  }
+  const codeForm = page.getByRole("heading", { name: "Créer un code de taxe", exact: true }).locator("..");
+  await codeForm.getByLabel("Code", { exact: true }).fill("TPS+TVQ");
+  await codeForm.getByLabel("Nom français").fill("Taxes Québec");
+  await codeForm.getByLabel("Nom anglais").fill("Quebec taxes");
+  await codeForm.getByLabel("Première taxe").selectOption({ label: "TPS — TPS" });
+  await codeForm.getByLabel("Deuxième taxe").selectOption({ label: "TVQ — TVQ" });
+  await codeForm.getByRole("button", { name: "Créer un code de taxe", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "TPS+TVQ — Taxes Québec", exact: true })).toBeVisible();
+  const preview = page.getByRole("region", { name: "Simuler une ligne" });
+  await preview.getByLabel("Code de taxe par défaut").selectOption({ label: "TPS+TVQ" });
+  await expect(preview.getByRole("status")).toContainText("114,98");
+  await preview.getByLabel("Date du calcul").fill("2019-01-01");
+  await expect(preview.getByRole("status")).toContainText("Choisissez un code");
+  await preview.getByLabel("Date du calcul").fill("2026-01-01");
+  await expectNoPageOverflow(page);
+  const future = page.getByRole("heading", { name: "Planifier un taux futur", exact: true }).locator("..");
+  await future.getByLabel("Taxe", { exact: true }).selectOption({ label: "TPS — TPS" });
+  await future.getByLabel("Taux (%)").fill("6");
+  await future.getByLabel("Date d’effet").fill("2990-01-01");
+  await future.getByRole("button", { name: "Planifier un taux futur", exact: true }).click();
+  await expect(page.getByText("6 % · 2990-01-01 → sans date de fin", { exact: true })).toBeVisible();
+  await captureReference(page, "taxes");
+  await openSection(page, "Produits et services");
+  await page.getByRole("link", { name: "Nouvel article" }).click();
+  await page.getByLabel("Nom de l’article").fill("Consultation comptable");
+  await page.getByLabel("Code", { exact: true }).fill("CONS");
+  await page.getByLabel("Prix unitaire (CAD)").fill("125,123456");
+  await page.getByLabel("Code de taxe par défaut").selectOption({ label: "TPS+TVQ — Taxes Québec" });
+  await page.getByRole("button", { name: "Enregistrer l’article" }).click();
+  await expect(page.getByRole("heading", { name: "Consultation comptable" })).toBeVisible();
+  await page.getByRole("button", { name: "Archiver", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Restaurer", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Restaurer", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Archiver", exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Retour au catalogue" }).click();
+  await expect(page.getByText(/125[,.]123456/)).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "catalogue");
 }
