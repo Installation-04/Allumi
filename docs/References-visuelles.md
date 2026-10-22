@@ -167,3 +167,10 @@ Voir [[Appearance-and-language]] pour le choix de langue et les modes clair, som
 ![Taxes anglaises sombres](images/taxes-en-dark-desktop.png)
 
 Parcours Chromium avec données fictives; voir [[Taxes-et-catalogue]].
+
+## Brouillons de factures
+
+![Brouillon détaillé](images/facture-brouillon-desktop.png)
+![Brouillons anglais sombres sur téléphone](images/factures-en-dark-mobile.png)
+
+Parcours Chromium avec données fictives; voir [[Brouillons-de-factures]]. Les brouillons n’ont aucun effet comptable.

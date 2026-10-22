@@ -200,6 +200,13 @@
         "postalCode": "Le code postal n'est pas valide (ex. H2X 1Y4).",
         "email": "Le courriel n'est pas valide."
       }
+    },
+    "sales": {
+      "invalid": "Vérifiez les dates, les lignes et les montants. Le total doit être positif; 50 lignes au maximum.",
+      "reference": "Choisissez des clients, articles, comptes de revenus et codes fiscaux actifs de cette entreprise.",
+      "rate": "Un taux fiscal manque à cette date, ou les calculs ne concordent pas. Vérifiez les taxes.",
+      "stale": "Ce brouillon a été modifié, supprimé ou validé ailleurs. Rechargez la fiche avant de poursuivre.",
+      "confirm": "Confirmez la suppression du brouillon."
     }
   },
   "nav": {
@@ -222,7 +229,8 @@
     "menu": "Menu",
     "closeMenu": "Fermer le menu",
     "catalog": "Produits et services",
-    "company": "Entreprise"
+    "company": "Entreprise",
+    "invoices": "Brouillons de factures"
   },
   "ledgerSetup": {
     "title": "Initialiser la comptabilité",
@@ -526,8 +534,8 @@
   "areas": {
     "ventes": {
       "title": "Ventes",
-      "description": "Retrouvez vos clients et les écritures liées à vos ventes.",
-      "planned": "Factures, avoirs et encaissements : lots 4.3 et 4.5. La facturation n’est pas encore disponible."
+      "description": "Préparez vos brouillons et retrouvez vos clients et articles.",
+      "planned": "Validation comptable des factures, avoirs et encaissements : non disponibles pour le moment."
     },
     "depenses": {
       "title": "Dépenses",
@@ -588,7 +596,8 @@
       "balance": "Balance de vérification",
       "exercices": "Exercices",
       "catalogue": "Produits et services",
-      "taxes": "Taxes et taux"
+      "taxes": "Taxes et taux",
+      "factures": "Brouillons de factures"
     }
   },
   "updates": {
@@ -709,5 +718,44 @@
     "taxFilingFrequency": "Fréquence des déclarations de taxes",
     "fiscalYearStart": "L'exercice financier commence en {month}. Il se fixe à la création de l'entreprise.",
     "save": "Enregistrer"
+  },
+  "sales": {
+    "title": "Brouillons de factures",
+    "draft": "Brouillon — non comptabilisé",
+    "intro": "Préparez vos factures sans écriture comptable ni numéro définitif. Validation, envoi, avoirs et paiements ne sont pas encore disponibles.",
+    "new": "Nouveau brouillon",
+    "edit": "Modifier le brouillon",
+    "back": "Retour aux brouillons",
+    "customer": "Client",
+    "reference": "Référence",
+    "date": "Date de facture",
+    "due": "Date d’échéance",
+    "memo": "Note",
+    "save": "Enregistrer le brouillon",
+    "saveHint": "Les totaux sont recalculés à l’enregistrement avec les taux applicables à la date de facture. Aucun montant n’est ajouté au grand livre.",
+    "lineHint": "Quantité positive, jusqu’à quatre décimales; prix positif ou nul, jusqu’à six décimales. Choisissez un code fiscal explicite, même sans taxe.",
+    "line": "Ligne {n}",
+    "item": "Article du catalogue",
+    "manual": "Saisie libre",
+    "choose": "Choisir",
+    "description": "Description",
+    "quantity": "Quantité",
+    "unitPrice": "Prix unitaire (CAD)",
+    "account": "Compte de revenus",
+    "taxCode": "Code de taxe",
+    "remove": "Retirer la ligne {n}",
+    "add": "Ajouter une ligne",
+    "subtotal": "Sous-total",
+    "total": "Total",
+    "rounding": "Arrondi enregistré",
+    "perLine": "Par ligne",
+    "perDocument": "Par document",
+    "search": "Rechercher",
+    "empty": "Aucun brouillon trouvé.",
+    "limit": "Les 100 premiers résultats sont affichés. Précisez votre recherche.",
+    "optionsLimit": "Les sélecteurs affichent les 500 premiers clients et articles actifs.",
+    "setupHint": "Avant de créer un brouillon, ajoutez un client actif, un compte de revenus et un code fiscal dans Contacts, Plan comptable et Taxes.",
+    "delete": "Supprimer le brouillon",
+    "confirmDelete": "Je confirme la suppression définitive de ce brouillon."
   }
 }

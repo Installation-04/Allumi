@@ -200,6 +200,13 @@
         "postalCode": "The postal code is not valid (e.g. H2X 1Y4).",
         "email": "The email address is not valid."
       }
+    },
+    "sales": {
+      "invalid": "Check dates, lines and amounts. The total must be positive; at most 50 lines.",
+      "reference": "Choose active customers, items, income accounts and tax codes belonging to this company.",
+      "rate": "A tax rate is missing on this date, or calculations do not agree. Check tax settings.",
+      "stale": "This draft was changed, deleted or posted elsewhere. Reload it before continuing.",
+      "confirm": "Confirm deletion of the draft."
     }
   },
   "nav": {
@@ -222,7 +229,8 @@
     "menu": "Menu",
     "closeMenu": "Close menu",
     "catalog": "Products and services",
-    "company": "Company"
+    "company": "Company",
+    "invoices": "Invoice drafts"
   },
   "ledgerSetup": {
     "title": "Set up the books",
@@ -526,8 +534,8 @@
   "areas": {
     "ventes": {
       "title": "Sales",
-      "description": "Find your customers and recorded sales entries.",
-      "planned": "Invoices, credit notes and receipts: batches 4.3 and 4.5. Invoicing is not available yet."
+      "description": "Prepare invoice drafts and find your customers and items.",
+      "planned": "Invoice posting, credit notes and receipts are not yet available."
     },
     "depenses": {
       "title": "Expenses",
@@ -588,7 +596,8 @@
       "balance": "Trial balance",
       "exercices": "Fiscal years",
       "catalogue": "Products and services",
-      "taxes": "Taxes and rates"
+      "taxes": "Taxes and rates",
+      "factures": "Invoice drafts"
     }
   },
   "updates": {
@@ -709,5 +718,44 @@
     "taxFilingFrequency": "Tax filing frequency",
     "fiscalYearStart": "The fiscal year starts in {month}. It is set when the company is created.",
     "save": "Save"
+  },
+  "sales": {
+    "title": "Invoice drafts",
+    "draft": "Draft — not posted",
+    "intro": "Prepare invoices without a journal entry or final number. Posting, sending, credit notes and payments are not yet available.",
+    "new": "New draft",
+    "edit": "Edit draft",
+    "back": "Back to drafts",
+    "customer": "Customer",
+    "reference": "Reference",
+    "date": "Invoice date",
+    "due": "Due date",
+    "memo": "Note",
+    "save": "Save draft",
+    "saveHint": "Totals are recalculated when saved using the rates effective on the invoice date. Nothing is added to the ledger.",
+    "lineHint": "Positive quantity, up to four decimal places; nonnegative price, up to six decimal places. Choose an explicit tax code, including for tax-free lines.",
+    "line": "Line {n}",
+    "item": "Catalogue item",
+    "manual": "Manual entry",
+    "choose": "Choose",
+    "description": "Description",
+    "quantity": "Quantity",
+    "unitPrice": "Unit price (CAD)",
+    "account": "Income account",
+    "taxCode": "Tax code",
+    "remove": "Remove line {n}",
+    "add": "Add line",
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "rounding": "Saved rounding",
+    "perLine": "Per line",
+    "perDocument": "Per document",
+    "search": "Search",
+    "empty": "No drafts found.",
+    "limit": "Showing the first 100 results. Refine your search.",
+    "optionsLimit": "Selectors show the first 500 active customers and items.",
+    "setupHint": "Before creating a draft, add an active customer, an income account and a tax code in Contacts, Chart of accounts and Taxes.",
+    "delete": "Delete draft",
+    "confirmDelete": "I confirm permanent deletion of this draft."
   }
 }

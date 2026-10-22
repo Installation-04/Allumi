@@ -4,6 +4,9 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+### Ajouté
+- Brouillons de factures FR/EN et mobile : clients, articles, lignes libres, calcul exact des taxes, recherche, modification et suppression confirmée, audit et protection contre les modifications périmées. Aucun effet comptable ni numéro définitif; validation et avoirs à venir.
+
 ## [0.3.0-alpha.2] - 2026-10-21
 
 ### Ajouté

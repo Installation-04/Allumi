@@ -25,6 +25,7 @@
 - [[Entreprise]]
 - [[Contacts]]
 - [[Taxes-et-catalogue]]
+- [[Brouillons-de-factures]]
 - [[Plan-comptable]]
 - [[Journal-et-ecritures]]
 - [[Exercices-et-periodes]]
