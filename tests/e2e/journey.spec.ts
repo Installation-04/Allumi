@@ -151,6 +151,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await contactsJourney(page);
   await catalogJourney(page);
   await companyJourney(page);
+  await draftsJourney(page);
   await page.goto('/versions');
   await expect(page.getByRole('heading', { name: 'Versions et mises à jour' })).toBeVisible();
   await expectNoPageOverflow(page);
@@ -430,7 +431,7 @@ async function appearanceJourney(page: Page) {
   await captureReference(page, "accounts-en-dark");
   await expectNoPageOverflow(page);
 
-  for (const [route, heading] of [["catalogue", "Products and services"], ["taxes", "Taxes and rates"], ["entreprise", "Company"]]) {
+  for (const [route, heading] of [["catalogue", "Products and services"], ["taxes", "Taxes and rates"], ["entreprise", "Company"], ["factures", "Invoice drafts"]]) {
     await page.goto(`${companyUrl}/${route}`);
     await expect(page.getByRole("heading", { name: heading, exact: true })).toBeVisible();
     await expectNoPageOverflow(page);
@@ -525,4 +526,47 @@ async function companyJourney(page: Page) {
   await expect(page.getByLabel("Code postal", { exact: true })).toHaveValue("H2X 1Y4");
   await expectNoPageOverflow(page);
   await captureReference(page, "entreprise");
+}
+
+async function draftsJourney(page: Page) {
+  await openSection(page, "Brouillons de factures");
+  await page.getByRole("link", { name: "Nouveau brouillon", exact: true }).click();
+  await page.getByLabel("Client", { exact: true }).selectOption({ label: "Atelier Boréal" });
+  await page.getByLabel("Référence", { exact: true }).fill("PROJET-2026-001");
+  await page.getByLabel("Date de facture", { exact: true }).fill("2019-06-01");
+  await page.getByLabel("Date d’échéance", { exact: true }).fill("2026-07-01");
+  const first = page.getByRole("group", { name: "Ligne 1", exact: true });
+  await first.getByLabel("Article du catalogue").selectOption({ label: "Consultation comptable" });
+  await first.getByLabel("Prix unitaire (CAD)").fill("100");
+  await first.getByLabel("Compte de revenus").selectOption({ label: "4000 — Revenus de services" });
+  await page.getByRole("button", { name: "Enregistrer le brouillon" }).click();
+  await expect(page.locator("form").getByRole("alert")).toContainText("Un taux fiscal manque");
+  await expect(first.getByLabel("Prix unitaire (CAD)")).toHaveValue("100");
+  await expect(first.getByLabel("Article du catalogue").locator("option:checked")).toHaveText("Consultation comptable");
+  await expect(first.getByLabel("Compte de revenus").locator("option:checked")).toHaveText("4000 — Revenus de services");
+  await expect(first.getByLabel("Code de taxe").locator("option:checked")).toHaveText("TPS+TVQ");
+  await page.getByLabel("Date de facture", { exact: true }).fill("2026-06-01");
+  await page.getByRole("button", { name: "Enregistrer le brouillon" }).click();
+  await expect(page.getByRole("heading", { name: "PROJET-2026-001", exact: true })).toBeVisible();
+  await expect(page.getByText(/Total:.*114,98/)).toBeVisible();
+  const draftUrl = page.url();
+  await page.getByRole("link", { name: "Modifier le brouillon" }).click();
+  await page.getByRole("group", { name: "Ligne 1", exact: true }).getByLabel("Quantité").fill("2");
+  await page.getByRole("button", { name: "Ajouter une ligne" }).click();
+  const second = page.getByRole("group", { name: "Ligne 2", exact: true });
+  await second.getByLabel("Description").fill("Préparation du dossier");
+  await second.getByLabel("Prix unitaire (CAD)").fill("10");
+  await second.getByLabel("Compte de revenus").selectOption({ label: "4000 — Revenus de services" });
+  await second.getByLabel("Code de taxe").selectOption({ label: "TPS+TVQ" });
+  await captureReference(page, "facture-formulaire");
+  await page.getByRole("button", { name: "Enregistrer le brouillon" }).click();
+  await expect(page).toHaveURL(draftUrl);
+  await expect(page.getByText(/Total:.*241,45/)).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Préparation du dossier" })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "facture-brouillon");
+  await page.getByRole("link", { name: "Retour aux brouillons" }).click();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "factures");
 }

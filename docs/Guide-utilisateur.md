@@ -56,3 +56,7 @@ Ouvrir **Taxes** pour configurer les taux et codes, puis **Produits et services*
 ## Identité de l’entreprise
 
 Le propriétaire renseigne les coordonnées et numéros fiscaux dans **Entreprise**. Les autres membres consultent la fiche. Voir [[Entreprise]] pour les formats acceptés et les limites.
+
+## Préparer une facture
+
+Ouvrir **Brouillons de factures** pour saisir un client et des lignes, puis consulter le calcul enregistré. Voir [[Brouillons-de-factures]]. Les brouillons ne sont pas comptabilisés et ne peuvent pas encore être validés ou envoyés.
