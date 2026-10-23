@@ -181,3 +181,10 @@ Parcours Chromium avec données fictives; voir [[Brouillons-de-factures]]. Les b
 ![Facture anglaise sombre sur téléphone](images/facture-validee-en-dark-mobile.png)
 
 Voir [[Validation-des-factures]].
+
+## Annulation des factures
+
+![Facture annulée](images/facture-annulee-desktop.png)
+![Annulation sur téléphone en anglais sombre](images/facture-annulee-en-dark-mobile.png)
+
+Voir [[Annulation-des-factures]].

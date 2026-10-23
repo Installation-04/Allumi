@@ -207,7 +207,10 @@
       "rate": "Un taux fiscal manque à cette date, ou les calculs ne concordent pas. Vérifiez les taxes.",
       "stale": "Ce brouillon a été modifié, supprimé ou validé ailleurs. Rechargez la fiche avant de poursuivre.",
       "confirm": "Confirmez la suppression du brouillon.",
-      "confirmPost": "Confirmez la validation définitive de la facture."
+      "confirmPost": "Confirmez la validation définitive de la facture.",
+      "invalidVoid": "Indiquez un motif de 1 à 500 caractères et une date égale ou postérieure à la date comptable.",
+      "confirmVoid": "Confirmez l’annulation définitive de la facture.",
+      "linked": "Cette facture a des paiements ou avoirs liés. Leur traitement doit être résolu avant l’annulation."
     }
   },
   "nav": {
@@ -759,7 +762,7 @@
     "delete": "Supprimer le brouillon",
     "confirmDelete": "Je confirme la suppression définitive de ce brouillon.",
     "post": "Valider la facture",
-    "postHint": "Cette action attribue un numéro définitif et comptabilise la facture. Le document sera verrouillé. Les avoirs et annulations ne sont pas encore disponibles.",
+    "postHint": "Cette action attribue un numéro définitif et comptabilise la facture. Le document sera verrouillé; sa correction passe par une annulation admissible. Les avoirs ne sont pas encore disponibles.",
     "postingDate": "Date comptable",
     "confirmPost": "Je confirme les montants et la validation définitive.",
     "postedList": "Factures validées",
@@ -767,6 +770,15 @@
     "journal": "Voir l’écriture comptable",
     "issuer": "Émetteur",
     "billedTo": "Facturé à",
-    "postedHint": "Les coordonnées ci-dessous sont figées à la validation. Envoi et paiements ne sont pas encore disponibles."
+    "postedHint": "Les coordonnées ci-dessous sont figées à la validation. Envoi et paiements ne sont pas encore disponibles.",
+    "void": "Annuler la facture",
+    "voided": "Facture annulée",
+    "voidDate": "Date de contre-passation",
+    "reason": "Motif",
+    "confirmVoid": "Je confirme l’annulation définitive de cette facture.",
+    "voidWarning": "L’annulation conserve la facture et crée une écriture inverse dans une période ouverte. Les paiements et avoirs liés empêchent cette opération.",
+    "voidHint": "Les montants ci-dessous sont ceux de la facture originale. Son effet comptable a été annulé par la contre-passation.",
+    "reversal": "Voir la contre-passation",
+    "postedLimit": "Les 100 factures les plus récemment validées sont affichées, y compris celles annulées."
   }
 }

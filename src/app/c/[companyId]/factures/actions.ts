@@ -37,3 +37,14 @@ export async function postInvoiceAction(companyId: string, id: string, revision:
     redirect(`/c/${companyId}/factures/validees/${id}`);
   }, values);
 }
+export async function voidInvoiceAction(companyId: string, id: string, _previous: FormState, form: FormData): Promise<FormState> {
+  const values = textValues(form, ["voidDate", "reason"]);
+  return safeAction(async () => {
+    if (form.get("confirm") !== "yes") throw new AppError("sales.confirmVoid");
+    const session = await requireSession();
+    const { voidInvoice } = await import("@/modules/sales");
+    await voidInvoice({ userId: session.userId, companyId }, id, values.voidDate ?? "", values.reason ?? "");
+    revalidatePath(`/c/${companyId}`, "layout");
+    redirect(`/c/${companyId}/factures/validees/${id}`);
+  }, values);
+}

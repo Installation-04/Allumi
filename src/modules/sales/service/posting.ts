@@ -52,12 +52,12 @@ export async function postInvoice(actor: CompanyContext, id: string, revision: s
 export async function listInvoices(actor: CompanyContext) {
   return withCompany(actor, async tx => {
     await requireRole(tx, "sales.read");
-    return tx.salesDocument.findMany({ where: { companyId: actor.companyId, kind: "INVOICE", status: "POSTED" }, select: { id: true, number: true, issueDate: true, totalCents: true }, orderBy: [{ postedAt: "desc" }, { id: "desc" }], take: 101 });
+    return tx.salesDocument.findMany({ where: { companyId: actor.companyId, kind: "INVOICE", status: { in: ["POSTED", "VOID"] } }, select: { id: true, status: true, number: true, issueDate: true, totalCents: true }, orderBy: [{ postedAt: "desc" }, { id: "desc" }], take: 101 });
   });
 }
 export async function getInvoice(actor: CompanyContext, id: string) {
   return withCompany(actor, async tx => {
     await requireRole(tx, "sales.read");
-    return tx.salesDocument.findFirst({ where: { companyId: actor.companyId, id, kind: "INVOICE", status: "POSTED" }, include: { lines: { orderBy: { position: "asc" } }, taxes: { include: { tax: { select: { code: true } } } } } });
+    return tx.salesDocument.findFirst({ where: { companyId: actor.companyId, id, kind: "INVOICE", status: { in: ["POSTED", "VOID"] } }, include: { voidEntry: { select: { entryDate: true } }, lines: { orderBy: { position: "asc" } }, taxes: { include: { tax: { select: { code: true } } } } } });
   });
 }
