@@ -2,7 +2,7 @@
 
 Logiciel de comptabilité **open source** et **auto-hébergeable** pour les PME et les travailleurs autonomes du Québec et du Canada. Une alternative libre aux logiciels de comptabilité infonuagiques propriétaires.
 
-> **État : pré-alpha.** Le squelette fonctionne (premier démarrage, connexion, vérification en deux étapes, interface FR/EN, Docker); le moteur comptable (plan comptable, journal, périodes, audit) est en place, les contacts, taxes configurables, produits/services et brouillons et validation des factures sont disponibles; avoirs et paiements arrivent ensuite ([feuille de route](docs/Feuille-de-route.md)). N'utilise pas Allumi pour de la comptabilité réelle avant une version stable.
+> **État : pré-alpha.** Le squelette fonctionne (premier démarrage, connexion, vérification en deux étapes, interface FR/EN, Docker); le moteur comptable (plan comptable, journal, périodes, audit) est en place, les contacts, taxes configurables, produits/services et brouillons et validation des factures sont disponibles; brouillons d’avoirs disponibles, validation des avoirs et paiements à venir ([feuille de route](docs/Feuille-de-route.md)). N'utilise pas Allumi pour de la comptabilité réelle avant une version stable.
 
 *English summary: Allumi is an open-source, self-hostable accounting app for Canadian small businesses (QST/GST aware, French-first, bilingual). The repo ships a Docker Compose stack, an Ubuntu install script, encrypted backups and a full wiki in `docs/`. Application code is in pre-alpha.*
 
@@ -29,7 +29,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.3 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.4 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -140,3 +140,10 @@ Identité, coordonnées et numéros fiscaux : [guide](docs/Entreprise.md).
 ![Facture annulée](docs/images/facture-annulee-desktop.png)
 
 <img src="docs/images/facture-annulee-en-dark-mobile.png" alt="Facture annulée en anglais sombre sur téléphone" width="360">
+
+## Brouillons d’avoirs partiels
+
+Préparez une correction depuis une facture validée, avec montants par ligne et taux d’origine. Aucun effet sur le journal ou le solde : la validation des avoirs reste à venir. [Guide](docs/Brouillons-d-avoirs.md).
+
+![Brouillon d’avoir sur ordinateur](docs/images/avoir-brouillon-desktop.png)
+![Brouillon d’avoir anglais sombre sur mobile](docs/images/avoir-brouillon-en-dark-mobile.png)

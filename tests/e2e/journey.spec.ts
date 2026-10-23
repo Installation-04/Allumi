@@ -602,6 +602,8 @@ async function postingJourney(page: Page) {
   await page.getByRole("link", { name: "View journal entry" }).click();
   await expect(page.getByRole("heading", { name: "Entry J-00003", exact: true })).toBeVisible();
   await page.goto(invoiceUrl);
+  const creditUrl = await creditDraftJourney(page);
+  await page.goto(invoiceUrl);
   await page.locator("summary", { hasText: "Void invoice" }).click();
   await page.getByLabel("Reversal date", { exact: true }).fill("2026-05-01");
   await page.getByLabel("Reason", { exact: true }).fill("Duplicate invoice");
@@ -625,6 +627,51 @@ async function postingJourney(page: Page) {
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await expect(page.getByText("Facture annulée", { exact: true })).toBeVisible();
   await captureReference(page, "facture-annulee");
+  await page.goto(creditUrl);
+  await expect(page.getByRole("status")).toContainText("n’est plus validée");
+  await expect(page.getByRole("link", { name: "Modifier l’avoir", exact: true })).toHaveCount(0);
+  await page.locator("summary", { hasText: "Supprimer le brouillon d’avoir" }).click();
+  await page.getByLabel("Je confirme la suppression de ce brouillon d’avoir.").check();
+  await page.getByRole("button", { name: "Supprimer le brouillon d’avoir", exact: true }).click();
+  await expect(page.getByText(/Aucun brouillon d’avoir/)).toBeVisible();
+  await page.goto(invoiceUrl);
   await page.getByRole("link", { name: "Factures validées", exact: true }).click();
   await expect(page.getByRole("link", { name: /F-00001/ })).toContainText("Facture annulée");
+}
+
+async function creditDraftJourney(page: Page) {
+  await page.getByRole("link", { name: "Prepare a credit note", exact: true }).click();
+  await page.getByLabel("Credit note date", { exact: true }).fill("2026-07-01");
+  await page.getByLabel("Credit note reason", { exact: true }).fill("Partial service adjustment");
+  await page.getByLabel("Consultation comptable", { exact: true }).fill("201");
+  await page.getByRole("button", { name: "Save credit note draft", exact: true }).click();
+  await expect(page.locator("form").getByRole("alert")).toBeVisible();
+  await expect(page.getByLabel("Credit note reason", { exact: true })).toHaveValue("Partial service adjustment");
+  await expect(page.getByLabel("Consultation comptable", { exact: true })).toHaveValue("201");
+  await page.getByLabel("Consultation comptable", { exact: true }).fill("50");
+  await page.getByRole("button", { name: "Save credit note draft", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Draft credit note", exact: true })).toBeVisible();
+  await expect(page.getByText(/Total:.*57.49/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Préparation du dossier" })).toHaveCount(0);
+  const url = page.url();
+  await page.reload();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "avoir-brouillon-en-dark");
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await page.getByRole("combobox", { name: "Apparence", exact: true }).selectOption("light");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await page.getByRole("link", { name: "Modifier l’avoir", exact: true }).click();
+  await expect(page.getByLabel("Consultation comptable", { exact: true })).toHaveValue("50.00");
+  await page.getByLabel("Motif de l’avoir", { exact: true }).fill("Ajustement partiel du service");
+  await captureReference(page, "avoir-formulaire");
+  await page.getByRole("button", { name: "Enregistrer le brouillon d’avoir", exact: true }).click();
+  await expect(page).toHaveURL(url);
+  await expectNoPageOverflow(page);
+  await captureReference(page, "avoir-brouillon");
+  await page.getByRole("link", { name: "Brouillons d’avoirs", exact: true }).click();
+  await expect(page.getByRole("link", { name: /Ajustement partiel du service/ })).toBeVisible();
+  await page.getByRole("button", { name: "English", exact: true }).click();
+  await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption("dark");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  return url;
 }
