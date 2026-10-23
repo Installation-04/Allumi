@@ -109,7 +109,7 @@ async function salesDraft(c: pg.Client, d: SalesDraftInput = {}): Promise<string
  * Posts a draft with its exact entry (t.invoice_post). An invoice debits receivables, a credit note credits them.
  * `arContact` lets a test charge the receivables line to someone other than the customer of the document.
  */
-async function salesPost(c: pg.Client, id: string, o: { number?: string; arContact?: string; entryDate?: string } = {}): Promise<PostedSales> {
+async function salesPost(c: pg.Client, id: string, o: { number?: string; arContact?: string; entryDate?: string; revenueAccount?: string } = {}): Promise<PostedSales> {
   const doc = await one<{ posting_date: string; contact_id: string; kind: string }>(c, "SELECT posting_date::text AS posting_date, contact_id, kind::text AS kind FROM sales_document WHERE id = $1", [id]);
   const subtotal = await int(c, "SELECT sum(amount_cents)::int AS n FROM sales_document_line WHERE document_id = $1", [id]);
   const gst = await int(c, "SELECT amount_cents::int AS n FROM sales_document_tax WHERE document_id = $1 AND tax_id = $2", [id, W.gst]);
@@ -119,7 +119,7 @@ async function salesPost(c: pg.Client, id: string, o: { number?: string; arConta
   const entryId = randomUUID();
   await entry(c, { id: entryId, no: nextEntryNo(), date: o.entryDate ?? doc.posting_date, source: "SALES_DOCUMENT", sourceId: id });
   await line(c, entryId, 1, W.receivable, { ...side(total, invoice), contact: o.arContact ?? doc.contact_id });
-  await line(c, entryId, 2, W.sales, side(subtotal, !invoice));
+  await line(c, entryId, 2, o.revenueAccount ?? W.sales, side(subtotal, !invoice));
   await line(c, entryId, 3, W.gstPayable, { ...side(gst, !invoice), tax: W.gst, box: "COLLECTED" });
   await line(c, entryId, 4, W.qstPayable, { ...side(qst, !invoice), tax: W.qst, box: "COLLECTED" });
   await c.query(
@@ -1399,4 +1399,8 @@ describe("rules that back up the privileges (table owner)", () => {
     expect(await codeAsTableOwner(onItem(db, rewrite))).toBe("AL004");
     expect(await codeAsTableOwner(onItem(db, remove))).toBe("AL004");
   });
+});
+
+it("refuses a balanced invoice posting to an account absent from its revenue lines", async () => {
+  expect(await code(async () => { await salesPost(app, await salesDraft(app), { revenueAccount: W.capital }); })).toBe("AL006");
 });

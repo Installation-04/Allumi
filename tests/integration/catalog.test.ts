@@ -106,3 +106,7 @@ it("installs catalogue price and account guards", async () => {
   expect(await q("SELECT conname FROM pg_constraint WHERE conname = 'item_price_range'")).toHaveLength(1);
   expect(await q("SELECT tgname FROM pg_trigger WHERE tgname IN ('item_account_guard', 'tax_account_types_guard') AND NOT tgisinternal")).toHaveLength(2);
 });
+
+it("checks invoice revenue and tax postings at transaction completion", async () => {
+  expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='invoice_posting_exact' AND tgdeferrable AND tginitdeferred AND NOT tgisinternal")).toHaveLength(1);
+});

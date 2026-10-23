@@ -174,3 +174,10 @@ Parcours Chromium avec données fictives; voir [[Taxes-et-catalogue]].
 ![Brouillons anglais sombres sur téléphone](images/factures-en-dark-mobile.png)
 
 Parcours Chromium avec données fictives; voir [[Brouillons-de-factures]]. Les brouillons n’ont aucun effet comptable.
+
+## Validation des factures
+
+![Facture validée](images/facture-validee-desktop.png)
+![Facture anglaise sombre sur téléphone](images/facture-validee-en-dark-mobile.png)
+
+Voir [[Validation-des-factures]].

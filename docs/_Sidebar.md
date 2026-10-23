@@ -42,3 +42,5 @@
 - [[Developpement-local]]
 - [[Developpement-cloud]]
 - [[Publication-du-wiki]]
+
+- [[Validation-des-factures]]

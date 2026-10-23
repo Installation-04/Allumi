@@ -3673,3 +3673,7 @@ REVOKE EXECUTE ON FUNCTION bank_deposit_complete() FROM PUBLIC;
 La migration `20261021000000_catalog_guards` borne le prix unitaire d’un article à un montant positif ou nul inférieur à 1 000 000 000 000 CAD, avec six décimales (`item_price_range`). Une valeur absente reste permise pour les anciennes données. L’interface exige un prix explicite.
 
 `item_account_guard` exige un compte de revenus actif pour les ventes et un compte de charges actif pour les achats. `tax_account_types_guard` exige un compte de passif actif pour les taxes à payer et un compte d’actif actif pour les taxes récupérables; le contrôle existant impose aussi le sous-type taxe de vente. Les clés étrangères composites, la RLS et les déclencheurs d’audit existants couvrent ces tables. Les données historiques incompatibles font échouer la migration et doivent être corrigées explicitement, sans suppression automatique.
+
+### Validation des factures
+
+Le trigger différé `invoice_posting_exact` compare l’écriture de chaque nouvelle facture aux comptes de revenus des lignes et aux comptes de taxes collectées. Il complète les contrôles existants du compte client, de l’équilibre, de la période et du lien document/journal. Une divergence annule toute la transaction, y compris les numéros réservés.

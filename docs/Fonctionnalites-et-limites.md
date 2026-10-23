@@ -10,8 +10,8 @@ Cette page distingue les parcours livrés du schéma et des fonctionnalités pla
 | Interface | Web adaptatif; tableau de bord et navigation intégrés | Essais supplémentaires sur Safari iOS et appareils physiques |
 | Entreprise | Identité, coordonnées et numéros fiscaux : [[Entreprise]] | Formats vérifiés, sans consultation des registres fiscaux |
 | Contacts et catalogue | Clients/fournisseurs et produits/services : [[Contacts]], [[Taxes-et-catalogue]] | Pas de suivi des stocks |
-| Taxes | Taux datés, codes, simulation et calcul exact : [[Taxes-et-catalogue]] | Validation des factures à venir; déclarations : phase 6 |
-| Ventes | Brouillons avec calcul exact : [[Brouillons-de-factures]] | Validation comptable, envoi et avoirs : phase 4 |
+| Taxes | Taux datés, codes, simulation et calcul exact : [[Taxes-et-catalogue]] | Déclarations : phase 6 |
+| Ventes | Brouillons et validation comptable : [[Brouillons-de-factures]], [[Validation-des-factures]] | Envoi, annulations et avoirs : phase 4 |
 | Achats | Contraintes de base préparées | Factures fournisseurs et dépenses : phase 4 |
 | Paiements et fichiers | Contraintes de base préparées | Paiements, dépôts, pièces jointes : phase 4 |
 | Banque | Planification | Import CSV/OFX, appariement, rapprochement : phase 5 |
@@ -24,4 +24,4 @@ Voir [[Feuille-de-route]], [[Guide-utilisateur]] et [[Plan-de-tests]].
 
 ## Brouillons de factures
 
-Création, modification, consultation et suppression sont disponibles : [[Brouillons-de-factures]]. Aucun numéro définitif, aucune écriture comptable, aucun envoi. Validation, avoirs et paiements restent à venir.
+Création, modification, consultation et suppression sont disponibles : [[Brouillons-de-factures]]. Un brouillon n’a aucun effet comptable. La [[Validation-des-factures]] lui attribue un numéro et crée son écriture. Envoi, annulations, avoirs et paiements restent à venir.

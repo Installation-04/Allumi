@@ -2,7 +2,7 @@
 
 Le menu **Brouillons de factures**, également accessible depuis **Ventes**, permet de préparer des factures en français ou en anglais sur ordinateur et téléphone.
 
-Un brouillon n’a **aucun numéro définitif et aucun effet comptable**. Il ne modifie ni les comptes clients ni le chiffre d’affaires du tableau de bord. La validation comptable, l’envoi, les avoirs et les paiements ne sont pas encore disponibles.
+Un brouillon n’a **aucun numéro définitif et aucun effet comptable**. Il ne modifie ni les comptes clients ni le chiffre d’affaires du tableau de bord. La validation comptable est disponible : [[Validation-des-factures]]. L’envoi, les avoirs et les paiements ne sont pas encore disponibles.
 
 ## Préparer et enregistrer
 
