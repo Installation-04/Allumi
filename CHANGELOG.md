@@ -4,6 +4,12 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+### Corrigé
+- Le sélecteur d’apparence conserve visuellement le thème enregistré après l’action serveur.
+
+### Ajouté
+- Validation atomique des factures : numéro définitif, journal équilibré, contrôle SQL des comptes de revenus et taxes, coordonnées figées, consultation FR/EN et mobile des factures verrouillées. Requêtes répétées sans double comptabilisation; annulations, avoirs, envoi et paiements non disponibles dans l’interface.
+
 ## [0.4.0-alpha.1] - 2026-10-22
 
 ### Ajouté

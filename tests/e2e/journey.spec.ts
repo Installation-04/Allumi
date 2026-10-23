@@ -178,6 +178,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await expect(page.getByText("Your role: Owner")).toBeVisible();
   await captureReference(page, "dashboard-en");
   await appearanceJourney(page);
+  await postingJourney(page);
 });
 
 /** Today in the company's time zone (the application uses America/Toronto), as YYYY-MM-DD. */
@@ -569,4 +570,34 @@ async function draftsJourney(page: Page) {
   await page.getByRole("link", { name: "Retour aux brouillons" }).click();
   await expectNoPageOverflow(page);
   await captureReference(page, "factures");
+}
+
+async function postingJourney(page: Page) {
+  await openSection(page, "Brouillons de factures");
+  await page.getByRole("link", { name: /PROJET-2026-001/ }).click();
+  await page.locator("summary", { hasText: "Valider la facture" }).click();
+  await page.getByLabel("Date comptable", { exact: true }).fill("2026-05-01");
+  await page.getByLabel("Je confirme les montants et la validation définitive.").check();
+  await page.getByRole("button", { name: "Valider la facture", exact: true }).click();
+  await expect(page.locator("form").getByRole("alert")).toBeVisible();
+  await page.getByLabel("Date comptable", { exact: true }).fill("2026-06-01");
+  await page.getByLabel("Je confirme les montants et la validation définitive.").check();
+  await captureReference(page, "validation-facture");
+  await page.getByRole("button", { name: "Valider la facture", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "F-00001", exact: true })).toBeVisible();
+  await expect(page.getByText(/Total:.*241,45/)).toBeVisible();
+  await expect(page.getByRole("link", { name: "Modifier le brouillon" })).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByText("Facture comptabilisée", { exact: true })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "facture-validee");
+  await page.getByRole("button", { name: "English", exact: true }).click();
+  await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption("dark");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.getByRole("combobox", { name: "Appearance", exact: true })).toHaveValue("dark");
+  await expect(page.getByText("Posted invoice", { exact: true })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "facture-validee-en-dark");
+  await page.getByRole("link", { name: "View journal entry" }).click();
+  await expect(page.getByRole("heading", { name: "Entry J-00003", exact: true })).toBeVisible();
 }

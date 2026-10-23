@@ -6,7 +6,7 @@
 | 1 | Architecture finale, schéma de base de données, plan de tests ([[Architecture]], [[Schema-de-donnees]], [[Plan-de-tests]]) | Fait |
 | 2 | Squelette : auth, i18n, `/api/health`, `/setup`, build Docker ([[Premier-demarrage]], [[Authentification]]) | Fait |
 | 3 | Moteur comptable : plan comptable, journal, périodes, audit ([[Plan-comptable]], [[Journal-et-ecritures]], [[Exercices-et-periodes]], [[Piste-d-audit]]) | Fait (PR #2 intégrée) |
-| 4 | Contacts, taxes (moteur de calcul), factures, paiements, dépenses, pièces jointes | Contacts, taxes/catalogue et brouillons disponibles; validation des ventes à venir |
+| 4 | Contacts, taxes (moteur de calcul), factures, paiements, dépenses, pièces jointes | Contacts, taxes/catalogue et brouillons disponibles; validation des factures disponible; avoirs à venir |
 | 5 | Banque (CSV/OFX), rapprochement | À faire |
 | 6 | Rapports (dont le sommaire TPS/TVQ), exports CSV/PDF | À faire |
 | 7 | Version bêta publique | À faire |
@@ -46,4 +46,4 @@ Lot 4.1 : implémentation intégrée à `main`, guide [[Contacts]].
 
 Lot 4.2 : taxes configurables, moteur de calcul exact et catalogue, guide [[Taxes-et-catalogue]].
 
-Lot 4.3a : brouillons de factures disponibles, guide [[Brouillons-de-factures]]. Validation comptable, numérotation définitive et avoirs restent à venir dans le lot Ventes.
+Lot 4.3a : brouillons de factures disponibles, guide [[Brouillons-de-factures]]. Validation comptable et numérotation définitive disponibles : [[Validation-des-factures]]. Avoirs, annulations, envoi et paiements restent à venir.

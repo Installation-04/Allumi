@@ -23,5 +23,6 @@ function ThemeControl({ value }: { value: Theme }) {
 }
 
 export function ThemePicker({ value }: { value: Theme }) {
-  return <form action={setTheme}><ThemeControl value={value} /></form>;
+  // React resets form controls after an action; the server-provided value already reflects the saved choice.
+  return <form action={setTheme} onReset={event => event.preventDefault()}><ThemeControl value={value} /></form>;
 }

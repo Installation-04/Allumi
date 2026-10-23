@@ -75,7 +75,7 @@ async function nextEntryNumber(tx: Tx, companyId: string): Promise<bigint> {
 async function insertEntry(
   tx: Tx,
   actor: Actor,
-  entry: { date: IsoDate; source: "MANUAL" | "OPENING_BALANCE" | "REVERSAL"; memo: string | null; lines: EntryLine[]; reversesEntryId?: string },
+  entry: { date: IsoDate; source: "MANUAL" | "OPENING_BALANCE" | "REVERSAL" | "SALES_DOCUMENT"; sourceId?: string; memo: string | null; lines: EntryLine[]; reversesEntryId?: string },
 ): Promise<{ id: string; number: bigint }> {
   const period = await tx.fiscalPeriod.findFirst({
     where: { companyId: actor.companyId, startDate: { lte: toDbDate(entry.date) }, endDate: { gte: toDbDate(entry.date) } },
@@ -92,6 +92,7 @@ async function insertEntry(
       entryDate: toDbDate(entry.date),
       fiscalPeriodId: period.id,
       sourceType: entry.source,
+      sourceId: entry.sourceId ?? null,
       reversesEntryId: entry.reversesEntryId ?? null,
       memo: entry.memo,
       createdById: actor.userId,
@@ -113,7 +114,8 @@ async function insertEntry(
       entryDate: toDbDate(entry.date),
     })),
   });
-  await tx.$executeRaw`SET CONSTRAINTS ALL IMMEDIATE`;
+  // Sales links its document before firing the deferred source checks.
+  if (entry.source !== "SALES_DOCUMENT") await tx.$executeRaw`SET CONSTRAINTS ALL IMMEDIATE`;
   return { id: created.id, number };
 }
 
@@ -259,4 +261,12 @@ export async function getEntry(actor: Actor, entryId: string): Promise<EntryDto 
     if (!row) return null;
     return toEntryDto(row as EntryRow, await numberFormat(tx, actor.companyId));
   });
+}
+
+/** Creates an invoice entry inside the caller's tenant transaction. Link the document before commit. */
+export async function createInvoiceEntry(tx: Tx, actor: Actor, input: { documentId: string; date: IsoDate; memo: string; lines: EntryLine[] }) {
+  await requireRole(tx, "entry.post");
+  const [problem] = checkEntry(input.lines);
+  if (problem) throw new AppError(problemKey(problem));
+  return insertEntry(tx, actor, { ...input, source: "SALES_DOCUMENT", sourceId: input.documentId });
 }

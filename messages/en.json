@@ -206,7 +206,8 @@
       "reference": "Choose active customers, items, income accounts and tax codes belonging to this company.",
       "rate": "A tax rate is missing on this date, or calculations do not agree. Check tax settings.",
       "stale": "This draft was changed, deleted or posted elsewhere. Reload it before continuing.",
-      "confirm": "Confirm deletion of the draft."
+      "confirm": "Confirm deletion of the draft.",
+      "confirmPost": "Confirm final posting of the invoice."
     }
   },
   "nav": {
@@ -535,7 +536,7 @@
     "ventes": {
       "title": "Sales",
       "description": "Prepare invoice drafts and find your customers and items.",
-      "planned": "Invoice posting, credit notes and receipts are not yet available."
+      "planned": "Sending, credit notes and receipts are not yet available."
     },
     "depenses": {
       "title": "Expenses",
@@ -722,7 +723,7 @@
   "sales": {
     "title": "Invoice drafts",
     "draft": "Draft — not posted",
-    "intro": "Prepare invoices without a journal entry or final number. Posting, sending, credit notes and payments are not yet available.",
+    "intro": "Prepare invoices, then post them to the ledger. A draft does not change the ledger. Sending, credit notes and payments are not yet available.",
     "new": "New draft",
     "edit": "Edit draft",
     "back": "Back to drafts",
@@ -756,6 +757,16 @@
     "optionsLimit": "Selectors show the first 500 active customers and items.",
     "setupHint": "Before creating a draft, add an active customer, an income account and a tax code in Contacts, Chart of accounts and Taxes.",
     "delete": "Delete draft",
-    "confirmDelete": "I confirm permanent deletion of this draft."
+    "confirmDelete": "I confirm permanent deletion of this draft.",
+    "post": "Post invoice",
+    "postHint": "This assigns a final number and posts the invoice to the ledger. The document will be locked. Credit notes and voiding are not yet available.",
+    "postingDate": "Posting date",
+    "confirmPost": "I confirm the amounts and final posting.",
+    "postedList": "Posted invoices",
+    "posted": "Posted invoice",
+    "journal": "View journal entry",
+    "issuer": "Issuer",
+    "billedTo": "Bill to",
+    "postedHint": "The details below were frozen when posted. Sending and payments are not yet available."
   }
 }

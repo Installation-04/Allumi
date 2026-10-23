@@ -26,3 +26,14 @@ export async function deleteDraftAction(companyId: string, id: string, revision:
     redirect(`/c/${companyId}/factures`);
   });
 }
+export async function postInvoiceAction(companyId: string, id: string, revision: string, _previous: FormState, form: FormData): Promise<FormState> {
+  const values = textValues(form, ["postingDate"]);
+  return safeAction(async () => {
+    if (form.get("confirm") !== "yes") throw new AppError("sales.confirmPost");
+    const session = await requireSession();
+    const { postInvoice } = await import("@/modules/sales");
+    await postInvoice({ userId: session.userId, companyId }, id, revision, values.postingDate ?? "");
+    revalidatePath(`/c/${companyId}`, "layout");
+    redirect(`/c/${companyId}/factures/validees/${id}`);
+  }, values);
+}

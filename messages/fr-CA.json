@@ -206,7 +206,8 @@
       "reference": "Choisissez des clients, articles, comptes de revenus et codes fiscaux actifs de cette entreprise.",
       "rate": "Un taux fiscal manque à cette date, ou les calculs ne concordent pas. Vérifiez les taxes.",
       "stale": "Ce brouillon a été modifié, supprimé ou validé ailleurs. Rechargez la fiche avant de poursuivre.",
-      "confirm": "Confirmez la suppression du brouillon."
+      "confirm": "Confirmez la suppression du brouillon.",
+      "confirmPost": "Confirmez la validation définitive de la facture."
     }
   },
   "nav": {
@@ -535,7 +536,7 @@
     "ventes": {
       "title": "Ventes",
       "description": "Préparez vos brouillons et retrouvez vos clients et articles.",
-      "planned": "Validation comptable des factures, avoirs et encaissements : non disponibles pour le moment."
+      "planned": "Envoi, avoirs et encaissements ne sont pas encore disponibles."
     },
     "depenses": {
       "title": "Dépenses",
@@ -722,7 +723,7 @@
   "sales": {
     "title": "Brouillons de factures",
     "draft": "Brouillon — non comptabilisé",
-    "intro": "Préparez vos factures sans écriture comptable ni numéro définitif. Validation, envoi, avoirs et paiements ne sont pas encore disponibles.",
+    "intro": "Préparez des factures puis validez-les pour les comptabiliser. Un brouillon ne modifie pas le grand livre. Envoi, avoirs et paiements ne sont pas encore disponibles.",
     "new": "Nouveau brouillon",
     "edit": "Modifier le brouillon",
     "back": "Retour aux brouillons",
@@ -756,6 +757,16 @@
     "optionsLimit": "Les sélecteurs affichent les 500 premiers clients et articles actifs.",
     "setupHint": "Avant de créer un brouillon, ajoutez un client actif, un compte de revenus et un code fiscal dans Contacts, Plan comptable et Taxes.",
     "delete": "Supprimer le brouillon",
-    "confirmDelete": "Je confirme la suppression définitive de ce brouillon."
+    "confirmDelete": "Je confirme la suppression définitive de ce brouillon.",
+    "post": "Valider la facture",
+    "postHint": "Cette action attribue un numéro définitif et comptabilise la facture. Le document sera verrouillé. Les avoirs et annulations ne sont pas encore disponibles.",
+    "postingDate": "Date comptable",
+    "confirmPost": "Je confirme les montants et la validation définitive.",
+    "postedList": "Factures validées",
+    "posted": "Facture comptabilisée",
+    "journal": "Voir l’écriture comptable",
+    "issuer": "Émetteur",
+    "billedTo": "Facturé à",
+    "postedHint": "Les coordonnées ci-dessous sont figées à la validation. Envoi et paiements ne sont pas encore disponibles."
   }
 }
