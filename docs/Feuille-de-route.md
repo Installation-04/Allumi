@@ -46,4 +46,6 @@ Lot 4.1 : implémentation intégrée à `main`, guide [[Contacts]].
 
 Lot 4.2 : taxes configurables, moteur de calcul exact et catalogue, guide [[Taxes-et-catalogue]].
 
-Lot 4.3a : brouillons de factures disponibles, guide [[Brouillons-de-factures]]. Validation comptable et numérotation définitive disponibles : [[Validation-des-factures]]. Avoirs, annulations, envoi et paiements restent à venir.
+Lot 4.3a : brouillons de factures disponibles, guide [[Brouillons-de-factures]]. Validation comptable et numérotation définitive disponibles : [[Validation-des-factures]]. Avoirs, envoi et paiements restent à venir.
+
+Annulation des factures validées disponible avec contre-passation et historique conservé : [[Annulation-des-factures]].

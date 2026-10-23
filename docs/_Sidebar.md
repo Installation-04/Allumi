@@ -44,3 +44,5 @@
 - [[Publication-du-wiki]]
 
 - [[Validation-des-factures]]
+
+- [[Annulation-des-factures]]

@@ -29,7 +29,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.2 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.3 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -132,3 +132,11 @@ Identité, coordonnées et numéros fiscaux : [guide](docs/Entreprise.md).
 ![Facture validée](docs/images/facture-validee-desktop.png)
 
 <img src="docs/images/facture-validee-en-dark-mobile.png" alt="Facture validée en anglais sombre sur téléphone" width="360">
+
+### Annulation avec historique
+
+[Annuler une facture](docs/Annulation-des-factures.md) crée une contre-passation sans supprimer le document original.
+
+![Facture annulée](docs/images/facture-annulee-desktop.png)
+
+<img src="docs/images/facture-annulee-en-dark-mobile.png" alt="Facture annulée en anglais sombre sur téléphone" width="360">

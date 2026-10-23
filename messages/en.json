@@ -207,7 +207,10 @@
       "rate": "A tax rate is missing on this date, or calculations do not agree. Check tax settings.",
       "stale": "This draft was changed, deleted or posted elsewhere. Reload it before continuing.",
       "confirm": "Confirm deletion of the draft.",
-      "confirmPost": "Confirm final posting of the invoice."
+      "confirmPost": "Confirm final posting of the invoice.",
+      "invalidVoid": "Enter a reason of 1–500 characters and a date on or after the posting date.",
+      "confirmVoid": "Confirm permanently voiding the invoice.",
+      "linked": "This invoice has linked payments or credit notes. Resolve them before voiding."
     }
   },
   "nav": {
@@ -759,7 +762,7 @@
     "delete": "Delete draft",
     "confirmDelete": "I confirm permanent deletion of this draft.",
     "post": "Post invoice",
-    "postHint": "This assigns a final number and posts the invoice to the ledger. The document will be locked. Credit notes and voiding are not yet available.",
+    "postHint": "This assigns a final number and posts the invoice to the ledger. The document will be locked; corrections require an eligible void. Credit notes are not yet available.",
     "postingDate": "Posting date",
     "confirmPost": "I confirm the amounts and final posting.",
     "postedList": "Posted invoices",
@@ -767,6 +770,15 @@
     "journal": "View journal entry",
     "issuer": "Issuer",
     "billedTo": "Bill to",
-    "postedHint": "The details below were frozen when posted. Sending and payments are not yet available."
+    "postedHint": "The details below were frozen when posted. Sending and payments are not yet available.",
+    "void": "Void invoice",
+    "voided": "Voided invoice",
+    "voidDate": "Reversal date",
+    "reason": "Reason",
+    "confirmVoid": "I confirm permanently voiding this invoice.",
+    "voidWarning": "Voiding keeps the invoice and creates a reversal in an open period. Linked payments and credit notes prevent this operation.",
+    "voidHint": "The amounts below belong to the original invoice. Its accounting effect has been reversed.",
+    "reversal": "View reversal",
+    "postedLimit": "The 100 most recently posted invoices are shown, including voided invoices."
   }
 }

@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, expect, it } from "vitest";
 import type pg from "pg";
-import { saveDraft, getDraft, postInvoice, getInvoice, listInvoices, deleteDraft } from "@/modules/sales";
+import { voidInvoice, saveDraft, getDraft, postInvoice, getInvoice, listInvoices, deleteDraft } from "@/modules/sales";
 import { owner } from "./helpers";
 import { seedWorld, W } from "./world";
 const actor = { userId: W.userOwnerA, companyId: W.companyA };
@@ -46,4 +46,30 @@ it("refuses stale reviews and locked periods without consuming numbers", async (
   expect(await getDraft(actor,id)).not.toBeNull();
   await postInvoice(actor,id,revision,'2026-07-01');
   expect((await getInvoice(actor,id))!.number).toBe('F-00002');
+});
+
+it("voids once, retains immutable history and reverses every account and tax exactly", async () => {
+  const invoice = (await listInvoices(actor)).find(i => i.number === "F-00001")!;
+  const before = (await getInvoice(actor,invoice.id))!;
+  await expect(voidInvoice(reader,invoice.id,"2026-07-02","Correction")).rejects.toThrow();
+  await expect(voidInvoice({userId:W.userOwnerB,companyId:W.companyB},invoice.id,"2026-07-02","Correction")).rejects.toThrow();
+  for (const [date,reason] of [["2026-05-01","Correction"],["invalid","Correction"],["2026-07-02","   "],["2026-07-02","x".repeat(501)]]) {
+    await expect(voidInvoice(actor,invoice.id,date!,reason!)).rejects.toThrow();
+  }
+  // June was locked by the preceding test: a failed reversal must leave the original posted.
+  await expect(voidInvoice(actor,invoice.id,"2026-06-02","Correction")).rejects.toThrow();
+  expect((await getInvoice(actor,invoice.id))!.status).toBe("POSTED");
+  expect(await Promise.all([1,2].map(()=>voidInvoice(actor,invoice.id,"2026-07-02","Duplicate invoice")))).toEqual([invoice.id,invoice.id]);
+  const after = (await getInvoice(reader,invoice.id))!;
+  expect(after).toMatchObject({status:"VOID",number:before.number,voidReason:"Duplicate invoice",totalCents:before.totalCents,billingSnapshot:before.billingSnapshot});
+  expect(after.voidEntry?.entryDate.toISOString().slice(0,10)).toBe("2026-07-02");
+  const sums=(await db.query("SELECT account_id,contact_id,tax_id,tax_box,sum(debit_cents-credit_cents)::text AS net FROM journal_line WHERE entry_id=ANY($1::uuid[]) GROUP BY account_id,contact_id,tax_id,tax_box",[[before.journalEntryId,after.voidEntryId]])).rows;
+  expect(sums.length).toBe(4);
+  expect(sums.every(r=>r.net==='0')).toBe(true);
+  expect((await db.query("SELECT count(*)::int AS n FROM journal_entry WHERE reverses_entry_id=$1",[before.journalEntryId])).rows[0].n).toBe(1);
+  expect((await listInvoices(reader)).find(i=>i.id===invoice.id)?.status).toBe("VOID");
+  await expect(deleteDraft(actor,invoice.id,"unused")).rejects.toThrow();
+  await expect(postInvoice(actor,invoice.id,"unused","2026-07-02")).rejects.toThrow();
+  const audit=(await db.query("SELECT after->>'status' AS status FROM audit_log WHERE entity_id=$1 AND action='row.update' ORDER BY occurred_at,id",[invoice.id])).rows;
+  expect(audit.map(r=>r.status)).toContain("VOID");
 });

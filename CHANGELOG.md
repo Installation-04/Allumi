@@ -4,6 +4,9 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+### Ajouté
+- Annulation confirmée des factures avec motif, date de contre-passation, écriture inverse exacte et historique conservé. Contrôles des périodes, paiements/avoirs liés, permissions et doubles demandes; parcours FR/EN et mobile.
+
 ## [0.4.0-alpha.2] - 2026-10-23
 
 ### Corrigé
