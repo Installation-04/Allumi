@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.2] - 2026-10-23
+
 ### Corrigé
 - Le sélecteur d’apparence conserve visuellement le thème enregistré après l’action serveur.
 
