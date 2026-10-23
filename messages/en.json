@@ -210,7 +210,9 @@
       "confirmPost": "Confirm final posting of the invoice.",
       "invalidVoid": "Enter a reason of 1–500 characters and a date on or after the posting date.",
       "confirmVoid": "Confirm permanently voiding the invoice.",
-      "linked": "This invoice has linked payments or credit notes. Resolve them before voiding."
+      "linked": "This invoice has linked payments or credit notes. Resolve them before voiding.",
+      "invalidCredit": "Enter a reason and a positive amount on at least one line, without exceeding the original amount or two decimal places.",
+      "creditSource": "Choose a posted invoice and a date on or after its posting date."
     }
   },
   "nav": {
@@ -234,7 +236,8 @@
     "closeMenu": "Close menu",
     "catalog": "Products and services",
     "company": "Company",
-    "invoices": "Invoice drafts"
+    "invoices": "Invoice drafts",
+    "credits": "Credit notes"
   },
   "ledgerSetup": {
     "title": "Set up the books",
@@ -539,7 +542,7 @@
     "ventes": {
       "title": "Sales",
       "description": "Prepare invoice drafts and find your customers and items.",
-      "planned": "Sending, credit notes and receipts are not yet available."
+      "planned": "Sending, credit note posting and receiving payments are not available yet."
     },
     "depenses": {
       "title": "Expenses",
@@ -601,7 +604,8 @@
       "exercices": "Fiscal years",
       "catalogue": "Products and services",
       "taxes": "Taxes and rates",
-      "factures": "Invoice drafts"
+      "factures": "Invoice drafts",
+      "avoirs": "Credit note drafts"
     }
   },
   "updates": {
@@ -726,7 +730,7 @@
   "sales": {
     "title": "Invoice drafts",
     "draft": "Draft — not posted",
-    "intro": "Prepare invoices, then post them to the ledger. A draft does not change the ledger. Sending, credit notes and payments are not yet available.",
+    "intro": "Prepare invoices, then post them to the ledger. A draft does not change the ledger. Sending, credit note posting and payments are not yet available.",
     "new": "New draft",
     "edit": "Edit draft",
     "back": "Back to drafts",
@@ -762,7 +766,7 @@
     "delete": "Delete draft",
     "confirmDelete": "I confirm permanent deletion of this draft.",
     "post": "Post invoice",
-    "postHint": "This assigns a final number and posts the invoice to the ledger. The document will be locked; corrections require an eligible void. Credit notes are not yet available.",
+    "postHint": "This assigns a final number and posts the invoice to the ledger. The document will be locked; corrections require an eligible void. Credit notes can be prepared as drafts; posting is not available yet.",
     "postingDate": "Posting date",
     "confirmPost": "I confirm the amounts and final posting.",
     "postedList": "Posted invoices",
@@ -780,5 +784,24 @@
     "voidHint": "The amounts below belong to the original invoice. Its accounting effect has been reversed.",
     "reversal": "View reversal",
     "postedLimit": "The 100 most recently posted invoices are shown, including voided invoices."
+  },
+  "credits": {
+    "title": "Credit note drafts",
+    "draft": "Draft credit note",
+    "new": "Prepare a credit note",
+    "edit": "Edit credit note",
+    "save": "Save credit note draft",
+    "intro": "A credit note draft prepares a correction without changing the ledger or invoice balance. Posting credit notes is not available yet.",
+    "amountHint": "Enter the amount before tax to credit for each line, with up to two decimal places. Leave 0 to exclude a line. Tax rates and rounding come from the original invoice. Drafts do not reserve any amount.",
+    "reason": "Credit note reason",
+    "maximum": "Original amount before tax: {amount}",
+    "source": "Original invoice: {number}",
+    "chooseInvoice": "Choose a posted invoice",
+    "limit": "Showing the 100 most recent credit note drafts.",
+    "empty": "No credit note drafts. Open a posted invoice to prepare a correction.",
+    "sourceUnavailable": "The original invoice is no longer posted. This draft remains readable and can be deleted, but cannot be edited.",
+    "delete": "Delete credit note draft",
+    "confirmDelete": "I confirm deletion of this credit note draft.",
+    "date": "Credit note date"
   }
 }

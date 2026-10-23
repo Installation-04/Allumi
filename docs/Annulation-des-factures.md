@@ -28,3 +28,5 @@ Données fictives, Chromium ordinateur et téléphone émulé. Les essais sur iP
 
 ![Facture annulée](images/facture-annulee-desktop.png)
 ![Facture annulée en anglais sombre sur téléphone](images/facture-annulee-en-dark-mobile.png)
+
+Les [[Brouillons-d-avoirs]] préparent une correction partielle sans effet comptable. Ils ne bloquent pas l’annulation; après celle-ci, ils restent consultables et supprimables mais ne peuvent plus être modifiés.

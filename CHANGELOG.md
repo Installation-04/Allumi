@@ -4,6 +4,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.4] - 2026-10-23
+
+### Ajouté
+- Brouillons d’avoirs partiels liés aux factures : montants par ligne, taux historiques, contrôle des révisions, consultation et suppression; parcours FR/EN, sombre et mobile. Aucun effet comptable avant une future validation.
+
 ## [0.4.0-alpha.3] - 2026-10-23
 
 ### Ajouté

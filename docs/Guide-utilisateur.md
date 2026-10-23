@@ -62,3 +62,5 @@ Le propriétaire renseigne les coordonnées et numéros fiscaux dans **Entrepris
 Ouvrir **Brouillons de factures** pour saisir un client et des lignes, puis consulter le calcul enregistré. Voir [[Brouillons-de-factures]]. Les brouillons ne sont pas comptabilisés. Voir [[Validation-des-factures]] pour leur attribuer un numéro et créer leur écriture. L’envoi n’est pas encore disponible.
 
 Pour corriger entièrement une facture validée, voir [[Annulation-des-factures]]. Le document et son numéro sont conservés.
+
+- [[Brouillons-d-avoirs]]

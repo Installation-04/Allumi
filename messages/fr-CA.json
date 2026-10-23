@@ -210,7 +210,9 @@
       "confirmPost": "Confirmez la validation définitive de la facture.",
       "invalidVoid": "Indiquez un motif de 1 à 500 caractères et une date égale ou postérieure à la date comptable.",
       "confirmVoid": "Confirmez l’annulation définitive de la facture.",
-      "linked": "Cette facture a des paiements ou avoirs liés. Leur traitement doit être résolu avant l’annulation."
+      "linked": "Cette facture a des paiements ou avoirs liés. Leur traitement doit être résolu avant l’annulation.",
+      "invalidCredit": "Saisissez un motif et un montant positif sur au moins une ligne, sans dépasser le montant original ni deux décimales.",
+      "creditSource": "Choisissez une facture validée et une date au moins égale à sa date comptable."
     }
   },
   "nav": {
@@ -234,7 +236,8 @@
     "closeMenu": "Fermer le menu",
     "catalog": "Produits et services",
     "company": "Entreprise",
-    "invoices": "Brouillons de factures"
+    "invoices": "Brouillons de factures",
+    "credits": "Avoirs"
   },
   "ledgerSetup": {
     "title": "Initialiser la comptabilité",
@@ -539,7 +542,7 @@
     "ventes": {
       "title": "Ventes",
       "description": "Préparez vos brouillons et retrouvez vos clients et articles.",
-      "planned": "Envoi, avoirs et encaissements ne sont pas encore disponibles."
+      "planned": "Envoi, validation des avoirs et encaissements ne sont pas encore disponibles."
     },
     "depenses": {
       "title": "Dépenses",
@@ -601,7 +604,8 @@
       "exercices": "Exercices",
       "catalogue": "Produits et services",
       "taxes": "Taxes et taux",
-      "factures": "Brouillons de factures"
+      "factures": "Brouillons de factures",
+      "avoirs": "Brouillons d’avoirs"
     }
   },
   "updates": {
@@ -726,7 +730,7 @@
   "sales": {
     "title": "Brouillons de factures",
     "draft": "Brouillon — non comptabilisé",
-    "intro": "Préparez des factures puis validez-les pour les comptabiliser. Un brouillon ne modifie pas le grand livre. Envoi, avoirs et paiements ne sont pas encore disponibles.",
+    "intro": "Préparez des factures puis validez-les pour les comptabiliser. Un brouillon ne modifie pas le grand livre. Envoi, validation des avoirs et paiements ne sont pas encore disponibles.",
     "new": "Nouveau brouillon",
     "edit": "Modifier le brouillon",
     "back": "Retour aux brouillons",
@@ -762,7 +766,7 @@
     "delete": "Supprimer le brouillon",
     "confirmDelete": "Je confirme la suppression définitive de ce brouillon.",
     "post": "Valider la facture",
-    "postHint": "Cette action attribue un numéro définitif et comptabilise la facture. Le document sera verrouillé; sa correction passe par une annulation admissible. Les avoirs ne sont pas encore disponibles.",
+    "postHint": "Cette action attribue un numéro définitif et comptabilise la facture. Le document sera verrouillé; sa correction passe par une annulation admissible. Les avoirs peuvent être préparés en brouillon; leur validation reste à venir.",
     "postingDate": "Date comptable",
     "confirmPost": "Je confirme les montants et la validation définitive.",
     "postedList": "Factures validées",
@@ -780,5 +784,24 @@
     "voidHint": "Les montants ci-dessous sont ceux de la facture originale. Son effet comptable a été annulé par la contre-passation.",
     "reversal": "Voir la contre-passation",
     "postedLimit": "Les 100 factures les plus récemment validées sont affichées, y compris celles annulées."
+  },
+  "credits": {
+    "title": "Brouillons d’avoirs",
+    "draft": "Avoir en brouillon",
+    "new": "Préparer un avoir",
+    "edit": "Modifier l’avoir",
+    "save": "Enregistrer le brouillon d’avoir",
+    "intro": "Un brouillon d’avoir prépare une correction sans modifier la comptabilité ni le solde de la facture. La validation comptable des avoirs n’est pas encore disponible.",
+    "amountHint": "Indiquez le montant hors taxes à créditer pour chaque ligne, avec au plus deux décimales. Laissez 0 pour exclure une ligne. Les taux et le mode d’arrondi proviennent de la facture d’origine. Les brouillons ne réservent aucun montant.",
+    "reason": "Motif de l’avoir",
+    "maximum": "Montant original hors taxes : {amount}",
+    "source": "Facture d’origine : {number}",
+    "chooseInvoice": "Choisir une facture validée",
+    "limit": "Les 100 brouillons d’avoirs les plus récents sont affichés.",
+    "empty": "Aucun brouillon d’avoir. Ouvrez une facture validée pour préparer une correction.",
+    "sourceUnavailable": "La facture d’origine n’est plus validée. Ce brouillon reste consultable et peut être supprimé, mais ne peut plus être modifié.",
+    "delete": "Supprimer le brouillon d’avoir",
+    "confirmDelete": "Je confirme la suppression de ce brouillon d’avoir.",
+    "date": "Date de l’avoir"
   }
 }

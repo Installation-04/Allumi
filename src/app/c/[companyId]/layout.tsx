@@ -18,6 +18,7 @@ export default async function CompanyLayout({ children, params }: { children: Re
     { href: `${base}/contacts`, label: t("contacts"), icon: "contacts" },
     { href: `${base}/journal`, label: t("journal"), icon: "journal" },
     { href: `${base}/factures`, label: t("invoices"), icon: "journal" },
+    { href: `${base}/avoirs`, label: t("credits"), icon: "journal" },
     { href: `${base}/catalogue`, label: t("catalog"), icon: "accounts" },
     { href: `${base}/comptes`, label: t("accounts"), shortLabel: t("short.accounts"), icon: "accounts" },
     { href: `${base}/balance`, label: t("trial"), shortLabel: t("short.trial"), icon: "trial" },
