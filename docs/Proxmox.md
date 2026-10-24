@@ -18,13 +18,24 @@ sudo apt install -y git
 sudo git clone https://github.com/Installation-04/Allumi.git /opt/allumi
 cd /opt/allumi
 # Préversion de test; utiliser uniquement des données fictives.
-sudo git checkout v0.4.0-alpha.5
+sudo git checkout v0.4.0-alpha.6
 sudo ./scripts/install.sh --domain compta.exemple.ca --email admin@exemple.ca
 ```
 
 Choisir un tag d’une release publiée, pas une branche en développement. Le script installe Docker, génère les secrets, démarre la base et les migrations, configure HTTPS et les sauvegardes. Voir [[Installation]] et conserver la clé de sauvegarde hors de la VM.
 
 Ouvrir l’adresse HTTPS et créer l’entreprise fictive et son administrateur. Tester la connexion, les contacts, une écriture équilibrée et la balance de vérification. `https://compta.exemple.ca/api/health` doit retourner `status: ok` et la version attendue. Consulter [[Fonctionnalites-et-limites]] pour les fonctions encore en préparation.
+
+## Option Docker déjà installé
+
+Dans la même VM dédiée, avec Docker Engine et Compose disponibles :
+
+```bash
+cd /opt/allumi
+sudo ./scripts/install-docker.sh --domain compta.exemple.ca --email admin@exemple.ca
+```
+
+Ce script ne modifie pas le pare-feu et ne planifie pas de sauvegardes. Voir [[Installation-Docker]] pour la préparation seule, les contrôles et la persistance des données.
 
 ## Clients et mises à jour
 

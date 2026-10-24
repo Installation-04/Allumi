@@ -15,7 +15,7 @@ Cette page explique comment installer Allumi sur un serveur Ubuntu avec Docker C
 
 ## Installation en une commande
 ```bash
-git clone https://github.com/OWNER/allumi.git /opt/allumi
+git clone https://github.com/Installation-04/Allumi.git /opt/allumi
 cd /opt/allumi
 sudo ./scripts/install.sh --domain compta.exemple.ca --email admin@exemple.ca
 ```
@@ -34,6 +34,16 @@ Le script est **idempotent** : le relancer ne régénère pas les secrets exista
 
 ## Premier démarrage
 Ouvre `https://ton-domaine`. Si aucun utilisateur n'existe, la page `/setup` te demande de créer l'entreprise et le compte administrateur, puis se désactive : voir [[Premier-demarrage]]. Active ensuite la 2FA ([[Authentification]]).
+
+## Docker déjà installé
+
+Le script dédié construit et démarre la pile sans modifier le système hôte :
+
+```bash
+./scripts/install-docker.sh --domain compta.exemple.ca --email admin@exemple.ca
+```
+
+Préparation seule, contrôles, sauvegardes et mises à jour : [[Installation-Docker]].
 
 ## Installation manuelle
 ```bash
