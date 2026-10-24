@@ -30,6 +30,7 @@ function ipv6Prefix(address: string): string | null {
  * Anything to the left may have been written by the client.
  */
 export function clientIpFromForwardedFor(header: string | null | undefined, trustedHops: number): string {
+  if (trustedHops === 0) return "unknown";
   const entries = (header ?? "")
     .split(",")
     .map((entry) => entry.trim())

@@ -6,7 +6,7 @@ Allumi peut être testé dans une **VM Ubuntu 24.04 dédiée**, avec Docker Comp
 
 Prévoir initialement 4 vCPU, 8 Go de RAM et 40 Go de disque, à ajuster selon les pièces jointes et sauvegardes. Relier la VM à votre pont réseau et lui attribuer une adresse stable. Ces valeurs sont un point de départ pour le build et les essais, pas un résultat de mesure de capacité.
 
-Prévoir un nom DNS et un certificat HTTPS reconnu par l’iPhone et Windows. L’installation standard utilise Caddy et demande que les ports 80/443 du domaine soient accessibles pour la délivrance du certificat. Pour un serveur privé derrière votre reverse proxy, configurer ce proxy et le TLS selon [[Configuration]]; un certificat auto-signé non reconnu ne convient pas au client Windows. PostgreSQL ne doit pas être exposé sur Internet.
+Accès web direct : `http://ADRESSE_VM:28080`. Aucun domaine ni certificat obligatoire. Pour un HTTPS externe, voir [[Configuration]]. PostgreSQL reste privé.
 
 ## Installation d’une version publiée
 
@@ -18,8 +18,8 @@ sudo apt install -y git
 sudo git clone https://github.com/Installation-04/Allumi.git /opt/allumi
 cd /opt/allumi
 # Préversion de test; utiliser uniquement des données fictives.
-sudo git checkout v0.4.0-alpha.9
-sudo ./scripts/install.sh --domain compta.exemple.ca --email admin@exemple.ca
+sudo git checkout v0.4.0-alpha.10
+sudo ./scripts/install.sh --interactive
 ```
 
 Choisir un tag d’une release publiée, pas une branche en développement. Le script installe Docker, génère les secrets, démarre la base et les migrations, configure HTTPS et les sauvegardes. Voir [[Installation]] et conserver la clé de sauvegarde hors de la VM.
@@ -52,4 +52,4 @@ Voir [[Mise-a-jour]] pour les permissions, l’interruption temporaire et la res
 
 ## Configuration guidée dans la VM
 
-Lancer `./scripts/install-docker.sh` sans argument dans le terminal ouvre l’assistant standard/avancé : domaine, courriel, langue, ports, adresse d’écoute, préparation seule et confirmation. Docker/Compose doivent déjà être installés. Voir [[Installation-Docker]] pour les contraintes HTTPS et les ports personnalisés. Ce script ne doit pas être lancé sur l’hôte Proxmox.
+Lancer `./scripts/install-docker.sh` sans argument dans le terminal ouvre l’assistant standard/avancé : URL d’accès, langue, port HTTP, adresse d’écoute, préparation seule et confirmation. Docker/Compose doivent déjà être installés. Voir [[Installation-Docker]] pour les ports personnalisés et le proxy externe facultatif. Ce script ne doit pas être lancé sur l’hôte Proxmox.

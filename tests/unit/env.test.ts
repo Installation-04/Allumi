@@ -24,10 +24,10 @@ describe("environment validation", () => {
     }
   });
 
-  it("trusts one proxy by default, and checks the bounds", () => {
-    expect(parseEnv(GOOD).TRUSTED_PROXY_HOPS).toBe(1);
+  it("trusts no proxy by default, and checks the bounds", () => {
+    expect(parseEnv(GOOD).TRUSTED_PROXY_HOPS).toBe(0);
     expect(parseEnv({ ...GOOD, TRUSTED_PROXY_HOPS: "2" }).TRUSTED_PROXY_HOPS).toBe(2);
-    for (const bad of ["0", "6", "-1", "1.5", "deux"]) expect(() => parseEnv({ ...GOOD, TRUSTED_PROXY_HOPS: bad })).toThrowError(/TRUSTED_PROXY_HOPS/);
+    for (const bad of ["6", "-1", "1.5", "deux"]) expect(() => parseEnv({ ...GOOD, TRUSTED_PROXY_HOPS: bad })).toThrowError(/TRUSTED_PROXY_HOPS/);
   });
 
   it("makes the setup token optional but never short", () => {

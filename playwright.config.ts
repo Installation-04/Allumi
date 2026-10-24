@@ -45,7 +45,7 @@ export default defineConfig({
       ENCRYPTION_KEY: process.env.ENCRYPTION_KEY ?? Buffer.alloc(32, 7).toString("base64"),
       LOG_LEVEL: "warn",
       // The journey is written for a plain French instance: a developer's .env must not change it.
-      SETUP_TOKEN: "",
+      SETUP_TOKEN: "e2e-setup-token-123456789",
       DEFAULT_LOCALE: "fr-CA",
       APP_VERSION: "",
       TRUSTED_PROXY_HOPS: "1",

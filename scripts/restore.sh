@@ -32,7 +32,7 @@ tar -xf "$WORK/backup.tar" -C "$WORK"
 [ -f "$WORK/db.dump" ] || die "db.dump absent de l'archive."
 
 info "Arrêt de l'application…"
-compose stop app caddy || true
+compose stop app || true
 compose up -d db
 
 info "Restauration de la base…"
@@ -64,4 +64,4 @@ fi
 
 info "Redémarrage (le service migrate reconfigure le rôle de l'application)…"
 compose up -d
-info "Restauration terminée. Vérifie https://$(env_get ALLUMI_DOMAIN)"
+info "Restauration terminée. Vérifie $(env_get APP_URL)"

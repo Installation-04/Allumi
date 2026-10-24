@@ -48,6 +48,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute('href', '/icons/allumi-180.png');
   await captureReference(page, "premier-demarrage");
 
+  await page.locator('[name="setupToken"]').fill("e2e-setup-token-123456789");
   await page.getByLabel("Nom de l'entreprise").fill("Atelier Exemple inc.");
   await page.getByLabel("Premier mois de l'exercice financier").selectOption("4");
   await page.getByLabel("Ton nom").fill("Alex Exemple");

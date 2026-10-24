@@ -3,6 +3,11 @@ import { describe, expect, it } from "vitest";
 import { clientIpFromForwardedFor } from "@/modules/auth/domain/client-ip";
 
 describe("client address behind a reverse proxy", () => {
+  it("ignores forged forwarded headers in direct HTTP deployments", () => {
+    for (const header of [null, "6.6.6.6", "203.0.113.7, 198.51.100.2"]) {
+      expect(clientIpFromForwardedFor(header, 0)).toBe("unknown");
+    }
+  });
   it("believes the entry appended by the trusted proxy, not what the client wrote", () => {
     expect(clientIpFromForwardedFor("203.0.113.7", 1)).toBe("203.0.113.7");
     // the client sent "6.6.6.6"; the proxy appended the address it really saw
