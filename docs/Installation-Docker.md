@@ -18,7 +18,7 @@ Dans la VM, avec un compte autorisé à utiliser Docker :
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.8
+git checkout v0.4.0-alpha.9
 ./scripts/install-docker.sh
 ```
 
@@ -114,7 +114,7 @@ En cas d’échec : `docker compose logs migrate app caddy`. Résoudre la cause 
 
 ## Architectures et ports par défaut
 
-Le serveur Docker prend en charge **Linux AMD64 (x86_64)** et **Linux ARM64 (aarch64, système 64 bits)**. Compose construit les images pour l’architecture native du moteur Docker; aucune option `platform: linux/amd64` n’est imposée. La CI démarre la pile, applique les migrations et vérifie la santé et `/setup` sur les deux architectures. Les images de release de l’application et des migrations sont publiées avec un manifeste commun AMD64/ARM64 à partir de la prochaine version. L’installateur Windows reste x64.
+Le serveur Docker prend en charge **Linux AMD64 (x86_64)** et **Linux ARM64 (aarch64, système 64 bits)**. Compose construit les images pour l’architecture native du moteur Docker; aucune option `platform: linux/amd64` n’est imposée. La CI démarre la pile, applique les migrations et vérifie la santé et `/setup` sur les deux architectures. Les images de release de l’application et des migrations sont publiées avec un manifeste commun AMD64/ARM64 à partir de v0.4.0-alpha.9. L’installateur Windows reste x64.
 
 Une nouvelle installation par `install-docker.sh` utilise HTTP **28080** et HTTPS **28443** : `https://compta.exemple.ca:28443`. Ces ports évitent les ports web habituels, sans garantir qu’ils sont libres sur votre machine. L’assistant permet de les changer. Une configuration existante garde ses ports; les anciennes configurations sans clés de ports gardent **80/443**. Les valeurs de repli Compose et `.env.example` restent 80/443 pour préserver les installations manuelles et l’installateur Ubuntu historique.
 
