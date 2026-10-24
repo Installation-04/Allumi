@@ -4,6 +4,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.5] - 2026-10-24
+
+### Ajouté
+- Validation et affectation intégrale des avoirs à leur facture : numérotation atomique, écritures inversées exactes, limites cumulées de lignes/taxes, contrôles de solde et de concurrence, consultation FR/EN et mobile. Migration `20261024000000_credit_posting`.
+
 ## [0.4.0-alpha.4] - 2026-10-23
 
 ### Ajouté

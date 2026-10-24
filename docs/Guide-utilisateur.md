@@ -64,3 +64,5 @@ Ouvrir **Brouillons de factures** pour saisir un client et des lignes, puis cons
 Pour corriger entièrement une facture validée, voir [[Annulation-des-factures]]. Le document et son numéro sont conservés.
 
 - [[Brouillons-d-avoirs]]
+
+- [[Validation-des-avoirs]]

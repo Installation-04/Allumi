@@ -195,3 +195,10 @@ Voir [[Annulation-des-factures]].
 ![Avoir sur téléphone en anglais sombre](images/avoir-brouillon-en-dark-mobile.png)
 
 Voir [[Brouillons-d-avoirs]].
+
+## Avoirs validés
+
+![Avoir validé](images/avoir-valide-desktop.png)
+![Avoir anglais sombre sur téléphone](images/avoir-valide-en-dark-mobile.png)
+
+Voir [[Validation-des-avoirs]].

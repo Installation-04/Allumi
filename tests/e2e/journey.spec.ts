@@ -179,6 +179,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await captureReference(page, "dashboard-en");
   await appearanceJourney(page);
   await postingJourney(page);
+  await creditPostingJourney(page);
 });
 
 /** Today in the company's time zone (the application uses America/Toronto), as YYYY-MM-DD. */
@@ -674,4 +675,59 @@ async function creditDraftJourney(page: Page) {
   await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption("dark");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   return url;
+}
+
+async function creditPostingJourney(page: Page) {
+  await openSection(page,"Brouillons de factures");
+  await page.getByRole("link",{name:"Nouveau brouillon",exact:true}).click();
+  await page.getByLabel("Client",{exact:true}).selectOption({label:"Atelier Boréal"});
+  await page.getByLabel("Date de facture",{exact:true}).fill("2026-06-01");
+  await page.getByLabel("Date d’échéance",{exact:true}).fill("2026-07-01");
+  const line=page.getByRole("group",{name:"Ligne 1",exact:true});
+  await line.getByLabel("Article du catalogue").selectOption({label:"Consultation comptable"});
+  await line.getByLabel("Prix unitaire (CAD)").fill("100");
+  await line.getByLabel("Compte de revenus").selectOption({label:"4000 — Revenus de services"});
+  await page.getByRole("button",{name:"Enregistrer le brouillon",exact:true}).click();
+  await page.locator("summary",{hasText:"Valider la facture"}).click();
+  await page.getByLabel("Date comptable",{exact:true}).fill("2026-06-01");
+  await page.getByLabel("Je confirme les montants et la validation définitive.").check();
+  await page.getByRole("button",{name:"Valider la facture",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"F-00002",exact:true})).toBeVisible();
+  const invoiceUrl=page.url();
+  await page.getByRole("link",{name:"Préparer un avoir",exact:true}).click();
+  await page.getByLabel("Date de l’avoir",{exact:true}).fill("2026-07-01");
+  await page.getByLabel("Motif de l’avoir",{exact:true}).fill("Ajustement du service");
+  await page.getByLabel("Consultation comptable",{exact:true}).fill("25");
+  await page.getByRole("button",{name:"Enregistrer le brouillon d’avoir",exact:true}).click();
+  await page.locator("summary",{hasText:"Valider et affecter l’avoir"}).click();
+  await page.getByLabel("Date comptable",{exact:true}).fill("2026-06-01");
+  await page.getByLabel("Je confirme la validation et l’affectation intégrale de cet avoir.").check();
+  await page.getByRole("button",{name:"Valider et affecter l’avoir",exact:true}).click();
+  await expect(page.locator("form").getByRole("alert")).toBeVisible();
+  await page.getByLabel("Date comptable",{exact:true}).fill("2026-07-01");
+  await page.getByLabel("Je confirme la validation et l’affectation intégrale de cet avoir.").check();
+  await captureReference(page,"validation-avoir");
+  await page.getByRole("button",{name:"Valider et affecter l’avoir",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"AV-00001",exact:true})).toBeVisible();
+  await expect(page.getByText(/Total:.*28,74/)).toBeVisible();
+  await expect(page.getByRole("link",{name:"Modifier l’avoir",exact:true})).toHaveCount(0);
+  const creditUrl=page.url();await page.reload();await expectNoPageOverflow(page);await captureReference(page,"avoir-valide");
+  await page.goto(invoiceUrl);await expect(page.getByText(/Solde restant:.*86,24/)).toBeVisible();
+  await expect(page.getByRole("link",{name:/AV-00001/})).toBeVisible();
+  await captureReference(page,"facture-avec-avoir");
+  await page.goto(creditUrl);
+  await page.getByRole("button",{name:"English",exact:true}).click();
+  await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");
+  await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
+  await expect(page.getByRole("combobox",{name:"Appearance",exact:true})).toHaveValue("dark");
+  await expect(page.getByText("Posted credit note",{exact:true})).toBeVisible();
+  await expectNoPageOverflow(page);await captureReference(page,"avoir-valide-en-dark");
+  await page.getByRole("link",{name:"View journal entry",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Entry J-00006",exact:true})).toBeVisible();
+  await page.goto(creditUrl);
+  await page.getByRole("link",{name:"Posted credit notes",exact:true}).click();
+  await expect(page.getByRole("link",{name:/AV-00001/})).toBeVisible();
+  await page.getByRole("button",{name:"Français",exact:true}).click();
+  await page.getByRole("combobox",{name:"Apparence",exact:true}).selectOption("light");
+  await expect(page.locator("html")).toHaveAttribute("data-theme","light");
 }

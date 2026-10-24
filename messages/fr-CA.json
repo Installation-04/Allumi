@@ -212,7 +212,10 @@
       "confirmVoid": "Confirmez l’annulation définitive de la facture.",
       "linked": "Cette facture a des paiements ou avoirs liés. Leur traitement doit être résolu avant l’annulation.",
       "invalidCredit": "Saisissez un motif et un montant positif sur au moins une ligne, sans dépasser le montant original ni deux décimales.",
-      "creditSource": "Choisissez une facture validée et une date au moins égale à sa date comptable."
+      "creditSource": "Choisissez une facture validée et une date au moins égale à sa date comptable.",
+      "creditLimit": "Les avoirs cumulés dépassent les montants de la facture d’origine. Révisez les lignes et les taxes.",
+      "creditBalance": "Le solde de la facture est insuffisant pour affecter cet avoir intégralement.",
+      "confirmCreditPost": "Confirmez la validation et l’affectation de l’avoir."
     }
   },
   "nav": {
@@ -542,7 +545,7 @@
     "ventes": {
       "title": "Ventes",
       "description": "Préparez vos brouillons et retrouvez vos clients et articles.",
-      "planned": "Envoi, validation des avoirs et encaissements ne sont pas encore disponibles."
+      "planned": "Envoi, remboursements et encaissements ne sont pas encore disponibles."
     },
     "depenses": {
       "title": "Dépenses",
@@ -730,7 +733,7 @@
   "sales": {
     "title": "Brouillons de factures",
     "draft": "Brouillon — non comptabilisé",
-    "intro": "Préparez des factures puis validez-les pour les comptabiliser. Un brouillon ne modifie pas le grand livre. Envoi, validation des avoirs et paiements ne sont pas encore disponibles.",
+    "intro": "Préparez des factures puis validez-les pour les comptabiliser. Un brouillon ne modifie pas le grand livre. Envoi et paiements ne sont pas encore disponibles.",
     "new": "Nouveau brouillon",
     "edit": "Modifier le brouillon",
     "back": "Retour aux brouillons",
@@ -766,7 +769,7 @@
     "delete": "Supprimer le brouillon",
     "confirmDelete": "Je confirme la suppression définitive de ce brouillon.",
     "post": "Valider la facture",
-    "postHint": "Cette action attribue un numéro définitif et comptabilise la facture. Le document sera verrouillé; sa correction passe par une annulation admissible. Les avoirs peuvent être préparés en brouillon; leur validation reste à venir.",
+    "postHint": "Cette action attribue un numéro définitif et comptabilise la facture. Le document sera verrouillé; sa correction passe par une annulation admissible. Les avoirs permettent une correction partielle.",
     "postingDate": "Date comptable",
     "confirmPost": "Je confirme les montants et la validation définitive.",
     "postedList": "Factures validées",
@@ -791,7 +794,7 @@
     "new": "Préparer un avoir",
     "edit": "Modifier l’avoir",
     "save": "Enregistrer le brouillon d’avoir",
-    "intro": "Un brouillon d’avoir prépare une correction sans modifier la comptabilité ni le solde de la facture. La validation comptable des avoirs n’est pas encore disponible.",
+    "intro": "Préparez une correction sans effet comptable, puis validez l’avoir pour le comptabiliser et réduire le solde de sa facture d’origine.",
     "amountHint": "Indiquez le montant hors taxes à créditer pour chaque ligne, avec au plus deux décimales. Laissez 0 pour exclure une ligne. Les taux et le mode d’arrondi proviennent de la facture d’origine. Les brouillons ne réservent aucun montant.",
     "reason": "Motif de l’avoir",
     "maximum": "Montant original hors taxes : {amount}",
@@ -802,6 +805,17 @@
     "sourceUnavailable": "La facture d’origine n’est plus validée. Ce brouillon reste consultable et peut être supprimé, mais ne peut plus être modifié.",
     "delete": "Supprimer le brouillon d’avoir",
     "confirmDelete": "Je confirme la suppression de ce brouillon d’avoir.",
-    "date": "Date de l’avoir"
+    "date": "Date de l’avoir",
+    "postedList": "Avoirs validés",
+    "postedEmpty": "Aucun avoir validé.",
+    "postedLimit": "Les 100 derniers avoirs validés ou annulés sont affichés.",
+    "posted": "Avoir comptabilisé",
+    "voided": "Avoir annulé",
+    "postedHint": "Cet avoir est verrouillé. Son écriture et son affectation sont conservées. La désaffectation, l’annulation d’un avoir et le remboursement ne sont pas encore disponibles dans l’interface.",
+    "applications": "Affectations actives",
+    "openBalance": "Solde restant",
+    "post": "Valider et affecter l’avoir",
+    "postWarning": "Cette action attribue un numéro, comptabilise l’avoir et affecte son total à la facture d’origine. Elle est définitive dans cette interface. Vérifiez les montants, le motif et la date; un solde insuffisant ou un dépassement des montants déjà crédités sera refusé.",
+    "confirmPost": "Je confirme la validation et l’affectation intégrale de cet avoir."
   }
 }

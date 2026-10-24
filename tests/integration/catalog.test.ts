@@ -110,3 +110,9 @@ it("installs catalogue price and account guards", async () => {
 it("checks invoice revenue and tax postings at transaction completion", async () => {
   expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='invoice_posting_exact' AND tgdeferrable AND tginitdeferred AND NOT tgisinternal")).toHaveLength(1);
 });
+
+it("guards cumulative linked credit limits and exact credit postings", async () => {
+  expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='credit_note_limits' AND NOT tgisinternal")).toHaveLength(1);
+  const rows=await q<{ definition:string }>("SELECT pg_get_functiondef('invoice_posting_exact()'::regprocedure) AS definition");
+  expect(rows[0]?.definition).toContain("CREDIT_NOTE");
+});

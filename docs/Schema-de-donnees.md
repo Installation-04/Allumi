@@ -3677,3 +3677,9 @@ La migration `20261021000000_catalog_guards` borne le prix unitaire d’un artic
 ### Validation des factures
 
 Le trigger différé `invoice_posting_exact` compare l’écriture de chaque nouvelle facture aux comptes de revenus des lignes et aux comptes de taxes collectées. Il complète les contrôles existants du compte client, de l’équilibre, de la période et du lien document/journal. Une divergence annule toute la transaction, y compris les numéros réservés.
+
+## Validation des avoirs liés
+
+La migration `20261024000000_credit_posting` étend `invoice_posting_exact` aux avoirs : crédit clients, débits des revenus et des taxes collectées exactement égaux aux lignes du document. Le trigger `credit_note_limits` verrouille la facture d’origine avant validation et refuse le cumul des avoirs validés dépassant une ligne originale (position, compte et code conservés), une taxe ou le total. Dates, contact et mode d’arrondi doivent correspondre au contrat de correction. Les avoirs annulés ne consomment plus ces plafonds; les brouillons ne les réservent pas.
+
+Le service valide et affecte intégralement l’avoir à sa facture d’origine dans une transaction, sous verrou de facture puis d’avoir. Les contraintes existantes d’affectation contrôlent les dates, la période, les contacts et les soldes disponibles; un solde insuffisant annule toute l’opération. Les coordonnées figées de la facture sont conservées sur l’avoir. Une nouvelle demande pour un avoir déjà validé retourne le même document.

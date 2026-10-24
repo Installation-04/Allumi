@@ -1,6 +1,6 @@
 # Brouillons d’avoirs partiels
 
-Un brouillon d’avoir prépare une réduction d’une facture validée. Il n’attribue aucun numéro, ne crée aucune écriture, ne réserve aucun montant et ne réduit pas le solde de la facture. **La validation et l’affectation comptables des avoirs ne sont pas encore disponibles.**
+Un brouillon d’avoir prépare une réduction d’une facture validée. Il n’attribue aucun numéro, ne crée aucune écriture, ne réserve aucun montant et ne réduit pas le solde de la facture. La [[Validation-des-avoirs]] permet ensuite de comptabiliser et affecter intégralement le brouillon à sa facture.
 
 ## Préparer une correction
 
@@ -26,6 +26,6 @@ La suppression demande une confirmation. Si la facture est annulée, ses brouill
 
 ## Limites
 
-Les plafonds du brouillon sont les montants originaux de chaque ligne et des taxes. Ils ne représentent pas un solde disponible après d’autres avoirs ou paiements. Plusieurs brouillons peuvent préparer la même correction; aucun ne réserve le montant. Les contrôles cumulés et concurrents du crédit disponible seront appliqués lors de la future validation et affectation.
+Les plafonds du brouillon sont les montants originaux de chaque ligne et des taxes. Ils ne représentent pas un solde disponible après d’autres avoirs ou paiements. Plusieurs brouillons peuvent préparer la même correction; aucun ne réserve le montant. Les contrôles cumulés et concurrents du crédit disponible sont appliqués lors de la [[Validation-des-avoirs]].
 
-Pas de validation, remboursement, PDF ou envoi dans ce parcours. Le journal reste inchangé. Pour une annulation complète admissible avec effet comptable, voir [[Annulation-des-factures]]. Les essais utilisent des données fictives; cette préversion ne convient pas à une comptabilité réelle. Captures issues des parcours Chromium ordinateur/mobile, pas d’essais sur iPhone physique.
+Le journal reste inchangé tant que le brouillon n’est pas validé. Remboursements, PDF et envoi restent à venir. Pour une annulation complète admissible avec effet comptable, voir [[Annulation-des-factures]]. Les essais utilisent des données fictives; cette préversion ne convient pas à une comptabilité réelle. Captures issues des parcours Chromium ordinateur/mobile, pas d’essais sur iPhone physique.
