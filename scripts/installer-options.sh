@@ -29,7 +29,7 @@ installer_ask() {
 installer_wizard() {
   local choice=1 mode=1 confirmation action_label
   printf "\n  ALLUMI — Assistant d’installation Docker\n\n" >&2
-  printf "Docker Engine et Compose doivent déjà être installés.\nLes données et secrets existants seront conservés. Ctrl+C pour quitter.\n\n1) Installation standard (réglages existants ou ports 80/443)\n2) Options avancées (ports, adresse d’écoute, délai)\n" >&2
+  printf "Docker Engine et Compose doivent déjà être installés.\nLes données et secrets existants seront conservés. Ctrl+C pour quitter.\n\n1) Installation standard (réglages existants ou ports 28080/28443)\n2) Options avancées (ports, adresse d’écoute, délai)\n" >&2
   installer_ask choice 'Parcours (1 ou 2)' valid_choice 1
   installer_ask DOMAIN 'Nom de domaine, sans https:// ni port' valid_domain "$DOMAIN"
   installer_ask EMAIL 'Courriel pour le certificat HTTPS' valid_email "$EMAIL"

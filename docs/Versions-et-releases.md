@@ -43,3 +43,5 @@ Le script sauvegarde d'abord, se place sur l'étiquette, complète ton `.env` et
 Chaque release réunit l’installateur Windows x64 `.exe`, son `.blockmap`, les métadonnées du canal de mise à jour (`latest.yml` ou `alpha.yml`/`beta.yml`), une archive du serveur et `SHA256SUMS.txt`. Les images application et migration sont publiées avec le numéro exact dans GHCR. `latest` est réservé aux versions stables.
 
 Pour les mises à jour Git, installer depuis un clone du dépôt : l’archive source n’inclut pas le répertoire `.git` nécessaire aux scripts. Les préversions Windows sont non signées. Les numéros utilisés par les mises à jour sont `X.Y.Z` ou `X.Y.Z-alpha.N`, `-beta.N`, `-rc.N`. Le client et le serveur portent le même numéro à la publication, mais peuvent être mis à jour séparément.
+
+Les images serveur et migrations sont construites nativement pour Linux AMD64 et ARM64, puis regroupées sous un tag de version commun. La publication de la release attend les deux architectures et la vérification des manifestes. Le client Windows reste x64.

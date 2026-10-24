@@ -7,7 +7,7 @@ Le script `scripts/install-docker.sh` installe Allumi dans la pile Docker du dé
 - Une VM Linux dédiée, par exemple Ubuntu 24.04 sur Proxmox. Ne pas installer sur l’hôte Proxmox.
 - Docker Engine et le plugin Docker Compose v2 déjà installés; le compte doit pouvoir exécuter `docker info` et `docker compose version`.
 - Bash, OpenSSL et Git. Prévoir initialement 4 vCPU, 8 Go de RAM et 40 Go de disque pour les builds et essais; ce n’est pas une mesure de capacité.
-- Un nom DNS dirigé vers la VM et les ports choisis disponibles pour Caddy (80/443 par défaut). Le certificat doit être reconnu par les clients Windows/iPhone.
+- Un nom DNS dirigé vers la VM et les ports choisis disponibles pour Caddy (28080/28443 par défaut pour une nouvelle installation via cet assistant). Le certificat doit être reconnu par les clients Windows/iPhone.
 
 Docker absent sur Ubuntu? Le script `sudo ./scripts/install.sh --domain … --email …` installe aussi le moteur, configure le pare-feu et planifie les sauvegardes. Voir [[Installation]]. Le script Docker dédié ne modifie ni les paquets, ni le pare-feu, ni les tâches planifiées de l’hôte.
 
@@ -28,7 +28,7 @@ Répondre aux questions du terminal. Utiliser seulement des données fictives pe
 
 Sans argument dans un terminal, l’assistant propose :
 
-1. **Installation standard** : réglages existants ou ports 80/443 pour une nouvelle installation.
+1. **Installation standard** : réglages existants ou ports 28080/28443 pour une nouvelle installation.
 2. **Options avancées** : adresse IPv4 d’écoute, ports HTTP/HTTPS distincts (1 à 65535) et délai du contrôle de santé.
 
 Les deux parcours demandent le domaine, le courriel HTTPS, la langue initiale (`fr-CA` ou `en`), puis le choix entre démarrer Docker ou préparer seulement `.env`. La langue initiale ne remplace pas les préférences des utilisateurs existants.
@@ -111,3 +111,11 @@ Dans le même clone Git :
 Choisir un tag publié. Pour les mises à jour depuis l’interface web, installer l’agent facultatif selon [[Mise-a-jour]]. L’EXE Windows et l’application iOS utilisent l’adresse HTTPS du serveur; voir [[Client-Windows]] et [[Application-mobile]]. Les captures de l’interface sont dans [[References-visuelles]].
 
 En cas d’échec : `docker compose logs migrate app caddy`. Résoudre la cause puis relancer le script; ne pas supprimer les volumes ni remplacer les clés existantes. Un verrou abandonné après une interruption brutale ne doit être retiré qu’après avoir vérifié qu’aucune installation ne tourne.
+
+## Architectures et ports par défaut
+
+Le serveur Docker prend en charge **Linux AMD64 (x86_64)** et **Linux ARM64 (aarch64, système 64 bits)**. Compose construit les images pour l’architecture native du moteur Docker; aucune option `platform: linux/amd64` n’est imposée. La CI démarre la pile, applique les migrations et vérifie la santé et `/setup` sur les deux architectures. Les images de release de l’application et des migrations sont publiées avec un manifeste commun AMD64/ARM64 à partir de la prochaine version. L’installateur Windows reste x64.
+
+Une nouvelle installation par `install-docker.sh` utilise HTTP **28080** et HTTPS **28443** : `https://compta.exemple.ca:28443`. Ces ports évitent les ports web habituels, sans garantir qu’ils sont libres sur votre machine. L’assistant permet de les changer. Une configuration existante garde ses ports; les anciennes configurations sans clés de ports gardent **80/443**. Les valeurs de repli Compose et `.env.example` restent 80/443 pour préserver les installations manuelles et l’installateur Ubuntu historique.
+
+Les ports personnalisés ne remplacent pas le routage nécessaire aux certificats ACME : par exemple, rediriger le port public 80 vers 28080 sur la VM. Pour accéder directement à l’URL avec `:28443`, ce port doit également être accessible aux clients.

@@ -185,3 +185,5 @@ La vérification en deux étapes doit être terminée dans les dix minutes suiva
 Dans une VM Linux avec Docker et Compose installés, lancez `./scripts/install-docker.sh` sans argument : parcours standard ou avancé, questions de configuration et confirmation avant installation. Domaine, langue et ports sont configurables. [Guide illustré](docs/Installation-Docker.md).
 
 ![Assistant Docker](docs/images/assistant-docker.png)
+
+L’assistant Docker utilise les ports **28080/28443** pour les nouvelles installations et conserve les réglages existants. Le serveur cible Linux **AMD64 et ARM64** (builds et tests Docker natifs pour les deux architectures). Voir le [guide Docker](docs/Installation-Docker.md).

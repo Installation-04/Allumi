@@ -59,6 +59,15 @@ class Installer(unittest.TestCase):
         self.assertEqual(original,self.config())
         log=self.log.read_text();self.assertIn('up -d --build',log);self.assertIn('config --quiet',log)
         self.assertNotIn('down',log)
+    def test_legacy_configuration_keeps_standard_ports(self):
+        self.assertEqual(self.run_install('--prepare-only').returncode,0)
+        path=self.root/'.env'
+        path.write_text('\n'.join(line for line in path.read_text().splitlines() if not line.startswith(('ALLUMI_HTTP_PORT=','ALLUMI_HTTPS_PORT=')))+'\n')
+        self.assertEqual(self.run_install('--prepare-only').returncode,0)
+        self.assertEqual(self.config()['ALLUMI_HTTP_PORT'],'80')
+        self.assertEqual(self.config()['ALLUMI_HTTPS_PORT'],'443')
+        self.assertEqual(self.config()['APP_URL'],'https://allumi.example.test')
+
     def test_prepare_only_does_not_call_docker(self):
         result=self.run_install('--prepare-only');self.assertEqual(result.returncode,0,result.stderr)
         self.assertFalse(self.log.exists());self.assertTrue((self.root/'.env').exists())
@@ -114,7 +123,7 @@ class Installer(unittest.TestCase):
         self.assertEqual(self.run_install().returncode,0)
         self.assertEqual(self.config(),cfg)
     def test_invalid_network_options_are_refused_without_writes(self):
-        for args in [('--http-port','0'),('--https-port','65536'),('--https-port','80'),('--http-port','080'),('--bind','999.0.0.1'),('--bind','127.0.0.01'),('--bind','$(touch nope)'),('--locale','de'),('--http-port',)]:
+        for args in [('--http-port','0'),('--https-port','65536'),('--https-port','28080'),('--http-port','080'),('--bind','999.0.0.1'),('--bind','127.0.0.01'),('--bind','$(touch nope)'),('--locale','de'),('--http-port',)]:
             self.assertNotEqual(self.run_install(*args).returncode,0,args)
             self.assertFalse((self.root/'.env').exists())
     def test_wizard_advanced_validates_and_prepares(self):
@@ -144,12 +153,12 @@ class Installer(unittest.TestCase):
             os.close(master);os.close(slave)
         self.assertEqual(result.returncode,0,result.stderr)
         self.assertIn('Assistant',result.stderr)
-        self.assertEqual(self.config()['ALLUMI_HTTPS_PORT'],'443')
+        self.assertEqual(self.config()['ALLUMI_HTTPS_PORT'],'28443')
         self.assertFalse(self.log.exists())
     def test_shell_network_variables_cannot_override_selected_settings(self):
         result=self.run_install(ALLUMI_HTTP_PORT='9876',ALLUMI_HTTPS_PORT='9877',ALLUMI_BIND_ADDRESS='127.0.0.9',DEFAULT_LOCALE='en')
         self.assertEqual(result.returncode,0,result.stderr)
-        self.assertEqual(self.config()['ALLUMI_HTTP_PORT'],'80')
+        self.assertEqual(self.config()['ALLUMI_HTTP_PORT'],'28080')
         self.assertEqual(self.config()['DEFAULT_LOCALE'],'fr-CA')
 
 if __name__=='__main__': unittest.main()

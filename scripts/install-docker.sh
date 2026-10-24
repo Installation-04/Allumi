@@ -12,8 +12,11 @@ umask 077
 [ "$ENV_FILE" = "$ALLUMI_DIR/.env" ] || die "cet installateur utilise uniquement .env à la racine du projet."
 [ ! -L "$ENV_FILE" ] || die ".env ne doit pas être un lien symbolique."
 DOMAIN="$(env_get ALLUMI_DOMAIN)"; EMAIL="$(env_get ACME_EMAIL)"
-INSTALL_HTTP_PORT="$(env_get ALLUMI_HTTP_PORT)"; INSTALL_HTTP_PORT="${INSTALL_HTTP_PORT:-80}"
-INSTALL_HTTPS_PORT="$(env_get ALLUMI_HTTPS_PORT)"; INSTALL_HTTPS_PORT="${INSTALL_HTTPS_PORT:-443}"
+# Older deployments without explicit port keys used Compose's 80/443 defaults.
+DEFAULT_HTTP_PORT=28080; DEFAULT_HTTPS_PORT=28443
+if [ -e "$ENV_FILE" ]; then DEFAULT_HTTP_PORT=80; DEFAULT_HTTPS_PORT=443; fi
+INSTALL_HTTP_PORT="$(env_get ALLUMI_HTTP_PORT)"; INSTALL_HTTP_PORT="${INSTALL_HTTP_PORT:-$DEFAULT_HTTP_PORT}"
+INSTALL_HTTPS_PORT="$(env_get ALLUMI_HTTPS_PORT)"; INSTALL_HTTPS_PORT="${INSTALL_HTTPS_PORT:-$DEFAULT_HTTPS_PORT}"
 INSTALL_BIND="$(env_get ALLUMI_BIND_ADDRESS)"; INSTALL_BIND="${INSTALL_BIND:-0.0.0.0}"
 INSTALL_LOCALE="$(env_get DEFAULT_LOCALE)"; INSTALL_LOCALE="${INSTALL_LOCALE:-fr-CA}"
 PREPARE_ONLY=0; WAIT_SECONDS=300; INTERACTIVE=0
@@ -44,8 +47,8 @@ Sans argument dans un terminal : assistant interactif.
 --interactive             Assistant avec récapitulatif et confirmation
 --domain DOMAINE          Nom DNS, sans protocole ni port
 --email COURRIEL          Adresse pour les certificats HTTPS
---http-port PORT          Port HTTP sur l’hôte (défaut : 80)
---https-port PORT         Port HTTPS sur l’hôte et dans l’URL (défaut : 443)
+--http-port PORT          Port HTTP sur l’hôte (nouvelle installation : 28080)
+--https-port PORT         Port HTTPS sur l’hôte et dans l’URL (nouvelle installation : 28443)
 --bind IPV4               Adresse d’écoute (défaut : 0.0.0.0)
 --locale fr-CA|en         Langue initiale (défaut : fr-CA)
 --prepare-only            Préparer .env sans lancer Docker
