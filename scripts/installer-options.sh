@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 # Validation and terminal wizard for install-docker.sh; no host or configuration writes.
-valid_domain() { [[ "$1" =~ ^([A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}$ ]] && [ "${#1}" -le 253 ]; }
-valid_email() { [[ "$1" =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}$ ]]; }
+valid_url() {
+  local host port
+  [[ "$1" =~ ^https?://([A-Za-z0-9.-]+)(:([0-9]+))?$ ]] || return 1
+  host="${BASH_REMATCH[1]}"; port="${BASH_REMATCH[3]}"
+  [[ "$host" =~ ^[0-9.]+$ ]] && { valid_bind "$host" || return 1; }
+  [[ "$host" =~ ^[A-Za-z0-9]([A-Za-z0-9.-]*[A-Za-z0-9])?$ ]] || return 1
+  [[ "$host" != *..* ]] || return 1
+  [ -z "$port" ] || valid_port "$port"
+}
 valid_port() { [[ "$1" =~ ^[1-9][0-9]{0,4}$ ]] && [ "$1" -le 65535 ]; }
 valid_timeout() { [[ "$1" =~ ^[1-9][0-9]{0,3}$ ]] && [ "$1" -le 3600 ]; }
 valid_locale() { [[ "$1" == fr-CA || "$1" == en ]]; }
@@ -29,23 +36,17 @@ installer_ask() {
 installer_wizard() {
   local choice=1 mode=1 confirmation action_label
   printf "\n  ALLUMI — Assistant d’installation Docker\n\n" >&2
-  printf "Docker Engine et Compose doivent déjà être installés.\nLes données et secrets existants seront conservés. Ctrl+C pour quitter.\n\n1) Installation standard (réglages existants ou ports 28080/28443)\n2) Options avancées (ports, adresse d’écoute, délai)\n" >&2
+  printf "Docker Engine et Compose doivent déjà être installés.\nLes données et secrets existants seront conservés. Ctrl+C pour quitter.\n\n1) Installation standard (réglages existants ou port HTTP 28080)\n2) Options avancées (ports, adresse d’écoute, délai)\n" >&2
   installer_ask choice 'Parcours (1 ou 2)' valid_choice 1
-  installer_ask DOMAIN 'Nom de domaine, sans https:// ni port' valid_domain "$DOMAIN"
-  installer_ask EMAIL 'Courriel pour le certificat HTTPS' valid_email "$EMAIL"
+  installer_ask INSTALL_URL 'Adresse web (ex. http://192.168.1.20:28080)' valid_url "$INSTALL_URL"
   installer_ask INSTALL_LOCALE 'Langue initiale (fr-CA ou en)' valid_locale "$INSTALL_LOCALE"
-  if ! valid_bind "$INSTALL_BIND" || ! valid_port "$INSTALL_HTTP_PORT" || ! valid_port "$INSTALL_HTTPS_PORT" || [ "$INSTALL_HTTP_PORT" = "$INSTALL_HTTPS_PORT" ] || ! valid_timeout "$WAIT_SECONDS"; then
+  if ! valid_bind "$INSTALL_BIND" || ! valid_port "$INSTALL_HTTP_PORT" || ! valid_timeout "$WAIT_SECONDS"; then
     printf 'Des réglages réseau sont invalides; passage aux options avancées.\n' >&2
     choice=2
   fi
   if [ "$choice" = 2 ]; then
     installer_ask INSTALL_BIND "Adresse IPv4 d’écoute (0.0.0.0 = toutes les interfaces)" valid_bind "$INSTALL_BIND"
     installer_ask INSTALL_HTTP_PORT "Port HTTP sur l’hôte (1–65535)" valid_port "$INSTALL_HTTP_PORT"
-    while :; do
-      installer_ask INSTALL_HTTPS_PORT "Port HTTPS sur l’hôte (1–65535, distinct du port HTTP)" valid_port "$INSTALL_HTTPS_PORT"
-      [ "$INSTALL_HTTP_PORT" != "$INSTALL_HTTPS_PORT" ] && break
-      printf 'HTTP et HTTPS doivent utiliser des ports différents.\n' >&2
-    done
     installer_ask WAIT_SECONDS 'Délai de santé après démarrage Compose (1–3600 secondes)' valid_timeout "$WAIT_SECONDS"
   fi
   [ "$PREPARE_ONLY" -eq 0 ] || mode=2
@@ -54,14 +55,9 @@ installer_wizard() {
   PREPARE_ONLY=$((mode - 1))
   action_label="Configurer et démarrer Docker"
   [ "$PREPARE_ONLY" -eq 0 ] || action_label="Préparer .env uniquement"
-  installer_url
-  printf '\nRésumé\n  Domaine : %s\n  Courriel HTTPS : %s\n  Adresse : %s\n  Écoute : %s — HTTP %s, HTTPS %s (TCP/UDP)\n  Langue initiale : %s\n  Délai : %s s\n  Action : %s\n' "$DOMAIN" "$EMAIL" "$INSTALL_URL" "$INSTALL_BIND" "$INSTALL_HTTP_PORT" "$INSTALL_HTTPS_PORT" "$INSTALL_LOCALE" "$WAIT_SECONDS" "$action_label" >&2
-  printf '\nHTTPS exige un DNS valide et les challenges ACME accessibles publiquement sur 80 ou 443.\nAvec des ports personnalisés, configure les redirections du routeur/proxy.\nAucun pare-feu ni routage Proxmox ne sera modifié. Les sauvegardes restent à configurer.\n\n' >&2
+  printf '\nRésumé\n  Adresse : %s\n  Écoute : %s — HTTP %s (TCP)\n  Langue initiale : %s\n  Délai : %s s\n  Action : %s\n' "$INSTALL_URL" "$INSTALL_BIND" "$INSTALL_HTTP_PORT" "$INSTALL_LOCALE" "$WAIT_SECONDS" "$action_label" >&2
+  printf "\nApplication + PostgreSQL privé; aucun certificat ni proxy intégré.\nL’URL doit correspondre à celle utilisée dans le navigateur.\nHTTP convient au réseau de test privé; votre proxy peut fournir HTTPS.\nAucun pare-feu ni routage Proxmox modifié. Sauvegardes à configurer.\n\n" >&2
   printf 'Appliquer cette configuration ? [o/N] : ' >&2
   IFS= read -r confirmation || die "saisie interrompue; aucune configuration modifiée."
-  case "$confirmation" in o|O|oui|Oui|y|Y|yes) ;; *) printf 'Installation annulée. Aucun changement.\n' >&2; exit 0 ;; esac
-}
-installer_url() {
-  INSTALL_URL="https://${DOMAIN}"
-  [ "$INSTALL_HTTPS_PORT" = 443 ] || INSTALL_URL="${INSTALL_URL}:${INSTALL_HTTPS_PORT}"
+  case "$confirmation" in o|O|oui|Oui|y|Y|yes) ;; *) printf 'Installation annulée. Aucun changement.\n' >&2; exit 130 ;; esac
 }

@@ -4,15 +4,16 @@ Toute la configuration passe par des variables d'environnement, lues depuis le f
 
 > Le fichier `.env` contient des secrets : permissions `600`, jamais dans Git, copie dans un gestionnaire de mots de passe. Ne le « source » pas dans un shell (`source .env`) : certaines valeurs, comme `SMTP_FROM`, contiennent des espaces.
 
-## Domaine et HTTPS
-| Variable | Description |
+## Accès web et proxy externe
+
+| Variable | Rôle |
 |---|---|
-| `ALLUMI_DOMAIN` | Nom de domaine public (ex. `compta.exemple.ca`). Caddy obtient le certificat automatiquement. |
-| `ACME_EMAIL` | Courriel pour les avis d'expiration du certificat. |
-| `APP_URL` | URL publique complète, avec `https://` et le port si différent de 443. Aussi utilisée par la redirection HTTP de Caddy. |
-| `ALLUMI_BIND_ADDRESS` | Adresse IPv4 de publication Docker : `0.0.0.0` (défaut, toutes les interfaces), une adresse de la VM, ou `127.0.0.1` pour un accès local. |
-| `ALLUMI_HTTP_PORT` | Port HTTP de l’hôte, défaut `80`. |
-| `ALLUMI_HTTPS_PORT` | Port HTTPS TCP/UDP de l’hôte, défaut `443`. Doit être distinct du port HTTP. |
+| `APP_URL` | Origine utilisée par le navigateur, ex. `http://192.168.1.20:28080`, ou HTTPS fourni par votre proxy externe. |
+| `ALLUMI_BIND_ADDRESS` | IPv4 d’écoute sur l’hôte, défaut `0.0.0.0`; `127.0.0.1` pour accès local seulement. |
+| `ALLUMI_HTTP_PORT` | Port HTTP publié de l’application, défaut `28080`, vers le port interne 3000. |
+| `ALLUMI_NETWORK_MODE` | Marqueur de migration réseau géré par les scripts; laisser `direct`. |
+
+Aucun proxy ni certificat n’est fourni. PostgreSQL reste privé. Les anciennes clés `ALLUMI_DOMAIN`, `ACME_EMAIL`, `ALLUMI_HTTPS_PORT` sont ignorées. Voir [[Installation-Docker]] pour la transition depuis Caddy.
 
 ## Base de données
 | Variable | Description |
@@ -37,8 +38,8 @@ PostgreSQL n'est **pas** exposé hors du réseau Docker en production. Pourquoi 
 | `NODE_ENV` | `production` en prod. |
 | `LOG_LEVEL` | `silent`, `fatal`, `error`, `warn`, `info` (défaut), `debug`, `trace`. Journaux JSON sur la sortie standard; jamais de secrets ni de renseignements personnels. |
 | `DEFAULT_LOCALE` | `fr-CA` (défaut) ou `en`. |
-| `SETUP_TOKEN` | Jeton demandé **une seule fois** par la page `/setup` (16 caractères ou plus). Sans lui, la première personne qui atteint l'adresse pourrait créer l'administrateur. Généré par `install.sh` et affiché à la fin de l'installation. Vide : pas de jeton, ce qui n'est accepté qu'en développement ou en HTTP : **en production avec une `APP_URL` en `https://`, `/setup` reste fermé tant que `SETUP_TOKEN` n'est pas défini.** Voir [[Premier-demarrage]]. |
-| `TRUSTED_PROXY_HOPS` | Nombre de proxys inversés devant l'application, de 1 à 5 (défaut 1 : le Caddy fourni). L'adresse du client est l'entrée de `X-Forwarded-For` située à cette distance **à partir de la droite**, la seule qu'un proxy de confiance a écrite : ce que le client envoie plus à gauche est ignoré. Si tu ajoutes un CDN devant Caddy, mets 2 **et** configure `trusted_proxies` dans le `Caddyfile` ; l'application ne doit jamais être joignable sans passer par ces proxys. Les adresses IPv6 d'un même /64 partagent un seul budget d'essais. |
+| `SETUP_TOKEN` | Jeton privé de première configuration, généré par les scripts. En production, `/setup` reste fermé sans jeton, en HTTP comme en HTTPS. |
+| `TRUSTED_PROXY_HOPS` | De 0 à 5, défaut 0 : accès direct, en-têtes transférés ignorés et budget IP partagé. Avec un proxy externe, renseigner le nombre de proxys de confiance et empêcher tout accès direct contournant ces proxys. |
 
 ## Courriel (SMTP)
 `SMTP_HOST`, `SMTP_PORT` (587 par défaut), `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`. Utilise un service transactionnel avec SPF, DKIM et DMARC configurés sur ton domaine, sinon les factures risquent d'aboutir dans les pourriels.
@@ -56,6 +57,6 @@ Détails : [[Sauvegardes]].
 ## Ajouter une variable (contributeurs)
 Toute nouvelle variable consommée par l’application doit être ajoutée à `.env.example`, validée au démarrage (Zod, dans `src/platform/env.ts`), transmise à l'application dans `docker-compose.yml` (liste explicite : le service `app` ne lit pas tout le `.env`) et documentée ici, dans le même commit.
 
-Les variables `ALLUMI_BIND_ADDRESS`, `ALLUMI_HTTP_PORT` et `ALLUMI_HTTPS_PORT` sont propres à Docker Compose : elles sont validées par l’installateur et ne sont pas transmises à l’application. Les ports internes restent 80/443 pour Caddy; le port applicatif et PostgreSQL ne sont pas publiés.
+Les variables de publication réseau sont propres à Compose. L’application écoute sur 3000 et PostgreSQL sur 5432 dans le réseau interne; seul le port de l’application est publié.
 
 Au démarrage, une variable manquante ou invalide arrête l'application avec un message qui les nomme toutes (voir [[Depannage]]).

@@ -32,6 +32,14 @@ describe("session cookie", () => {
     expect((await load()).names.sessionCookieName()).toBe("allumi_session");
   });
 
+  it("sets and clears a usable HTTP cookie on a LAN address", async () => {
+    vi.stubEnv("APP_URL", "http://192.168.1.20:28080");
+    const { session } = await load();
+    await session.setSessionCookie("token", new Date("2030-01-01T00:00:00Z"));
+    expect(set).toHaveBeenCalledWith("allumi_session", "token", expect.objectContaining({ httpOnly: true, secure: false, sameSite: "lax", path: "/" }));
+    await session.clearSessionCookie();
+    expect(set).toHaveBeenLastCalledWith("allumi_session", "", expect.objectContaining({ secure: false, maxAge: 0 }));
+  });
   it("is set httpOnly, SameSite=Lax, and Secure over HTTPS", async () => {
     vi.stubEnv("APP_URL", "https://compta.exemple.ca");
     const { session } = await load();

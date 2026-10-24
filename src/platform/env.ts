@@ -19,9 +19,9 @@ const schema = z
       .refine((value) => Buffer.from(value, "base64").length === 32, "must be 32 bytes encoded in base64"),
     LOG_LEVEL: z.enum(["silent", "fatal", "error", "warn", "info", "debug", "trace"]).default("info"),
     DEFAULT_LOCALE: z.enum(["fr-CA", "en"]).default("fr-CA"),
-    // Reverse proxies between the internet and the app (the bundled Caddy is one). The client address
+    // Zero ignores forwarded headers; otherwise count trusted external proxies. The client address
     // is the entry of X-Forwarded-For that many places from the right.
-    TRUSTED_PROXY_HOPS: z.coerce.number().int().min(1).max(5).default(1),
+    TRUSTED_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(0),
     // When set, /setup asks for it: nobody who merely reaches the URL first can claim the instance.
     SETUP_TOKEN: z.string().min(16, "must be at least 16 characters").optional(),
     SMTP_HOST: z.string().optional(),

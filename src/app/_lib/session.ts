@@ -40,8 +40,8 @@ export async function clearSessionCookie(): Promise<void> {
 }
 
 /**
- * The bundled Caddy replaces any X-Forwarded-For sent by the client with the address it saw. Behind
- * further proxies, TRUSTED_PROXY_HOPS says how many entries to skip from the right.
+ * Direct access ignores forwarded headers. With a trusted external proxy, count hops from the right.
+ * Next.js does not expose the peer socket here, so direct clients share the unknown-IP budget.
  */
 export async function clientIp(): Promise<string> {
   return clientIpFromForwardedFor((await headers()).get("x-forwarded-for"), env().TRUSTED_PROXY_HOPS);

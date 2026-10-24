@@ -40,6 +40,11 @@ env_set() {
 # Complète un .env créé par une version plus ancienne : rôle restreint de l'application et jeton de /setup.
 env_backfill() {
   local pass db url token
+  # Removing the bundled proxy changes the trust boundary. Reset old deployments once.
+  if [ "$(env_get ALLUMI_NETWORK_MODE)" != direct ]; then
+    env_set TRUSTED_PROXY_HOPS 0
+    env_set ALLUMI_NETWORK_MODE direct
+  fi
   pass="$(env_get APP_DB_PASSWORD)"
   url="$(env_get APP_DATABASE_URL)"
   if [ -z "$pass" ] || [ "$pass" = "CHANGE_ME" ]; then

@@ -26,7 +26,7 @@ Les migrations de base de données ne sont pas toujours réversibles. Le retour 
 
 ## Mises à jour du système
 - `sudo apt update && sudo apt upgrade` régulièrement; active `unattended-upgrades`.
-- Images : `docker compose pull db caddy && docker compose up -d` (PostgreSQL reste en version 17; un changement de version majeure demande un dump/restore).
+- Images : `docker compose pull db && docker compose up -d` (PostgreSQL reste en version 17; un changement de version majeure demande un dump/restore).
 
 ## Depuis le web ou le client Windows
 
@@ -52,3 +52,7 @@ sudo systemctl status allumi-update.timer
 En cas d’échec de sauvegarde, l’ancienne application redémarre. Après le début d’une migration, aucun retour arrière automatique n’est tenté : utiliser la sauvegarde et la procédure de restauration. L’agent root installé est une copie contrôlée; pour mettre à jour ce composant lui-même après revue d’une release : `sudo install -m 0755 scripts/update-agent.py /usr/local/sbin/allumi-update-agent`.
 
 Pour désactiver les demandes automatiques : `sudo systemctl disable --now allumi-update.timer`, puis retirer la variable et le montage ajoutés au service app et le recréer. Les mises à jour du client Windows restent indépendantes : [[Client-Windows]].
+
+## Transition vers la pile sans SSL intégré
+
+À partir de v0.4.0-alpha.10, Caddy est retiré. Pour passer d’un ancien accès HTTPS intégré à HTTP direct, effectuer la transition manuelle de [[Installation-Docker]] et définir la nouvelle `APP_URL` avant de redémarrer. La mise à jour conserve les URL existantes, les secrets et les volumes; elle ne réécrit pas une URL HTTPS qui peut être servie par un proxy externe.

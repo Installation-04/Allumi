@@ -4,12 +4,12 @@
 
 ## Vue d'ensemble
 ```
-Internet ─▶ Caddy (80/443, HTTPS auto, en-têtes de sécurité)
+Navigateur ─▶ HTTP :28080 (ou votre proxy HTTPS externe)
               └─▶ app (Next.js standalone, :3000, non-root, FS en lecture seule)
                      │  rôle PostgreSQL « allumi_app » (sans BYPASSRLS, pas propriétaire)
                      └─▶ db (PostgreSQL 17)
               migrate ─▶ db   rôle propriétaire : applique les migrations, puis s'arrête
-Volumes : db_data · app_storage (pièces jointes) · app_cache · caddy_data (certificats)
+Volumes : db_data · app_storage (pièces jointes) · app_cache
 ```
 
 ## Stack
@@ -150,7 +150,7 @@ Le rôle `allumi_app` est créé par la migration sans droit de connexion; l'ét
 - `/setup` crée l'administrateur d'instance, propriétaire de la première entreprise, si `instance.setup_completed_at` est nul. L'opération (`app_setup_instance`) est sérialisée par un verrou sur la ligne `instance`, puis la page se désactive. Seul un administrateur d'instance crée ensuite d'autres entreprises.
 - Mots de passe hachés en argon2id. Sessions en base : on ne stocke que le SHA-256 du jeton. Cookie `__Host-` httpOnly, Secure, SameSite=Lax, avec expiration glissante et absolue.
 - TOTP (RFC 6238). Le secret est chiffré en AES-256-GCM avec `ENCRYPTION_KEY`; un code déjà accepté ne l'est jamais deux fois (`totp_last_step`); les codes de récupération sont hachés et à usage unique. Réinitialisation du mot de passe par courriel (jeton haché, à usage unique).
-- Limitation de débit dans PostgreSQL (pas de Redis), par IP (IPv6 : par /64) et par courriel. L'IP est l'entrée de `X-Forwarded-For` située à `TRUSTED_PROXY_HOPS` places de la droite (1 avec le Caddy fourni, qui remplace l'en-tête du client). Les clés sont des HMAC (sous-clé HKDF dérivée d'`AUTH_SECRET`); les codes de récupération suivent `ENCRYPTION_KEY`.
+- Limitation de débit dans PostgreSQL (pas de Redis), par IP (IPv6 : par /64) et par courriel. L'IP est l'entrée de `X-Forwarded-For` située à `TRUSTED_PROXY_HOPS` places de la droite (0 par défaut : ignorer les en-têtes et partager le budget IP; 1 pour un proxy externe de confiance). Les clés sont des HMAC (sous-clé HKDF dérivée d'`AUTH_SECRET`); les codes de récupération suivent `ENCRYPTION_KEY`.
 - `/setup` exige `SETUP_TOKEN` s'il est défini (comparaison à temps constant), pour qu'on ne puisse pas s'emparer d'une instance neuve.
 - Server Actions : vérification d'origine de Next. Route handlers qui modifient des données : vérification de l'en-tête `Origin`.
 
@@ -174,7 +174,7 @@ La matrice est du code (`can(role, action)`), testée unitairement; le service l
 - `audit_log` est en ajout seulement (privilèges + triggers). Exception unique : `audit_redact`, réservée au propriétaire, retire des renseignements personnels (Loi 25) sans toucher aux champs comptables, et se journalise.
 
 ## Pièces jointes, exports, journaux
-- Pièces jointes : interface `Storage` (implémentation disque dans `/app/storage`, S3 plus tard). Clé `<company_id>/<aaaa>/<mm>/<uuid>`, jamais le nom fourni. Taille max 25 Mo (limite de Caddy), type MIME vérifié sur le contenu, empreinte SHA-256.
+- Pièces jointes : interface `Storage` (implémentation disque dans `/app/storage`, S3 plus tard). Clé `<company_id>/<aaaa>/<mm>/<uuid>`, jamais le nom fourni. Taille cible 25 Mo (limite à appliquer dans le futur service de pièces jointes et le proxy externe), type MIME vérifié sur le contenu, empreinte SHA-256.
 - Exports CSV en flux; PDF générés côté serveur, sans navigateur sans tête, avec polices embarquées. La bibliothèque sera choisie en phase 6.
 - Journaux pino en JSON sur stdout, niveau `LOG_LEVEL`, identifiant de requête; jamais de secret ni de renseignement personnel (liste de champs masqués).
 
