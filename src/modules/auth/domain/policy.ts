@@ -2,6 +2,7 @@
 
 export const SESSION_IDLE_MS = 8 * 60 * 60 * 1000; // signed out after 8 h without activity
 export const SESSION_ABSOLUTE_MS = 14 * 24 * 60 * 60 * 1000; // and after 14 days whatever happens
+export const MFA_PENDING_MS = 10 * 60 * 1000; // password-only sessions must finish MFA within 10 minutes
 export const SESSION_TOUCH_MS = 5 * 60 * 1000; // last_seen_at is refreshed at most every 5 min
 
 export const LOCK_AFTER_FAILURES = 10;

@@ -1,6 +1,6 @@
 import "server-only";
 import { withAnonymous, withUser } from "@/platform/tenant";
-import { isFullySignedIn, sessionExpiry, sessionIsValid, SESSION_TOUCH_MS } from "../domain/policy";
+import { isFullySignedIn, sessionExpiry, sessionIsValid, SESSION_TOUCH_MS, MFA_PENDING_MS } from "../domain/policy";
 import { newToken, sha256Hex } from "./crypto";
 
 export type SessionInfo = {
@@ -49,7 +49,7 @@ export async function resolveSession(token: string | undefined, now = new Date()
   const row = rows[0];
   if (!row || row.disabled) return null;
   const valid = sessionIsValid({ createdAt: row.created_at, lastSeenAt: row.last_seen_at, expiresAt: row.expires_at }, now);
-  if (!valid) {
+  if (!valid || (row.totp_enabled && !row.mfa_verified_at && now.getTime() >= row.created_at.getTime() + MFA_PENDING_MS)) {
     await withUser({ userId: row.user_id }, (tx) => tx.session.deleteMany({ where: { id } }));
     return null;
   }
@@ -61,10 +61,6 @@ export async function resolveSession(token: string | undefined, now = new Date()
     mfaPending: !isFullySignedIn({ totpEnabled: row.totp_enabled, mfaVerifiedAt: row.mfa_verified_at }),
     expiresAt: row.expires_at,
   };
-}
-
-export async function markMfaVerified(userId: string, token: string, now = new Date()): Promise<void> {
-  await withUser({ userId }, (tx) => tx.session.updateMany({ where: { id: sha256Hex(token) }, data: { mfaVerifiedAt: now } }));
 }
 
 export async function destroySession(userId: string, token: string): Promise<void> {

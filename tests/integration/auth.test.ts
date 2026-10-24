@@ -9,7 +9,7 @@ import {
   createSession,
   destroySession,
   disableTotp,
-  markMfaVerified,
+  completeMfaSignIn,
   resolveSession,
   totpStatus,
   verifySecondFactor,
@@ -281,13 +281,121 @@ describe("two-factor authentication", () => {
   });
 
   it("closes the other sessions and forgets the second-factor proof when it is turned off", async () => {
-    const { userId, secret, enrolledAt } = await enrolledUser("epoque@exemple.test");
+    const { userId, secret, recoveryCodes, enrolledAt } = await enrolledUser("epoque@exemple.test");
     const [current, other] = [await createSession(userId, "ordinateur"), await createSession(userId, "téléphone")];
-    await markMfaVerified(userId, current.token);
-    await markMfaVerified(userId, other.token);
+    expect(await completeMfaSignIn(userId, current.token, recoveryCodes[0]!)).toBe("ok");
+    expect(await completeMfaSignIn(userId, other.token, recoveryCodes[1]!)).toBe("ok");
     const later = enrolledAt + 30_000;
     expect(await disableTotp(userId, PASSWORD, totpCode(secret, later), { keepSessionToken: current.token, now: new Date(later) })).toBe("ok");
     const remaining = (await db.query("SELECT id, mfa_verified_at FROM session WHERE user_id = $1", [userId])).rows;
     expect(remaining).toEqual([{ id: sha256Hex(current.token), mfa_verified_at: null }]);
+  });
+});
+
+describe("concurrent MFA state changes", () => {
+  it("confirms an enrollment only once and retains exactly the winning recovery codes", async () => {
+    const userId = await seedUser(db, { email: "concurrent-enrollment@exemple.test" });
+    const pending = (await beginTotpEnrollment(userId, "concurrent-enrollment@exemple.test"))!;
+    const now = new Date();
+    const code = totpCode(pending.secret, now.getTime());
+    const results = await Promise.all([1, 2].map(() => confirmTotpEnrollment(userId, code, PASSWORD, { now })));
+    expect(results.map(r => r.status).sort()).toEqual(["invalid", "ok"]);
+    const winner = results.find(r => r.status === "ok")!;
+    if (winner.status !== "ok") throw new Error("no winner");
+    expect(await verifySecondFactor(userId, winner.recoveryCodes[0]!)).toBe("ok");
+    expect((await totpStatus(userId)).recoveryCodesLeft).toBe(9);
+  });
+
+  it("cannot replace a pending secret while confirming the old one", async () => {
+    const email = "replace-enrollment@exemple.test";
+    const userId = await seedUser(db, { email });
+    const pending = (await beginTotpEnrollment(userId, email))!;
+    const now = new Date();
+    const [confirmed, replacement] = await Promise.all([
+      confirmTotpEnrollment(userId, totpCode(pending.secret, now.getTime()), PASSWORD, { now }),
+      beginTotpEnrollment(userId, email),
+    ]);
+    if (confirmed.status === "ok") {
+      expect(replacement).toBeNull();
+      expect(await verifySecondFactor(userId, totpCode(pending.secret, now.getTime() + 30_000), new Date(now.getTime() + 30_000))).toBe("ok");
+    } else {
+      expect(confirmed.status).toBe("invalid");
+      expect(replacement).not.toBeNull();
+      expect((await totpStatus(userId)).enabled).toBe(false);
+    }
+  });
+
+  it("cannot use the same TOTP both to sign in and to disable MFA", async () => {
+    const email = "concurrent-disable@exemple.test";
+    const userId = await seedUser(db, { email });
+    const pending = (await beginTotpEnrollment(userId, email))!;
+    const now = new Date();
+    await confirmTotpEnrollment(userId, totpCode(pending.secret, now.getTime()), PASSWORD, { now });
+    const session = await createSession(userId, null, now);
+    const later = new Date(now.getTime() + 30_000);
+    const code = totpCode(pending.secret, later.getTime());
+    const results = await Promise.all([
+      completeMfaSignIn(userId, session.token, code, later),
+      disableTotp(userId, PASSWORD, code, { now: later }),
+    ]);
+    expect(results.sort()).toEqual(["invalid", "ok"]);
+  });
+
+  it("authorizes only one session for concurrent uses of one recovery code", async () => {
+    const email = "concurrent-recovery@exemple.test";
+    const userId = await seedUser(db, { email });
+    const pending = (await beginTotpEnrollment(userId, email))!;
+    const confirmed = await confirmTotpEnrollment(userId, totpCode(pending.secret, Date.now()), PASSWORD);
+    if (confirmed.status !== "ok") throw new Error("no enrollment");
+    const sessions = [await createSession(userId, null), await createSession(userId, null)];
+    const results = await Promise.all(sessions.map(s => completeMfaSignIn(userId, s.token, confirmed.recoveryCodes[0]!)));
+    expect(results.filter(r => r === "ok")).toHaveLength(1);
+    for (let i = 0; i < sessions.length; i++) expect((await resolveSession(sessions[i]!.token))?.mfaPending).toBe(results[i] !== "ok");
+    expect((await totpStatus(userId)).recoveryCodesLeft).toBe(9);
+  });
+
+  it("rolls back recovery-code consumption when session authorization fails", async () => {
+    const email = "atomic-mfa@exemple.test";
+    const userId = await seedUser(db, { email });
+    const pending = (await beginTotpEnrollment(userId, email))!;
+    const confirmed = await confirmTotpEnrollment(userId, totpCode(pending.secret, Date.now()), PASSWORD);
+    if (confirmed.status !== "ok") throw new Error("no enrollment");
+    const session = await createSession(userId, null);
+    // Fault injection in this test file's isolated database, never in the application schema.
+    await db.query(`CREATE FUNCTION test_mfa_failure() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'injected session failure'; END $$;
+      CREATE TRIGGER test_mfa_failure BEFORE UPDATE OF mfa_verified_at ON session FOR EACH ROW EXECUTE FUNCTION test_mfa_failure()`);
+    try {
+      await expect(completeMfaSignIn(userId, session.token, confirmed.recoveryCodes[0]!)).rejects.toThrow();
+      expect((await totpStatus(userId)).recoveryCodesLeft).toBe(10);
+      expect((await resolveSession(session.token))?.mfaPending).toBe(true);
+      expect((await db.query("SELECT count(*)::int n FROM audit_log WHERE action='auth.recovery_code_used' AND entity_id=$1", [userId])).rows[0].n).toBe(0);
+    } finally {
+      await db.query("DROP TRIGGER test_mfa_failure ON session; DROP FUNCTION test_mfa_failure()");
+    }
+    expect(await completeMfaSignIn(userId, session.token, confirmed.recoveryCodes[0]!)).toBe("ok");
+  });
+
+  it("rejects expired, foreign, revoked and disabled sessions without consuming a recovery code", async () => {
+    const email = "pending-expiry@exemple.test";
+    const userId = await seedUser(db, { email });
+    const now = new Date();
+    const pending = (await beginTotpEnrollment(userId, email))!;
+    const confirmed = await confirmTotpEnrollment(userId, totpCode(pending.secret, now.getTime()), PASSWORD, { now });
+    if (confirmed.status !== "ok") throw new Error("no enrollment");
+    const expired = await createSession(userId, null, new Date(now.getTime() - 600_000));
+    const code = confirmed.recoveryCodes[0]!;
+    expect(await resolveSession(expired.token, new Date(now.getTime() - 1))).toMatchObject({ mfaPending: true });
+    expect(await completeMfaSignIn(userId, expired.token, code, now)).toBe("invalid");
+    expect(await resolveSession(expired.token, now)).toBeNull();
+    const foreignUser = await seedUser(db, { email: "foreign-session@exemple.test" });
+    const foreign = await createSession(foreignUser, null, now);
+    expect(await completeMfaSignIn(userId, foreign.token, code, now)).toBe("invalid");
+    const revoked = await createSession(userId, null, now);
+    await destroySession(userId, revoked.token);
+    expect(await completeMfaSignIn(userId, revoked.token, code, now)).toBe("invalid");
+    const disabled = await createSession(userId, null, now);
+    await db.query("UPDATE app_user SET disabled_at=now() WHERE id=$1", [userId]);
+    expect(await completeMfaSignIn(userId, disabled.token, code, now)).toBe("invalid");
+    expect((await totpStatus(userId)).recoveryCodesLeft).toBe(10);
   });
 });

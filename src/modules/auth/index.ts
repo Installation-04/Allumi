@@ -6,10 +6,11 @@ export {
   pendingTotpEnrollment,
   totpStatus,
   verifySecondFactor,
+  completeMfaSignIn,
   type EnrollmentResult,
   type MfaResult,
 } from "./service/mfa";
-export { createSession, destroySession, markMfaVerified, resolveSession, type SessionInfo } from "./service/session";
+export { createSession, destroySession, resolveSession, type SessionInfo } from "./service/session";
 export { isSetUp, currentSetupGate, setupInstance, type SetupResult } from "./service/setup";
 export { clientIpFromForwardedFor } from "./domain/client-ip";
 export type { SetupGate } from "./domain/setup-gate";

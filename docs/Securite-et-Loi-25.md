@@ -14,7 +14,9 @@
 - L'application se connecte à PostgreSQL avec un **rôle restreint** (sans droit de contourner la sécurité par ligne) et ne reçoit jamais les identifiants du propriétaire de la base. L'isolation entre entreprises, les rôles et l'immuabilité du journal sont appliqués par la base elle-même ([[Architecture]]).
 - Sessions à jeton opaque (seule l'empreinte est stockée), mots de passe argon2id, limitation de débit et verrouillage de compte.
 - PostgreSQL accessible seulement dans le réseau Docker interne.
-- HTTPS automatique avec HSTS, en-têtes de sécurité (Caddy).
+- HTTPS automatique avec HSTS via Caddy. L’application sert aussi ses en-têtes de sécurité lorsqu’elle est utilisée derrière un autre proxy : `nosniff`, refus des iframes, `Referer` limité à l’origine pour les liens HTTPS vers un autre site (pas de chemin ni de paramètres), caméra/microphone/géolocalisation désactivés.
+- Politique CSP ciblée : `frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'`. Elle interdit l’intégration dans un autre site, les objets embarqués et les formulaires vers une autre origine. Elle ne constitue pas encore une politique stricte de scripts par nonce et ne garantit pas l’absence de XSS.
+- La connexion en attente de 2FA expire après dix minutes; consommation du code et autorisation de session sont atomiques. Les changements du facteur sont sérialisés ([[Authentification]]).
 - Secrets uniquement dans `.env` (600).
 
 ## Données et vie privée (Loi 25 — Québec)

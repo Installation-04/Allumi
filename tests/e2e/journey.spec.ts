@@ -27,6 +27,17 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   const manifestResponse = await page.request.get('/manifest.webmanifest');
   expect(manifestResponse.status()).toBe(200);
   expect(await manifestResponse.json()).toMatchObject({ name: 'Allumi', display: 'standalone', start_url: '/' });
+  // Security headers also protect the standalone server without a reverse proxy.
+  for (const path of ["/connexion", "/api/health", "/icons/allumi-180.png"]) {
+    const response = await page.request.get(path);
+    const headers = response.headers();
+    expect(headers["x-content-type-options"]).toBe("nosniff");
+    expect(headers["x-frame-options"]).toBe("DENY");
+    expect(headers["referrer-policy"]).toBe("strict-origin-when-cross-origin");
+    expect(headers["permissions-policy"]).toContain("camera=()");
+    expect(headers["content-security-policy"]).toContain("frame-ancestors 'none'");
+    expect(headers["content-security-policy"]).toContain("form-action 'self'");
+  }
   // Fresh instance: everything leads to /setup.
   await page.goto("/");
   await expect(page).toHaveURL(/\/setup$/);
@@ -136,6 +147,9 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   // A protected page stays closed until the second factor is done.
   await page.goto("/compte/securite");
   await expect(page).toHaveURL(/\/connexion\/2fa$/);
+
+  await expectNoPageOverflow(page);
+  await captureReference(page, "connexion-deux-etapes");
 
   // The code that enabled 2FA cannot be replayed (rejected whether or not its window is still open)...
   await page.getByLabel("Code à 6 chiffres").fill(totp.generate({ timestamp: enrolledAt }));

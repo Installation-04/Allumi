@@ -57,7 +57,7 @@
   },
   "mfa": {
     "title": "Two-step verification",
-    "intro": "Enter the code from your authenticator app, or a recovery code.",
+    "intro": "Enter the code from your authenticator app, or a recovery code. Complete this step within 10 minutes of entering your password; after that, sign in again.",
     "submit": "Verify",
     "cancel": "Use another account"
   },
