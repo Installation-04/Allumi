@@ -10,6 +10,14 @@ export {
   type EnrollmentResult,
   type MfaResult,
 } from "./service/mfa";
+export {
+  changePassword,
+  listSessions,
+  revokeOtherSessions,
+  revokeSession,
+  type PasswordChangeResult,
+  type SessionSummary,
+} from "./service/account";
 export { createSession, destroySession, resolveSession, type SessionInfo } from "./service/session";
 export { isSetUp, currentSetupGate, setupInstance, type SetupResult } from "./service/setup";
 export { clientIpFromForwardedFor } from "./domain/client-ip";

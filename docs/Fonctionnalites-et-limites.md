@@ -5,7 +5,7 @@ Cette page distingue les parcours livrés du schéma et des fonctionnalités pla
 | Domaine | Disponible actuellement | À venir |
 |---|---|---|
 | Installation | Docker Compose, configuration, migrations, santé, sauvegarde/restauration | Validation bêta et retours d’exploitation |
-| Accès | Premier compte/entreprise, connexion, sessions, 2FA, récupération 2FA, FR/EN | Réinitialisation du mot de passe, invitations, administration des membres/entreprises |
+| Accès | Premier compte/entreprise, connexion, sessions et appareils connectés, changement de mot de passe, 2FA, récupération 2FA, FR/EN | Réinitialisation du mot de passe, invitations, administration des membres/entreprises |
 | Comptabilité | Plan comptable, journal, soldes d’ouverture, contre-passation, périodes, balance, audit | Autres rapports détaillés |
 | Interface | Web adaptatif; tableau de bord et navigation intégrés | Essais supplémentaires sur Safari iOS et appareils physiques |
 | Entreprise | Identité, coordonnées et numéros fiscaux : [[Entreprise]] | Formats vérifiés, sans consultation des registres fiscaux |

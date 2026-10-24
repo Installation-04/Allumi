@@ -75,7 +75,23 @@
     "disable": "Turn off 2FA",
     "disableHint": "Enter your password and a current code to turn off 2FA.",
     "backHome": "Back",
-    "enrollPasswordHint": "To turn it on, also enter your password: a stolen session cookie is not enough to enroll another device."
+    "enrollPasswordHint": "To turn it on, also enter your password: a stolen session cookie is not enough to enroll another device.",
+    "passwordTitle": "Password",
+    "passwordHint": "Enter your current password, then a new one (at least {min} characters). Your other devices will be signed out.",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "changePassword": "Change password",
+    "passwordChanged": "Password changed. Your other devices were signed out.",
+    "sessionsTitle": "Signed-in devices",
+    "sessionsIntro": "These are the devices where your account is open. Disconnect the ones you do not recognise, then change your password.",
+    "thisDevice": "This device",
+    "lastActive": "Last active: {date}",
+    "signedInAt": "Signed in on {date}",
+    "awaitingSecondFactor": "Waiting for two-step verification.",
+    "unknownDevice": "Unknown device",
+    "signOut": "Disconnect",
+    "signOutDevice": "Disconnect {device}",
+    "signOutOthers": "Disconnect all other devices"
   },
   "dashboard": {
     "title": "{company}",
@@ -128,7 +144,9 @@
       "tooLong": "The password is too long.",
       "sameAsEmail": "The password cannot be your e-mail address.",
       "alreadySetUp": "This instance is already set up. Sign in.",
-      "generic": "Something went wrong. Try again."
+      "generic": "Something went wrong. Try again.",
+      "currentPassword": "The current password is wrong.",
+      "sameAsCurrent": "The new password must be different from the current one."
     },
     "AL001": "Debits and credits are not equal.",
     "AL002": "An entry needs at least two lines.",
