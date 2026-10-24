@@ -13,7 +13,7 @@ Avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà installés :
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.8
+git checkout v0.4.0-alpha.9
 ./scripts/install-docker.sh --domain compta.exemple.ca --email admin@exemple.ca
 ```
 
@@ -42,7 +42,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.8 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.9 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -179,3 +179,11 @@ L’annulation retire les affectations à la facture d’origine et crée une co
 La vérification en deux étapes doit être terminée dans les dix minutes suivant le mot de passe. [Guide d’authentification](docs/Authentification.md) et [protections de sécurité](docs/Securite-et-Loi-25.md).
 
 ![Connexion avec deuxième facteur](docs/images/connexion-deux-etapes-desktop.png)
+
+### Assistant Docker interactif
+
+Dans une VM Linux avec Docker et Compose installés, lancez `./scripts/install-docker.sh` sans argument : parcours standard ou avancé, questions de configuration et confirmation avant installation. Domaine, langue et ports sont configurables. [Guide illustré](docs/Installation-Docker.md).
+
+![Assistant Docker](docs/images/assistant-docker.png)
+
+L’assistant Docker utilise les ports **28080/28443** pour les nouvelles installations et conserve les réglages existants. Le serveur cible Linux **AMD64 et ARM64** (builds et tests Docker natifs pour les deux architectures). Voir le [guide Docker](docs/Installation-Docker.md).

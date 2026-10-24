@@ -2,7 +2,7 @@
 	email {$ACME_EMAIL}
 }
 
-{$ALLUMI_DOMAIN} {
+https://{$ALLUMI_DOMAIN} {
 	encode zstd gzip
 
 	header {
@@ -19,4 +19,9 @@
 	}
 
 	reverse_proxy app:3000
+}
+
+# Explicit redirect preserves a custom public HTTPS port.
+http://{$ALLUMI_DOMAIN} {
+	redir {$APP_URL}{uri} permanent
 }

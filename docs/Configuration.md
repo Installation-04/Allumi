@@ -9,7 +9,10 @@ Toute la configuration passe par des variables d'environnement, lues depuis le f
 |---|---|
 | `ALLUMI_DOMAIN` | Nom de domaine public (ex. `compta.exemple.ca`). Caddy obtient le certificat automatiquement. |
 | `ACME_EMAIL` | Courriel pour les avis d'expiration du certificat. |
-| `APP_URL` | URL publique complète, avec `https://`. |
+| `APP_URL` | URL publique complète, avec `https://` et le port si différent de 443. Aussi utilisée par la redirection HTTP de Caddy. |
+| `ALLUMI_BIND_ADDRESS` | Adresse IPv4 de publication Docker : `0.0.0.0` (défaut, toutes les interfaces), une adresse de la VM, ou `127.0.0.1` pour un accès local. |
+| `ALLUMI_HTTP_PORT` | Port HTTP de l’hôte, défaut `80`. |
+| `ALLUMI_HTTPS_PORT` | Port HTTPS TCP/UDP de l’hôte, défaut `443`. Doit être distinct du port HTTP. |
 
 ## Base de données
 | Variable | Description |
@@ -51,6 +54,8 @@ PostgreSQL n'est **pas** exposé hors du réseau Docker en production. Pourquoi 
 Détails : [[Sauvegardes]].
 
 ## Ajouter une variable (contributeurs)
-Toute nouvelle variable doit être ajoutée à `.env.example`, validée au démarrage (Zod, dans `src/platform/env.ts`), transmise à l'application dans `docker-compose.yml` (liste explicite : le service `app` ne lit pas tout le `.env`) et documentée ici, dans le même commit.
+Toute nouvelle variable consommée par l’application doit être ajoutée à `.env.example`, validée au démarrage (Zod, dans `src/platform/env.ts`), transmise à l'application dans `docker-compose.yml` (liste explicite : le service `app` ne lit pas tout le `.env`) et documentée ici, dans le même commit.
+
+Les variables `ALLUMI_BIND_ADDRESS`, `ALLUMI_HTTP_PORT` et `ALLUMI_HTTPS_PORT` sont propres à Docker Compose : elles sont validées par l’installateur et ne sont pas transmises à l’application. Les ports internes restent 80/443 pour Caddy; le port applicatif et PostgreSQL ne sont pas publiés.
 
 Au démarrage, une variable manquante ou invalide arrête l'application avec un message qui les nomme toutes (voir [[Depannage]]).
