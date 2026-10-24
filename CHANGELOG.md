@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.6] - 2026-10-24
+
 ### Ajouté
 - Installateur Docker Compose dédié : préparation seule, génération atomique de configuration privée, conservation des secrets, refus des configurations de développement et des volumes orphelins, contrôle de santé avec code d’échec. Tests du script et démarrage réel de la pile dans la CI; guide Docker/Proxmox.
 
