@@ -179,3 +179,9 @@ L’annulation retire les affectations à la facture d’origine et crée une co
 La vérification en deux étapes doit être terminée dans les dix minutes suivant le mot de passe. [Guide d’authentification](docs/Authentification.md) et [protections de sécurité](docs/Securite-et-Loi-25.md).
 
 ![Connexion avec deuxième facteur](docs/images/connexion-deux-etapes-desktop.png)
+
+### Assistant Docker interactif
+
+Dans une VM Linux avec Docker et Compose installés, lancez `./scripts/install-docker.sh` sans argument : parcours standard ou avancé, questions de configuration et confirmation avant installation. Domaine, langue et ports sont configurables. [Guide illustré](docs/Installation-Docker.md).
+
+![Assistant Docker](docs/images/assistant-docker.png)

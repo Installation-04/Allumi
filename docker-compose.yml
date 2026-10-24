@@ -77,12 +77,13 @@ services:
     image: caddy:2-alpine
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
+      - "${ALLUMI_BIND_ADDRESS:-0.0.0.0}:${ALLUMI_HTTP_PORT:-80}:80"
+      - "${ALLUMI_BIND_ADDRESS:-0.0.0.0}:${ALLUMI_HTTPS_PORT:-443}:443"
+      - "${ALLUMI_BIND_ADDRESS:-0.0.0.0}:${ALLUMI_HTTPS_PORT:-443}:443/udp"
     environment:
       ALLUMI_DOMAIN: ${ALLUMI_DOMAIN:?ALLUMI_DOMAIN manquant dans .env}
       ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL manquant dans .env}
+      APP_URL: ${APP_URL:?APP_URL manquant dans .env}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

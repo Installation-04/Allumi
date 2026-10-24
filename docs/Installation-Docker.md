@@ -7,7 +7,7 @@ Le script `scripts/install-docker.sh` installe Allumi dans la pile Docker du dé
 - Une VM Linux dédiée, par exemple Ubuntu 24.04 sur Proxmox. Ne pas installer sur l’hôte Proxmox.
 - Docker Engine et le plugin Docker Compose v2 déjà installés; le compte doit pouvoir exécuter `docker info` et `docker compose version`.
 - Bash, OpenSSL et Git. Prévoir initialement 4 vCPU, 8 Go de RAM et 40 Go de disque pour les builds et essais; ce n’est pas une mesure de capacité.
-- Un nom DNS dirigé vers la VM et les ports 80/443 disponibles pour Caddy. Le certificat doit être reconnu par les clients Windows/iPhone.
+- Un nom DNS dirigé vers la VM et les ports choisis disponibles pour Caddy (80/443 par défaut). Le certificat doit être reconnu par les clients Windows/iPhone.
 
 Docker absent sur Ubuntu? Le script `sudo ./scripts/install.sh --domain … --email …` installe aussi le moteur, configure le pare-feu et planifie les sauvegardes. Voir [[Installation]]. Le script Docker dédié ne modifie ni les paquets, ni le pare-feu, ni les tâches planifiées de l’hôte.
 
@@ -19,10 +19,41 @@ Dans la VM, avec un compte autorisé à utiliser Docker :
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
 git checkout v0.4.0-alpha.8
-./scripts/install-docker.sh --domain compta.exemple.ca --email admin@exemple.ca
+./scripts/install-docker.sh
 ```
 
-Remplacer le domaine et le courriel. Utiliser seulement des données fictives pendant cette préversion. Le script utilise `.env` à la racine du dépôt; ce fichier est exclu des images Docker. Le projet Compose se nomme `allumi` par défaut : une seule installation par défaut sur ce moteur. Ne pas créer un deuxième dossier pour mettre à jour une instance existante.
+Répondre aux questions du terminal. Utiliser seulement des données fictives pendant cette préversion. Le script utilise `.env` à la racine du dépôt; ce fichier est exclu des images Docker. Le projet Compose se nomme `allumi` par défaut : une seule installation par défaut sur ce moteur. Ne pas créer un deuxième dossier pour mettre à jour une instance existante.
+
+## Assistant interactif
+
+Sans argument dans un terminal, l’assistant propose :
+
+1. **Installation standard** : réglages existants ou ports 80/443 pour une nouvelle installation.
+2. **Options avancées** : adresse IPv4 d’écoute, ports HTTP/HTTPS distincts (1 à 65535) et délai du contrôle de santé.
+
+Les deux parcours demandent le domaine, le courriel HTTPS, la langue initiale (`fr-CA` ou `en`), puis le choix entre démarrer Docker ou préparer seulement `.env`. La langue initiale ne remplace pas les préférences des utilisateurs existants.
+
+Un récapitulatif présente l’URL complète et les réglages. **Entrée seule à la confirmation annule**; `o` confirme. Une fin de saisie ou `Ctrl+C` avant confirmation ne modifie pas `.env`. Les valeurs incorrectes sont redemandées. Les secrets ne sont jamais demandés ni affichés.
+
+![Exemple de dialogue de l’installateur](images/assistant-docker.png)
+
+La capture reproduit la sortie d’un essai avec données fictives. Le script agit dans la VM Linux; il ne crée pas de VM/LXC, ne configure pas Proxmox et ne modifie pas le pare-feu.
+
+Pour forcer le dialogue avec des valeurs préremplies :
+
+```bash
+./scripts/install-docker.sh --interactive --domain compta.exemple.ca --email admin@exemple.ca
+```
+
+Avec des arguments et sans `--interactive`, le script ne pose aucune question : le mode automatisé existant reste disponible. Sans terminal et sans paramètres valides, il échoue au lieu d’attendre une saisie.
+
+### Ports personnalisés et HTTPS
+
+Avec HTTP `8080` et HTTPS `8443`, l’URL générée devient `https://compta.exemple.ca:8443`. Caddy conserve ce port dans la redirection HTTP. Les ports internes de la base et de l’application restent privés. L’adresse `0.0.0.0` expose les ports sur toutes les interfaces IPv4; `127.0.0.1` limite l’accès à la VM elle-même. IPv6 n’est pas proposé dans cet assistant.
+
+Les certificats publics exigent toujours un DNS valide et un challenge ACME accessible depuis Internet sur **80 ou 443**. Modifier les ports locaux ne change pas cette exigence : configurer le routeur/proxy, par exemple le port public 80 vers le port 8080 de la VM. L’installateur ne le fait pas. Un test `healthy` ne valide pas le certificat. Si le port public HTTPS diffère du port local, adapter `APP_URL` dans `.env` avant de démarrer; le modèle guidé suppose qu’ils sont identiques.
+
+Une réinstallation sans préciser les nouvelles options conserve les ports, l’adresse et la langue enregistrés. Les mises à jour utilisent ces réglages persistants. Ne pas employer la relance de l’installateur pour une mise à jour sans sauvegarde : voir [[Mise-a-jour]].
 
 ## Ce que fait le script
 
@@ -35,6 +66,16 @@ Remplacer le domaine et le courriel. Utiliser seulement des données fictives pe
 Les identifiants de déploiement viennent de `.env`, sans exécuter ce fichier comme un script. Les variables de connexion d’un shell de développement ne remplacent pas celles du fichier. Un verrou empêche deux installateurs de modifier simultanément cette configuration.
 
 ## Options
+
+```bash
+# Installation automatisée avec ports personnalisés
+./scripts/install-docker.sh --domain compta.exemple.ca --email admin@exemple.ca \
+  --http-port 8080 --https-port 8443 --bind 0.0.0.0 --locale en
+
+# Afficher toutes les options
+./scripts/install-docker.sh --help
+```
+
 
 ```bash
 # Préparer uniquement la configuration, sans appeler Docker ni démarrer de conteneur

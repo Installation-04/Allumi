@@ -49,3 +49,7 @@ sudo ./scripts/enable-web-updates.sh
 ```
 
 Voir [[Mise-a-jour]] pour les permissions, l’interruption temporaire et la restauration. Un snapshot VM avant les essais complète les sauvegardes chiffrées, sans les remplacer. Aucun déploiement sur votre Proxmox ni test sur votre matériel n’a été effectué par la CI.
+
+## Configuration guidée dans la VM
+
+Lancer `./scripts/install-docker.sh` sans argument dans le terminal ouvre l’assistant standard/avancé : domaine, courriel, langue, ports, adresse d’écoute, préparation seule et confirmation. Docker/Compose doivent déjà être installés. Voir [[Installation-Docker]] pour les contraintes HTTPS et les ports personnalisés. Ce script ne doit pas être lancé sur l’hôte Proxmox.

@@ -7,28 +7,63 @@ umask 077
 # shellcheck source=lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-DOMAIN=""; EMAIL=""; PREPARE_ONLY=0; WAIT_SECONDS=300
+# shellcheck source=installer-options.sh
+. "$(dirname "${BASH_SOURCE[0]}")/installer-options.sh"
+[ "$ENV_FILE" = "$ALLUMI_DIR/.env" ] || die "cet installateur utilise uniquement .env à la racine du projet."
+[ ! -L "$ENV_FILE" ] || die ".env ne doit pas être un lien symbolique."
+DOMAIN="$(env_get ALLUMI_DOMAIN)"; EMAIL="$(env_get ACME_EMAIL)"
+INSTALL_HTTP_PORT="$(env_get ALLUMI_HTTP_PORT)"; INSTALL_HTTP_PORT="${INSTALL_HTTP_PORT:-80}"
+INSTALL_HTTPS_PORT="$(env_get ALLUMI_HTTPS_PORT)"; INSTALL_HTTPS_PORT="${INSTALL_HTTPS_PORT:-443}"
+INSTALL_BIND="$(env_get ALLUMI_BIND_ADDRESS)"; INSTALL_BIND="${INSTALL_BIND:-0.0.0.0}"
+INSTALL_LOCALE="$(env_get DEFAULT_LOCALE)"; INSTALL_LOCALE="${INSTALL_LOCALE:-fr-CA}"
+PREPARE_ONLY=0; WAIT_SECONDS=300; INTERACTIVE=0
+[ "$#" -ne 0 ] || { [ ! -t 0 ] || INTERACTIVE=1; }
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --domain|--email|--timeout)
+    --domain|--email|--timeout|--http-port|--https-port|--bind|--locale)
       [ "$#" -ge 2 ] && [[ "$2" != --* ]] || die "valeur manquante pour $1"
       case "$1" in
         --domain) DOMAIN="$2" ;;
         --email) EMAIL="$2" ;;
         --timeout) WAIT_SECONDS="$2" ;;
+        --http-port) INSTALL_HTTP_PORT="$2" ;;
+        --https-port) INSTALL_HTTPS_PORT="$2" ;;
+        --bind) INSTALL_BIND="$2" ;;
+        --locale) INSTALL_LOCALE="$2" ;;
       esac
       shift 2 ;;
+    --interactive) INTERACTIVE=1; shift ;;
     --prepare-only) PREPARE_ONLY=1; shift ;;
-    -h|--help) sed -n '2,3p' "$0"; exit 0 ;;
+    -h|--help)
+      cat <<'HELP'
+Allumi — installation Docker (Docker Engine et Compose déjà installés).
+Sans argument dans un terminal : assistant interactif.
+--interactive             Assistant avec récapitulatif et confirmation
+--domain DOMAINE          Nom DNS, sans protocole ni port
+--email COURRIEL          Adresse pour les certificats HTTPS
+--http-port PORT          Port HTTP sur l’hôte (défaut : 80)
+--https-port PORT         Port HTTPS sur l’hôte et dans l’URL (défaut : 443)
+--bind IPV4               Adresse d’écoute (défaut : 0.0.0.0)
+--locale fr-CA|en         Langue initiale (défaut : fr-CA)
+--prepare-only            Préparer .env sans lancer Docker
+--timeout SECONDES        Attente de santé après Compose (défaut : 300)
+Les réglages existants sont conservés si aucune option ne les remplace.
+HELP
+      exit 0 ;;
     *) die "option inconnue : $1" ;;
   esac
 done
-[[ "$DOMAIN" =~ ^([A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}$ ]] && [ "${#DOMAIN}" -le 253 ] || die "--domain doit être un nom DNS, sans protocole ni port."
-[[ "$DOMAIN" != *..* ]] || die "domaine invalide."
-[[ "$EMAIL" =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}$ ]] || die "--email est requis et doit être valide."
-[[ "$WAIT_SECONDS" =~ ^[1-9][0-9]{0,3}$ ]] && [ "$WAIT_SECONDS" -le 3600 ] || die "--timeout doit être entre 1 et 3600 secondes."
+[ "$INTERACTIVE" -eq 0 ] || installer_wizard
+valid_domain "$DOMAIN" || die "--domain doit être un nom DNS, sans protocole ni port."
+valid_email "$EMAIL" || die "--email est requis et doit être valide."
+valid_timeout "$WAIT_SECONDS" || die "--timeout doit être entre 1 et 3600 secondes."
+valid_port "$INSTALL_HTTP_PORT" && valid_port "$INSTALL_HTTPS_PORT" || die "les ports doivent être entre 1 et 65535."
+[ "$INSTALL_HTTP_PORT" != "$INSTALL_HTTPS_PORT" ] || die "HTTP et HTTPS doivent utiliser des ports différents."
+valid_bind "$INSTALL_BIND" || die "--bind doit être une adresse IPv4 valide."
+valid_locale "$INSTALL_LOCALE" || die "--locale doit être fr-CA ou en."
+installer_url
 # Deployment credentials must come from the selected file, never from a development shell.
-unset DATABASE_URL APP_DATABASE_URL POSTGRES_PASSWORD POSTGRES_USER POSTGRES_DB APP_DB_PASSWORD AUTH_SECRET ENCRYPTION_KEY SETUP_TOKEN APP_URL ALLUMI_DOMAIN ACME_EMAIL
+unset DATABASE_URL APP_DATABASE_URL POSTGRES_PASSWORD POSTGRES_USER POSTGRES_DB APP_DB_PASSWORD AUTH_SECRET ENCRYPTION_KEY SETUP_TOKEN APP_URL ALLUMI_DOMAIN ACME_EMAIL ALLUMI_HTTP_PORT ALLUMI_HTTPS_PORT ALLUMI_BIND_ADDRESS DEFAULT_LOCALE
 command -v openssl >/dev/null 2>&1 || die "OpenSSL est requis pour générer les secrets."
 [ -f "$ALLUMI_DIR/docker-compose.yml" ] && [ -f "$ALLUMI_DIR/.env.example" ] || die "lance le script depuis une copie complète d’Allumi."
 if [ "$PREPARE_ONLY" -eq 0 ]; then
@@ -83,7 +118,11 @@ else
 fi
 env_set ALLUMI_DOMAIN "$DOMAIN"
 env_set ACME_EMAIL "$EMAIL"
-env_set APP_URL "https://${DOMAIN}"
+env_set APP_URL "$INSTALL_URL"
+env_set ALLUMI_HTTP_PORT "$INSTALL_HTTP_PORT"
+env_set ALLUMI_HTTPS_PORT "$INSTALL_HTTPS_PORT"
+env_set ALLUMI_BIND_ADDRESS "$INSTALL_BIND"
+env_set DEFAULT_LOCALE "$INSTALL_LOCALE"
 chmod 600 "$TEMP_ENV"
 if [ "$PREPARE_ONLY" -eq 0 ]; then
   docker compose --project-directory "$ALLUMI_DIR" -f "$ALLUMI_DIR/docker-compose.yml" --env-file "$TEMP_ENV" config --quiet
@@ -110,8 +149,8 @@ done
 cat <<EOF_DONE
 
 Allumi est démarré et l’application est healthy.
-  Adresse : https://${DOMAIN}
-  HTTPS  : vérifier le DNS et l’accès aux ports 80/443; le certificat peut prendre quelques minutes.
+  Adresse : ${INSTALL_URL}
+  HTTPS  : vérifier DNS et challenges ACME publics 80/443 (rediriger vers les ports choisis au besoin).
   Début  : ouvre /setup; le jeton de première configuration est SETUP_TOKEN dans .env.
   Données : volumes Docker conservés. Ne lance pas docker compose down -v.
   Sauvegardes : à configurer et tester (docs/Sauvegardes.md); aucune tâche planifiée ajoutée.
