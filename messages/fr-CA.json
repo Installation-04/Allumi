@@ -215,7 +215,10 @@
       "creditSource": "Choisissez une facture validée et une date au moins égale à sa date comptable.",
       "creditLimit": "Les avoirs cumulés dépassent les montants de la facture d’origine. Révisez les lignes et les taxes.",
       "creditBalance": "Le solde de la facture est insuffisant pour affecter cet avoir intégralement.",
-      "confirmCreditPost": "Confirmez la validation et l’affectation de l’avoir."
+      "confirmCreditPost": "Confirmez la validation et l’affectation de l’avoir.",
+      "confirmCreditVoid": "Confirmez l’annulation définitive de l’avoir.",
+      "creditVoidDate": "La date d’annulation ne peut précéder la comptabilisation, une affectation ou son retrait.",
+      "creditVoidLinked": "Un remboursement actif ou une affectation à une autre facture empêche l’annulation."
     }
   },
   "nav": {
@@ -811,11 +814,17 @@
     "postedLimit": "Les 100 derniers avoirs validés ou annulés sont affichés.",
     "posted": "Avoir comptabilisé",
     "voided": "Avoir annulé",
-    "postedHint": "Cet avoir est verrouillé. Son écriture et son affectation sont conservées. La désaffectation, l’annulation d’un avoir et le remboursement ne sont pas encore disponibles dans l’interface.",
-    "applications": "Affectations actives",
+    "postedHint": "Les montants validés sont verrouillés. Une annulation conserve l’avoir, son écriture et l’historique des affectations.",
+    "applications": "Historique des affectations",
     "openBalance": "Solde restant",
     "post": "Valider et affecter l’avoir",
-    "postWarning": "Cette action attribue un numéro, comptabilise l’avoir et affecte son total à la facture d’origine. Elle est définitive dans cette interface. Vérifiez les montants, le motif et la date; un solde insuffisant ou un dépassement des montants déjà crédités sera refusé.",
-    "confirmPost": "Je confirme la validation et l’affectation intégrale de cet avoir."
+    "postWarning": "Cette action attribue un numéro, comptabilise l’avoir et affecte son total à la facture d’origine. Les montants seront verrouillés; une correction exige une annulation admissible. Vérifiez les montants, le motif et la date; un solde insuffisant ou un dépassement des montants déjà crédités sera refusé.",
+    "confirmPost": "Je confirme la validation et l’affectation intégrale de cet avoir.",
+    "void": "Annuler l’avoir",
+    "voidWarning": "Cette opération retire les affectations à la facture d’origine et crée une écriture inverse dans une période ouverte. Un remboursement actif ou une affectation à une autre facture empêche l’annulation.",
+    "confirmVoid": "Je confirme l’annulation définitive de cet avoir.",
+    "voidHint": "Cet avoir a été annulé. Les montants ci-dessous sont conservés pour l’historique; ils ne réduisent plus le solde de la facture.",
+    "unapplied": "Retirée le {date}",
+    "active": "Active"
   }
 }

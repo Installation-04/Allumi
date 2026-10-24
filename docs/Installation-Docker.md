@@ -18,7 +18,7 @@ Dans la VM, avec un compte autorisé à utiliser Docker :
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.6
+git checkout v0.4.0-alpha.7
 ./scripts/install-docker.sh --domain compta.exemple.ca --email admin@exemple.ca
 ```
 

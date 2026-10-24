@@ -37,3 +37,15 @@ export async function postCreditAction(companyId: string, id: string, revision: 
     redirect(`/c/${companyId}/avoirs/valides/${id}`);
   },values);
 }
+
+export async function voidCreditAction(companyId: string, id: string, _previous: FormState, form: FormData): Promise<FormState> {
+  const values = textValues(form, ["voidDate", "reason"]);
+  return safeAction(async () => {
+    if (form.get("confirm") !== "yes") throw new AppError("sales.confirmCreditVoid");
+    const session = await requireSession();
+    const { voidCreditNote } = await import("@/modules/sales");
+    await voidCreditNote({ userId: session.userId, companyId }, id, values.voidDate ?? "", values.reason ?? "");
+    revalidatePath(`/c/${companyId}`, "layout");
+    redirect(`/c/${companyId}/avoirs/valides/${id}`);
+  }, values);
+}

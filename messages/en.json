@@ -215,7 +215,10 @@
       "creditSource": "Choose a posted invoice and a date on or after its posting date.",
       "creditLimit": "Combined credit notes exceed the original invoice amounts. Review the lines and taxes.",
       "creditBalance": "The invoice balance is insufficient to apply this credit note in full.",
-      "confirmCreditPost": "Confirm posting and applying this credit note."
+      "confirmCreditPost": "Confirm posting and applying this credit note.",
+      "confirmCreditVoid": "Confirm permanently voiding the credit note.",
+      "creditVoidDate": "The void date cannot precede posting, an application or its removal.",
+      "creditVoidLinked": "An active refund or application to another invoice prevents voiding."
     }
   },
   "nav": {
@@ -811,11 +814,17 @@
     "postedLimit": "Showing the 100 most recent posted or voided credit notes.",
     "posted": "Posted credit note",
     "voided": "Voided credit note",
-    "postedHint": "This credit note is locked. Its journal entry and application are retained. Unapplying, voiding a credit note and refunds are not yet available in the interface.",
-    "applications": "Active applications",
+    "postedHint": "Posted amounts are locked. Voiding retains the credit note, its journal entry and application history.",
+    "applications": "Application history",
     "openBalance": "Remaining balance",
     "post": "Post and apply credit note",
-    "postWarning": "This assigns a number, posts the credit note and applies its full amount to the original invoice. It cannot be undone in this interface. Check the amounts, reason and date; an insufficient balance or amounts already credited will be refused.",
-    "confirmPost": "I confirm posting and fully applying this credit note."
+    "postWarning": "This assigns a number, posts the credit note and applies its full amount to the original invoice. Amounts will be locked; correction requires an eligible void. Check the amounts, reason and date; an insufficient balance or amounts already credited will be refused.",
+    "confirmPost": "I confirm posting and fully applying this credit note.",
+    "void": "Void credit note",
+    "voidWarning": "This removes applications to the original invoice and creates a reversal in an open period. An active refund or application to another invoice prevents voiding.",
+    "confirmVoid": "I confirm permanently voiding this credit note.",
+    "voidHint": "This credit note was voided. The amounts below are retained for history; they no longer reduce the invoice balance.",
+    "unapplied": "Unapplied on {date}",
+    "active": "Active"
   }
 }
