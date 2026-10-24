@@ -2,14 +2,15 @@
 
 ## Connexion
 - Courriel et mot de passe. Les mots de passe sont hachés avec **argon2id** (paramètres recommandés par l'OWASP) et ne sont jamais journalisés.
-- Une adresse inconnue, un mauvais mot de passe et un compte verrouillé donnent la **même réponse** (« Courriel ou mot de passe incorrect, ou compte temporairement verrouillé »), et prennent à peu près le même temps (l'écart résiduel est de quelques millisecondes, et le nombre d'essais par courriel est limité) : deviner quels comptes existent est impraticable.
-- **Limitation de débit** (dans PostgreSQL, sans service externe) : 8 essais par courriel et 30 par adresse IP en 15 minutes. Les clés sont des empreintes chiffrées : ni les adresses IP ni les courriels ne sont conservés.
+- Une adresse inconnue, un mauvais mot de passe et un compte verrouillé donnent la **même réponse** (« Courriel ou mot de passe incorrect, ou compte temporairement verrouillé »), et prennent à peu près le même temps (l'écart résiduel est de quelques millisecondes, et le nombre d'essais par courriel est limité) : ces mesures réduisent les possibilités d’énumération des comptes sans garantir un temps de réponse constant.
+- **Limitation de débit** (dans PostgreSQL, sans service externe) : 8 essais par courriel et 30 par adresse IP en 15 minutes. Les clés sont des empreintes HMAC : ni les adresses IP ni les courriels ne sont conservés.
 - **Verrouillage** du compte pendant 15 minutes après 10 échecs de suite. Quand le verrou expire, le compteur repart à zéro. Compromis assumé : quelqu'un qui connaît ton courriel peut te faire attendre quelques minutes, mais personne ne peut deviner ton mot de passe en continu, d'où qu'il vienne.
 - Chaque échec est inscrit à la piste d'audit et visible par la personne visée.
 
 ## Sessions
 - Cookie `httpOnly`, `SameSite=Lax`, et `Secure` en HTTPS. En production (HTTPS), il porte le préfixe `__Host-` : il n'est valable que pour ton domaine exact.
 - La base ne conserve que l'**empreinte SHA-256** du jeton : une fuite de la base ne permet pas de voler des sessions.
+- Une connexion en attente de la 2FA expire **10 minutes après le mot de passe**, même si la page reste active. Recommencer la connexion si le délai est dépassé.
 - Fermeture après **8 heures d'inactivité** ou **14 jours** au total.
 - À la connexion depuis un navigateur qui n'a encore aucune langue choisie (nouvel appareil), la **langue enregistrée dans ton compte** est appliquée. Une langue choisie dans ce navigateur n'est jamais écrasée.
 - « Se déconnecter » supprime la session côté serveur et efface le cookie.
@@ -23,7 +24,8 @@ Compatible avec toute application d'authentification (Aegis, Google Authenticato
 
 Détails de sécurité :
 - Le secret est **chiffré** (AES-256-GCM) avec `ENCRYPTION_KEY` : voir [[Configuration]]. Perdre cette clé rend les secrets illisibles.
-- Un code déjà accepté **ne peut pas être rejoué** (RFC 6238, §5.2).
+- Un code déjà accepté **ne peut pas être rejoué** (RFC 6238, §5.2). Activation, remplacement du secret en attente, vérification et désactivation sont sérialisés par utilisateur; deux demandes concurrentes ne peuvent pas accepter le même état.
+- À la connexion, la consommation du code et l’autorisation de la session sont atomiques. Une session expirée, révoquée, d’un autre utilisateur ou d’un compte désactivé est refusée avant de consommer un code de récupération.
 - Les tentatives de code sont limitées (8 par 15 minutes).
 - Pour **désactiver** la 2FA, il faut le mot de passe et un code actuel.
 - **Rouvrir une période ou un exercice** ([[Exercices-et-periodes]]) demande aussi un code saisi à ce moment, même si la session est déjà vérifiée : un témoin de connexion volé ne suffit pas à rouvrir le passé. Chaque essai de code, à la connexion ou pour rouvrir le passé, compte dans la même limite de 8 essais par 15 minutes.
@@ -43,3 +45,10 @@ Les droits sont appliqués **par la base de données**, pas seulement par l'inte
 | Consulter la piste d'audit | ✓ | ✓ | — |
 
 Voir aussi [[Architecture]] et [[Securite-et-Loi-25]].
+
+## Écran de vérification
+
+![Vérification en deux étapes](images/connexion-deux-etapes-desktop.png)
+![Vérification sur téléphone](images/connexion-deux-etapes-mobile.png)
+
+Captures issues de données fictives, avant saisie du code; aucune clé TOTP ni aucun code de récupération n’est affiché.

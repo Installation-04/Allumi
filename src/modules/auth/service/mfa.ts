@@ -2,7 +2,7 @@ import "server-only";
 import { recordEvent } from "@/modules/audit";
 import { withUser, type Tx } from "@/platform/tenant";
 import { generateRecoveryCodes, normalizeRecoveryCode } from "../domain/recovery-codes";
-import { RATE_LIMITS } from "../domain/policy";
+import { RATE_LIMITS, sessionIsValid, MFA_PENDING_MS } from "../domain/policy";
 import { newTotpSecret, totpUri, verifyTotp } from "../domain/totp";
 import { decrypt, encrypt, recoveryCodeHash, sha256Hex, verifyPassword } from "./crypto";
 import { hit } from "./rate-limit";
@@ -31,11 +31,36 @@ async function closeOtherSessions(tx: Tx, userId: string, keepSessionToken: stri
  * RFC 6238 §5.2) or a single-use recovery code.
  */
 export async function verifySecondFactor(userId: string, code: string, now = new Date()): Promise<MfaResult> {
+  return checkSecondFactor(userId, code, now);
+}
+
+/** Consume the code and authorize this live session in one transaction. */
+export async function completeMfaSignIn(userId: string, token: string, code: string, now = new Date()): Promise<MfaResult> {
+  if (!token || token.length < 20 || token.length > 128) return "invalid";
+  return checkSecondFactor(userId, code, now, token);
+}
+
+async function lockCredential(tx: Tx, userId: string): Promise<void> {
+  await tx.$queryRaw`SELECT user_id FROM user_credential WHERE user_id=${userId}::uuid FOR UPDATE`;
+}
+
+async function checkSecondFactor(userId: string, code: string, now: Date, sessionToken?: string): Promise<MfaResult> {
   if (!(await hit("mfa:user", userId, RATE_LIMITS.mfaUser)).allowed) return "rate_limited";
 
   const result = await withUser({ userId }, async (tx) => {
+    await lockCredential(tx, userId);
     const credential = await tx.userCredential.findUnique({ where: { userId } });
     if (!credential?.totpSecretEnc || !credential.totpEnabledAt) return "invalid" as const;
+    if (sessionToken) {
+      const id = sha256Hex(sessionToken);
+      await tx.$queryRaw`SELECT id FROM session WHERE id=${id} AND user_id=${userId}::uuid FOR UPDATE`;
+      const session = await tx.session.findFirst({ where: { id, userId }, include: { user: { select: { disabledAt: true } } } });
+      if (!session || session.user.disabledAt || !sessionIsValid(session, now) || (!session.mfaVerifiedAt && now.getTime() >= session.createdAt.getTime() + MFA_PENDING_MS)) return "invalid" as const;
+    }
+    const accept = async (): Promise<MfaResult> => {
+      if (sessionToken) await tx.session.update({ where: { id: sha256Hex(sessionToken), userId }, data: { mfaVerifiedAt: now } });
+      return "ok";
+    };
 
     const step = verifyTotp(decrypt(credential.totpSecretEnc), code, now.getTime());
     if (step !== null) {
@@ -43,7 +68,7 @@ export async function verifySecondFactor(userId: string, code: string, now = new
         where: { userId, OR: [{ totpLastStep: null }, { totpLastStep: { lt: BigInt(step) } }] },
         data: { totpLastStep: BigInt(step) },
       });
-      return claimed.count === 1 ? ("ok" as const) : ("invalid" as const);
+      return claimed.count === 1 ? accept() : ("invalid" as const);
     }
 
     const recovery = normalizeRecoveryCode(code);
@@ -54,7 +79,7 @@ export async function verifySecondFactor(userId: string, code: string, now = new
       });
       if (used.count === 1) {
         await recordEvent(tx, { action: "auth.recovery_code_used", entityType: "app_user", entityId: userId, global: true });
-        return "ok" as const;
+        return accept();
       }
     }
     return "invalid" as const;
@@ -78,6 +103,7 @@ export async function totpStatus(userId: string): Promise<{ enabled: boolean; pe
 export async function beginTotpEnrollment(userId: string, email: string): Promise<{ secret: string; uri: string } | null> {
   const secret = newTotpSecret();
   const stored = await withUser({ userId }, async (tx) => {
+    await lockCredential(tx, userId);
     const credential = await tx.userCredential.findUnique({ where: { userId } });
     if (!credential || credential.totpEnabledAt) return false;
     await tx.userCredential.update({ where: { userId }, data: { totpSecretEnc: encrypt(secret) } });
@@ -97,6 +123,7 @@ export async function confirmTotpEnrollment(userId: string, code: string, passwo
   if (!(await hit("mfa:user", userId, RATE_LIMITS.mfaUser)).allowed) return { status: "rate_limited" };
   const codes = generateRecoveryCodes((size) => randomBytes(size));
   const confirmed = await withUser({ userId }, async (tx) => {
+    await lockCredential(tx, userId);
     const credential = await tx.userCredential.findUnique({ where: { userId } });
     if (!credential?.totpSecretEnc || credential.totpEnabledAt) return false;
     if (!(await verifyPassword(credential.passwordHash, password))) return false;
@@ -120,6 +147,7 @@ export async function disableTotp(userId: string, password: string, code: string
   const now = scope.now ?? new Date();
   if (!(await hit("mfa:user", userId, RATE_LIMITS.mfaUser)).allowed) return "rate_limited";
   return withUser({ userId }, async (tx) => {
+    await lockCredential(tx, userId);
     const credential = await tx.userCredential.findUnique({ where: { userId } });
     if (!credential?.totpSecretEnc || !credential.totpEnabledAt) return "invalid";
     const step = verifyTotp(decrypt(credential.totpSecretEnc), code, now.getTime());
