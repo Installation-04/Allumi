@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Annulation atomique des avoirs : retrait daté des affectations d’origine, contre-passation exacte, motif et historique FR/EN sur ordinateur et mobile; refus des remboursements actifs et affectations à une autre facture.
+
 ## [0.4.0-alpha.6] - 2026-10-24
 
 ### Ajouté

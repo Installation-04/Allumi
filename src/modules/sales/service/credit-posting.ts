@@ -47,7 +47,7 @@ export async function postCreditNote(actor: CompanyContext, id: string, revision
 export async function getPostedCredit(actor: CompanyContext, id: string) {
   return withCompany(actor, async tx => {
     await requireRole(tx,"sales.read");
-    return tx.salesDocument.findFirst({ where:{ companyId:actor.companyId,id,kind:"CREDIT_NOTE",status:{in:["POSTED","VOID"]} },include:{ lines:{orderBy:{position:"asc"}},taxes:{include:{tax:{select:{code:true}}}},creditedDocument:{select:{id:true,number:true}},creditsApplied:true } });
+    return tx.salesDocument.findFirst({ where:{ companyId:actor.companyId,id,kind:"CREDIT_NOTE",status:{in:["POSTED","VOID"]} },include:{ lines:{orderBy:{position:"asc"}},taxes:{include:{tax:{select:{code:true}}}},creditedDocument:{select:{id:true,number:true}},creditsApplied:{orderBy:[{appliedDate:"asc"},{id:"asc"}],include:{invoice:{select:{number:true}}}},voidEntry:{select:{entryDate:true}} } });
   });
 }
 export async function listPostedCredits(actor: CompanyContext, invoiceId?: string) {

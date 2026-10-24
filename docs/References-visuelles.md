@@ -202,3 +202,10 @@ Voir [[Brouillons-d-avoirs]].
 ![Avoir anglais sombre sur téléphone](images/avoir-valide-en-dark-mobile.png)
 
 Voir [[Validation-des-avoirs]].
+
+## Avoirs annulés
+
+![Avoir annulé et affectation retirée](images/avoir-annule-desktop.png)
+![Avoir annulé en anglais sombre sur téléphone](images/avoir-annule-en-dark-mobile.png)
+
+Voir [[Validation-des-avoirs]].
