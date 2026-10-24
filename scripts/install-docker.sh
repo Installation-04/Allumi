@@ -17,7 +17,10 @@ INSTALL_HTTPS_PORT="$(env_get ALLUMI_HTTPS_PORT)"; INSTALL_HTTPS_PORT="${INSTALL
 INSTALL_BIND="$(env_get ALLUMI_BIND_ADDRESS)"; INSTALL_BIND="${INSTALL_BIND:-0.0.0.0}"
 INSTALL_LOCALE="$(env_get DEFAULT_LOCALE)"; INSTALL_LOCALE="${INSTALL_LOCALE:-fr-CA}"
 PREPARE_ONLY=0; WAIT_SECONDS=300; INTERACTIVE=0
-[ "$#" -ne 0 ] || { [ ! -t 0 ] || INTERACTIVE=1; }
+if [ "$#" -eq 0 ]; then
+  [ -t 0 ] || die "aucun terminal interactif : utilise --interactive ou fournis les options --domain et --email."
+  INTERACTIVE=1
+fi
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --domain|--email|--timeout|--http-port|--https-port|--bind|--locale)

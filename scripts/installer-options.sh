@@ -27,7 +27,7 @@ installer_ask() {
   done
 }
 installer_wizard() {
-  local choice=1 mode=1 confirmation
+  local choice=1 mode=1 confirmation action_label
   printf "\n  ALLUMI — Assistant d’installation Docker\n\n" >&2
   printf "Docker Engine et Compose doivent déjà être installés.\nLes données et secrets existants seront conservés. Ctrl+C pour quitter.\n\n1) Installation standard (réglages existants ou ports 80/443)\n2) Options avancées (ports, adresse d’écoute, délai)\n" >&2
   installer_ask choice 'Parcours (1 ou 2)' valid_choice 1
@@ -52,8 +52,10 @@ installer_wizard() {
   printf '\n1) Configurer et démarrer Docker\n2) Préparer .env uniquement\n' >&2
   installer_ask mode 'Action (1 ou 2)' valid_choice "$mode"
   PREPARE_ONLY=$((mode - 1))
+  action_label="Configurer et démarrer Docker"
+  [ "$PREPARE_ONLY" -eq 0 ] || action_label="Préparer .env uniquement"
   installer_url
-  printf '\nRésumé\n  Domaine : %s\n  Courriel HTTPS : %s\n  Adresse : %s\n  Écoute : %s — HTTP %s, HTTPS %s (TCP/UDP)\n  Langue initiale : %s\n  Délai : %s s\n  Préparation seule : %s\n' "$DOMAIN" "$EMAIL" "$INSTALL_URL" "$INSTALL_BIND" "$INSTALL_HTTP_PORT" "$INSTALL_HTTPS_PORT" "$INSTALL_LOCALE" "$WAIT_SECONDS" "$PREPARE_ONLY" >&2
+  printf '\nRésumé\n  Domaine : %s\n  Courriel HTTPS : %s\n  Adresse : %s\n  Écoute : %s — HTTP %s, HTTPS %s (TCP/UDP)\n  Langue initiale : %s\n  Délai : %s s\n  Action : %s\n' "$DOMAIN" "$EMAIL" "$INSTALL_URL" "$INSTALL_BIND" "$INSTALL_HTTP_PORT" "$INSTALL_HTTPS_PORT" "$INSTALL_LOCALE" "$WAIT_SECONDS" "$action_label" >&2
   printf '\nHTTPS exige un DNS valide et les challenges ACME accessibles publiquement sur 80 ou 443.\nAvec des ports personnalisés, configure les redirections du routeur/proxy.\nAucun pare-feu ni routage Proxmox ne sera modifié. Les sauvegardes restent à configurer.\n\n' >&2
   printf 'Appliquer cette configuration ? [o/N] : ' >&2
   IFS= read -r confirmation || die "saisie interrompue; aucune configuration modifiée."

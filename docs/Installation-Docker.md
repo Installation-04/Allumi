@@ -45,7 +45,7 @@ Pour forcer le dialogue avec des valeurs préremplies :
 ./scripts/install-docker.sh --interactive --domain compta.exemple.ca --email admin@exemple.ca
 ```
 
-Avec des arguments et sans `--interactive`, le script ne pose aucune question : le mode automatisé existant reste disponible. Sans terminal et sans paramètres valides, il échoue au lieu d’attendre une saisie.
+Avec des arguments et sans `--interactive`, le script ne pose aucune question : le mode automatisé existant reste disponible. Sans terminal et sans argument, il échoue au lieu de lancer une installation ou d’attendre une saisie.
 
 ### Ports personnalisés et HTTPS
 
