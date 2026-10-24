@@ -6,6 +6,19 @@ Logiciel de comptabilité **open source** et **auto-hébergeable** pour les PME 
 
 *English summary: Allumi is an open-source, self-hostable accounting app for Canadian small businesses (QST/GST aware, French-first, bilingual). The repo ships a Docker Compose stack, an Ubuntu install script, encrypted backups and a full wiki in `docs/`. Application code is in pre-alpha.*
 
+## Installation Docker
+
+Avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà installés :
+
+```bash
+git clone https://github.com/Installation-04/Allumi.git allumi
+cd allumi
+git checkout v0.4.0-alpha.6
+./scripts/install-docker.sh --domain compta.exemple.ca --email admin@exemple.ca
+```
+
+Le script génère une configuration privée, conserve les secrets existants et vérifie le démarrage. Option `--prepare-only` pour préparer sans démarrer. [Guide Docker](docs/Installation-Docker.md) · [Proxmox](docs/Proxmox.md). Préversion pour données fictives uniquement.
+
 ## Fonctions visées (MVP)
 - Plan comptable et journal à partie double
 - Clients, fournisseurs, factures, paiements, dépenses
@@ -29,7 +42,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.5 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.6 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
