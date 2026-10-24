@@ -12,7 +12,7 @@ Le propriétaire et les comptables peuvent valider; les lecteurs peuvent consult
 
 Depuis **Brouillons de factures → Factures validées**, ouvrir le numéro souhaité. Les 100 factures les plus récemment validées sont affichées, y compris celles annulées avec leur statut. La fiche présente les montants, dates et coordonnées figées à la validation, avec un lien **Voir l’écriture comptable**. Modifier ensuite le client ou l’entreprise ne réécrit pas ces coordonnées.
 
-Une facture validée et son écriture sont immuables. Une correction complète passe par [[Annulation-des-factures]], qui crée une écriture inverse et conserve le document. Les [[Brouillons-d-avoirs]] sont disponibles sans effet comptable; leur validation reste à venir. Utiliser uniquement des données fictives pendant cette préversion. Envoi, PDF, paiements et solde ouvert ne sont pas encore disponibles dans ce parcours. Une écriture de facture ne peut pas être contre-passée depuis le journal manuel.
+Une facture validée et son écriture sont immuables. Une correction complète passe par [[Annulation-des-factures]], qui crée une écriture inverse et conserve le document. Les [[Brouillons-d-avoirs]] sont disponibles sans effet comptable; leur [[Validation-des-avoirs]] permet une correction partielle. Utiliser uniquement des données fictives pendant cette préversion. Le solde restant et les avoirs validés liés sont affichés. Envoi, PDF et saisie des paiements ne sont pas encore disponibles dans ce parcours. Une écriture de facture ne peut pas être contre-passée depuis le journal manuel.
 
 ## Captures
 

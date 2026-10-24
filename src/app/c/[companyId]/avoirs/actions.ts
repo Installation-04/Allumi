@@ -26,3 +26,14 @@ export async function deleteCreditAction(companyId: string, id: string, revision
     redirect(`/c/${companyId}/avoirs`);
   });
 }
+export async function postCreditAction(companyId: string, id: string, revision: string, _previous: FormState, form: FormData): Promise<FormState> {
+  const values=textValues(form,["postingDate"]);
+  return safeAction(async()=>{
+    if(form.get("confirm")!=="yes") throw new AppError("sales.confirmCreditPost");
+    const session=await requireSession();
+    const {postCreditNote}=await import("@/modules/sales");
+    await postCreditNote({userId:session.userId,companyId},id,revision,values.postingDate??"");
+    revalidatePath(`/c/${companyId}`,"layout");
+    redirect(`/c/${companyId}/avoirs/valides/${id}`);
+  },values);
+}

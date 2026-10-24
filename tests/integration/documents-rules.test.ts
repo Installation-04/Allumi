@@ -1404,3 +1404,23 @@ describe("rules that back up the privileges (table owner)", () => {
 it("refuses a balanced invoice posting to an account absent from its revenue lines", async () => {
   expect(await code(async () => { await salesPost(app, await salesDraft(app), { revenueAccount: W.capital }); })).toBe("AL006");
 });
+
+it("rejects a credit posting with an incorrect revenue account even when balanced", async () => {
+  expect(await code(async () => {
+    const invoice=await postedInvoice(app);
+    await salesPost(app,await salesDraft(app,{kind:"CREDIT_NOTE",credits:invoice.id,cents:3000,date:"2026-04-05"}),{revenueAccount:W.capital});
+  })).toBe("AL006");
+});
+it("rejects cumulative linked credits above the original line in SQL", async () => {
+  expect(await code(async () => {
+    const invoice=await postedInvoice(app);
+    await postedInvoice(app,{kind:"CREDIT_NOTE",credits:invoice.id,cents:6000,date:"2026-04-05"});
+    await postedInvoice(app,{kind:"CREDIT_NOTE",credits:invoice.id,cents:5000,date:"2026-04-06"});
+  })).toBe("AL006");
+});
+it("rejects cumulative tax rounding above the invoice even while the net base fits", async () => {
+  expect(await code(async () => {
+    const invoice=await postedInvoice(app,{cents:100});
+    for(let i=0;i<6;i++) await postedInvoice(app,{kind:"CREDIT_NOTE",credits:invoice.id,cents:10,date:"2026-04-05"});
+  })).toBe("AL006");
+});

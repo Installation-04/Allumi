@@ -48,3 +48,5 @@
 - [[Annulation-des-factures]]
 
 - [[Brouillons-d-avoirs]]
+
+- [[Validation-des-avoirs]]

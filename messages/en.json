@@ -212,7 +212,10 @@
       "confirmVoid": "Confirm permanently voiding the invoice.",
       "linked": "This invoice has linked payments or credit notes. Resolve them before voiding.",
       "invalidCredit": "Enter a reason and a positive amount on at least one line, without exceeding the original amount or two decimal places.",
-      "creditSource": "Choose a posted invoice and a date on or after its posting date."
+      "creditSource": "Choose a posted invoice and a date on or after its posting date.",
+      "creditLimit": "Combined credit notes exceed the original invoice amounts. Review the lines and taxes.",
+      "creditBalance": "The invoice balance is insufficient to apply this credit note in full.",
+      "confirmCreditPost": "Confirm posting and applying this credit note."
     }
   },
   "nav": {
@@ -542,7 +545,7 @@
     "ventes": {
       "title": "Sales",
       "description": "Prepare invoice drafts and find your customers and items.",
-      "planned": "Sending, credit note posting and receiving payments are not available yet."
+      "planned": "Sending, refunds and receiving payments are not yet available."
     },
     "depenses": {
       "title": "Expenses",
@@ -730,7 +733,7 @@
   "sales": {
     "title": "Invoice drafts",
     "draft": "Draft — not posted",
-    "intro": "Prepare invoices, then post them to the ledger. A draft does not change the ledger. Sending, credit note posting and payments are not yet available.",
+    "intro": "Prepare invoices, then post them to the ledger. A draft does not change the ledger. Sending and payments are not yet available.",
     "new": "New draft",
     "edit": "Edit draft",
     "back": "Back to drafts",
@@ -766,7 +769,7 @@
     "delete": "Delete draft",
     "confirmDelete": "I confirm permanent deletion of this draft.",
     "post": "Post invoice",
-    "postHint": "This assigns a final number and posts the invoice to the ledger. The document will be locked; corrections require an eligible void. Credit notes can be prepared as drafts; posting is not available yet.",
+    "postHint": "This assigns a final number and posts the invoice to the ledger. The document will be locked; corrections require an eligible void. Credit notes allow partial corrections.",
     "postingDate": "Posting date",
     "confirmPost": "I confirm the amounts and final posting.",
     "postedList": "Posted invoices",
@@ -791,7 +794,7 @@
     "new": "Prepare a credit note",
     "edit": "Edit credit note",
     "save": "Save credit note draft",
-    "intro": "A credit note draft prepares a correction without changing the ledger or invoice balance. Posting credit notes is not available yet.",
+    "intro": "Prepare a correction without affecting the ledger, then post the credit note to record it and reduce its original invoice balance.",
     "amountHint": "Enter the amount before tax to credit for each line, with up to two decimal places. Leave 0 to exclude a line. Tax rates and rounding come from the original invoice. Drafts do not reserve any amount.",
     "reason": "Credit note reason",
     "maximum": "Original amount before tax: {amount}",
@@ -802,6 +805,17 @@
     "sourceUnavailable": "The original invoice is no longer posted. This draft remains readable and can be deleted, but cannot be edited.",
     "delete": "Delete credit note draft",
     "confirmDelete": "I confirm deletion of this credit note draft.",
-    "date": "Credit note date"
+    "date": "Credit note date",
+    "postedList": "Posted credit notes",
+    "postedEmpty": "No posted credit notes.",
+    "postedLimit": "Showing the 100 most recent posted or voided credit notes.",
+    "posted": "Posted credit note",
+    "voided": "Voided credit note",
+    "postedHint": "This credit note is locked. Its journal entry and application are retained. Unapplying, voiding a credit note and refunds are not yet available in the interface.",
+    "applications": "Active applications",
+    "openBalance": "Remaining balance",
+    "post": "Post and apply credit note",
+    "postWarning": "This assigns a number, posts the credit note and applies its full amount to the original invoice. It cannot be undone in this interface. Check the amounts, reason and date; an insufficient balance or amounts already credited will be refused.",
+    "confirmPost": "I confirm posting and fully applying this credit note."
   }
 }
