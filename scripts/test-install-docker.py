@@ -77,6 +77,13 @@ class Installer(unittest.TestCase):
         self.assertEqual(self.run_install('--prepare-only').returncode,0)
         self.assertEqual(self.config()['TRUSTED_PROXY_HOPS'],'1')
 
+    def test_bootstrap_distinguishes_preparation_from_startup(self):
+        report=self.root/'result'
+        for action,expected in [('2','prepared'),('1','started')]:
+            result=subprocess.run(['bash','-c','exec 3>"$1"; shift; exec "$@"','bash',str(report),'bash',str(self.root/'scripts/install-docker.sh'),'--interactive'],env={**self.env,'ALLUMI_REPORT_RESULT':'1'},input='1\nhttp://192.168.1.20:28080\n\n'+action+'\no\n',text=True,capture_output=True,timeout=15)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertEqual(report.read_text().strip(),expected)
+
     def test_prepare_only_does_not_call_docker(self):
         result=self.run_install('--prepare-only');self.assertEqual(result.returncode,0,result.stderr)
         self.assertFalse(self.log.exists());self.assertTrue((self.root/'.env').exists())

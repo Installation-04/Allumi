@@ -9,8 +9,8 @@ docker compose logs migrate        # migrations
 ```
 
 ## Le site ne s'ouvre pas / erreur de certificat
-- DNS : `dig +short ton-domaine` doit retourner l'IP du serveur.
-- Ports 80 et 443 ouverts (pare-feu du serveur **et** du fournisseur infonuagique).
+- En accès direct, utiliser l’adresse IP de la VM et `http://`, sans dépendre du DNS.
+- Vérifier que le port HTTP configuré (28080 par défaut) est accessible et que `APP_URL` correspond à cette adresse.
 - Aucun certificat intégré depuis v0.4.0-alpha.10 : utiliser `http://ADRESSE_VM:28080`, ou consulter les logs de votre proxy externe. Voir [[Installation-Docker]] pour la transition.
 
 ## « POSTGRES_PASSWORD manquant »
