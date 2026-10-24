@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.9] - 2026-10-24
+
 - Docker : ports initiaux 28080/28443, conservation des anciens ports, CI native AMD64/ARM64 et publication des images serveur/migrations avec manifestes multiarchitecture.
 
 - Assistant Docker interactif standard/avancé : domaine, courriel, langue, ports, adresse IPv4, délai et préparation seule; récapitulatif avant confirmation, conservation des réglages et secrets. Ports Compose persistants et redirection HTTP respectant le port HTTPS configuré.
