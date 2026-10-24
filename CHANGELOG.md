@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.10] - 2026-10-24
+
 - Docker : application HTTP directe sur 28080 et PostgreSQL privé, sans Caddy ni SSL intégré; assistant par URL/IP, transition documentée avec conservation des données, tests natifs AMD64/ARM64. En accès direct, ignorer les en-têtes IP transférés; première configuration protégée par jeton en production HTTP comme HTTPS.
 
 ## [0.4.0-alpha.9] - 2026-10-24
