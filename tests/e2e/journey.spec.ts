@@ -771,13 +771,18 @@ async function creditPostingJourney(page: Page) {
   await expect(page.locator("html")).toHaveAttribute("data-theme","light");
 }
 
-/** Signs in from another browser with the password and a recovery code. */
-async function signInElsewhere(page: Page, password: string, recoveryCode: string) {
+/**
+ * Signs in from another browser. Without a recovery code it stops at the second-factor page, which is enough to
+ * prove the password was accepted. Every code typed counts in the limit of 8 per 15 minutes and per account,
+ * which the whole journey shares: keep the number of codes used here low.
+ */
+async function signInElsewhere(page: Page, password: string, recoveryCode?: string) {
   await page.goto("/connexion");
   await page.getByLabel("Courriel").fill(EMAIL);
   await page.getByLabel("Mot de passe").fill(password);
   await page.getByRole("button", { name: "Se connecter" }).click();
   await expect(page).toHaveURL(/\/connexion\/2fa$/);
+  if (recoveryCode === undefined) return;
   await page.getByLabel("Code à 6 chiffres").fill(recoveryCode);
   await page.getByRole("button", { name: "Vérifier" }).click();
   await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
@@ -786,6 +791,7 @@ async function signInElsewhere(page: Page, password: string, recoveryCode: strin
 /** Signed-in devices and password change, with a second browser as the "other device". */
 async function securityJourney(page: Page, browser: Browser, recoveryCodes: string[]) {
   const disconnect = page.getByRole("button", { name: /^Déconnecter (?!tous les autres)/ });
+  const dashboard = page.url();
   await page.goto("/compte/securite");
   await expect(page.getByRole("heading", { name: "Appareils connectés" })).toBeVisible();
   await expect(page.getByText("Cet appareil")).toBeVisible();
@@ -837,6 +843,9 @@ async function securityJourney(page: Page, browser: Browser, recoveryCodes: stri
   // Back to the password the rest of the journey uses.
   await fill(NEXT, PASSWORD);
   const verifier = await browser.newContext();
-  await signInElsewhere(await verifier.newPage(), PASSWORD, recoveryCodes[3] ?? "");
+  await signInElsewhere(await verifier.newPage(), PASSWORD);
   await verifier.close();
+
+  // The next journeys start from the company's dashboard.
+  await page.goto(dashboard);
 }
