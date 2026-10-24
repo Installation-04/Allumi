@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.8] - 2026-10-24
+
 - Dépendance transitive `fast-uri` mise à jour de 3.1.8 à 3.1.9 pour corriger les avis de sécurité sur la normalisation des URI.
 
 - Sécurité : sérialisation des changements 2FA, vérification et autorisation de session atomiques, expiration après dix minutes des connexions en attente de 2FA; protections HTTP et CSP ciblée servies aussi sans Caddy.
