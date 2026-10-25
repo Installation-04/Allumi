@@ -1,5 +1,5 @@
 import { mkdirSync, readFileSync } from "node:fs";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Secret, TOTP } from "otpauth";
 
 const VERSION = (JSON.parse(readFileSync("package.json", "utf8")) as { version: string }).version;
@@ -14,6 +14,9 @@ async function captureReference(page: Page, name: string) {
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ scale: "css", path: `docs/images/${name}-${process.env.E2E_MOBILE === "1" ? "mobile" : "desktop"}.png`, fullPage: process.env.E2E_MOBILE !== "1", animations: "disabled" });
 }
+
+/** The recovery codes list, in either language; the page also lists the signed-in devices. */
+const recoveryCodeItems = (page: Page) => page.getByRole("list", { name: /^(Codes de récupération|Recovery codes)$/ }).getByRole("listitem");
 
 async function expectNoPageOverflow(page: Page) {
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -122,13 +125,13 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await page.getByLabel("Code à 6 chiffres").fill(totp.generate({ timestamp: enrolledAt }));
   await page.getByRole("button", { name: "Confirmer et activer" }).click();
   await expect(page.getByRole("heading", { name: "Codes de récupération" })).toBeVisible();
-  const recoveryCodes = await page.locator("main li").allInnerTexts();
+  const recoveryCodes = await recoveryCodeItems(page).allInnerTexts();
   expect(recoveryCodes).toHaveLength(10);
 
   // The codes are shown once: switching the language while they are on screen must not lose them.
   await page.getByRole("button", { name: "English" }).click();
   await expect(page.getByRole("heading", { name: "Recovery codes" })).toBeVisible();
-  await expect(page.locator("main li")).toHaveText(recoveryCodes);
+  await expect(recoveryCodeItems(page)).toHaveText(recoveryCodes);
   await page.getByRole("button", { name: "Français" }).click();
   await expect(page.getByRole("heading", { name: "Codes de récupération" })).toBeVisible();
 
@@ -162,6 +165,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await page.getByRole("button", { name: "Vérifier" }).click();
   await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
 
+  await securityJourney(page, browser, recoveryCodes);
   await ledgerJourney(page, totp);
   await contactsJourney(page);
   await catalogJourney(page);
@@ -765,4 +769,83 @@ async function creditPostingJourney(page: Page) {
   await page.getByRole("button",{name:"Français",exact:true}).click();
   await page.getByRole("combobox",{name:"Apparence",exact:true}).selectOption("light");
   await expect(page.locator("html")).toHaveAttribute("data-theme","light");
+}
+
+/**
+ * Signs in from another browser. Without a recovery code it stops at the second-factor page, which is enough to
+ * prove the password was accepted. Every code typed counts in the limit of 8 per 15 minutes and per account,
+ * which the whole journey shares: keep the number of codes used here low.
+ */
+async function signInElsewhere(page: Page, password: string, recoveryCode?: string) {
+  await page.goto("/connexion");
+  await page.getByLabel("Courriel").fill(EMAIL);
+  await page.getByLabel("Mot de passe").fill(password);
+  await page.getByRole("button", { name: "Se connecter" }).click();
+  await expect(page).toHaveURL(/\/connexion\/2fa$/);
+  if (recoveryCode === undefined) return;
+  await page.getByLabel("Code à 6 chiffres").fill(recoveryCode);
+  await page.getByRole("button", { name: "Vérifier" }).click();
+  await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
+}
+
+/** Signed-in devices and password change, with a second browser as the "other device". */
+async function securityJourney(page: Page, browser: Browser, recoveryCodes: string[]) {
+  const disconnect = page.getByRole("button", { name: /^Déconnecter (?!tous les autres)/ });
+  const dashboard = page.url();
+  await page.goto("/compte/securite");
+  await expect(page.getByRole("heading", { name: "Appareils connectés" })).toBeVisible();
+  await expect(page.getByText("Cet appareil")).toBeVisible();
+  await expect(disconnect).toHaveCount(0);
+
+  // Another device appears, and disconnecting it really closes its session.
+  const other = await browser.newContext();
+  const otherPage = await other.newPage();
+  await signInElsewhere(otherPage, PASSWORD, recoveryCodes[1] ?? "");
+  await page.reload();
+  await expect(disconnect).toHaveCount(1);
+  await expectNoPageOverflow(page);
+  await captureReference(page, "securite-appareils");
+  await disconnect.click();
+  await expect(disconnect).toHaveCount(0);
+  await otherPage.goto("/compte/securite");
+  await expect(otherPage).toHaveURL(/\/connexion$/);
+
+  // Changing the password asks for the current one and applies the policy; the form keeps nothing after a refusal.
+  const change = page.getByRole("button", { name: "Changer le mot de passe" });
+  const fill = async (current: string, next: string, confirm = next) => {
+    await page.getByLabel("Mot de passe actuel").fill(current);
+    await page.getByLabel("Nouveau mot de passe", { exact: true }).fill(next);
+    await page.getByLabel("Confirmation du mot de passe").fill(confirm);
+    await change.click();
+  };
+  const NEXT = "une autre phrase de passe 2027";
+  await fill("ce n'est pas le bon", NEXT);
+  await expect(page.getByText("Le mot de passe actuel est incorrect.")).toBeVisible();
+  await fill(PASSWORD, NEXT, "autre chose entièrement");
+  await expect(page.getByText("Les mots de passe ne correspondent pas.")).toBeVisible();
+  await fill(PASSWORD, "court");
+  await expect(page.getByText("Le mot de passe est trop court (au moins 12 caractères).")).toBeVisible();
+  await fill(PASSWORD, PASSWORD);
+  await expect(page.getByText("Le nouveau mot de passe doit être différent de l'actuel.")).toBeVisible();
+
+  // The other browser signs in again, then loses its session when the password changes; this one keeps its own.
+  await signInElsewhere(otherPage, PASSWORD, recoveryCodes[2] ?? "");
+  await fill(PASSWORD, NEXT);
+  await expect(page.getByText("Mot de passe changé. Les autres appareils ont été déconnectés.")).toBeVisible();
+  await expect(page.getByLabel("Mot de passe actuel")).toHaveValue("");
+  await captureReference(page, "securite-mot-de-passe");
+  await otherPage.goto("/compte/securite");
+  await expect(otherPage).toHaveURL(/\/connexion$/);
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Appareils connectés" })).toBeVisible();
+  await other.close();
+
+  // Back to the password the rest of the journey uses.
+  await fill(NEXT, PASSWORD);
+  const verifier = await browser.newContext();
+  await signInElsewhere(await verifier.newPage(), PASSWORD);
+  await verifier.close();
+
+  // The next journeys start from the company's dashboard.
+  await page.goto(dashboard);
 }

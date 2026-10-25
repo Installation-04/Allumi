@@ -22,7 +22,7 @@ type SessionScope = {
  * Closes every other session of the user after a change to the second factor, so that a stolen cookie
  * does not outlive the change. Without a token to keep, every session is closed.
  */
-async function closeOtherSessions(tx: Tx, userId: string, keepSessionToken: string | undefined): Promise<void> {
+export async function closeOtherSessions(tx: Tx, userId: string, keepSessionToken: string | undefined): Promise<void> {
   await tx.session.deleteMany({ where: keepSessionToken ? { userId, NOT: { id: sha256Hex(keepSessionToken) } } : { userId } });
 }
 
@@ -40,7 +40,7 @@ export async function completeMfaSignIn(userId: string, token: string, code: str
   return checkSecondFactor(userId, code, now, token);
 }
 
-async function lockCredential(tx: Tx, userId: string): Promise<void> {
+export async function lockCredential(tx: Tx, userId: string): Promise<void> {
   await tx.$queryRaw`SELECT user_id FROM user_credential WHERE user_id=${userId}::uuid FOR UPDATE`;
 }
 

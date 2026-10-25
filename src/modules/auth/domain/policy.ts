@@ -13,6 +13,7 @@ export const RATE_LIMITS = {
   loginIp: { max: 30, windowSeconds: 15 * 60 },
   loginEmail: { max: 8, windowSeconds: 15 * 60 },
   mfaUser: { max: 8, windowSeconds: 15 * 60 },
+  passwordUser: { max: 8, windowSeconds: 15 * 60 },
   setupIp: { max: 10, windowSeconds: 60 * 60 },
 } as const;
 

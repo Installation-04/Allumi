@@ -5,19 +5,23 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import {
   attemptLogin,
   beginTotpEnrollment,
+  changePassword,
   confirmTotpEnrollment,
   createSession,
   destroySession,
   disableTotp,
   completeMfaSignIn,
+  listSessions,
   resolveSession,
+  revokeOtherSessions,
+  revokeSession,
   totpStatus,
   verifySecondFactor,
 } from "@/modules/auth";
 import { SESSION_ABSOLUTE_MS, SESSION_IDLE_MS } from "@/modules/auth/domain/policy";
 import { sha256Hex } from "@/modules/auth/service/crypto";
 import { purgeOldWindows } from "@/modules/auth/service/rate-limit";
-import { owner, PASSWORD, seedUser } from "./helpers";
+import { enableTotp, owner, PASSWORD, seedUser } from "./helpers";
 
 let db: pg.Client;
 beforeAll(async () => {
@@ -397,5 +401,133 @@ describe("concurrent MFA state changes", () => {
     await db.query("UPDATE app_user SET disabled_at=now() WHERE id=$1", [userId]);
     expect(await completeMfaSignIn(userId, disabled.token, code, now)).toBe("invalid");
     expect((await totpStatus(userId)).recoveryCodesLeft).toBe(10);
+  });
+});
+
+describe("devices", () => {
+  const chrome = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
+
+  it("lists the live sessions of the user only, the current one first, without any token", async () => {
+    const userId = await seedUser(db, { email: "liste@exemple.test" });
+    const stranger = await seedUser(db, { email: "autre@exemple.test" });
+    const t0 = new Date();
+    const old = await createSession(userId, "téléphone", new Date(t0.getTime() - 60_000));
+    const current = await createSession(userId, chrome, t0);
+    await createSession(stranger, "autre", t0);
+    const expired = await createSession(userId, "expirée", new Date(t0.getTime() - SESSION_ABSOLUTE_MS - 1000));
+    await db.query("UPDATE session SET last_seen_at = $1 WHERE id = $2", [t0, sha256Hex(expired.token)]);
+
+    const sessions = await listSessions(userId, current.token, t0);
+    expect(sessions.map((session) => [session.id, session.current])).toEqual([
+      [sha256Hex(current.token), true],
+      [sha256Hex(old.token), false],
+    ]);
+    expect(sessions[0]?.device).toEqual({ browser: "Chrome", system: "Windows" });
+    expect(JSON.stringify(sessions)).not.toContain(current.token);
+  });
+
+  it("marks a password-only session as waiting for the second factor, and hides it once its ten minutes are over", async () => {
+    const userId = await seedUser(db, { email: "deuxetapes@exemple.test" });
+    await enableTotp(userId, "deuxetapes@exemple.test");
+    await db.query("DELETE FROM session WHERE user_id = $1", [userId]);
+    const t0 = new Date();
+    const current = await createSession(userId, null, t0);
+    const waiting = await createSession(userId, null, new Date(t0.getTime() - 5 * 60_000));
+    const lapsed = await createSession(userId, null, new Date(t0.getTime() - 11 * 60_000));
+    const sessions = await listSessions(userId, current.token, t0);
+    expect(sessions.map((session) => [session.id, session.mfaPending])).toEqual([
+      [sha256Hex(current.token), true],
+      [sha256Hex(waiting.token), true],
+    ]);
+    expect(sessions.some((session) => session.id === sha256Hex(lapsed.token))).toBe(false);
+  });
+
+  it("signs another device out, audits it, and refuses the current device, a stranger's session and malformed ids", async () => {
+    const userId = await seedUser(db, { email: "revoque-un@exemple.test" });
+    const stranger = await seedUser(db, { email: "voisin@exemple.test" });
+    const [current, other, foreign] = [await createSession(userId, "a"), await createSession(userId, "b"), await createSession(stranger, "c")];
+
+    expect(await revokeSession(userId, sha256Hex(current.token), current.token)).toBe("current");
+    expect(await revokeSession(userId, sha256Hex(foreign.token), current.token)).toBe("not_found");
+    expect(await revokeSession(userId, "pas-un-identifiant", current.token)).toBe("not_found");
+    expect(await revokeSession(userId, sha256Hex(other.token), current.token)).toBe("revoked");
+    expect(await revokeSession(userId, sha256Hex(other.token), current.token)).toBe("not_found");
+
+    expect(await resolveSession(other.token)).toBeNull();
+    expect(await resolveSession(current.token)).not.toBeNull();
+    expect(await resolveSession(foreign.token)).not.toBeNull();
+    const audit = (await db.query("SELECT action FROM audit_log WHERE action = 'auth.session_revoked' AND entity_id = $1", [userId])).rows;
+    expect(audit).toHaveLength(1);
+  });
+
+  it("signs every other device out and says how many", async () => {
+    const userId = await seedUser(db, { email: "revoque-tout@exemple.test" });
+    const [current, second, third] = [await createSession(userId, "a"), await createSession(userId, "b"), await createSession(userId, "c")];
+    expect(await revokeOtherSessions(userId, current.token)).toBe(2);
+    expect(await resolveSession(second.token)).toBeNull();
+    expect(await resolveSession(third.token)).toBeNull();
+    expect(await resolveSession(current.token)).not.toBeNull();
+    expect(await revokeOtherSessions(userId, current.token)).toBe(0);
+    const audit = (await db.query("SELECT after FROM audit_log WHERE action = 'auth.sessions_revoked' AND entity_id = $1", [userId])).rows;
+    expect(audit).toEqual([{ after: { count: 2 } }]);
+  });
+});
+
+describe("password change", () => {
+  const NEW_PASSWORD = "une toute autre phrase de passe 2027";
+
+  it("changes the password, signs the other devices out and keeps the current one", async () => {
+    const userId = await seedUser(db, { email: "change@exemple.test" });
+    const [current, other] = [await createSession(userId, "ordinateur"), await createSession(userId, "téléphone")];
+    expect(await changePassword(userId, PASSWORD, NEW_PASSWORD, { keepSessionToken: current.token })).toEqual({ status: "ok" });
+
+    expect(await resolveSession(other.token)).toBeNull();
+    expect(await resolveSession(current.token)).toMatchObject({ userId });
+    expect(await login("change@exemple.test", PASSWORD)).toEqual({ status: "invalid" });
+    expect((await login("change@exemple.test", NEW_PASSWORD)).status).toBe("ok");
+    const stored = (await db.query("SELECT password_hash, password_changed_at FROM user_credential WHERE user_id = $1", [userId])).rows[0];
+    expect(stored.password_hash).toMatch(/^\$argon2id\$/);
+    expect(stored.password_hash).not.toContain(NEW_PASSWORD);
+    const audit = (await db.query("SELECT action, after FROM audit_log WHERE action = 'auth.password_changed' AND entity_id = $1", [userId])).rows;
+    expect(audit).toEqual([{ action: "auth.password_changed", after: null }]);
+  });
+
+  it("refuses a wrong current password without touching anything, and audits the attempt", async () => {
+    const userId = await seedUser(db, { email: "mauvais@exemple.test" });
+    const other = await createSession(userId, "téléphone");
+    expect(await changePassword(userId, "ce n'est pas le bon mot de passe", NEW_PASSWORD)).toEqual({ status: "invalid" });
+    expect(await resolveSession(other.token)).not.toBeNull();
+    expect((await login("mauvais@exemple.test", PASSWORD)).status).toBe("ok");
+    const audit = (await db.query("SELECT 1 FROM audit_log WHERE action = 'auth.password_change_failed' AND entity_id = $1", [userId])).rows;
+    expect(audit).toHaveLength(1);
+  });
+
+  it("applies the password policy after the current password, and refuses to keep the same one", async () => {
+    const userId = await seedUser(db, { email: "politique@exemple.test" });
+    expect(await changePassword(userId, PASSWORD, "court")).toEqual({ status: "weak_password", problem: "tooShort" });
+    expect(await changePassword(userId, PASSWORD, "x".repeat(300))).toEqual({ status: "weak_password", problem: "tooLong" });
+    expect(await changePassword(userId, PASSWORD, "  Politique@Exemple.test  ")).toEqual({ status: "weak_password", problem: "sameAsEmail" });
+    expect(await changePassword(userId, PASSWORD, PASSWORD)).toEqual({ status: "same_password" });
+    expect(await changePassword(userId, "faux", "court")).toEqual({ status: "invalid" });
+    expect((await login("politique@exemple.test", PASSWORD)).status).toBe("ok");
+  });
+
+  it("rate-limits attempts, even with the right password", async () => {
+    const userId = await seedUser(db, { email: "essais-mdp@exemple.test" });
+    for (let attempt = 0; attempt < 8; attempt++) expect((await changePassword(userId, "faux", NEW_PASSWORD)).status).toBe("invalid");
+    expect(await changePassword(userId, PASSWORD, NEW_PASSWORD)).toEqual({ status: "rate_limited" });
+    expect((await login("essais-mdp@exemple.test", PASSWORD)).status).toBe("ok");
+  });
+
+  it("lets only one of two concurrent changes win", async () => {
+    const userId = await seedUser(db, { email: "course@exemple.test" });
+    const results = await Promise.all([changePassword(userId, PASSWORD, NEW_PASSWORD), changePassword(userId, PASSWORD, "encore une autre phrase 2028")]);
+    expect(results.map((result) => result.status).sort()).toEqual(["invalid", "ok"]);
+  });
+
+  it("does not change the password of a disabled account", async () => {
+    const userId = await seedUser(db, { email: "desactive@exemple.test" });
+    await db.query("UPDATE app_user SET disabled_at = now() WHERE id = $1", [userId]);
+    expect(await changePassword(userId, PASSWORD, NEW_PASSWORD)).toEqual({ status: "invalid" });
   });
 });

@@ -16,6 +16,7 @@
 - PostgreSQL accessible seulement dans le réseau Docker interne.
 - HTTP direct sur réseau privé, HTTPS/HSTS à configurer sur un proxy externe pour un accès sécurisé. Aucun certificat intégré. L’application sert ses en-têtes de sécurité même sans proxy : `nosniff`, refus des iframes, `Referer` limité à l’origine pour les liens HTTPS vers un autre site (pas de chemin ni de paramètres), caméra/microphone/géolocalisation désactivés.
 - Politique CSP ciblée : `frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'`. Elle interdit l’intégration dans un autre site, les objets embarqués et les formulaires vers une autre origine. Elle ne constitue pas encore une politique stricte de scripts par nonce et ne garantit pas l’absence de XSS.
+- Le compte affiche ses appareils connectés et permet de les déconnecter; le changement de mot de passe exige l’actuel et déconnecte les autres appareils ([[Authentification]]).
 - La connexion en attente de 2FA expire après dix minutes; consommation du code et autorisation de session sont atomiques. Les changements du facteur sont sérialisés ([[Authentification]]).
 - Secrets uniquement dans `.env` (600).
 

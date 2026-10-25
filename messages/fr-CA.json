@@ -75,7 +75,23 @@
     "disable": "Désactiver la 2FA",
     "disableHint": "Entre ton mot de passe et un code actuel pour désactiver la 2FA.",
     "backHome": "Retour",
-    "enrollPasswordHint": "Pour l'activer, entre aussi ton mot de passe : un témoin de session volé ne suffit pas à enrôler un autre appareil."
+    "enrollPasswordHint": "Pour l'activer, entre aussi ton mot de passe : un témoin de session volé ne suffit pas à enrôler un autre appareil.",
+    "passwordTitle": "Mot de passe",
+    "passwordHint": "Entre ton mot de passe actuel, puis un nouveau (au moins {min} caractères). Les autres appareils seront déconnectés.",
+    "currentPassword": "Mot de passe actuel",
+    "newPassword": "Nouveau mot de passe",
+    "changePassword": "Changer le mot de passe",
+    "passwordChanged": "Mot de passe changé. Les autres appareils ont été déconnectés.",
+    "sessionsTitle": "Appareils connectés",
+    "sessionsIntro": "Voici les appareils où ton compte est ouvert. Déconnecte ceux que tu ne reconnais pas, puis change ton mot de passe.",
+    "thisDevice": "Cet appareil",
+    "lastActive": "Dernière activité : {date}",
+    "signedInAt": "Connecté le {date}",
+    "awaitingSecondFactor": "En attente de la vérification en deux étapes.",
+    "unknownDevice": "Appareil inconnu",
+    "signOut": "Déconnecter",
+    "signOutDevice": "Déconnecter {device}",
+    "signOutOthers": "Déconnecter tous les autres appareils"
   },
   "dashboard": {
     "title": "{company}",
@@ -128,7 +144,9 @@
       "tooLong": "Le mot de passe est trop long.",
       "sameAsEmail": "Le mot de passe ne peut pas être ton courriel.",
       "alreadySetUp": "Cette instance est déjà configurée. Connecte-toi.",
-      "generic": "Une erreur est survenue. Réessaie."
+      "generic": "Une erreur est survenue. Réessaie.",
+      "currentPassword": "Le mot de passe actuel est incorrect.",
+      "sameAsCurrent": "Le nouveau mot de passe doit être différent de l'actuel."
     },
     "AL001": "Les débits et les crédits ne sont pas égaux.",
     "AL002": "Une écriture doit compter au moins deux lignes.",

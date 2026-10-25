@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { Field, FormError, SubmitButton } from "@/app/_components/ui";
-import { beginEnrollmentAction, confirmEnrollmentAction, disableTotpAction } from "./actions";
+import { beginEnrollmentAction, changePasswordAction, confirmEnrollmentAction, disableTotpAction } from "./actions";
 
 /**
  * The whole two-factor section lives in ONE client component whose place in the tree never changes.
@@ -29,7 +29,7 @@ export function TwoFactorPanel({
       <div className="space-y-3">
         <h2 className="text-lg font-semibold">{t("recoveryTitle")}</h2>
         <p className="text-sm">{t("recoveryIntro")}</p>
-        <ul className="grid grid-cols-2 gap-2 rounded-md border border-stone-300 bg-stone-100 p-4 font-mono text-sm dark:border-stone-700 dark:bg-stone-800">
+        <ul aria-label={t("recoveryTitle")} className="grid grid-cols-2 gap-2 rounded-md border border-stone-300 bg-stone-100 p-4 font-mono text-sm dark:border-stone-700 dark:bg-stone-800">
           {state.recoveryCodes.map((code) => (
             <li key={code}>{code}</li>
           ))}
@@ -85,6 +85,26 @@ function DisableForm() {
       <Field name="password" type="password" label={t("form.password")} autoComplete="current-password" />
       <Field name="code" label={t("form.code")} autoComplete="one-time-code" inputMode="numeric" />
       <SubmitButton variant="secondary">{t("security.disable")}</SubmitButton>
+    </form>
+  );
+}
+
+export function PasswordForm() {
+  const t = useTranslations();
+  const [state, action] = useActionState(changePasswordAction, undefined);
+  return (
+    <form action={action} className="space-y-4">
+      <p className="text-sm">{t("security.passwordHint", { min: 12 })}</p>
+      {state?.error ? <FormError message={t(`errors.form.${state.error}`, { min: 12 })} /> : null}
+      {state?.notice === "saved" ? (
+        <p role="status" className="text-brand-700 dark:text-brand-500">
+          {t("security.passwordChanged")}
+        </p>
+      ) : null}
+      <Field name="currentPassword" type="password" label={t("security.currentPassword")} autoComplete="current-password" />
+      <Field name="newPassword" type="password" label={t("security.newPassword")} autoComplete="new-password" />
+      <Field name="newPasswordConfirm" type="password" label={t("form.passwordConfirm")} autoComplete="new-password" />
+      <SubmitButton>{t("security.changePassword")}</SubmitButton>
     </form>
   );
 }

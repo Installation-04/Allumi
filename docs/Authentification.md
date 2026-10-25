@@ -14,7 +14,14 @@
 - Fermeture après **8 heures d'inactivité** ou **14 jours** au total.
 - À la connexion depuis un navigateur qui n'a encore aucune langue choisie (nouvel appareil), la **langue enregistrée dans ton compte** est appliquée. Une langue choisie dans ce navigateur n'est jamais écrasée.
 - « Se déconnecter » supprime la session côté serveur et efface le cookie.
+- **Sécurité du compte → Appareils connectés** liste les sessions ouvertes (navigateur et système déduits de l’en-tête User-Agent, dernière activité, date de connexion) et permet de **déconnecter un appareil** ou **tous les autres**. Seul ton propre compte est visible; l’appareil courant n’est jamais fermé depuis cette liste (utilise « Se déconnecter »). Une connexion encore en attente de la 2FA y figure, marquée comme telle. Chaque déconnexion est inscrite à la piste d’audit (sans jeton ni identifiant de session).
 - Activer ou désactiver la 2FA **déconnecte tous les autres appareils**, et une session vérifiée avant la désactivation ne saute pas la deuxième étape si tu réactives la 2FA.
+
+## Changer le mot de passe
+**Sécurité du compte → Mot de passe** demande le **mot de passe actuel**, puis le nouveau deux fois : un témoin de session volé ne suffit pas à prendre le compte. Le nouveau mot de passe suit la même règle qu’à l’installation (au moins 12 caractères, pas ton courriel) et doit différer de l’actuel.
+- Le changement **déconnecte tous les autres appareils** dans la même transaction; l’appareil courant reste ouvert. Les verrous de compte et les codes de récupération ne changent pas.
+- Les essais sont limités (8 par 15 minutes et par compte, réussis ou non), et deux changements simultanés sont sérialisés : un seul peut réussir.
+- La piste d’audit note le changement et chaque refus du mot de passe actuel, jamais les mots de passe.
 
 ## Vérification en deux étapes (TOTP)
 Compatible avec toute application d'authentification (Aegis, Google Authenticator, 1Password, etc.).
@@ -32,7 +39,7 @@ Détails de sécurité :
 - Tant que la deuxième étape n'est pas faite, la session ne donne accès qu'à la page de vérification.
 
 ## Ce qui n'est pas encore là
-Réinitialisation du mot de passe par courriel, invitations de membres et changement de mot de passe arrivent avec les modules suivants (voir [[Feuille-de-route]]). Si tu perds ton mot de passe et tes codes de récupération, un administrateur de l'instance doit intervenir directement dans la base.
+Réinitialisation du mot de passe par courriel et invitations de membres arrivent avec les modules suivants (voir [[Feuille-de-route]]). Si tu perds ton mot de passe et tes codes de récupération, un administrateur de l'instance doit intervenir directement dans la base.
 
 ## Rôles
 Les droits sont appliqués **par la base de données**, pas seulement par l'interface :
