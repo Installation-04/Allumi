@@ -6,7 +6,7 @@ import { requireSession } from "@/app/_lib/session";
 import { safeAction } from "@/app/_lib/safe-action";
 import { textValues, type FormState } from "@/app/_lib/form-state";
 import { AppError } from "@/platform/errors";
-import { createConnection, disconnect, replaceCredentials, setImportedStatus, syncConnection, type ProviderId } from "@/modules/integrations";
+import { cancelPaymentLink, collectPayments, createConnection, createPaymentLink, disconnect, replaceCredentials, setFeeAccount, setImportedStatus, syncConnection, type ProviderId } from "@/modules/integrations";
 
 /** The credentials as typed. A secret field is read from the form and goes nowhere else: never back to the page, never logged. */
 const credentialsOf = (provider: ProviderId, form: FormData) =>
@@ -66,5 +66,49 @@ export async function setStatusAction(companyId: string, transactionId: string, 
     await setImportedStatus({ userId: session.userId, companyId }, transactionId, status);
     revalidatePath(`/c/${companyId}/transactions`);
     return undefined;
+  });
+}
+
+/** Where the processing fees of online payments are booked. */
+export async function setFeeAccountAction(companyId: string, connectionId: string, _previous: FormState, form: FormData): Promise<FormState> {
+  const values = textValues(form, ["accountId"]);
+  return safeAction(async () => {
+    const session = await requireSession();
+    await setFeeAccount({ userId: session.userId, companyId }, connectionId, values.accountId ?? "");
+    revalidatePath(`/c/${companyId}`, "layout");
+    return { notice: "saved" };
+  }, values);
+}
+
+/** Looks at the payment pages of a connection and books what was paid. The counts go back to the page in its address, never a payment. */
+export async function collectPaymentsAction(companyId: string, connectionId: string, back: string, _previous: FormState, _form: FormData): Promise<FormState> {
+  return safeAction(async () => {
+    const session = await requireSession();
+    const result = await collectPayments({ userId: session.userId, companyId }, { connectionId });
+    revalidatePath(`/c/${companyId}`, "layout");
+    const counts = new URLSearchParams({
+      checked: String(result.checked), paid: String(result.paid), review: String(result.review), extra: String(result.extra), waiting: String(result.waiting), failed: String(result.failed), more: result.more ? "1" : "0",
+    });
+    redirect(`${back}?${counts}`);
+  });
+}
+
+export async function createPaymentLinkAction(companyId: string, invoiceId: string, _previous: FormState, form: FormData): Promise<FormState> {
+  const values = textValues(form, ["connectionId"]);
+  return safeAction(async () => {
+    const session = await requireSession();
+    await createPaymentLink({ userId: session.userId, companyId }, { invoiceId, connectionId: values.connectionId });
+    revalidatePath(`/c/${companyId}`, "layout");
+    return { notice: "saved" };
+  }, values);
+}
+
+export async function cancelPaymentLinkAction(companyId: string, invoiceId: string, linkId: string, _previous: FormState, _form: FormData): Promise<FormState> {
+  return safeAction(async () => {
+    const session = await requireSession();
+    const result = await cancelPaymentLink({ userId: session.userId, companyId }, linkId);
+    revalidatePath(`/c/${companyId}`, "layout");
+    const outcome = result.status === "CANCELLED" ? (result.closedAtService ? "cancelled" : "cancelledOpen") : result.status === "PAID" ? "paid" : "review";
+    redirect(`/c/${companyId}/factures/validees/${invoiceId}?cancel=${outcome}`);
   });
 }

@@ -246,6 +246,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   const paidInvoiceUrl = await creditPostingJourney(page);
   await paymentsJourney(page, paidInvoiceUrl);
   await integrationsJourney(page);
+  await onlinePaymentsJourney(page, paidInvoiceUrl);
   // Nothing in the whole journey (both locales, every form, the security pages, a second browser) was blocked.
   expect(cspViolations, "Content-Security-Policy violations").toEqual([]);
 });
@@ -1047,6 +1048,127 @@ async function integrationsJourney(page: Page) {
   await expectNoPageOverflow(page);
   await page.getByRole("button", { name: "Français", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Transactions importées", exact: true })).toBeVisible();
+}
+
+/**
+ * Seeds a Stripe connection whose keys cannot be read, and, on demand, a live payment link on an invoice. The service
+ * is called by the server, not by the browser, so a test cannot reach it; what is left to prove here is what a person
+ * sees and does: the choice of the fee account, the refusal that keeps a link pending, the live link and its address,
+ * a payment under review, cancelling, both languages.
+ */
+async function seedOnlineConnection(companyId: string) {
+  const db = new pg.Client({ connectionString: e2eUrls().owner });
+  await db.connect();
+  try {
+    const account = (await db.query("SELECT id FROM account WHERE company_id = $1 AND subtype = 'BANK' ORDER BY code LIMIT 1", [companyId])).rows[0].id as string;
+    const user = (await db.query("SELECT id FROM app_user WHERE email = $1", [EMAIL])).rows[0].id as string;
+    const connection = (await db.query(
+      `INSERT INTO integration_connection (id, company_id, provider, label, account_id, status, credentials_hint, import_from, created_by_id, updated_at)
+       VALUES (gen_random_uuid(), $1, 'STRIPE', 'Stripe en ligne', $2, 'ACTIVE', 'cd34', '2026-01-01', $3, now()) RETURNING id`, [companyId, account, user])).rows[0].id as string;
+    await db.query("INSERT INTO integration_credential (id, company_id, connection_id, credentials_enc, updated_at) VALUES (gen_random_uuid(), $1, $2, decode('0102030405060708090a0b0c0d0e0f10', 'hex'), now())", [companyId, connection]);
+    return connection;
+  } finally {
+    await db.end();
+  }
+}
+
+async function seedPaymentLink(companyId: string, connectionId: string, invoiceId: string, state: "ACTIVE" | "REVIEW") {
+  const db = new pg.Client({ connectionString: e2eUrls().owner });
+  await db.connect();
+  try {
+    const user = (await db.query("SELECT id FROM app_user WHERE email = $1", [EMAIL])).rows[0].id as string;
+    const id = (await db.query(
+      `INSERT INTO payment_link (id, company_id, invoice_id, connection_id, amount_cents, created_by_id, updated_at)
+       VALUES (gen_random_uuid(), $1, $2, $3, 6498, $4, now()) RETURNING id`, [companyId, invoiceId, connectionId, user])).rows[0].id as string;
+    await db.query("UPDATE payment_link SET status = 'ACTIVE', external_price_id = 'price_e2e', external_id = 'plink_e2e', url = 'https://buy.stripe.com/test_e2e', updated_at = now() WHERE id = $1", [id]);
+    if (state === "REVIEW") await db.query("UPDATE payment_link SET status = 'REVIEW', review_reason = 'payments.exceeds', updated_at = now() WHERE id = $1", [id]);
+    return id;
+  } finally {
+    await db.end();
+  }
+}
+
+async function onlinePaymentsJourney(page: Page, invoiceUrl: string) {
+  const company = new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0] ?? "";
+  const invoiceId = new URL(invoiceUrl, page.url()).pathname.split("/").at(-1) ?? "";
+  const connectionId = await seedOnlineConnection(company.slice(3));
+  const alert = (text: string) => page.locator("form").getByRole("alert").filter({ hasText: text });
+  const panel = page.getByRole("region", { name: "Paiement en ligne", exact: true });
+
+  // no fee account yet: the invoice offers no link, and says what to do
+  await page.goto(invoiceUrl);
+  await expect(panel).toContainText("Aucune connexion Stripe n’est prête");
+  await expect(panel.getByRole("link", { name: "Aller aux intégrations" })).toBeVisible();
+
+  // the owner chooses where Stripe's fees are booked
+  await page.goto(`${company}/integrations/${connectionId}`);
+  await expect(page.getByRole("heading", { name: "Paiement en ligne des factures", exact: true })).toBeVisible();
+  await expect(page.getByText("Non choisi", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Vérifier les paiements en ligne", exact: true })).toHaveCount(0);
+  await page.getByLabel("Compte des frais de traitement").selectOption({ label: "6010 · Frais bancaires" });
+  await page.getByRole("button", { name: "Enregistrer le compte", exact: true }).click();
+  await expect(page.getByText("Réglages enregistrés.")).toBeVisible();
+  await page.reload();
+  await expect(page.getByText("6010 · Frais bancaires", { exact: true }).first()).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "paiement-en-ligne-connexion", "Paiement en ligne des factures");
+  // nothing to look at yet: no call, and the page says so
+  await page.getByRole("button", { name: "Vérifier les paiements en ligne", exact: true }).click();
+  await expect(page.getByText("Vérification terminée : aucun nouveau paiement.")).toBeVisible();
+
+  // a link needs the keys too: refused, and the link stays pending with the reason so it can be resumed
+  await page.goto(invoiceUrl);
+  await expect(panel).toBeVisible();
+  await panel.locator("summary", { hasText: "Créer un lien de paiement" }).click();
+  await expect(panel.getByText(/Le lien vaut pour le solde actuel, 64,98/)).toBeVisible();
+  await panel.getByRole("button", { name: "Créer le lien", exact: true }).click();
+  await expect(alert("Les clés enregistrées sont illisibles")).toBeVisible();
+  await page.goto(invoiceUrl);
+  await expect(panel.getByText(/^En préparation · /)).toBeVisible();
+  await expect(panel).toContainText("Ce lien n’a pas pu être créé chez Stripe");
+  await expect(panel).toContainText("Les clés enregistrées sont illisibles");
+  await expect(panel.getByRole("button", { name: "Reprendre la création", exact: true })).toBeVisible();
+  await expect(panel.locator("summary", { hasText: "Créer un lien de paiement" })).toHaveCount(0); // one live link per invoice
+  await expectNoPageOverflow(page);
+  await panel.getByRole("button", { name: "Annuler le lien", exact: true }).click();
+  await expect(panel.getByText("Lien annulé.")).toBeVisible();
+  await expect(panel.getByText(/^Annulé · /)).toBeVisible();
+
+  // a live link: its address, the buttons, and no second link; the check is refused without readable keys
+  const linkId = await seedPaymentLink(company.slice(3), connectionId, invoiceId, "ACTIVE");
+  await page.goto(invoiceUrl);
+  await expect(panel.getByText(/^Prêt à payer · /)).toBeVisible();
+  await expect(panel.getByRole("link", { name: "https://buy.stripe.com/test_e2e" })).toHaveAttribute("href", "https://buy.stripe.com/test_e2e");
+  await expect(panel.getByRole("link", { name: "https://buy.stripe.com/test_e2e" })).toHaveAttribute("rel", "noopener noreferrer");
+  await expect(panel.locator("summary", { hasText: "Créer un lien de paiement" })).toHaveCount(0);
+  await expectNoPageOverflow(page);
+  await captureReference(page, "paiement-en-ligne-facture", "Paiement en ligne");
+  await panel.getByRole("button", { name: "Vérifier le paiement", exact: true }).click();
+  await expect(alert("Les clés enregistrées sont illisibles")).toBeVisible();
+
+  // a payment that could not be booked: the reason, and nothing was recorded
+  const db = new pg.Client({ connectionString: e2eUrls().owner });
+  await db.connect();
+  try {
+    await db.query("UPDATE payment_link SET status = 'REVIEW', review_reason = 'payments.exceeds', updated_at = now() WHERE id = $1", [linkId]);
+  } finally {
+    await db.end();
+  }
+  await page.goto(invoiceUrl);
+  await expect(panel.getByText(/^À vérifier · /)).toBeVisible();
+  await expect(panel.getByRole("alert")).toContainText("Allumi n’a rien enregistré : Le montant dépasse le solde restant de la facture.");
+  await expect(page.getByText(/Solde restant:.*64,98/)).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "paiement-en-ligne-a-verifier", "Paiement en ligne");
+  await panel.getByRole("button", { name: "Fermer ce signalement", exact: true }).click();
+  await expect(panel.getByText("Lien annulé.")).toBeVisible();
+
+  // English
+  await page.getByRole("button", { name: "English", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Online payment", exact: true })).toContainText("Create a payment link");
+  await expectNoPageOverflow(page);
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await expect(panel).toBeVisible();
 }
 
 /**

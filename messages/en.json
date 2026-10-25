@@ -270,6 +270,24 @@
       "notFound": "Payment not found.",
       "invalidVoid": "Give a reason of 1 to 500 characters and a date on or after the payment and its applications.",
       "confirmVoid": "Confirm the permanent voiding of the payment."
+    },
+    "onlinePayments": {
+      "invalid": "Invalid request.",
+      "invoiceNotFound": "Invoice not found.",
+      "nothingDue": "This invoice has no balance left to pay.",
+      "amountRange": "Stripe accepts payments from $0.50 to $999,999.99: the balance of this invoice is outside that range.",
+      "currency": "Online payment is only offered in Canadian dollars.",
+      "feeAccount": "Choose the processing fee account in the Stripe connection first.",
+      "feeAccountInvalid": "Choose an active expense account of this company.",
+      "provider": "Only Stripe offers online payment for now.",
+      "linkExists": "This invoice already has a live link for another balance or another connection. Cancel it first.",
+      "linkChanged": "This link changed in the meantime. Reload the page.",
+      "notFound": "Payment link not found.",
+      "alreadyPaid": "This link is already paid.",
+      "amount": "The amount paid is not the amount of the link.",
+      "fee": "The fees reported by Stripe do not agree with the amount paid.",
+      "settlementCurrency": "Stripe settled this payment in a currency other than Canadian dollars: record it by hand.",
+      "rule": "The books refused the entry (a locked period, for example)."
     }
   },
   "nav": {
@@ -1052,5 +1070,55 @@
     "voidHint": "This credit note was voided. The amounts below are retained for history; they no longer reduce the invoice balance.",
     "unapplied": "Unapplied on {date}",
     "active": "Active"
+  },
+  "onlinePayments": {
+    "title": "Online payment",
+    "intro": "Let your customer pay this invoice by card on a page hosted by Stripe. Allumi never sees the card number and needs no public address: you check afterwards whether the payment has arrived.",
+    "statuses": {
+      "PENDING": "Being prepared",
+      "ACTIVE": "Ready to pay",
+      "PAID": "Paid",
+      "REVIEW": "To review",
+      "CANCELLED": "Cancelled"
+    },
+    "test": "test",
+    "addressLabel": "Payment page address, to send to your customer",
+    "pendingHint": "This link could not be created at Stripe. Resume it or cancel it.",
+    "resume": "Resume creation",
+    "paidOn": "Paid on {date}",
+    "fees": "Stripe fees",
+    "net": "Net paid out",
+    "reviewHint": "A payment reached Stripe, but Allumi recorded nothing: {reason} If needed, record the payment by hand (it also appears in the imported transactions), then dismiss this notice.",
+    "cancel": "Cancel the link",
+    "dismiss": "Dismiss this notice",
+    "check": "Check for payment",
+    "checkHint": "Stripe does not notify Allumi: press here to record a payment that may have arrived.",
+    "create": "Create a payment link",
+    "createSubmit": "Create the link",
+    "createHint": "The link is for the current balance, {amount}, and for a single payment. If the balance changes, cancel it and create another.",
+    "connectionField": "Stripe connection",
+    "noConnection": "No Stripe connection is ready. Connect Stripe, then choose the processing fee account.",
+    "goIntegrations": "Go to integrations",
+    "cancelResult": {
+      "cancelled": "Link cancelled.",
+      "cancelledOpen": "Link cancelled here, but Stripe could not be reached (the connection is disconnected): close the page in your Stripe dashboard.",
+      "paid": "A payment had just arrived: it was recorded, so the link is not cancelled.",
+      "review": "A payment had just arrived but could not be recorded: see the notice below."
+    },
+    "collected": "{paid, plural, =0 {Check complete: no new payment.} one {Check complete: # payment recorded.} other {Check complete: # payments recorded.}}",
+    "collectedReview": "{count, plural, one {# payment to review: open the invoice concerned.} other {# payments to review: open the invoices concerned.}}",
+    "collectedExtra": "{count, plural, one {# duplicate payment received on a link that was already paid: refund it in Stripe.} other {# duplicate payments received on links that were already paid: refund them in Stripe.}}",
+    "collectedWaiting": "{count, plural, one {# payment is still being processed at Stripe: check again later.} other {# payments are still being processed at Stripe: check again later.}}",
+    "collectedFailed": "{count, plural, one {# link could not be read this time (unexpected answer).} other {# links could not be read this time (unexpected answer).}}",
+    "collectedMore": "Some links are left to check: press again.",
+    "feeSection": "Online payment of invoices",
+    "feeAccountField": "Processing fee account",
+    "feeAccountHint": "The fees Stripe keeps on each online payment are booked to this expense account. Until it is chosen, no payment link is offered.",
+    "feeAccountSubmit": "Save the account",
+    "feeAccountNone": "Not chosen",
+    "feeAccountApplies": "A change applies to the payments recorded from now on.",
+    "keysHint": "For online payment, the restricted key must also be able to write “Prices” and “Payment Links” and to read “Checkout Sessions” and “PaymentIntents”. Replace the key if needed.",
+    "collectButton": "Check online payments",
+    "collectConnectionHint": "Looks at the active payment links of this connection and records the payments received: the receipt at the gross amount, then the fees in an entry of their own. Nothing is recorded twice."
   }
 }

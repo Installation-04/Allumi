@@ -2,13 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { can } from "@/modules/companies";
-import { getConnection } from "@/modules/integrations";
-import { ActionForm, Field } from "@/app/_components/ui";
+import { getConnection, listFeeAccounts } from "@/modules/integrations";
+import { ActionForm, Field, SelectField } from "@/app/_components/ui";
 import { FOCUS } from "@/app/_components/focus";
 import { searchText } from "@/app/_lib/search-params";
 import { accountName, loadCompany } from "../../_lib";
 import { validId } from "../../factures/editor";
-import { disconnectAction, replaceCredentialsAction, syncAction } from "../actions";
+import { disconnectAction, replaceCredentialsAction, setFeeAccountAction, syncAction, collectPaymentsAction } from "../actions";
+import { CollectNotice } from "../collect-notice";
 
 export async function generateMetadata() { return { title: (await getTranslations("integrations"))("title") }; }
 
@@ -23,17 +24,23 @@ export default async function ConnectionPage({ params, searchParams }: { params:
   const query = await searchParams;
   const t = await getTranslations("integrations");
   const te = await getTranslations("errors");
+  const to = await getTranslations("onlinePayments");
   const base = `/c/${company.id}`;
   const isOwner = can(company.role, "integration.manage");
   const imported = Number(searchText(query.imported));
   const justSynced = searchText(query.imported) !== undefined && Number.isInteger(imported) && imported >= 0;
   const skipped = Number(searchText(query.skipped)) || 0;
+  const online = isOwner && connection.status === "ACTIVE" && connection.provider === "STRIPE";
+  const feeAccounts = online ? await listFeeAccounts(actor) : [];
   const rows: [string, React.ReactNode][] = [
     [t("serviceLabel"), `${t(`providers.${connection.provider}`)}${connection.sandbox ? ` · ${t("test")}` : ""}`],
     [t("accountField"), `${connection.accountCode} · ${accountName({ nameFr: connection.accountNameFr, nameEn: connection.accountNameEn }, locale)}`],
     [t("importFromField"), connection.importFrom],
     ...(connection.credentialsHint ? [[t("keyHint"), `…${connection.credentialsHint}`] as [string, React.ReactNode]] : []),
     [t("lastSync"), connection.lastSyncedAt ? stamp(connection.lastSyncedAt) : t("neverSynced")],
+    ...(connection.provider === "STRIPE"
+      ? [[to("feeAccountField"), connection.feeAccountId ? `${connection.feeAccountCode} · ${accountName({ nameFr: connection.feeAccountNameFr ?? "", nameEn: connection.feeAccountNameEn ?? "" }, locale)}` : to("feeAccountNone")] as [string, React.ReactNode]]
+      : []),
   ];
   return (
     <section className="max-w-3xl space-y-5 break-words">
@@ -60,6 +67,25 @@ export default async function ConnectionPage({ params, searchParams }: { params:
           <p className="text-sm text-stone-600 dark:text-stone-400">{t("syncHint")}</p>
           {connection.syncing ? <p className="text-sm">{t("syncing")}</p> : null}
         </div>
+      ) : null}
+      <CollectNotice query={query} />
+      {online ? (
+        <section className="space-y-3 rounded border border-stone-300 p-4 dark:border-stone-700" aria-labelledby="online-title">
+          <h2 id="online-title" className="font-semibold">{to("feeSection")}</h2>
+          <ActionForm action={setFeeAccountAction.bind(null, company.id, connection.id)} label={to("feeAccountSubmit")}>
+            <SelectField
+              name="accountId" label={to("feeAccountField")} hint={`${to("feeAccountHint")} ${to("feeAccountApplies")}`} defaultValue={connection.feeAccountId ?? undefined}
+              options={feeAccounts.map((account) => ({ value: account.id, label: `${account.code} · ${accountName(account, locale)}` }))}
+            />
+          </ActionForm>
+          {connection.feeAccountId ? (
+            <div className="space-y-2">
+              <ActionForm action={collectPaymentsAction.bind(null, company.id, connection.id, `${base}/integrations/${connection.id}`)} label={to("collectButton")} variant="primary" />
+              <p className="text-sm text-stone-600 dark:text-stone-400">{to("collectConnectionHint")}</p>
+            </div>
+          ) : null}
+          <p className="text-sm text-stone-600 dark:text-stone-400">{to("keysHint")}</p>
+        </section>
       ) : null}
       {isOwner ? (
         <details className="rounded border border-stone-300 p-4 dark:border-stone-700">

@@ -270,6 +270,24 @@
       "notFound": "Encaissement introuvable.",
       "invalidVoid": "Indiquez un motif de 1 à 500 caractères et une date égale ou postérieure à l’encaissement et à ses affectations.",
       "confirmVoid": "Confirmez l’annulation définitive de l’encaissement."
+    },
+    "onlinePayments": {
+      "invalid": "Demande invalide.",
+      "invoiceNotFound": "Facture introuvable.",
+      "nothingDue": "Cette facture n’a plus de solde à payer.",
+      "amountRange": "Stripe accepte des paiements de 0,50 $ à 999 999,99 $ : le solde de cette facture est hors de cette plage.",
+      "currency": "Le paiement en ligne n’est offert qu’en dollars canadiens.",
+      "feeAccount": "Choisissez d’abord le compte des frais de traitement dans la connexion Stripe.",
+      "feeAccountInvalid": "Choisissez un compte de charges actif de cette entreprise.",
+      "provider": "Seul Stripe offre le paiement en ligne pour l’instant.",
+      "linkExists": "Cette facture a déjà un lien actif pour un autre solde ou une autre connexion. Annulez-le d’abord.",
+      "linkChanged": "Ce lien a changé entre-temps. Rechargez la page.",
+      "notFound": "Lien de paiement introuvable.",
+      "alreadyPaid": "Ce lien est déjà payé.",
+      "amount": "Le montant payé n’est pas celui du lien.",
+      "fee": "Les frais rapportés par Stripe ne concordent pas avec le montant payé.",
+      "settlementCurrency": "Stripe a réglé ce paiement dans une autre devise que le dollar canadien : enregistrez-le à la main.",
+      "rule": "Les livres ont refusé l’enregistrement (période verrouillée, par exemple)."
     }
   },
   "nav": {
@@ -1052,5 +1070,55 @@
     "voidHint": "Cet avoir a été annulé. Les montants ci-dessous sont conservés pour l’historique; ils ne réduisent plus le solde de la facture.",
     "unapplied": "Retirée le {date}",
     "active": "Active"
+  },
+  "onlinePayments": {
+    "title": "Paiement en ligne",
+    "intro": "Offrez à votre client de payer cette facture par carte sur une page hébergée par Stripe. Allumi ne voit jamais le numéro de carte et n’a besoin d’aucune adresse publique : c’est vous qui vérifiez ensuite si le paiement est arrivé.",
+    "statuses": {
+      "PENDING": "En préparation",
+      "ACTIVE": "Prêt à payer",
+      "PAID": "Payé",
+      "REVIEW": "À vérifier",
+      "CANCELLED": "Annulé"
+    },
+    "test": "essai",
+    "addressLabel": "Adresse de la page de paiement, à envoyer à votre client",
+    "pendingHint": "Ce lien n’a pas pu être créé chez Stripe. Reprenez-le ou annulez-le.",
+    "resume": "Reprendre la création",
+    "paidOn": "Payé le {date}",
+    "fees": "Frais Stripe",
+    "net": "Net versé",
+    "reviewHint": "Un paiement est arrivé chez Stripe, mais Allumi n’a rien enregistré : {reason} Au besoin, enregistrez l’encaissement à la main (le paiement figure aussi dans les transactions importées), puis fermez ce signalement.",
+    "cancel": "Annuler le lien",
+    "dismiss": "Fermer ce signalement",
+    "check": "Vérifier le paiement",
+    "checkHint": "Stripe ne prévient pas Allumi : appuyez ici pour enregistrer un paiement qui serait arrivé.",
+    "create": "Créer un lien de paiement",
+    "createSubmit": "Créer le lien",
+    "createHint": "Le lien vaut pour le solde actuel, {amount}, et pour un seul paiement. Si le solde change, annulez-le et créez-en un autre.",
+    "connectionField": "Connexion Stripe",
+    "noConnection": "Aucune connexion Stripe n’est prête. Connectez Stripe, puis choisissez le compte des frais de traitement.",
+    "goIntegrations": "Aller aux intégrations",
+    "cancelResult": {
+      "cancelled": "Lien annulé.",
+      "cancelledOpen": "Lien annulé ici, mais Stripe n’a pas pu être joint (connexion déconnectée) : fermez la page dans votre tableau de bord Stripe.",
+      "paid": "Un paiement venait d’arriver : il a été enregistré et le lien n’est donc pas annulé.",
+      "review": "Un paiement venait d’arriver mais n’a pas pu être enregistré : voyez le signalement ci-dessous."
+    },
+    "collected": "{paid, plural, =0 {Vérification terminée : aucun nouveau paiement.} one {Vérification terminée : # paiement enregistré.} other {Vérification terminée : # paiements enregistrés.}}",
+    "collectedReview": "{count, plural, one {# paiement à vérifier : ouvrez la facture concernée.} other {# paiements à vérifier : ouvrez les factures concernées.}}",
+    "collectedExtra": "{count, plural, one {# paiement en double reçu sur un lien déjà payé : remboursez-le dans Stripe.} other {# paiements en double reçus sur des liens déjà payés : remboursez-les dans Stripe.}}",
+    "collectedWaiting": "{count, plural, one {# paiement en cours de traitement chez Stripe : vérifiez de nouveau plus tard.} other {# paiements en cours de traitement chez Stripe : vérifiez de nouveau plus tard.}}",
+    "collectedFailed": "{count, plural, one {# lien n’a pas pu être lu cette fois (réponse inattendue).} other {# liens n’ont pas pu être lus cette fois (réponse inattendue).}}",
+    "collectedMore": "Il reste des liens à vérifier : appuyez de nouveau.",
+    "feeSection": "Paiement en ligne des factures",
+    "feeAccountField": "Compte des frais de traitement",
+    "feeAccountHint": "Les frais retenus par Stripe sur chaque paiement en ligne sont comptabilisés dans ce compte de charges. Tant qu’il n’est pas choisi, aucun lien de paiement n’est offert.",
+    "feeAccountSubmit": "Enregistrer le compte",
+    "feeAccountNone": "Non choisi",
+    "feeAccountApplies": "Le changement vaut pour les paiements enregistrés à partir de maintenant.",
+    "keysHint": "Pour le paiement en ligne, la clé restreinte doit aussi pouvoir écrire « Prix » et « Liens de paiement » et lire « Sessions Checkout » et « PaymentIntents ». Remplacez la clé au besoin.",
+    "collectButton": "Vérifier les paiements en ligne",
+    "collectConnectionHint": "Regarde les liens de paiement actifs de cette connexion et enregistre les paiements reçus : l’encaissement au brut, puis les frais dans une écriture à part. Rien n’est enregistré deux fois."
   }
 }
