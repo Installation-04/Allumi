@@ -250,6 +250,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await onlinePaymentsJourney(page, paidInvoiceUrl);
   await bankImportJourney(page);
   await bankMatchingJourney(page);
+  await bankReconciliationJourney(page);
   // Nothing in the whole journey (both locales, every form, the security pages, a second browser) was blocked.
   expect(cspViolations, "Content-Security-Policy violations").toEqual([]);
 });
@@ -1407,6 +1408,112 @@ async function bankMatchingJourney(page: Page) {
   await expectNoPageOverflow(page);
   await page.getByRole("button", { name: "Français", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Apparier à des écritures existantes", exact: true })).toBeVisible();
+}
+
+/**
+ * Reconciling the bank account against a statement: the card of the account, starting with the statement's day and
+ * balance, the lines matched to statement lines ticked in one click, the running difference and the unsaved warning,
+ * completing only at a zero difference, the freeze it puts on the matches, reopening with a reason, English, and no
+ * overflow. It follows the matching journey, whose five matched lines (1 500,00 + 100,00 − 3,00 − 15,00 − 250,00) are
+ * the 1 332,00 the statement says.
+ */
+async function bankReconciliationJourney(page: Page) {
+  const company = new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0] ?? "";
+  const month = todayInToronto().slice(0, 7);
+  const day = `${month}-06`;
+  const money = (text: string) => new RegExp(text.replace(/ /g, "\\s").replace(/\$/g, "\\$"));
+  const card = page.locator("li").filter({ has: page.getByRole("heading", { name: "1000 · Banque – compte courant", exact: true }) });
+  const figures = page.locator("dl");
+  const figure = (term: string, amount: string) => new RegExp(`${term}\\s*${amount.replace(/ /g, "\\s").replace(/\$/g, "\\$")}`); // a term and its figure sit side by side in the list
+
+  await page.goto(`${company}/rapprochement`);
+  await expect(page.getByRole("heading", { name: "Rapprochement bancaire", exact: true })).toBeVisible();
+  await expect(card).toContainText("Aucun rapprochement terminé pour ce compte.");
+  await expectNoPageOverflow(page);
+  // a statement whose day does not exist is refused, and what was typed stays
+  await card.getByLabel("Date de fin du relevé").fill(day);
+  await card.getByLabel("Solde final du relevé").fill("1 332,00 plus");
+  await card.getByRole("button", { name: "Commencer un rapprochement : 1000 Banque – compte courant", exact: true }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "Vérifiez le compte, la date du relevé et son solde" })).toBeVisible();
+  await expect(card.getByLabel("Solde final du relevé")).toHaveValue("1 332,00 plus");
+  await card.getByLabel("Solde final du relevé").fill("1 332,00");
+  await card.getByRole("button", { name: "Commencer un rapprochement : 1000 Banque – compte courant", exact: true }).click();
+
+  // the sheet: nothing counted yet, so the whole balance is left to explain
+  await expect(page.getByRole("heading", { name: `Rapprochement de 1000 · Banque – compte courant au ${day}`, exact: true })).toBeVisible();
+  await expect(figures).toContainText(figure("Solde du relevé", "1 332,00 $"));
+  await expect(figures).toContainText(figure("Écart", "1 332,00 $"));
+  await expect(page.getByText("On peut terminer quand l’écart enregistré est nul")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Terminer le rapprochement", exact: true })).toHaveCount(0);
+
+  // the lines the statement already proves are ticked in one click
+  await page.getByRole("button", { name: "Pointer les 5 lignes appariées à des transactions", exact: true }).click();
+  await expect(figures).toContainText(figure("Écart", "0,00 $"));
+  await expect(page.getByRole("checkbox", { checked: true })).toHaveCount(5);
+  await expect(page.getByRole("status").filter({ hasText: "Compté" })).toContainText("L’écart est nul");
+  await expectNoPageOverflow(page);
+  await captureReference(page, "rapprochement-feuille", "Pointer les lignes du relevé");
+
+  // unticking a line shows the difference at once, and warns that it is not saved; saving takes completing away
+  const fee = page.getByRole("checkbox", { name: /PAIEMENT CARTE/ });
+  await fee.uncheck();
+  await expect(page.getByRole("status").filter({ hasText: "Compté" })).toContainText(money("Écart -250,00 $"));
+  await expect(page.getByText("Modifications non enregistrées")).toBeVisible();
+  await page.getByRole("button", { name: "Enregistrer le pointage", exact: true }).click();
+  await expect(page.getByText("Pointage enregistré.", { exact: true })).toBeVisible();
+  await expect(page.getByText(/On peut terminer quand l’écart enregistré est nul/)).toContainText(money("écart actuel : -250,00 $"));
+  await fee.check();
+  await expect(page.getByText("Modifications non enregistrées")).toBeVisible();
+  await page.getByRole("button", { name: "Enregistrer le pointage", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Terminer le rapprochement", exact: true })).toBeVisible();
+  await expect(page.getByText("L’écart est nul : le pointage enregistré donne le solde du relevé.")).toBeVisible();
+
+  // completed: frozen, listed with its lines, and its matches cannot be undone
+  await page.getByRole("button", { name: "Terminer le rapprochement", exact: true }).click();
+  await expect(page.getByText(/^Terminé · \d{4}-\d{2}-\d{2}$/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Lignes comptées par ce rapprochement", exact: true })).toBeVisible();
+  await expect(page.getByRole("listitem").filter({ hasText: "✓" })).toHaveCount(5);
+  await expect(page.getByRole("checkbox")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Rouvrir", exact: true })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "rapprochement-termine", "Lignes comptées par ce rapprochement");
+  const sheet = page.url();
+  await page.goto(`${company}/transactions?q=DEPOT CLIENT`);
+  const deposit = page.locator("li.rounded").filter({ has: page.getByRole("heading", { name: "DEPOT CLIENT ATELIER", exact: true }) });
+  await expect(deposit).toContainText("pointée par un rapprochement");
+  await expect(deposit.getByRole("button", { name: /Défaire l’appariement/ })).toHaveCount(0);
+  await page.goto(`${company}/rapprochement`);
+  await expect(card).toContainText(money("Dernier rapprochement terminé : " + day + " · 1 332,00 $"));
+  await expect(card.getByRole("button", { name: /Commencer un rapprochement/ })).toBeVisible();
+  await captureReference(page, "rapprochement-liste", "Rapprochement bancaire");
+
+  // reopened with a reason (ten characters at least), it can be changed again, and the matches are free
+  await page.goto(sheet);
+  await page.getByLabel("Motif de la réouverture").fill("court");
+  await page.getByRole("button", { name: "Rouvrir ce rapprochement", exact: true }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "Écrivez le motif de la réouverture" })).toBeVisible();
+  await expect(page.getByLabel("Motif de la réouverture")).toHaveValue("court");
+  await page.getByLabel("Motif de la réouverture").fill("Une ligne avait été oubliée au relevé");
+  await page.getByRole("button", { name: "Rouvrir ce rapprochement", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Pointer les lignes du relevé", exact: true })).toBeVisible();
+  await expect(page.getByRole("checkbox", { checked: true })).toHaveCount(5);
+  await page.goto(`${company}/transactions?q=DEPOT CLIENT`);
+  await expect(deposit.getByRole("button", { name: /Défaire l’appariement/ })).toBeVisible();
+  await page.goto(sheet);
+  await page.getByRole("button", { name: "Terminer le rapprochement", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Lignes comptées par ce rapprochement", exact: true })).toBeVisible();
+
+  // English
+  await page.goto(`${company}/rapprochement`);
+  await page.getByRole("button", { name: "English", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Bank reconciliation", exact: true })).toBeVisible();
+  await expect(page.locator("li").filter({ has: page.getByRole("heading", { name: "1000 · Bank – chequing", exact: true }) })).toContainText("Last completed reconciliation");
+  await page.getByRole("link", { name: day, exact: true }).first().click();
+  await expect(page.getByRole("heading", { name: `Reconciliation of 1000 · Bank – chequing at ${day}`, exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Reopen", exact: true })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await expect(page.getByRole("heading", { name: `Rapprochement de 1000 · Banque – compte courant au ${day}`, exact: true })).toBeVisible();
 }
 
 /**

@@ -2,7 +2,7 @@
 
 Une **transaction bancaire** (une ligne d'un relevé importé, [[Import-de-releves]], ou une ligne que Stripe ou PayPal rapporte, [[Integrations]]) n'entre dans les livres que de deux façons : en étant **appariée** à une écriture qui existe déjà au journal, ou en donnant lieu à une **nouvelle écriture**. **Banque et transactions → Transactions bancaires** les range, du plus récent au plus ancien.
 
-Réservé aux **propriétaires** et aux **comptables** (les autres membres consultent). L'appariement ne change **jamais** le journal : il relie une ligne du relevé à une ou plusieurs lignes du grand livre **sur le même compte**. Le rapprochement bancaire de fin de période est l'étape suivante de la phase 5 ([[Feuille-de-route]]).
+Réservé aux **propriétaires** et aux **comptables** (les autres membres consultent). L'appariement ne change **jamais** le journal : il relie une ligne du relevé à une ou plusieurs lignes du grand livre **sur le même compte**. Le rapprochement bancaire de fin de période ([[Rapprochement-bancaire]]) vient ensuite.
 
 ## L'écriture probable
 
@@ -33,7 +33,7 @@ Un paiement de carte de crédit, un versement Stripe au compte bancaire, un tran
 
 ## Défaire un appariement
 
-**Défaire l'appariement** libère la transaction (elle redevient « à traiter ») et ses lignes du journal. Une **écriture créée** à partir de la transaction reste au journal (elle ne se supprime pas) : elle sera offerte comme écriture probable, ou contre-passez-la si elle était erronée. Refusé tant qu'un **rapprochement bancaire** compte une des lignes : on rouvre d'abord le rapprochement. La base le refuse aussi (`bank_match_reconciled_guard`).
+**Défaire l'appariement** libère la transaction (elle redevient « à traiter ») et ses lignes du journal. Une **écriture créée** à partir de la transaction reste au journal (elle ne se supprime pas) : elle sera offerte comme écriture probable, ou contre-passez-la si elle était erronée. Refusé tant qu'un **rapprochement bancaire terminé** compte une des lignes : on rouvre d'abord le dernier rapprochement du compte ([[Rapprochement-bancaire]]). Un rapprochement en cours n'est qu'un travail et ne bloque rien. La base le refuse aussi (`bank_match_reconciled_guard`).
 
 ## Ce qui est refusé
 
