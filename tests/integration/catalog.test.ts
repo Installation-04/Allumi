@@ -70,6 +70,21 @@ describe("database catalog (guards against a migration that forgets a table)", (
     expect(tables.filter((table) => !exempt.has(table) && !audited.has(table))).toEqual([]);
   });
 
+  it("keeps the credentials of integrations for the owner alone, and never deletes a connection", async () => {
+    const policies = await q<{ policyname: string; cmd: string; qual: string | null; with_check: string | null }>(
+      "SELECT policyname, cmd, qual, with_check FROM pg_policies WHERE schemaname = 'public' AND tablename = 'integration_credential'",
+    );
+    expect(policies.map((row) => row.cmd).sort()).toEqual(["INSERT", "SELECT", "UPDATE"]);
+    for (const row of policies) expect(`${row.qual ?? ""}${row.with_check ?? ""}`, row.policyname).toContain("OWNER");
+    for (const table of ["integration_connection", "integration_credential"]) {
+      const [row] = await q<{ del: boolean; trunc: boolean }>("SELECT has_table_privilege('allumi_app', $1, 'DELETE') AS del, has_table_privilege('allumi_app', $1, 'TRUNCATE') AS trunc", [`public.${table}`]);
+      expect(row, table).toEqual({ del: false, trunc: false });
+    }
+    // the secret itself is outside every audit trigger's payload: the trigger names it as a secret column
+    const [trigger] = await q<{ def: string }>("SELECT pg_get_triggerdef(oid) AS def FROM pg_trigger WHERE tgname = 'integration_credential_audit'");
+    expect(trigger?.def).toContain("credentials_enc");
+  });
+
   it("denies EXECUTE on functions to PUBLIC (only the application role may call the few that it needs)", async () => {
     const rows = await q<{ proname: string }>(
       `SELECT p.proname FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
