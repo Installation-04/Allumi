@@ -24,7 +24,7 @@ export default async function ContactsPage({ params, searchParams }: { params: P
   const url = (change: Partial<ContactFilter>) => `${base}?${new URLSearchParams({ q, kind, status, page: String(result.page), ...Object.fromEntries(Object.entries(change).map(([k, v]) => [k, String(v)])) })}`;
   return (
     <section className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-2xl font-semibold">{t("title")}</h1><p className="mt-1 text-sm text-stone-500 dark:text-stone-400">{t("intro")}</p></div>{can(company.role, "contact.manage") && <Link href={`${base}/nouveau`} className={`inline-flex min-h-11 items-center rounded-full bg-brand-700 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-800 ${FOCUS}`}>{t("new")}</Link>}</div>
+      <div className="flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-2xl font-semibold">{t("title")}</h1><p className="mt-1 text-sm text-stone-500 dark:text-stone-400">{t("intro")}</p></div>{can(company, "contact.manage") && <Link href={`${base}/nouveau`} className={`inline-flex min-h-11 items-center rounded-full bg-brand-700 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-800 ${FOCUS}`}>{t("new")}</Link>}</div>
       <nav aria-label={t("typesLabel")} className="flex gap-4 border-b border-stone-200 dark:border-stone-800">
         {(["ALL", "CUSTOMER", "SUPPLIER"] as const).map((value) => <Link key={value} href={url({ kind: value, page: 1 })} aria-current={kind === value ? "page" : undefined} className={`inline-flex min-h-11 items-center border-b-2 px-1 text-sm ${FOCUS} ${kind === value ? "border-brand-700 font-semibold" : "border-transparent"}`}>{t(`filters.${value}`)}</Link>)}
       </nav>

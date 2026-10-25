@@ -24,7 +24,7 @@ export default async function ContactPage({ params }: { params: Promise<{ compan
     <section className="max-w-3xl space-y-5 break-words">
       <Link href={`/c/${company.id}/contacts`} className={`inline-flex min-h-11 items-center rounded text-sm underline ${FOCUS}`}>{t("back")}</Link>
       <div className="flex flex-wrap items-center justify-between gap-3"><h1 className="text-2xl font-semibold">{contact.displayName}</h1><span className="rounded-full bg-stone-200 px-3 py-1 text-sm dark:bg-stone-800">{contact.isActive ? t("active") : t("archived")}</span></div>
-      {can(company.role, "contact.manage") ? <>
+      {can(company, "contact.manage") ? <>
         <ContactForm companyId={company.id} contactId={contact.id} initial={initial} />
         <div className="space-y-3 rounded-lg border border-stone-200 p-4 dark:border-stone-800"><p className="text-sm">{t("archiveHint")}</p><ActionForm action={setContactActiveAction.bind(null, company.id, contact.id, !contact.isActive)} label={contact.isActive ? t("archive") : t("restore")} /></div>
       </> : <dl className="grid gap-4 rounded-lg border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-900 sm:grid-cols-2">

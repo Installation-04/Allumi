@@ -19,7 +19,7 @@ export async function generateMetadata() {
 export default async function EditAccountPage({ params }: { params: Promise<{ companyId: string; accountId: string }> }) {
   const { accountId } = await params;
   const { company, actor } = await loadCompany(params);
-  if (!UUID.test(accountId) || !can(company.role, "account.manage")) notFound();
+  if (!UUID.test(accountId) || !can(company, "account.manage")) notFound();
   const account = await getAccount(actor, accountId);
   if (!account) notFound();
   const t = await getTranslations("accounts");

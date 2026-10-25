@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Gestion des utilisateurs : invitations à usage unique, rôles admin/utilisateur/lecteur/comptable externe et permissions modulaires appliquées côté serveur et par RLS.
+
 ## [0.4.0-alpha.12] - 2026-10-25
 
 - Publication : démarrage réel des images téléchargées depuis GHCR sur AMD64 et ARM64 avant publication des fichiers de release.

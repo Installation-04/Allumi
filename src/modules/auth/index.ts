@@ -26,3 +26,6 @@ export { codeSchema, loginSchema, setupSchema } from "./domain/schemas";
 export { PASSWORD_MIN_LENGTH, type PasswordProblem } from "./domain/password";
 export { SESSION_ABSOLUTE_MS } from "./domain/policy";
 export { getProfile, type Profile } from "./service/profile";
+
+export { newToken, sha256Hex } from "./service/crypto";
+export { acceptInvitation } from "./service/invitation";

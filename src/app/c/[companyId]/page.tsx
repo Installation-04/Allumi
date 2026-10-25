@@ -29,7 +29,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ compan
   const sections = [
     { href: `${base}/comptes`, title: tn("accounts"), hint: t("accountsHint"), icon: "accounts" as const },
     { href: `${base}/exercices`, title: tn("fiscal"), hint: t("fiscalHint"), icon: "fiscal" as const },
-    ...(can(company.role, "audit.read") ? [{ href: `${base}/audit`, title: tn("audit"), hint: t("auditHint"), icon: "audit" as const }] : []),
+    ...(can(company, "audit.read") ? [{ href: `${base}/audit`, title: tn("audit"), hint: t("auditHint"), icon: "audit" as const }] : []),
   ];
 
   return (
@@ -41,7 +41,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ compan
           <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">{t("role", { role: t(`roles.${company.role}`) })}</p>
         </div>
 
-        {status.initialized && can(company.role, "entry.post") ? <Link href={`${base}/journal/nouvelle`} className={`inline-flex min-h-11 items-center gap-2 rounded-full bg-brand-700 px-4 py-2 text-sm font-semibold text-white lg:hidden ${FOCUS}`}><Icon name="plus" />{t("newEntry")}</Link> : null}
+        {status.initialized && can(company, "entry.post") ? <Link href={`${base}/journal/nouvelle`} className={`inline-flex min-h-11 items-center gap-2 rounded-full bg-brand-700 px-4 py-2 text-sm font-semibold text-white lg:hidden ${FOCUS}`}><Icon name="plus" />{t("newEntry")}</Link> : null}
       </div>
 
       {totals && journal ? (
@@ -128,7 +128,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ compan
       ) : (
         <Card title={ts("title")} headingLevel={2}>
           <p className="text-sm">{ts("intro")}</p>
-          {can(company.role, "account.manage") ? <ActionForm action={initializeLedgerAction.bind(null, company.id)} label={ts("submit")} variant="primary" /> : <p className="text-sm">{ts("notAllowed")}</p>}
+          {can(company, "account.manage") ? <ActionForm action={initializeLedgerAction.bind(null, company.id)} label={ts("submit")} variant="primary" /> : <p className="text-sm">{ts("notAllowed")}</p>}
         </Card>
       )}
       <Link href="/compte/securite" className={`inline-flex min-h-11 items-center rounded text-sm text-stone-600 underline dark:text-stone-400 ${FOCUS}`}>{t("security")}</Link>

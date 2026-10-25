@@ -98,9 +98,10 @@
     "pageTitle": "Dashboard",
     "role": "Your role: {role}",
     "roles": {
-      "OWNER": "Owner",
-      "ACCOUNTANT": "Accountant",
-      "READ_ONLY": "Read-only"
+      "OWNER": "Admin",
+      "USER": "User",
+      "READ_ONLY": "Viewer",
+      "ACCOUNTANT": "External accountant"
     },
     "pickCompany": "Choose a company",
     "noCompany": "Your account is not a member of any company.",
@@ -237,6 +238,17 @@
       "confirmCreditVoid": "Confirm permanently voiding the credit note.",
       "creditVoidDate": "The void date cannot precede posting, an application or its removal.",
       "creditVoidLinked": "An active refund or application to another invoice prevents voiding."
+    },
+    "members": {
+      "invalid": "Check the email, role and permissions.",
+      "exists": "This person is already a member of the company.",
+      "notFound": "This access or invitation no longer exists.",
+      "self": "Another administrator must change your access. The last administrator must be retained.",
+      "password": "Enter a name and a password of at least 12 characters, different from the email.",
+      "invitationInvalid": "Invalid, expired, revoked or already used invitation. If the account exists, sign in with the invited email before trying again.",
+      "rateLimited": "Too many attempts. Try again in 15 minutes.",
+      "dependencies": "Incompatible permissions: see the dependencies shown in the form.",
+      "confirm": "Confirm the action before continuing."
     }
   },
   "nav": {
@@ -261,7 +273,8 @@
     "catalog": "Products and services",
     "company": "Company",
     "invoices": "Invoice drafts",
-    "credits": "Credit notes"
+    "credits": "Credit notes",
+    "members": "Users and permissions"
   },
   "ledgerSetup": {
     "title": "Set up the books",
@@ -844,5 +857,52 @@
     "voidHint": "This credit note was voided. The amounts below are retained for history; they no longer reduce the invoice balance.",
     "unapplied": "Unapplied on {date}",
     "active": "Active"
+  },
+  "members": {
+    "title": "Users and permissions",
+    "intro": "Manage access to this company. Roles provide starting profiles; module permissions let you customize them.",
+    "superAdmin": "You are a super administrator of this instance. Company permissions and server access are separate.",
+    "role": "Role",
+    "permissions": "Module permissions",
+    "permissionHint": "Admin: full access. Viewer: read access at most. Sales write access requires Accounting write access and at least read access to Contacts, Products and Taxes. Audit requires read access to every module.",
+    "modules": {
+      "contacts": "Contacts",
+      "catalog": "Products and services",
+      "sales": "Sales and invoices",
+      "accounting": "Accounting and reports",
+      "taxes": "Taxes",
+      "audit": "Audit trail"
+    },
+    "levels": {
+      "default": "Role default",
+      "none": "No access",
+      "read": "Read",
+      "write": "Write"
+    },
+    "email": "Email",
+    "invite": "Invite a user",
+    "share": "Copy this code now and share it privately with the recipient. It expires in seven days.",
+    "sharePath": "The recipient opens /invitation on this server. No email is sent automatically.",
+    "join": "Accept an invitation",
+    "active": "Company members",
+    "disabled": "Disabled account",
+    "self": "Your account: another administrator must change your access.",
+    "save": "Save access",
+    "remove": "Remove access",
+    "removeHint": "Removes access to this company only. Accounting records and audit history are retained.",
+    "pending": "Pending invitations",
+    "empty": "No pending invitations.",
+    "expires": "Expires {date}",
+    "revoke": "Revoke invitation",
+    "confirm": "I confirm this action.",
+    "existing": "Signed in: the invitation email must match your account. Your password stays unchanged.",
+    "newAccount": "New account: enter the code you received and choose a password. If you already have an account, sign in first and return here.",
+    "signInFirst": "I already have an account: sign in",
+    "accept": "Accept and continue",
+    "code": "Invitation code",
+    "name": "Display name",
+    "password": "Password",
+    "passwordHint": "At least 12 characters.",
+    "language": "Language"
   }
 }

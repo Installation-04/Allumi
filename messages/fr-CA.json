@@ -98,9 +98,10 @@
     "pageTitle": "Tableau de bord",
     "role": "Ton rôle : {role}",
     "roles": {
-      "OWNER": "Propriétaire",
-      "ACCOUNTANT": "Comptable",
-      "READ_ONLY": "Lecture seule"
+      "OWNER": "Admin",
+      "USER": "Utilisateur",
+      "READ_ONLY": "Lecteur",
+      "ACCOUNTANT": "Comptable externe"
     },
     "pickCompany": "Choisis une entreprise",
     "noCompany": "Ton compte n'est membre d'aucune entreprise.",
@@ -237,6 +238,17 @@
       "confirmCreditVoid": "Confirmez l’annulation définitive de l’avoir.",
       "creditVoidDate": "La date d’annulation ne peut précéder la comptabilisation, une affectation ou son retrait.",
       "creditVoidLinked": "Un remboursement actif ou une affectation à une autre facture empêche l’annulation."
+    },
+    "members": {
+      "invalid": "Vérifiez le courriel, le rôle et les permissions.",
+      "exists": "Cette personne est déjà membre de l’entreprise.",
+      "notFound": "Cet accès ou cette invitation n’existe plus.",
+      "self": "Un autre administrateur doit modifier votre accès. Le dernier administrateur doit être conservé.",
+      "password": "Indiquez un nom et un mot de passe d’au moins 12 caractères, différent du courriel.",
+      "invitationInvalid": "Invitation invalide, expirée, révoquée ou déjà utilisée. Si le compte existe, connectez-vous avec le courriel invité avant de réessayer.",
+      "rateLimited": "Trop de tentatives. Réessayez dans 15 minutes.",
+      "dependencies": "Permissions incompatibles : consultez les dépendances indiquées dans le formulaire.",
+      "confirm": "Confirmez l’action avant de continuer."
     }
   },
   "nav": {
@@ -261,7 +273,8 @@
     "catalog": "Produits et services",
     "company": "Entreprise",
     "invoices": "Brouillons de factures",
-    "credits": "Avoirs"
+    "credits": "Avoirs",
+    "members": "Utilisateurs et permissions"
   },
   "ledgerSetup": {
     "title": "Initialiser la comptabilité",
@@ -844,5 +857,52 @@
     "voidHint": "Cet avoir a été annulé. Les montants ci-dessous sont conservés pour l’historique; ils ne réduisent plus le solde de la facture.",
     "unapplied": "Retirée le {date}",
     "active": "Active"
+  },
+  "members": {
+    "title": "Utilisateurs et permissions",
+    "intro": "Gérez les accès à cette entreprise. Les rôles servent de profils de départ; les permissions par module permettent de les adapter.",
+    "superAdmin": "Vous êtes super administrateur de cette instance. Les droits d’entreprise et l’accès au serveur sont distincts.",
+    "role": "Rôle",
+    "permissions": "Permissions par module",
+    "permissionHint": "Admin : tous les droits. Lecteur : lecture au maximum. Ventes en modification exige Comptabilité en modification et Contacts, Produits et Taxes en lecture au minimum. L’audit exige la lecture de tous les modules.",
+    "modules": {
+      "contacts": "Contacts",
+      "catalog": "Produits et services",
+      "sales": "Ventes et factures",
+      "accounting": "Comptabilité et rapports",
+      "taxes": "Taxes",
+      "audit": "Piste d’audit"
+    },
+    "levels": {
+      "default": "Selon le rôle",
+      "none": "Aucun accès",
+      "read": "Lecture",
+      "write": "Modification"
+    },
+    "email": "Courriel",
+    "invite": "Inviter un utilisateur",
+    "share": "Copiez ce code maintenant et transmettez-le à la personne par un canal privé. Il expire dans sept jours.",
+    "sharePath": "La personne ouvre /invitation sur ce serveur. Aucun courriel n’est envoyé automatiquement.",
+    "join": "Accepter une invitation",
+    "active": "Membres de l’entreprise",
+    "disabled": "Compte désactivé",
+    "self": "Votre compte : un autre administrateur doit modifier votre accès.",
+    "save": "Enregistrer les accès",
+    "remove": "Retirer l’accès",
+    "removeHint": "Retire uniquement l’accès à cette entreprise. Les écritures et la piste d’audit sont conservées.",
+    "pending": "Invitations en attente",
+    "empty": "Aucune invitation en attente.",
+    "expires": "Expire le {date}",
+    "revoke": "Révoquer l’invitation",
+    "confirm": "Je confirme cette action.",
+    "existing": "Connecté : le courriel de l’invitation doit correspondre à votre compte. Votre mot de passe reste inchangé.",
+    "newAccount": "Nouveau compte : saisissez le code reçu et choisissez votre mot de passe. Si vous avez déjà un compte, connectez-vous d’abord puis revenez ici.",
+    "signInFirst": "J’ai déjà un compte : me connecter",
+    "accept": "Accepter et continuer",
+    "code": "Code d’invitation",
+    "name": "Nom affiché",
+    "password": "Mot de passe",
+    "passwordHint": "Au moins 12 caractères.",
+    "language": "Langue"
   }
 }

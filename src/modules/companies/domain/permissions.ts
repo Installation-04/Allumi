@@ -1,10 +1,14 @@
+import { moduleLevel, type AccessContext, type Module } from "./module-access";
 // Who may do what in a company. The database enforces the core of this matrix with row level security
 // (everybody reads; the owner and the accountant write; only the owner manages the company); the application
 // uses it to show the right buttons and to refuse early with a clear message.
 
-export type Role = "OWNER" | "ACCOUNTANT" | "READ_ONLY";
+export type Role = "OWNER" | "USER" | "ACCOUNTANT" | "READ_ONLY";
 
 export type Action =
+  | "members.manage"
+  | "taxes.read"
+  | "taxes.manage"
   | "sales.read"
   | "sales.manage"
   | "company.read"
@@ -25,15 +29,18 @@ export type Action =
   | "audit.read";
 
 const ALLOWED: Record<Action, readonly Role[]> = {
-  "sales.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
+  "members.manage": ["OWNER"],
+  "taxes.read": ["OWNER", "USER", "ACCOUNTANT", "READ_ONLY"],
+  "taxes.manage": ["OWNER", "ACCOUNTANT"],
+  "sales.read": ["OWNER", "USER", "ACCOUNTANT", "READ_ONLY"],
   "sales.manage": ["OWNER", "ACCOUNTANT"],
-  "company.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
+  "company.read": ["OWNER", "USER", "ACCOUNTANT", "READ_ONLY"],
   "company.manage": ["OWNER"],
-  "catalog.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
-  "catalog.manage": ["OWNER", "ACCOUNTANT"],
-  "contact.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
-  "contact.manage": ["OWNER", "ACCOUNTANT"],
-  "ledger.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
+  "catalog.read": ["OWNER", "USER", "ACCOUNTANT", "READ_ONLY"],
+  "catalog.manage": ["OWNER", "USER", "ACCOUNTANT"],
+  "contact.read": ["OWNER", "USER", "ACCOUNTANT", "READ_ONLY"],
+  "contact.manage": ["OWNER", "USER", "ACCOUNTANT"],
+  "ledger.read": ["OWNER", "USER", "ACCOUNTANT", "READ_ONLY"],
   "entry.post": ["OWNER", "ACCOUNTANT"],
   "entry.reverse": ["OWNER", "ACCOUNTANT"],
   "account.manage": ["OWNER", "ACCOUNTANT"],
@@ -46,8 +53,15 @@ const ALLOWED: Record<Action, readonly Role[]> = {
   "audit.read": ["OWNER", "ACCOUNTANT"],
 };
 
-export function can(role: Role, action: Action): boolean {
-  return ALLOWED[action].includes(role);
+export function can(subject: Role | AccessContext, action: Action): boolean {
+  const context = typeof subject === "string" ? { role: subject } : subject;
+  const ownerOnly: Action[] = ["members.manage", "company.manage", "period.reopen", "fiscalYear.reopen", "fiscalYear.close"];
+  if (ownerOnly.includes(action)) return context.role === "OWNER";
+  if (action === "company.read") return true;
+  const prefix = action.split(".")[0];
+  const module: Module = prefix === "contact" ? "contacts" : prefix === "catalog" ? "catalog" : prefix === "sales" ? "sales" : prefix === "taxes" ? "taxes" : prefix === "audit" ? "audit" : "accounting";
+  const level = moduleLevel(context, module);
+  return action.endsWith(".read") ? level !== "none" : level === "write";
 }
 
 export const ACTIONS = Object.keys(ALLOWED) as Action[];

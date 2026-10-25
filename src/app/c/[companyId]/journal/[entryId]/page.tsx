@@ -29,7 +29,7 @@ export default async function EntryPage({ params }: { params: Promise<{ companyI
   // Numbers of the linked entries, for the "reversed by / reverses" sentences.
   const label = async (id: string | null) => (id ? ((await getEntry(actor, id))?.numberLabel ?? "") : "");
   const [reversedBy, reverses] = [await label(entry.reversedByEntryId), await label(entry.reversesEntryId)];
-  const canReverse = can(company.role, "entry.reverse") && (entry.source === "MANUAL" || entry.source === "OPENING_BALANCE") && !entry.reversedByEntryId;
+  const canReverse = can(company, "entry.reverse") && (entry.source === "MANUAL" || entry.source === "OPENING_BALANCE") && !entry.reversedByEntryId;
   const fromDocument = !["MANUAL", "OPENING_BALANCE", "REVERSAL"].includes(entry.source);
 
   return (

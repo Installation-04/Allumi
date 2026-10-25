@@ -3683,3 +3683,7 @@ Le trigger différé `invoice_posting_exact` compare l’écriture de chaque nou
 La migration `20261024000000_credit_posting` étend `invoice_posting_exact` aux avoirs : crédit clients, débits des revenus et des taxes collectées exactement égaux aux lignes du document. Le trigger `credit_note_limits` verrouille la facture d’origine avant validation et refuse le cumul des avoirs validés dépassant une ligne originale (position, compte et code conservés), une taxe ou le total. Dates, contact et mode d’arrondi doivent correspondre au contrat de correction. Les avoirs annulés ne consomment plus ces plafonds; les brouillons ne les réservent pas.
 
 Le service valide et affecte intégralement l’avoir à sa facture d’origine dans une transaction, sous verrou de facture puis d’avoir. Les contraintes existantes d’affectation contrôlent les dates, la période, les contacts et les soldes disponibles; un solde insuffisant annule toute l’opération. Les coordonnées figées de la facture sont conservées sur l’avoir. Une nouvelle demande pour un avoir déjà validé retourne le même document.
+
+## Accès modulaires
+
+La migration `20261027000000_user_management` ajoute le rôle `USER` et `module_access` (JSON validé) aux adhésions et invitations. Les politiques restrictives complètent l’isolation existante. `app_accept_invitation` consomme un code haché sous verrou, sans changer les identifiants d’un compte existant. Les invitations sont réservées aux admins.

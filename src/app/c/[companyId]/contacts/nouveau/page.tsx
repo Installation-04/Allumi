@@ -10,7 +10,7 @@ export async function generateMetadata() { return { title: (await getTranslation
 
 export default async function NewContactPage({ params }: { params: Promise<{ companyId: string }> }) {
   const { company } = await loadCompany(params);
-  if (!can(company.role, "contact.manage")) notFound();
+  if (!can(company, "contact.manage")) notFound();
   const t = await getTranslations("contacts");
   return <section className="max-w-3xl space-y-5"><Link href={`/c/${company.id}/contacts`} className={`inline-flex min-h-11 items-center rounded text-sm underline ${FOCUS}`}>{t("back")}</Link><h1 className="text-2xl font-semibold">{t("new")}</h1><ContactForm companyId={company.id} /></section>;
 }

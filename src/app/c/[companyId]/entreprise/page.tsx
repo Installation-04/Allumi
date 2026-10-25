@@ -22,7 +22,7 @@ export default async function CompanyProfilePage({ params }: { params: Promise<{
   ];
   const locale = await getLocale();
   const profile = await getCompanyProfile(actor);
-  const manage = can(company.role, "company.manage");
+  const manage = can(company, "company.manage");
   // the month names of the messages are for lists ("Janvier"); inside a French sentence they are lower case
   const monthInSentence = (name: string) => (locale.startsWith("fr") ? name.toLocaleLowerCase("fr-CA") : name);
 
