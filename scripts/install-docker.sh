@@ -141,12 +141,16 @@ while :; do
   [ "$SECONDS" -lt "$DEADLINE" ] || die "application non saine après ${WAIT_SECONDS} s. Consulte docker compose logs migrate app. Les données et .env sont conservés."
   sleep 2
 done
+# Sous install.sh (ALLUMI_REPORT_RESULT=1), c'est lui qui affiche le résumé final, jeton compris : pas de doublon.
+SETUP_LINE=""
+[ "${ALLUMI_REPORT_RESULT:-0}" = 1 ] || SETUP_LINE="$(print_setup_token)"
 cat <<EOF_DONE
 
 Allumi est démarré et l’application est healthy.
   Adresse : ${INSTALL_URL}
   Réseau : HTTP direct sur le port $INSTALL_HTTP_PORT. TLS éventuel géré par votre proxy externe.
-  Début  : ouvre /setup; le jeton de première configuration est SETUP_TOKEN dans .env.
+  Début  : ouvre /setup et crée l’entreprise et l’administrateur.
+${SETUP_LINE}
   Données : volumes Docker conservés. Ne lance pas docker compose down -v.
   Sauvegardes : à configurer et tester (docs/Sauvegardes.md); aucune tâche planifiée ajoutée.
   Mises à jour : scripts/update.sh pour une copie Git, voir docs/Mise-a-jour.md.

@@ -64,18 +64,15 @@ EOF
   chmod 644 /etc/cron.d/allumi-backup
 fi
 
-SETUP_TOKEN_VALUE="$(env_get SETUP_TOKEN)"
-SETUP_HINT=""
-if [ -n "$SETUP_TOKEN_VALUE" ]; then
-  SETUP_HINT="
-  Jeton    : ${SETUP_TOKEN_VALUE}  (demandé une seule fois par la page /setup)"
-fi
+# Le jeton n'est affiché que si la page /setup est encore ouverte (voir print_setup_token dans lib.sh).
+SETUP_LINE="$(print_setup_token)"
 
 cat <<EOF
 
 $(printf '%s' "$c_grn")Allumi est installé.$(printf '%s' "$c_off")
   Adresse  : $(env_get APP_URL)
-  Étape    : ouvre l'adresse et crée l'entreprise + l'administrateur (page /setup)${SETUP_HINT}
+  Étape    : ouvre l'adresse et crée l'entreprise + l'administrateur (page /setup)
+${SETUP_LINE}
   Secrets  : ${ENV_FILE}  (chmod 600 — sauvegarde-le dans un gestionnaire de mots de passe)
   Sauvegarde : configure BACKUP_AGE_RECIPIENT et BACKUP_RCLONE_REMOTE dans .env, puis lance
                ./scripts/backup.sh pour tester.  Voir docs/Sauvegardes.md
