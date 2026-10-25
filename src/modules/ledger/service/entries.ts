@@ -121,19 +121,26 @@ async function insertEntry(
 
 /** Posts a manual entry (or the opening balances) after checking it twice: here, and in the database. */
 export async function postManualEntry(actor: Actor, input: ManualEntryInput): Promise<{ id: string; number: bigint }> {
+  checkManualEntry(input); // a bad entry is refused before a transaction is opened
+  return inCompany(actor, (tx) => postManualEntryWithin(tx, actor, input));
+}
+
+function checkManualEntry(input: ManualEntryInput) {
   const parsed = manualEntrySchema.safeParse(input);
   if (!parsed.success) throw new AppError("ledger.invalidEntry");
-  const { date, kind, memo, lines } = parsed.data;
-  const [problem] = checkEntry(lines);
+  const [problem] = checkEntry(parsed.data.lines);
   if (problem) throw new AppError(problemKey(problem));
+  return parsed.data;
+}
 
-  return inCompany(actor, async (tx) => {
-    await requireRole(tx, "entry.post");
-    const ids = [...new Set(lines.map((line) => line.accountId))];
-    const accounts = await tx.account.findMany({ where: { companyId: actor.companyId, id: { in: ids } }, select: { id: true, subtype: true, isActive: true } });
-    if (accounts.length !== ids.length || accounts.some((account) => !acceptsManualEntries(account))) throw new AppError("ledger.accountNotAllowed");
-    return insertEntry(tx, actor, { date, source: kind, memo: memo ?? null, lines });
-  });
+/** The same, inside the caller's transaction (an entry that must commit together with something else). */
+export async function postManualEntryWithin(tx: Tx, actor: Actor, input: ManualEntryInput): Promise<{ id: string; number: bigint }> {
+  const { date, kind, memo, lines } = checkManualEntry(input);
+  await requireRole(tx, "entry.post");
+  const ids = [...new Set(lines.map((line) => line.accountId))];
+  const accounts = await tx.account.findMany({ where: { companyId: actor.companyId, id: { in: ids } }, select: { id: true, subtype: true, isActive: true } });
+  if (accounts.length !== ids.length || accounts.some((account) => !acceptsManualEntries(account))) throw new AppError("ledger.accountNotAllowed");
+  return insertEntry(tx, actor, { date, source: kind, memo: memo ?? null, lines });
 }
 
 /**

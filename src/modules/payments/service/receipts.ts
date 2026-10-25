@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { requireRole } from "@/modules/companies";
 import { createPaymentEntry, createPaymentReversal, formatNumber, isValidIsoDate, todayIso, type EntryLine } from "@/modules/ledger";
 import { AppError, toAppError } from "@/platform/errors";
-import { withCompany, type CompanyContext } from "@/platform/tenant";
+import { withCompany, type CompanyContext, type Tx } from "@/platform/tenant";
 import { acceptsReceipts, receiptSchema, receiptVoidSchema } from "../domain/receipt";
 
 export const RECEIPTS_PER_PAGE = 25;
@@ -20,57 +20,63 @@ const iso = (date: Date) => date.toISOString().slice(0, 10);
  * the person reviewed (`expectedOpenCents`) must still be the open balance, which also refuses a form submitted twice.
  */
 export async function recordReceipt(actor: CompanyContext, input: unknown, options: { now?: Date } = {}): Promise<{ id: string; number: string }> {
+  try {
+    return await withCompany(actor, (tx) => recordReceiptWithin(tx, actor, input, options));
+  } catch (error) {
+    throw toAppError(error);
+  }
+}
+
+/**
+ * The same, inside the caller's transaction: for an operation that must commit together with a receipt (a payment
+ * collected online records the receipt and its fee as one). The caller maps database rules with `toAppError`.
+ */
+export async function recordReceiptWithin(tx: Tx, actor: CompanyContext, input: unknown, options: { now?: Date } = {}): Promise<{ id: string; number: string }> {
   const parsed = receiptSchema.safeParse(input);
   if (!parsed.success || !isValidIsoDate(parsed.data.date)) throw new AppError("payments.invalid");
   const { invoiceId, amountCents, expectedOpenCents, date, accountId, method, reference, memo } = parsed.data;
   if (date > todayIso(options.now)) throw new AppError("payments.futureDate");
-  try {
-    return await withCompany(actor, async (tx) => {
-      await requireRole(tx, "sales.manage");
-      const locked = await tx.$queryRaw<{ id: string }[]>`
-        SELECT id FROM sales_document WHERE company_id = ${actor.companyId}::uuid AND id = ${invoiceId}::uuid AND kind = 'INVOICE' FOR UPDATE`;
-      if (!locked[0]) throw new AppError("payments.invoiceNotFound");
-      const invoice = await tx.salesDocument.findFirstOrThrow({ where: { companyId: actor.companyId, id: invoiceId }, select: { number: true, status: true, contactId: true, postingDate: true } });
-      if (invoice.status !== "POSTED") throw new AppError("payments.invoiceNotOpen");
-      if (date < iso(invoice.postingDate)) throw new AppError("payments.dateBeforeInvoice");
+  await requireRole(tx, "sales.manage");
+  const locked = await tx.$queryRaw<{ id: string }[]>`
+    SELECT id FROM sales_document WHERE company_id = ${actor.companyId}::uuid AND id = ${invoiceId}::uuid AND kind = 'INVOICE' FOR UPDATE`;
+  if (!locked[0]) throw new AppError("payments.invoiceNotFound");
+  const invoice = await tx.salesDocument.findFirstOrThrow({ where: { companyId: actor.companyId, id: invoiceId }, select: { number: true, status: true, contactId: true, postingDate: true } });
+  if (invoice.status !== "POSTED") throw new AppError("payments.invoiceNotOpen");
+  if (date < iso(invoice.postingDate)) throw new AppError("payments.dateBeforeInvoice");
 
-      const open = await tx.$queryRaw<{ cents: bigint }[]>`SELECT sales_document_open_cents(${actor.companyId}::uuid, ${invoiceId}::uuid) AS cents`;
-      const openCents = open[0]?.cents ?? 0n;
-      if (openCents !== expectedOpenCents) throw new AppError("payments.stale");
-      if (amountCents > openCents) throw new AppError("payments.exceeds");
+  const open = await tx.$queryRaw<{ cents: bigint }[]>`SELECT sales_document_open_cents(${actor.companyId}::uuid, ${invoiceId}::uuid) AS cents`;
+  const openCents = open[0]?.cents ?? 0n;
+  if (openCents !== expectedOpenCents) throw new AppError("payments.stale");
+  if (amountCents > openCents) throw new AppError("payments.exceeds");
 
-      const account = await tx.account.findFirst({ where: { companyId: actor.companyId, id: accountId }, select: { subtype: true, systemKey: true, isActive: true } });
-      if (!account || !acceptsReceipts(account)) throw new AppError("payments.account");
-      const receivable = await tx.account.findFirst({ where: { companyId: actor.companyId, systemKey: "ACCOUNTS_RECEIVABLE", isActive: true }, select: { id: true } });
-      if (!receivable) throw new AppError("ledger.notInitialized");
+  const account = await tx.account.findFirst({ where: { companyId: actor.companyId, id: accountId }, select: { subtype: true, systemKey: true, isActive: true } });
+  if (!account || !acceptsReceipts(account)) throw new AppError("payments.account");
+  const receivable = await tx.account.findFirst({ where: { companyId: actor.companyId, systemKey: "ACCOUNTS_RECEIVABLE", isActive: true }, select: { id: true } });
+  if (!receivable) throw new AppError("ledger.notInitialized");
 
-      const sequence = await tx.$queryRaw<{ n: bigint; prefix: string; padding: number }[]>`
-        UPDATE number_sequence SET next_value = next_value + 1
-         WHERE company_id = ${actor.companyId}::uuid AND key = 'PAYMENT_RECEIVED'::sequence_key
-     RETURNING next_value - 1 AS n, prefix, padding`;
-      if (!sequence[0]) throw new AppError("ledger.notInitialized");
-      const number = formatNumber(sequence[0].prefix, sequence[0].padding, sequence[0].n);
+  const sequence = await tx.$queryRaw<{ n: bigint; prefix: string; padding: number }[]>`
+    UPDATE number_sequence SET next_value = next_value + 1
+     WHERE company_id = ${actor.companyId}::uuid AND key = 'PAYMENT_RECEIVED'::sequence_key
+ RETURNING next_value - 1 AS n, prefix, padding`;
+  if (!sequence[0]) throw new AppError("ledger.notInitialized");
+  const number = formatNumber(sequence[0].prefix, sequence[0].padding, sequence[0].n);
 
-      const id = randomUUID();
-      const lines: EntryLine[] = [
-        { accountId, debitCents: amountCents, creditCents: 0n },
-        { accountId: receivable.id, debitCents: 0n, creditCents: amountCents, contactId: invoice.contactId },
-      ];
-      const entry = await createPaymentEntry(tx, actor, { paymentId: id, date, memo: invoice.number ? `${number} · ${invoice.number}` : number, lines });
-      const day = new Date(`${date}T00:00:00Z`);
-      await tx.payment.create({
-        data: {
-          id, companyId: actor.companyId, direction: "RECEIVED", ledger: "RECEIVABLE", number, contactId: invoice.contactId, paymentDate: day,
-          amountCents, accountId, method, reference, memo, journalEntryId: entry.id, createdById: actor.userId,
-        },
-      });
-      await tx.paymentAllocation.create({ data: { companyId: actor.companyId, paymentId: id, salesDocumentId: invoiceId, amountCents, appliedDate: day, createdById: actor.userId } });
-      await tx.$executeRaw`SET CONSTRAINTS ALL IMMEDIATE`;
-      return { id, number };
-    });
-  } catch (error) {
-    throw toAppError(error);
-  }
+  const id = randomUUID();
+  const lines: EntryLine[] = [
+    { accountId, debitCents: amountCents, creditCents: 0n },
+    { accountId: receivable.id, debitCents: 0n, creditCents: amountCents, contactId: invoice.contactId },
+  ];
+  const entry = await createPaymentEntry(tx, actor, { paymentId: id, date, memo: invoice.number ? `${number} · ${invoice.number}` : number, lines });
+  const day = new Date(`${date}T00:00:00Z`);
+  await tx.payment.create({
+    data: {
+      id, companyId: actor.companyId, direction: "RECEIVED", ledger: "RECEIVABLE", number, contactId: invoice.contactId, paymentDate: day,
+      amountCents, accountId, method, reference, memo, journalEntryId: entry.id, createdById: actor.userId,
+    },
+  });
+  await tx.paymentAllocation.create({ data: { companyId: actor.companyId, paymentId: id, salesDocumentId: invoiceId, amountCents, appliedDate: day, createdById: actor.userId } });
+  await tx.$executeRaw`SET CONSTRAINTS ALL IMMEDIATE`;
+  return { id, number };
 }
 
 /**
