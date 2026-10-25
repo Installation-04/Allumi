@@ -37,6 +37,13 @@ export const receiptVoidSchema = z.object({
   reason: z.string().trim().min(1).max(500),
 });
 
+/** An amount as a form field shows it, ready to be typed again: `114,98` in fr-CA, `114.98` in en. */
+export function amountInput(cents: bigint, locale: "fr-CA" | "en"): string {
+  const whole = (cents / 100n).toString();
+  const fraction = (cents % 100n).toString().padStart(2, "0");
+  return `${whole}${locale === "en" ? "." : ","}${fraction}`;
+}
+
 export type AccountForReceipt = { subtype: string; systemKey: string | null; isActive: boolean };
 
 /**

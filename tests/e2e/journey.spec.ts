@@ -241,7 +241,8 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await captureReference(page, "dashboard-en");
   await appearanceJourney(page);
   await postingJourney(page);
-  await creditPostingJourney(page);
+  const paidInvoiceUrl = await creditPostingJourney(page);
+  await paymentsJourney(page, paidInvoiceUrl);
   // Nothing in the whole journey (both locales, every form, the security pages, a second browser) was blocked.
   expect(cspViolations, "Content-Security-Policy violations").toEqual([]);
 });
@@ -741,7 +742,7 @@ async function creditDraftJourney(page: Page) {
   return url;
 }
 
-async function creditPostingJourney(page: Page) {
+async function creditPostingJourney(page: Page): Promise<string> {
   await openSection(page,"Brouillons de factures");
   await page.getByRole("link",{name:"Nouveau brouillon",exact:true}).click();
   await page.getByLabel("Client",{exact:true}).selectOption({label:"Atelier Boréal"});
@@ -814,6 +815,103 @@ async function creditPostingJourney(page: Page) {
   await page.getByRole("button",{name:"Français",exact:true}).click();
   await page.getByRole("combobox",{name:"Apparence",exact:true}).selectOption("light");
   await expect(page.locator("html")).toHaveAttribute("data-theme","light");
+  return invoiceUrl;
+}
+
+/**
+ * Payments received on the posted invoice F-00002 (open balance 114,98 $ after its credit note was voided): a refused
+ * overpayment that keeps what was typed, two partial payments, a void that restores the balance, and the list in both
+ * languages.
+ */
+async function paymentsJourney(page: Page, invoiceUrl: string) {
+  const alert = (text: string) => page.locator("form").getByRole("alert").filter({ hasText: text });
+  const bank = "1000 · Banque – compte courant";
+  const fill = async (amount: string, date: string, method = "EFT", reference = "") => {
+    await page.getByLabel("Montant reçu", { exact: true }).fill(amount);
+    await page.getByLabel("Date de réception", { exact: true }).fill(date);
+    await page.getByLabel("Compte de réception", { exact: true }).selectOption({ label: bank });
+    await page.getByLabel("Mode de paiement", { exact: true }).selectOption(method);
+    if (reference) await page.getByLabel(/^Référence/).fill(reference);
+  };
+  await page.goto(invoiceUrl);
+  await expect(page.getByText("Non payée", { exact: true })).toBeVisible();
+  await expect(page.getByText("Aucun encaissement appliqué à cette facture.")).toBeVisible();
+  await page.locator("summary", { hasText: "Enregistrer un encaissement" }).click();
+  // the form proposes the whole balance, in the language's own notation
+  await expect(page.getByLabel("Montant reçu", { exact: true })).toHaveValue("114,98");
+  await expectNoPageOverflow(page);
+  await captureReference(page, "encaissement-formulaire");
+
+  // more than the balance: refused, and what was typed stays
+  await fill("200", "2026-06-15", "CHEQUE", "Chèque 1042");
+  await page.getByRole("button", { name: "Enregistrer l’encaissement", exact: true }).click();
+  await expect(alert("Le montant dépasse le solde restant")).toBeVisible();
+  await expect(page.getByLabel("Montant reçu", { exact: true })).toHaveValue("200");
+  await expect(page.getByLabel("Mode de paiement", { exact: true })).toHaveValue("CHEQUE");
+  await expect(page.getByLabel(/^Référence/)).toHaveValue("Chèque 1042");
+
+  // a first, partial payment
+  await fill("50", "2026-06-15", "CHEQUE", "Chèque 1042");
+  await page.getByRole("button", { name: "Enregistrer l’encaissement", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Encaissement E-00001", exact: true })).toBeVisible();
+  await expect(page.getByText("Chèque 1042", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: /50,00.*F-00002/ })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "encaissement");
+  await page.goto(invoiceUrl);
+  await expect(page.getByText("Partiellement payée", { exact: true })).toBeVisible();
+  await expect(page.getByText(/Solde restant:.*64,98/)).toBeVisible();
+  await expect(page.getByRole("link", { name: "E-00001", exact: true })).toBeVisible();
+
+  // the rest: the invoice is paid and the form is gone
+  await page.locator("summary", { hasText: "Enregistrer un encaissement" }).click();
+  await expect(page.getByLabel("Montant reçu", { exact: true })).toHaveValue("64,98");
+  await fill("64,98", "2026-06-20");
+  await page.getByRole("button", { name: "Enregistrer l’encaissement", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Encaissement E-00002", exact: true })).toBeVisible();
+  const secondUrl = page.url();
+  await page.goto(invoiceUrl);
+  await expect(page.getByText("Payée", { exact: true })).toBeVisible();
+  await expect(page.getByText("Cette facture est payée en entier.")).toBeVisible();
+  await expect(page.locator("summary", { hasText: "Enregistrer un encaissement" })).toHaveCount(0);
+  await captureReference(page, "facture-payee");
+
+  // voiding the second payment: a date before it is refused, then it restores the balance and keeps the reason
+  await page.goto(secondUrl);
+  await page.locator("summary", { hasText: "Annuler cet encaissement" }).click();
+  await page.getByLabel("Date d’annulation", { exact: true }).fill("2026-06-10");
+  await page.getByLabel("Motif (obligatoire, 500 caractères au plus)", { exact: true }).fill("Chèque sans provision");
+  await page.getByLabel("Je confirme l’annulation définitive de cet encaissement.").check();
+  await page.getByRole("button", { name: "Annuler l’encaissement", exact: true }).click();
+  await expect(alert("égale ou postérieure à l’encaissement")).toBeVisible();
+  await expect(page.getByLabel("Motif (obligatoire, 500 caractères au plus)", { exact: true })).toHaveValue("Chèque sans provision");
+  await page.getByLabel("Date d’annulation", { exact: true }).fill("2026-06-25");
+  await page.getByLabel("Je confirme l’annulation définitive de cet encaissement.").check();
+  await page.getByRole("button", { name: "Annuler l’encaissement", exact: true }).click();
+  await expect(page.getByText("Annulé le 2026-06-25")).toBeVisible();
+  await expect(page.getByText("Motif : Chèque sans provision")).toBeVisible();
+  await expect(page.locator("summary", { hasText: "Annuler cet encaissement" })).toHaveCount(0);
+  await expectNoPageOverflow(page);
+  await captureReference(page, "encaissement-annule");
+  await page.goto(invoiceUrl);
+  await expect(page.getByText("Partiellement payée", { exact: true })).toBeVisible();
+  await expect(page.getByText(/Solde restant:.*64,98/)).toBeVisible();
+  await expect(page.getByRole("link", { name: "E-00002", exact: true })).toHaveCount(0);
+
+  // the list, from the Sales area, in both languages
+  await openSection(page, "Ventes");
+  await page.getByRole("link", { name: "Encaissements", exact: true }).first().click();
+  await expect(page.getByRole("heading", { name: "Encaissements", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: /E-00001/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /E-00002.*Annulé/ })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "encaissements");
+  await page.getByRole("button", { name: "English", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Payments received", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: /E-00002.*Voided/ })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Encaissements", exact: true })).toBeVisible();
 }
 
 /**

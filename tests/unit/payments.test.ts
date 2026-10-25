@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { PAYMENT_METHODS, acceptsReceipts, receiptSchema, receiptVoidSchema, settlementStatus } from "@/modules/payments";
+import { PAYMENT_METHODS, acceptsReceipts, amountInput, receiptSchema, receiptVoidSchema, settlementStatus } from "@/modules/payments";
+import { parseMoney } from "@/modules/ledger";
 
 const ID = "00000000-0000-7000-8000-00000000a100";
 const valid = { invoiceId: ID, amountCents: "11498", expectedOpenCents: "11498", date: "2026-06-15", accountId: ID, method: "EFT" };
@@ -68,5 +69,20 @@ describe("how settled an invoice is", () => {
     expect(settlementStatus(11498n, 1n)).toBe("PARTIAL");
     expect(settlementStatus(11498n, 0n)).toBe("PAID");
     expect(settlementStatus(0n, 0n)).toBe("PAID");
+  });
+});
+
+describe("an amount in a form field", () => {
+  it("is typed the way the language writes it, with no currency or grouping", () => {
+    expect(amountInput(11498n, "fr-CA")).toBe("114,98");
+    expect(amountInput(11498n, "en")).toBe("114.98");
+    expect(amountInput(5n, "en")).toBe("0.05");
+    expect(amountInput(100000000n, "fr-CA")).toBe("1000000,00");
+  });
+  it("reads back to the same cents", () => {
+    for (const cents of [1n, 5n, 99n, 100n, 11498n, 123456789n, 99_999_999_999_999n]) {
+      expect(parseMoney(amountInput(cents, "fr-CA"), "fr-CA")).toBe(cents);
+      expect(parseMoney(amountInput(cents, "en"), "en")).toBe(cents);
+    }
   });
 });
