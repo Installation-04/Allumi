@@ -4,7 +4,7 @@
 
 Logiciel de comptabilité **open source** et **auto-hébergeable** pour les PME et les travailleurs autonomes du Québec et du Canada. Une alternative libre aux logiciels de comptabilité infonuagiques propriétaires.
 
-> **État : pré-alpha.** Le squelette fonctionne (premier démarrage, connexion, vérification en deux étapes, interface FR/EN, Docker); le moteur comptable (plan comptable, journal, périodes, audit) est en place, les contacts, taxes configurables, produits/services et brouillons et validation des factures sont disponibles; brouillons, validation, affectation et annulation des avoirs disponibles; paiements à venir ([feuille de route](docs/Feuille-de-route.md)). N'utilise pas Allumi pour de la comptabilité réelle avant une version stable.
+> **État : pré-alpha.** Le squelette fonctionne (premier démarrage, connexion, vérification en deux étapes, interface FR/EN, Docker); le moteur comptable (plan comptable, journal, périodes, audit) est en place, les contacts, taxes configurables, produits/services et brouillons et validation des factures sont disponibles; brouillons, validation, affectation et annulation des avoirs disponibles; encaissements de factures disponibles; remboursements, dépôts et paiements fournisseurs à venir ([feuille de route](docs/Feuille-de-route.md)). N'utilise pas Allumi pour de la comptabilité réelle avant une version stable.
 
 *English summary: Allumi is an open-source, self-hostable accounting app for Canadian small businesses (QST/GST aware, French-first, bilingual). The repo ships a Docker Compose stack, an Ubuntu install script, encrypted backups and a full wiki in `docs/`. Application code is in pre-alpha.*
 

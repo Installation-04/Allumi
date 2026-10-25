@@ -16,7 +16,7 @@ Les montants affichés restent ceux de la facture originale : ils ne représente
 
 ## Contrôles
 
-Une période verrouillée, une date antérieure, un paiement affecté, un avoir affecté ou un avoir validé lié empêchent l’opération. Un avoir admissible peut être annulé depuis sa fiche : voir [[Validation-des-avoirs]]. La désaffectation des paiements n’est pas encore disponible; il ne faut pas contourner ces protections en modifiant directement la base.
+Une période verrouillée, une date antérieure, un paiement affecté, un avoir affecté ou un avoir validé lié empêchent l’opération. Un avoir admissible peut être annulé depuis sa fiche : voir [[Validation-des-avoirs]]. Pour un paiement affecté, annuler d’abord l’encaissement (voir [[Encaissements]]; la facture retrouve alors son solde), puis la facture. Il ne faut pas contourner ces protections en modifiant directement la base.
 
 La contre-passation et le statut sont enregistrés ensemble. Un refus ne laisse aucune écriture partielle. Répéter la demande ou cliquer deux fois ne crée pas de seconde contre-passation et ne remplace pas le premier motif. La piste d’audit conserve le changement.
 

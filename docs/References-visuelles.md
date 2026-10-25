@@ -203,6 +203,16 @@ Voir [[Brouillons-d-avoirs]].
 
 Voir [[Validation-des-avoirs]].
 
+## Encaissements
+
+![Formulaire d’encaissement sur la facture](images/encaissement-formulaire-desktop.png)
+![Facture payée](images/facture-payee-desktop.png)
+![Liste des encaissements](images/encaissements-desktop.png)
+![Encaissement sur téléphone](images/encaissement-mobile.png)
+![Encaissement annulé sur téléphone](images/encaissement-annule-mobile.png)
+
+Voir [[Encaissements]].
+
 ## Avoirs annulés
 
 ![Avoir annulé et affectation retirée](images/avoir-annule-desktop.png)
