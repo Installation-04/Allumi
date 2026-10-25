@@ -6,6 +6,7 @@ import { moduleLevel, type AccessContext, type Module } from "./module-access";
 export type Role = "OWNER" | "USER" | "ACCOUNTANT" | "READ_ONLY";
 
 export type Action =
+  | "contact.anonymize"
   | "bank.read"
   | "bank.manage"
   | "integration.manage"
@@ -32,6 +33,7 @@ export type Action =
   | "audit.read";
 
 const ALLOWED: Record<Action, readonly Role[]> = {
+  "contact.anonymize": ["OWNER"],
   "bank.read": ["OWNER", "USER", "ACCOUNTANT", "READ_ONLY"],
   "bank.manage": ["OWNER", "ACCOUNTANT"],
   "integration.manage": ["OWNER"],
@@ -61,7 +63,7 @@ const ALLOWED: Record<Action, readonly Role[]> = {
 
 export function can(subject: Role | AccessContext, action: Action): boolean {
   const context = typeof subject === "string" ? { role: subject } : subject;
-  const ownerOnly: Action[] = ["integration.manage", "members.manage", "company.manage", "period.reopen", "fiscalYear.reopen", "fiscalYear.close"];
+  const ownerOnly: Action[] = ["contact.anonymize", "integration.manage", "members.manage", "company.manage", "period.reopen", "fiscalYear.reopen", "fiscalYear.close"];
   if (ownerOnly.includes(action)) return context.role === "OWNER";
   if (action === "company.read") return true;
   const prefix = action.split(".")[0];

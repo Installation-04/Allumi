@@ -191,7 +191,11 @@
     "contacts": {
       "invalid": "Check the contact fields, including email, country and payment terms.",
       "invalidFilter": "Invalid contact filters.",
-      "notFound": "This contact was not found or has been anonymized."
+      "notFound": "This contact was not found or has been anonymized.",
+      "anonymizeInvalid": "Choose a reason and confirm the anonymization.",
+      "twoFactorRequired": "Turn on two-factor authentication (Account security) to anonymize a contact.",
+      "codeInvalid": "The verification code is invalid or was already used.",
+      "rateLimited": "Too many attempts: try again in a few minutes."
     },
     "updates": {
       "unavailable": "Update check unavailable. Try again later.",
@@ -599,6 +603,21 @@
     "archive": "Archive contact",
     "restore": "Restore contact",
     "archiveHint": "Archiving hides this contact from the active list and preserves accounting references. It can be restored; no data is deleted.",
+    "anonymize": "Anonymize this contact (Law 25)",
+    "anonymizeIntro": "Permanently erases this contact’s personal information: name, contact details, notes and registration numbers, in the record and in the audit trail. This cannot be undone.",
+    "anonymizeKept": "Accounting documents are kept: a posted invoice keeps its frozen copy of the customer’s details, because accounting records must be retained. Entries, amounts and taxes do not change.",
+    "anonymizeNeedsTwoFactor": "Owner only, with two-factor authentication turned on (Account security).",
+    "anonymizeReason": "Reason",
+    "anonymizeReasons": {
+      "SUBJECT_REQUEST": "Request from the person concerned",
+      "RETENTION_ENDED": "Retention period ended",
+      "OTHER": "Other reason"
+    },
+    "anonymizeCode": "Verification code",
+    "anonymizeCodeHint": "The six-digit code from your authenticator app, or a recovery code. A code works only once.",
+    "anonymizeConfirm": "I understand the erasure is permanent.",
+    "anonymizeSubmit": "Anonymize permanently",
+    "anonymized": "Contact anonymized. Their personal information was erased from the record and the audit trail.",
     "status": "Status",
     "search": "Search name, email or phone",
     "apply": "Search",

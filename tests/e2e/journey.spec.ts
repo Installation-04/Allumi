@@ -212,7 +212,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
 
   await securityJourney(page, browser, recoveryCodes);
   await ledgerJourney(page, totp);
-  await contactsJourney(page);
+  await contactsJourney(page, recoveryCodes[3] ?? "");
   await catalogJourney(page);
   await companyJourney(page);
   await draftsJourney(page);
@@ -431,7 +431,7 @@ async function ledgerJourney(page: Page, totp: TOTP) {
   await expectNoPageOverflow(page);
 }
 
-async function contactsJourney(page: Page) {
+async function contactsJourney(page: Page, recoveryCode: string) {
   await openSection(page, "Contacts");
   await page.getByRole("link", { name: "Nouveau contact" }).click();
   await page.getByLabel("Nom affiché").fill("Atelier Boréal");
@@ -463,6 +463,73 @@ async function contactsJourney(page: Page) {
   await expect(page.getByRole("link", { name: /Atelier Boréal/ })).toBeVisible();
   await expectNoPageOverflow(page);
   await captureReference(page, "contacts");
+  await anonymizeJourney(page, recoveryCode);
+}
+
+/** The attempts at a one-time code are counted per user (8 per 15 minutes) and the journey has used most of them. */
+async function resetCodeAttempts() {
+  const db = new pg.Client({ connectionString: e2eUrls().owner });
+  await db.connect();
+  try { await db.query("DELETE FROM rate_limit"); } finally { await db.end(); }
+}
+
+/**
+ * Law 25: the owner erases a person from the directory. It needs a code typed now (a wrong one changes nothing),
+ * clears the record and leaves no trace of the person in the audit trail, which says who erased and why.
+ */
+async function anonymizeJourney(page: Page, recoveryCode: string) {
+  const company = new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0] ?? "";
+  const email = "marie.tremblay@erasure.example";
+  const phone = "514 555-0177";
+  await page.goto(`${company}/contacts/nouveau`);
+  await page.getByLabel("Nom affiché").fill("Marie Tremblay");
+  await page.getByLabel("Courriel", { exact: true }).fill(email);
+  await page.getByLabel("Téléphone", { exact: true }).fill(phone);
+  await page.getByLabel("Notes").fill("Préfère être jointe le soir.");
+  await page.getByRole("button", { name: "Créer le contact" }).click();
+  await expect(page.getByRole("heading", { name: "Marie Tremblay" })).toBeVisible();
+  const contactUrl = page.url();
+  const trail = async () => {
+    await page.goto(`${company}/audit?objet=contact`);
+    await expect(page.getByRole("heading", { name: "Piste d'audit" })).toBeVisible();
+    return (await page.locator("body").textContent()) ?? "";
+  };
+  // the audit trail does hold the person before the erasure (so the later check can fail)
+  expect(await trail()).toContain(email);
+
+  await page.goto(contactUrl);
+  const erase = page.locator("details").filter({ hasText: "Anonymiser ce contact (Loi 25)" });
+  await erase.getByText("Anonymiser ce contact (Loi 25)").click();
+  await expect(erase.getByText("Les documents comptables sont conservés")).toBeVisible();
+  await expectNoPageOverflow(page);
+  const submit = async (code: string) => {
+    await erase.getByLabel("Motif").selectOption("SUBJECT_REQUEST");
+    await erase.getByLabel("Code de vérification").fill(code);
+    await erase.getByLabel("Je comprends que l’effacement est définitif.").check();
+    await erase.getByRole("button", { name: "Anonymiser définitivement" }).click();
+  };
+  await resetCodeAttempts();
+  await submit("000000");
+  await expect(erase.getByRole("alert").filter({ hasText: "invalide ou déjà utilisé" })).toBeVisible();
+  await expect(erase.getByLabel("Motif")).toHaveValue("SUBJECT_REQUEST");
+  await expect(page).toHaveURL(contactUrl);
+  expect(await trail()).toContain(email);
+
+  await page.goto(contactUrl);
+  await erase.getByText("Anonymiser ce contact (Loi 25)").click();
+  await submit(recoveryCode);
+  await expect(page).toHaveURL(/\/contacts\?anonymized=1$/);
+  await expect(page.getByRole("status").filter({ hasText: "Contact anonymisé" })).toBeVisible();
+  await page.goto(`${company}/contacts?status=ALL&q=Tremblay`);
+  await expect(page.getByRole("link", { name: /Marie Tremblay/ })).toHaveCount(0);
+  expect((await page.goto(contactUrl))?.status()).toBe(404);
+
+  const after = await trail();
+  for (const secret of [email, phone, "Marie", "Tremblay", "jointe le soir"]) expect(after, secret).not.toContain(secret);
+  await expect(page.getByRole("cell", { name: "contact.anonymize" })).toBeVisible();
+  await expect(page.getByRole("cell", { name: "privacy.redact" })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await page.goto(company);
 }
 
 

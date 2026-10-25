@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { getContact } from "@/modules/contacts";
+import { ANONYMIZATION_REASONS, getContact } from "@/modules/contacts";
 import { can } from "@/modules/companies";
-import { ActionForm } from "@/app/_components/ui";
+import { ActionForm, Field, SelectField } from "@/app/_components/ui";
 import { FOCUS } from "@/app/_components/focus";
 import { loadCompany } from "../../_lib";
 import { ContactForm } from "../contact-form";
-import { setContactActiveAction } from "../actions";
+import { anonymizeContactAction, setContactActiveAction } from "../actions";
 
 export async function generateMetadata() { return { title: (await getTranslations("contacts"))("details") }; }
 
@@ -27,6 +27,19 @@ export default async function ContactPage({ params }: { params: Promise<{ compan
       {can(company, "contact.manage") ? <>
         <ContactForm companyId={company.id} contactId={contact.id} initial={initial} />
         <div className="space-y-3 rounded-lg border border-stone-200 p-4 dark:border-stone-800"><p className="text-sm">{t("archiveHint")}</p><ActionForm action={setContactActiveAction.bind(null, company.id, contact.id, !contact.isActive)} label={contact.isActive ? t("archive") : t("restore")} /></div>
+        {can(company.role, "contact.anonymize") && <details className="rounded-lg border border-red-300 p-4 dark:border-red-900">
+          <summary className="min-h-11 cursor-pointer font-medium">{t("anonymize")}</summary>
+          <div className="mt-3 space-y-3">
+            <p className="text-sm">{t("anonymizeIntro")}</p>
+            <p className="text-sm">{t("anonymizeKept")}</p>
+            <p className="text-sm text-stone-600 dark:text-stone-400">{t("anonymizeNeedsTwoFactor")}</p>
+            <ActionForm action={anonymizeContactAction.bind(null, company.id, contact.id)} label={t("anonymizeSubmit")}>
+              <SelectField name="reason" label={t("anonymizeReason")} options={ANONYMIZATION_REASONS.map((value) => ({ value, label: t(`anonymizeReasons.${value}`) }))} />
+              <Field name="code" label={t("anonymizeCode")} hint={t("anonymizeCodeHint")} autoComplete="one-time-code" />
+              <label className="inline-flex min-h-11 items-center gap-3"><input type="checkbox" name="confirm" value="yes" required />{t("anonymizeConfirm")}</label>
+            </ActionForm>
+          </div>
+        </details>}
       </> : <dl className="grid gap-4 rounded-lg border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-900 sm:grid-cols-2">
         <div><dt className="text-sm text-stone-500 dark:text-stone-400">{t("locale")}</dt><dd>{contact.locale === "en" ? "English" : "Français"}</dd></div>
         <div><dt className="text-sm text-stone-500 dark:text-stone-400">{t("kind")}</dt><dd>{t(`kinds.${initial.kind as "CUSTOMER" | "SUPPLIER" | "BOTH"}`)}</dd></div>

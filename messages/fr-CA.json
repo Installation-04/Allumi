@@ -191,7 +191,11 @@
     "contacts": {
       "invalid": "Vérifiez les champs du contact, notamment le courriel, le pays et le délai de paiement.",
       "invalidFilter": "Les filtres de contacts sont invalides.",
-      "notFound": "Ce contact est introuvable ou anonymisé."
+      "notFound": "Ce contact est introuvable ou anonymisé.",
+      "anonymizeInvalid": "Choisissez un motif et confirmez l’anonymisation.",
+      "twoFactorRequired": "Activez la vérification en deux étapes (Sécurité du compte) pour anonymiser un contact.",
+      "codeInvalid": "Le code de vérification est invalide ou déjà utilisé.",
+      "rateLimited": "Trop d’essais : réessayez dans quelques minutes."
     },
     "updates": {
       "unavailable": "Vérification indisponible. Réessayez plus tard.",
@@ -599,6 +603,21 @@
     "archive": "Archiver le contact",
     "restore": "Restaurer le contact",
     "archiveHint": "L’archivage masque le contact de la liste active et conserve ses références comptables. Il peut être restauré; aucune donnée n’est supprimée.",
+    "anonymize": "Anonymiser ce contact (Loi 25)",
+    "anonymizeIntro": "Efface définitivement les renseignements personnels de ce contact : nom, coordonnées, notes et numéros d’inscription, dans la fiche comme dans la piste d’audit. L’opération est irréversible.",
+    "anonymizeKept": "Les documents comptables sont conservés : une facture validée garde la copie figée des coordonnées du client, car les registres comptables doivent être conservés. Les écritures, les montants et les taxes ne changent pas.",
+    "anonymizeNeedsTwoFactor": "Réservé au propriétaire, avec la vérification en deux étapes active (Sécurité du compte).",
+    "anonymizeReason": "Motif",
+    "anonymizeReasons": {
+      "SUBJECT_REQUEST": "Demande de la personne concernée",
+      "RETENTION_ENDED": "Fin de la période de conservation",
+      "OTHER": "Autre motif"
+    },
+    "anonymizeCode": "Code de vérification",
+    "anonymizeCodeHint": "Le code à six chiffres de votre application d’authentification, ou un code de récupération. Un code ne sert qu’une fois.",
+    "anonymizeConfirm": "Je comprends que l’effacement est définitif.",
+    "anonymizeSubmit": "Anonymiser définitivement",
+    "anonymized": "Contact anonymisé. Ses renseignements personnels ont été effacés de la fiche et de la piste d’audit.",
     "status": "État",
     "search": "Rechercher un nom, un courriel ou un téléphone",
     "apply": "Rechercher",
