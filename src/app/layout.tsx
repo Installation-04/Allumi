@@ -8,7 +8,7 @@ import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("app");
-  return { title: { default: "Allumi", template: "%s · Allumi" }, description: t("tagline"), other: { "apple-mobile-web-app-capable": "yes" }, appleWebApp: { capable: true, title: "Allumi", statusBarStyle: "default" }, icons: { apple: "/icons/allumi-180.png" } };
+  return { title: { default: "Allumi", template: "%s · Allumi" }, description: t("tagline"), other: { "apple-mobile-web-app-capable": "yes" }, appleWebApp: { capable: true, title: "Allumi", statusBarStyle: "default" }, icons: { icon: [{ url: "/icons/allumi.svg", type: "image/svg+xml" }, { url: "/favicon.ico", sizes: "48x48" }], apple: "/icons/allumi-180.png" } };
 }
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#007f5f" };

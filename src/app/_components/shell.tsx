@@ -8,6 +8,7 @@ import { setLocale } from "@/app/langue/actions";
 import { appVersion } from "@/platform/version";
 import { FOCUS } from "./focus";
 import { getSession } from "@/app/_lib/session";
+import { Logo } from "./logo";
 
 export async function Header({ global = false, companyName }: { global?: boolean; companyName?: string }) {
   const t = await getTranslations("common");
@@ -19,7 +20,7 @@ export async function Header({ global = false, companyName }: { global?: boolean
       <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-1 sm:px-6">
         {companyName ? <Link href="/" className={`min-w-0 max-w-full rounded py-3 text-sm font-medium ${FOCUS}`}>{companyName}</Link> : (
         <Link href="/" className={`inline-flex min-h-11 items-center gap-2 rounded-sm text-xl font-bold text-brand-700 dark:text-brand-500 ${FOCUS}`}>
-          <span aria-hidden="true" className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-700 text-lg text-white">a</span>
+          <Logo size={36} />
           Allumi
         </Link>
         )}

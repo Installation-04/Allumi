@@ -31,7 +31,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   expect(manifestResponse.status()).toBe(200);
   expect(await manifestResponse.json()).toMatchObject({ name: 'Allumi', display: 'standalone', start_url: '/' });
   // Security headers also protect the standalone server without a reverse proxy.
-  for (const path of ["/connexion", "/api/health", "/icons/allumi-180.png"]) {
+  for (const path of ["/connexion", "/api/health", "/icons/allumi-180.png", "/icons/allumi.svg", "/favicon.ico"]) {
     const response = await page.request.get(path);
     const headers = response.headers();
     expect(headers["x-content-type-options"]).toBe("nosniff");
@@ -49,6 +49,13 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
 
   await expect(page.locator('meta[name="apple-mobile-web-app-capable"]')).toHaveAttribute('content', 'yes');
   await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute('href', '/icons/allumi-180.png');
+  // The tab icon is served to visitors without a session, and the logo in the header is the drawn mark.
+  await expect(page.locator('link[rel="icon"][type="image/svg+xml"]')).toHaveAttribute('href', '/icons/allumi.svg');
+  expect((await page.request.get('/icons/allumi.svg')).headers()['content-type']).toContain('image/svg+xml');
+  expect((await page.request.get('/favicon.ico')).status()).toBe(200);
+  expect((await page.request.get('/icons/allumi-maskable-512.png')).status()).toBe(200);
+  expect((await (await page.request.get('/manifest.webmanifest')).json()).icons).toContainEqual(expect.objectContaining({ purpose: 'maskable', sizes: '512x512' }));
+  await expect(page.locator('header svg[aria-hidden="true"]').first()).toBeVisible();
   await captureReference(page, "premier-demarrage");
 
   await page.locator('[name="setupToken"]').fill("e2e-setup-token-123456789");

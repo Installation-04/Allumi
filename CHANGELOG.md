@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Nouveau logo, original : une flamme (« allumé ») posée sur un signe égal (débit = crédit), à la place de la lettre « a » sur fond vert. Logo dessiné dans l’en-tête et le menu, icône d’onglet (SVG et `favicon.ico`, jusque-là absentes), icônes iOS et PWA avec variante « maskable » pour Android, icône de l’installateur Windows. Tout est généré par `npm run icons` à partir d’une seule définition; tests de cohérence ajoutés. Les captures de la documentation montrent encore l’ancien logo jusqu’à leur prochaine régénération.
+
 - Images déjà construites : une copie placée sur une version étiquetée télécharge les images publiées par la release (application et migrations, AMD64/ARM64) au lieu de les compiler. `install-docker.sh`, `update.sh` (donc aussi la mise à jour depuis l’interface) et le nouveau `up.sh` choisissent seuls; repli sur la construction si les images sont introuvables, pour une branche ou des fichiers modifiés, ou avec `--build`. Le Compose lit `ALLUMI_APP_IMAGE`/`ALLUMI_MIGRATE_IMAGE` (noms locaux par défaut : développement et CI inchangés). La première mise à jour depuis une version antérieure construit encore sur place.
 
 - Documentation : captures ordinateur/téléphone de l’écran Sécurité du compte (appareils connectés et changement de mot de passe).
