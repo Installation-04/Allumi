@@ -7,6 +7,7 @@ set -euo pipefail
 # shellcheck source=lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 require_env
+isolate_deployment_env
 
 FORCE_BUILD=0
 for arg in "$@"; do

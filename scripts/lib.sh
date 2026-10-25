@@ -64,6 +64,15 @@ env_backfill() {
 
 compose() { docker compose --project-directory "$ALLUMI_DIR" "$@"; }
 
+# Les identifiants et réglages de déploiement viennent du fichier .env, jamais de l'environnement du shell :
+# Compose donne la priorité aux variables d'environnement sur celles de .env, si bien qu'un shell de développement
+# (ou une CI) qui exporte DATABASE_URL ferait migrer et servir la mauvaise base.
+isolate_deployment_env() {
+  unset DATABASE_URL APP_DATABASE_URL POSTGRES_PASSWORD POSTGRES_USER POSTGRES_DB APP_DB_PASSWORD AUTH_SECRET ENCRYPTION_KEY \
+    SETUP_TOKEN APP_URL ALLUMI_DOMAIN ACME_EMAIL ALLUMI_HTTP_PORT ALLUMI_HTTPS_PORT ALLUMI_BIND_ADDRESS DEFAULT_LOCALE \
+    ALLUMI_APP_IMAGE ALLUMI_MIGRATE_IMAGE
+}
+
 # --- Images : téléchargées (version publiée) ou construites sur place ------------------------------------------
 # Le workflow Release construit et publie, pour chaque version étiquetée, les images application et migrations
 # (AMD64 et ARM64) avant de publier la release. Une copie placée exactement sur une étiquette les télécharge au lieu

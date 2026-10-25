@@ -9,6 +9,7 @@ set -euo pipefail
 # shellcheck source=lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 require_env
+isolate_deployment_env
 cd "$ALLUMI_DIR"
 
 BACKUP=1

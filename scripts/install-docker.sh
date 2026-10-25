@@ -61,7 +61,7 @@ valid_port "$INSTALL_HTTP_PORT" || die "le port doit être entre 1 et 65535."
 valid_bind "$INSTALL_BIND" || die "--bind doit être une adresse IPv4 valide."
 valid_locale "$INSTALL_LOCALE" || die "--locale doit être fr-CA ou en."
 # Deployment credentials must come from the selected file, never from a development shell.
-unset DATABASE_URL APP_DATABASE_URL POSTGRES_PASSWORD POSTGRES_USER POSTGRES_DB APP_DB_PASSWORD AUTH_SECRET ENCRYPTION_KEY SETUP_TOKEN APP_URL ALLUMI_DOMAIN ACME_EMAIL ALLUMI_HTTP_PORT ALLUMI_HTTPS_PORT ALLUMI_BIND_ADDRESS DEFAULT_LOCALE
+isolate_deployment_env
 command -v openssl >/dev/null 2>&1 || die "OpenSSL est requis pour générer les secrets."
 [ -f "$ALLUMI_DIR/docker-compose.yml" ] && [ -f "$ALLUMI_DIR/.env.example" ] || die "lance le script depuis une copie complète d’Allumi."
 if [ "$PREPARE_ONLY" -eq 0 ]; then

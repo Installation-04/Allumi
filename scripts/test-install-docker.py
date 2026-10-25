@@ -14,7 +14,7 @@ DOCKER = r'''#!/usr/bin/env python3
 import os,sys
 from pathlib import Path
 args=sys.argv[1:]
-if any(os.environ.get(k) for k in ['DATABASE_URL','APP_DATABASE_URL','ALLUMI_HTTP_PORT','ALLUMI_HTTPS_PORT','ALLUMI_BIND_ADDRESS','DEFAULT_LOCALE']): sys.exit(97)
+if any(os.environ.get(k) for k in ['DATABASE_URL','APP_DATABASE_URL','ALLUMI_HTTP_PORT','ALLUMI_HTTPS_PORT','ALLUMI_BIND_ADDRESS','DEFAULT_LOCALE','ALLUMI_APP_IMAGE','ALLUMI_MIGRATE_IMAGE']): sys.exit(97)
 with open(os.environ['DOCKER_TEST_LOG'],'a') as f: f.write(' '.join(args)+'\n')
 if args==['info'] and os.environ.get('DOCKER_TEST_DENY'): sys.exit(1)
 if args[:2]==['ps','-aq'] or args[:2]==['volume','ls']:
@@ -181,6 +181,10 @@ class Installer(Harness):
 
 class PublishedImages(Harness):
     """A copy sitting exactly on a release tag downloads the images the release published; anything else builds."""
+    # A developer shell or a CI job exports these; the scripts must not let them override the deployment's .env.
+    LEAKED={'DATABASE_URL':'postgresql://dev:dev@localhost/dev','APP_DATABASE_URL':'postgresql://dev:dev@localhost/dev','ALLUMI_HTTP_PORT':'9999','ALLUMI_APP_IMAGE':'evil/app:1','ALLUMI_MIGRATE_IMAGE':'evil/migrate:1'}
+    def setUp(self):
+        super().setUp();self.env.update(self.LEAKED)
     GIT_ENV={'GIT_AUTHOR_NAME':'t','GIT_AUTHOR_EMAIL':'t@t','GIT_COMMITTER_NAME':'t','GIT_COMMITTER_EMAIL':'t@t'}
     def git(self,*args):
         subprocess.run(['git',*args],cwd=self.root,check=True,capture_output=True,env={**os.environ,**self.GIT_ENV})
