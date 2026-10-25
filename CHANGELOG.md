@@ -7,6 +7,7 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 - Documentation : captures ordinateur/téléphone de l’écran Sécurité du compte (appareils connectés et changement de mot de passe).
 
 - Documentation : cadrage mobile ciblé, références dans le README et génération des captures par préfixe.
+- Installation en une commande : `scripts/get.sh` (POSIX sh, utilisable avec `curl … | sh`) détecte le système, le processeur (AMD64/ARM64), la mémoire, le disque, la virtualisation, les droits et Docker, puis lance `install.sh` ou `install-docker.sh`. `--check` ne modifie rien; confirmation avant d’agir; dépôt cloné sur la dernière version, sans écraser de modifications locales. Tests dans la CI.
 
 - Sécurité du compte : liste des appareils connectés avec déconnexion d’un appareil ou de tous les autres, et changement de mot de passe (mot de passe actuel exigé, politique de longueur, essais limités, autres appareils déconnectés, piste d’audit). FR/EN, sans migration.
 

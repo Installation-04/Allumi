@@ -8,7 +8,13 @@ Logiciel de comptabilité **open source** et **auto-hébergeable** pour les PME 
 
 ## Installation Docker
 
-Avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà installés :
+En une commande (détecte le système et le processeur, puis lance l’installateur adapté; `-s -- --check` pour voir sans modifier) :
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh
+```
+
+Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà installés :
 
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
