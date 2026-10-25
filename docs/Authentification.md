@@ -59,3 +59,12 @@ Voir aussi [[Architecture]] et [[Securite-et-Loi-25]].
 ![Vérification sur téléphone](images/connexion-deux-etapes-mobile.png)
 
 Captures issues de données fictives, avant saisie du code; aucune clé TOTP ni aucun code de récupération n’est affiché.
+
+## Écran Sécurité du compte
+
+![Mot de passe et appareils connectés](images/securite-appareils-desktop.png)
+![Sécurité du compte sur téléphone](images/securite-appareils-mobile.png)
+![Mot de passe changé](images/securite-mot-de-passe-desktop.png)
+![Confirmation sur téléphone](images/securite-mot-de-passe-mobile.png)
+
+Captures issues de données fictives : aucun mot de passe, jeton, clé TOTP ni code de récupération n’est affiché.
