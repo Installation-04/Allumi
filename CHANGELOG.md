@@ -10,8 +10,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 - Images déjà construites : une copie placée sur une version étiquetée télécharge les images publiées par la release (application et migrations, AMD64/ARM64) au lieu de les compiler. `install-docker.sh`, `update.sh` (donc aussi la mise à jour depuis l’interface) et le nouveau `up.sh` choisissent seuls; repli sur la construction si les images sont introuvables, pour une branche ou des fichiers modifiés, ou avec `--build`. Le Compose lit `ALLUMI_APP_IMAGE`/`ALLUMI_MIGRATE_IMAGE` (noms locaux par défaut : développement et CI inchangés). La première mise à jour depuis une version antérieure construit encore sur place.
 
+## [0.4.0-alpha.11] - 2026-10-25
+
 - Documentation : captures ordinateur/téléphone de l’écran Sécurité du compte (appareils connectés et changement de mot de passe).
 
+- Documentation : cadrage mobile ciblé, références dans le README et génération des captures par préfixe.
 - Installation en une commande : `scripts/get.sh` (POSIX sh, utilisable avec `curl … | sh`) détecte le système, le processeur (AMD64/ARM64), la mémoire, le disque, la virtualisation, les droits et Docker, puis lance `install.sh` ou `install-docker.sh`. `--check` ne modifie rien; confirmation avant d’agir; dépôt cloné sur la dernière version, sans écraser de modifications locales. Tests dans la CI.
 
 - Sécurité du compte : liste des appareils connectés avec déconnexion d’un appareil ou de tous les autres, et changement de mot de passe (mot de passe actuel exigé, politique de longueur, essais limités, autres appareils déconnectés, piste d’audit). FR/EN, sans migration.

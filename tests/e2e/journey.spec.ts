@@ -8,10 +8,12 @@ const EMAIL = "admin@exemple.test";
 const PASSWORD = "une phrase de passe très longue 2026";
 
 /** Optional wiki references from the isolated, fictional browser-test company only. */
-async function captureReference(page: Page, name: string) {
+async function captureReference(page: Page, name: string, mobileHeading?: string) {
   if (process.env.ALLUMI_SCREENSHOTS !== "1") return;
+  if (process.env.ALLUMI_SCREENSHOT_PREFIX && !name.startsWith(process.env.ALLUMI_SCREENSHOT_PREFIX)) return;
   mkdirSync("docs/images", { recursive: true });
   await page.evaluate(() => window.scrollTo(0, 0));
+  if (mobileHeading && process.env.E2E_MOBILE === "1") await page.getByRole("heading", { name: mobileHeading, exact: true }).evaluate((heading) => heading.scrollIntoView({ block: "start" }));
   await page.screenshot({ scale: "css", path: `docs/images/${name}-${process.env.E2E_MOBILE === "1" ? "mobile" : "desktop"}.png`, fullPage: process.env.E2E_MOBILE !== "1", animations: "disabled" });
 }
 
@@ -811,7 +813,7 @@ async function securityJourney(page: Page, browser: Browser, recoveryCodes: stri
   await page.reload();
   await expect(disconnect).toHaveCount(1);
   await expectNoPageOverflow(page);
-  await captureReference(page, "securite-appareils");
+  await captureReference(page, "securite-appareils", "Appareils connectés");
   await disconnect.click();
   await expect(disconnect).toHaveCount(0);
   await otherPage.goto("/compte/securite");
@@ -840,7 +842,7 @@ async function securityJourney(page: Page, browser: Browser, recoveryCodes: stri
   await fill(PASSWORD, NEXT);
   await expect(page.getByText("Mot de passe changé. Les autres appareils ont été déconnectés.")).toBeVisible();
   await expect(page.getByLabel("Mot de passe actuel")).toHaveValue("");
-  await captureReference(page, "securite-mot-de-passe");
+  await captureReference(page, "securite-mot-de-passe", "Mot de passe");
   await otherPage.goto("/compte/securite");
   await expect(otherPage).toHaveURL(/\/connexion$/);
   await page.reload();
