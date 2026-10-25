@@ -11,6 +11,8 @@ Ouvrir la facture dans **Brouillons de factures → Factures validées**. Sous l
 - le **compte de réception** : un compte bancaire, la caisse, ou **Fonds non déposés** en attendant le dépôt;
 - le **mode de paiement** (comptant, chèque, virement, Interac, cartes, autre), une **référence** (numéro de chèque ou de transaction) et une **note**, facultatives.
 
+Un paiement par carte reçu par un **lien de paiement Stripe** est enregistré par Allumi lui-même, sur demande du propriétaire (section **Paiement en ligne** de la facture) : encaissement au montant brut, mode « carte de crédit », référence = identifiant du paiement chez Stripe, et frais de traitement dans une écriture à part. Voir [[Integrations]].
+
 À l’enregistrement, Allumi crée **en une seule transaction** :
 
 1. l’écriture au journal : l’argent **entre** dans le compte choisi (débit) et le compte **clients** diminue (crédit, pour ce client);

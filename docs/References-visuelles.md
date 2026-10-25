@@ -219,6 +219,9 @@ Voir [[Encaissements]].
 ![Fiche d’une connexion](images/integration-connexion-desktop.png)
 ![Transactions importées](images/transactions-importees-desktop.png)
 ![Transactions importées sur téléphone](images/transactions-importees-mobile.png)
+![Fiche d’une connexion : compte des frais et vérification des paiements](images/paiement-en-ligne-connexion-desktop.png)
+![Facture avec un lien de paiement prêt](images/paiement-en-ligne-facture-desktop.png)
+![Paiement à vérifier sur téléphone](images/paiement-en-ligne-a-verifier-mobile.png)
 
 Voir [[Integrations]].
 

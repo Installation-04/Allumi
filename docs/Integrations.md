@@ -4,7 +4,9 @@ Une **intégration** relie Allumi à un service externe pour **importer ses tran
 
 **Ce que cela fait** : lire les transactions du service, les convertir en un format commun (montant net, brut, frais, devise, date, type) et les ranger dans **Banque et transactions → Transactions importées**.
 
-**Ce que cela ne fait pas** (volontairement, pour cette première étape) : aucune **écriture comptable** n’est créée, aucun paiement n’est enregistré sur une facture, aucune transaction n’est rapprochée automatiquement. Le rapprochement avec les factures, les paiements enregistrés et le journal viendra ensuite (phase 5, voir [[Feuille-de-route]]). Il n’y a pas non plus de paiement en ligne sur les factures ni de webhook : un serveur auto-hébergé n’est en général pas joignable depuis Internet, et l’import ne demande que des appels **sortants**.
+**Ce que cela ne fait pas** : l’**import** ne crée aucune **écriture comptable**, n’enregistre aucun paiement sur une facture et ne rapproche rien automatiquement. Le rapprochement avec les factures, les paiements enregistrés et le journal viendra ensuite (phase 5, voir [[Feuille-de-route]]). Il n’y a pas non plus de webhook : un serveur auto-hébergé n’est en général pas joignable depuis Internet, et tout ce qui est décrit ici ne demande que des appels **sortants**.
+
+**Paiement en ligne des factures** : avec Stripe, le propriétaire peut en plus créer, pour une facture validée, un **lien de paiement** hébergé par Stripe et enregistrer le paiement reçu : voir la section « Paiement en ligne des factures (Stripe) » plus bas. PayPal n’offre pas encore cette fonction.
 
 ## Connecter un service
 
@@ -14,7 +16,7 @@ Réservé au **propriétaire** de l’entreprise. **Banque et transactions → I
 - **Compte du plan comptable** (type banque) dont le service tient le solde. Au besoin, créez d’abord un compte « Stripe » ou « PayPal » de type banque dans le [[Plan-comptable]];
 - **Importer à partir du** : première journée importée (PayPal garde trois ans d’historique);
 - les **clés** du service :
-  - **Stripe** : une clé d’API **restreinte en lecture seule** (permission « Transactions de solde » : lecture) est recommandée; une clé secrète `sk_` fonctionne aussi. Une clé publique `pk_` est refusée. Une clé de test (`_test_`) crée une connexion d’**essai**;
+  - **Stripe** : une clé d’API **restreinte** est recommandée : « Transactions de solde » en lecture suffit pour l’import; pour le paiement en ligne, ajoutez l’écriture sur « Prix » et « Liens de paiement » et la lecture sur « Sessions Checkout » et « PaymentIntents ». Une clé secrète `sk_` fonctionne aussi. Une clé publique `pk_` est refusée. Une clé de test (`_test_`) crée une connexion d’**essai**;
   - **PayPal** : l’identifiant et le secret d’une application REST dont la fonction **Transaction Search** est activée, et l’environnement (**production** ou **bac à sable**). PayPal peut mettre jusqu’à **trois heures** à rapporter une transaction.
 
 Allumi **vérifie les clés auprès du service avant de rien enregistrer** : un refus (clés invalides, permission manquante, service indisponible) s’explique par un message et ne laisse aucune connexion. Les clés sont ensuite **chiffrées** et ne sont **plus jamais affichées** : seule la fin de la clé (4 caractères) permet de la reconnaître.
@@ -42,8 +44,33 @@ Les montants sont des **cents exacts** (jamais de décimale flottante). Les **de
 
 Allumi **refuse** toute réponse qui n’a pas la forme documentée ou dont les chiffres ne concordent pas (`net ≠ brut − frais`) : la synchronisation s’arrête avec le message « réponse inattendue » et **rien** de la fenêtre fautive n’est importé.
 
+## Paiement en ligne des factures (Stripe)
+
+Réservé au **propriétaire**, sur une connexion Stripe active. Rien ne demande une adresse publique ni un webhook : Allumi **appelle** Stripe pour créer la page, puis, quand vous le demandez, **regarde** si elle a été payée.
+
+**Mise en place** (une fois) : sur la fiche de la connexion, choisissez le **compte des frais de traitement** (un compte de charges, par exemple « 6010 · Frais bancaires »). Sans lui, aucun lien n’est offert. Le changement vaut pour les paiements enregistrés à partir de ce moment; les écritures déjà passées gardent leur compte.
+
+**Créer un lien** : sur une facture validée qui a un solde, section **Paiement en ligne**, **Créer un lien de paiement**. Le lien vaut pour le **solde actuel** et pour **un seul paiement** (la page se ferme d’elle-même après un paiement). Envoyez son adresse à votre client; il paie par carte sur la page de Stripe, et Allumi ne voit jamais le numéro de carte. Une facture n’a qu’**un lien en cours** à la fois (la base l’impose) : si le solde change (un autre paiement, un avoir), annulez le lien et créez-en un autre.
+
+**Enregistrer le paiement** : **Vérifier le paiement** sur la facture (ou **Vérifier les paiements en ligne** sur la fiche de la connexion, pour tous les liens d’un coup). Pour chaque paiement réglé, Allumi crée **en une seule transaction** :
+
+1. l’**encaissement** au montant **brut** payé par le client, sur le **compte de la connexion**, appliqué à la facture (numéroté comme tout encaissement : voir [[Encaissements]]);
+2. une **écriture des frais** à part : charge au compte des frais de traitement, crédit au compte de la connexion, pour les frais que Stripe a retenus;
+3. le paiement en ligne (la session Stripe, l’encaissement, l’écriture des frais, brut, frais, net) et le lien marqué **Payé**.
+
+Le solde du compte de la connexion égale ainsi le **net** que Stripe verse, comme la transaction importée correspondante. L’encaissement et les frais sont des écritures séparées parce que la base exige qu’un encaissement égale exactement le montant appliqué à la facture. La date comptable est le jour du paiement chez Stripe, dans le fuseau horaire de l’entreprise.
+
+**Sûreté** : regarder deux fois, ou deux personnes en même temps, n’enregistre rien en double (la session Stripe est unique, le lien est verrouillé pendant l’enregistrement). Les requêtes qui créent un prix ou une page portent une **clé d’idempotence** : si la réponse de Stripe se perd, **Reprendre la création** retrouve ce que le premier essai a fait au lieu d’en faire un second (Stripe garde ces clés 24 heures).
+
+**Quand Allumi ne peut pas enregistrer le paiement**, rien n’est écrit dans les livres et le lien passe à **À vérifier**, avec la raison : le solde a changé depuis la création du lien (un autre encaissement, un avoir), la facture a été annulée, la période comptable est verrouillée ou la date précède la facture, le compte de la connexion n’accepte pas d’encaissement, le compte des frais a disparu, le montant ou les frais rapportés ne concordent pas, ou Stripe a réglé dans une autre devise que le dollar canadien. L’argent est quand même arrivé chez Stripe : il figure dans les transactions importées. Enregistrez l’encaissement à la main au besoin, puis **fermez le signalement**.
+
+**Annuler un lien** ferme d’abord la page chez Stripe, puis regarde une dernière fois : un paiement arrivé entre-temps est enregistré (le lien n’est alors pas annulé). Si la connexion est déconnectée, le lien est annulé ici mais la page reste ouverte chez Stripe : fermez-la dans votre tableau de bord. Un **deuxième paiement** reçu sur un lien déjà payé (deux clients passés avant la fermeture) n’est pas enregistré : le résultat le signale, remboursez-le dans Stripe.
+
+**Limites** : dollars canadiens seulement; de 0,50 $ à 999 999,99 $ par lien (les limites de Stripe); ni remboursement, ni litige, ni acompte, ni paiement partiel d’un lien (un remboursement chez Stripe apparaît dans les transactions importées; enregistrez-le comme un remboursement quand ce lot existera); pas de vérification automatique : c’est un bouton, comme la synchronisation. Annuler l’encaissement d’un paiement en ligne (**Annuler cet encaissement**) ne rembourse pas le client et n’annule pas l’écriture des frais : remboursez dans Stripe, puis corrigez les écritures à la main.
+
 ## Sécurité et vie privée
 
+- **Ce qui part vers Stripe** pour une page de paiement : le montant du solde, la devise, le libellé « Facture F-00012 » et l’identifiant interne du lien. Ni le nom ni les coordonnées du client, ni le nom de l’entreprise n’y sont envoyés.
 - **Clés chiffrées** en AES-256-GCM avec `ENCRYPTION_KEY`, par une clé dérivée propre à cet usage, et **liées à leur connexion** : un blob copié vers une autre connexion ou une autre entreprise ne se déchiffre pas. Elles vivent dans une table à part que **seul le propriétaire peut lire** (la base l’impose); elles ne sont jamais affichées, journalisées ni copiées dans la [[Piste-d-audit]] (seul « clés modifiées » y figure).
 - Les clés voyagent dans un **en-tête**, jamais dans une adresse. Les adresses des services sont **fixes** dans le code (`api.stripe.com`, `api-m.paypal.com` et son bac à sable); aucune adresse ne vient de la saisie, et **aucune redirection** n’est suivie.
 - **Minimisation (Loi 25)** : PayPal n’est interrogé que pour `transaction_info` : ni nom, ni courriel, ni adresse de client n’entrent dans Allumi. Les transactions de solde de Stripe n’en portent pas non plus; seule la **description** donnée par le service est conservée telle quelle (elle peut contenir un nom si vous l’y mettez vous-même). Voir [[Securite-et-Loi-25]].
@@ -58,6 +85,7 @@ Les connecteurs sont écrits d’après la **documentation officielle** de Strip
 
 - **Signe des frais PayPal** : la documentation ne dit pas si `fee_amount` est négatif quand des frais sont prélevés. Allumi le traite comme un effet signé sur le solde (un paiement reçu a des frais négatifs), conserve les chaînes d’origine avec chaque transaction et **signale « À vérifier »** toute transaction dont le signe des frais est inhabituel. Comparez la première synchronisation au rapport de PayPal.
 - **Format des dates** envoyées à PayPal (`AAAA-MM-JJThh:mm:ss+0000`, comme dans ses réponses) et **permissions** exigées par la clé restreinte de Stripe.
+- **Pages de paiement Stripe** : les appels (prix, lien de paiement avec `restrictions[completed_sessions][limit]`, sessions Checkout d’un lien, PaymentIntent avec `expand[]=latest_charge.balance_transaction`) suivent la documentation, mais n’ont jamais été essayés contre un compte Stripe, même en mode test. À confirmer en mode test avant tout usage réel : la création d’un lien, un paiement avec la carte de test `4242 4242 4242 4242`, puis « Vérifier le paiement » (encaissement au brut, frais, solde du compte égal au net), les permissions de la clé restreinte, et un paiement refusé ou en traitement.
 - Les identifiants des transactions PayPal peuvent se répéter dans les rapports : Allumi les combine avec le code d’événement.
 
 ## Ajouter un autre service
@@ -77,3 +105,6 @@ Données fictives, Chromium ordinateur et téléphone émulé.
 ![Fiche d’une connexion](images/integration-connexion-desktop.png)
 ![Transactions importées](images/transactions-importees-desktop.png)
 ![Transactions importées sur téléphone](images/transactions-importees-mobile.png)
+![Fiche d’une connexion : compte des frais et vérification des paiements](images/paiement-en-ligne-connexion-desktop.png)
+![Facture avec un lien de paiement prêt](images/paiement-en-ligne-facture-desktop.png)
+![Paiement à vérifier sur téléphone](images/paiement-en-ligne-a-verifier-mobile.png)
