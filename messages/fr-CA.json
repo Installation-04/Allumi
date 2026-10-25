@@ -237,6 +237,26 @@
       "confirmCreditVoid": "Confirmez l’annulation définitive de l’avoir.",
       "creditVoidDate": "La date d’annulation ne peut précéder la comptabilisation, une affectation ou son retrait.",
       "creditVoidLinked": "Un remboursement actif ou une affectation à une autre facture empêche l’annulation."
+    },
+    "integrations": {
+      "invalid": "Vérifiez le nom, le compte, la date et les clés. Une clé Stripe commence par sk_ ou rk_ (pas pk_).",
+      "notFound": "Connexion introuvable.",
+      "importFrom": "Choisissez un jour réel, pas dans le futur (PayPal : pas plus de trois ans dans le passé).",
+      "account": "Choisissez un compte de type banque actif de cette entreprise.",
+      "labelTaken": "Une connexion de ce service porte déjà ce nom.",
+      "unauthorized": "Le service a refusé ces identifiants. Vérifiez la clé ou le secret.",
+      "forbidden": "Le service refuse l’accès : vérifiez les permissions de la clé (lecture des transactions de solde pour Stripe, Transaction Search pour PayPal).",
+      "rateLimited": "Le service demande de patienter. Réessayez dans quelques minutes.",
+      "unavailable": "Le service est injoignable pour le moment. Réessayez plus tard.",
+      "invalidResponse": "La réponse du service n’a pas le format attendu : rien n’a été importé pour cette période. Réessayez; si le problème persiste, signalez-le.",
+      "tooMany": "Cette période contient trop de transactions pour une synchronisation.",
+      "busy": "Une synchronisation de cette connexion est déjà en cours.",
+      "disabled": "Cette connexion est désactivée. Reconnectez-la avec de nouvelles clés.",
+      "credentials": "Les clés enregistrées sont illisibles. Remplacez-les.",
+      "failed": "La synchronisation a échoué. Réessayez.",
+      "environment": "Ces clés ne sont pas du même environnement (essai ou production) que la connexion.",
+      "transactionNotFound": "Transaction introuvable ou déjà rapprochée.",
+      "confirmDisconnect": "Confirmez la déconnexion."
     }
   },
   "nav": {
@@ -576,7 +596,7 @@
     "banque": {
       "title": "Banque et transactions",
       "description": "Accédez au plan comptable et aux écritures enregistrées.",
-      "planned": "Import CSV/OFX, connexion des opérations et rapprochement bancaire : phase 5. Aucun flux bancaire automatique actuellement."
+      "planned": "Import CSV/OFX, flux bancaires et rapprochement : phase 5. Disponible : l’import des transactions Stripe et PayPal (sans écriture comptable)."
     },
     "tresorerie": {
       "title": "Trésorerie",
@@ -629,8 +649,114 @@
       "catalogue": "Produits et services",
       "taxes": "Taxes et taux",
       "factures": "Brouillons de factures",
-      "avoirs": "Brouillons d’avoirs"
+      "avoirs": "Brouillons d’avoirs",
+      "integrations": "Intégrations",
+      "transactions": "Transactions importées"
     }
+  },
+  "integrations": {
+    "title": "Intégrations",
+    "intro": "Reliez Stripe ou PayPal pour importer leurs transactions (paiements, frais, remboursements, virements) dans une boîte de réception. Rien n’est comptabilisé automatiquement.",
+    "openInbox": "Voir les transactions importées",
+    "empty": "Aucune connexion",
+    "emptyOwner": "Connectez un service ci-dessous pour importer ses transactions.",
+    "emptyOther": "Le propriétaire de l’entreprise peut connecter un service.",
+    "providers": {
+      "STRIPE": "Stripe",
+      "PAYPAL": "PayPal"
+    },
+    "test": "essai",
+    "statuses": {
+      "ACTIVE": "Active",
+      "DISABLED": "Déconnectée"
+    },
+    "transactionCount": "{count, plural, =0 {Aucune transaction} one {# transaction} other {# transactions}}",
+    "lastFailed": "La dernière synchronisation a échoué.",
+    "ownerOnly": "Seul le propriétaire connecte un service, le synchronise et remplace ses clés.",
+    "connect": "Connecter {provider}",
+    "connectSubmit": "Vérifier les clés et connecter",
+    "noAccount": "Aucun compte de type banque n’est actif. Créez-en un dans le plan comptable (par exemple « Stripe »), puis revenez ici.",
+    "hint": {
+      "STRIPE": "Dans Stripe, créez une clé d’API restreinte en lecture seule (« Transactions de solde » : lecture) et collez-la ici. Allumi vérifie la clé, la chiffre et ne l’affiche plus jamais. Les transactions importées ne créent aucune écriture comptable.",
+      "PAYPAL": "Dans PayPal Developer, créez une application REST dont la fonction « Transaction Search » est activée, puis copiez l’identifiant et le secret client. Les données de PayPal peuvent arriver jusqu’à trois heures après la transaction."
+    },
+    "labelField": "Nom de la connexion",
+    "accountField": "Compte du plan comptable",
+    "accountHint": "Le solde du service est suivi dans ce compte (type banque). Au besoin, créez d’abord un compte « Stripe » ou « PayPal » de type banque.",
+    "importFromField": "Importer à partir du",
+    "importFromHint": "Les transactions antérieures à cette date ne sont pas importées. PayPal garde trois ans d’historique.",
+    "apiKeyField": "Clé d’API Stripe",
+    "apiKeyHint": "Elle commence par sk_ ou rk_. Elle est chiffrée et n’est plus jamais affichée.",
+    "environmentField": "Environnement",
+    "environments": {
+      "live": "Production",
+      "sandbox": "Bac à sable (essai)"
+    },
+    "clientIdField": "Identifiant client PayPal",
+    "clientSecretField": "Secret client PayPal",
+    "clientSecretHint": "Il est chiffré et n’est plus jamais affiché.",
+    "back": "Retour aux intégrations",
+    "serviceLabel": "Service",
+    "keyHint": "Clé (fin)",
+    "lastSync": "Dernière synchronisation",
+    "neverSynced": "Jamais",
+    "transactions": "Transactions importées",
+    "syncResult": "{count, plural, =0 {Synchronisation terminée : aucune nouvelle transaction.} one {Synchronisation terminée : # transaction importée.} other {Synchronisation terminée : # transactions importées.}}",
+    "syncSkipped": "{count, plural, one {# transaction ignorée (devise sans cents ou non réglée).} other {# transactions ignorées (devise sans cents ou non réglées).}}",
+    "syncMore": "L’historique est long : relancez la synchronisation pour continuer.",
+    "keysReplaced": "Clés remplacées. La connexion est active.",
+    "lastFailedWith": "La dernière synchronisation a échoué. {reason}",
+    "testNotice": "Connexion d’essai (clés de test ou bac à sable) : ses transactions sont fictives. Pointez-la vers un compte d’essai plutôt que vers vos vrais comptes.",
+    "sync": "Synchroniser maintenant",
+    "syncHint": "Importe les nouvelles transactions, sans créer d’écriture comptable. Un long historique se poursuit en relançant la synchronisation.",
+    "syncing": "Une synchronisation est en cours.",
+    "replaceKeys": "Remplacer les clés",
+    "replaceSubmit": "Vérifier et remplacer",
+    "replaceHint": "Pour une clé renouvelée ou pour reconnecter une connexion. Les nouvelles clés sont vérifiées auprès du service et doivent être du même environnement (essai ou production).",
+    "disconnect": "Déconnecter",
+    "disconnectSubmit": "Déconnecter le service",
+    "disconnectWarning": "La déconnexion arrête l’import et efface la clé chiffrée. Les transactions déjà importées sont conservées; vous pourrez reconnecter avec de nouvelles clés.",
+    "confirmDisconnect": "Je confirme la déconnexion."
+  },
+  "transactions": {
+    "title": "Transactions importées",
+    "intro": "Ce que Stripe et PayPal rapportent : paiements, frais, remboursements, virements. Cette boîte de réception ne crée aucune écriture; le rapprochement avec les factures et le journal viendra ensuite.",
+    "connection": "Connexion",
+    "allConnections": "Toutes les connexions",
+    "status": "État",
+    "allStatuses": "Tous les états",
+    "apply": "Filtrer",
+    "count": "{count, plural, =0 {Aucune transaction} one {# transaction} other {# transactions}}",
+    "empty": "Aucune transaction dans cette vue",
+    "emptyHint": "Connectez un service et lancez une synchronisation.",
+    "goToIntegrations": "Aller aux intégrations",
+    "kinds": {
+      "PAYMENT": "Paiement",
+      "REFUND": "Remboursement",
+      "PAYOUT": "Virement",
+      "FEE": "Frais",
+      "DISPUTE": "Litige",
+      "ADJUSTMENT": "Ajustement",
+      "OTHER": "Autre"
+    },
+    "statuses": {
+      "UNMATCHED": "À traiter",
+      "MATCHED": "Rapprochée",
+      "EXCLUDED": "Mise de côté"
+    },
+    "test": "essai",
+    "gross": "Brut",
+    "fee": "Frais",
+    "reference": "Référence",
+    "flagged": "À vérifier : le signe des frais est inhabituel pour ce service.",
+    "setAside": "Mettre de côté",
+    "setAsideNamed": "Mettre de côté : {description}",
+    "restore": "Remettre à traiter",
+    "restoreNamed": "Remettre à traiter : {description}",
+    "pagination": "Pagination des transactions importées",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {page} sur {count}"
   },
   "updates": {
     "title": "Versions et mises à jour",

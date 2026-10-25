@@ -1,6 +1,8 @@
 import { mkdirSync, readFileSync } from "node:fs";
 import { expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
 import { Secret, TOTP } from "otpauth";
+import pg from "pg";
+import { e2eUrls } from "./db";
 
 const VERSION = (JSON.parse(readFileSync("package.json", "utf8")) as { version: string }).version;
 
@@ -242,6 +244,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await appearanceJourney(page);
   await postingJourney(page);
   await creditPostingJourney(page);
+  await integrationsJourney(page);
   // Nothing in the whole journey (both locales, every form, the security pages, a second browser) was blocked.
   expect(cspViolations, "Content-Security-Policy violations").toEqual([]);
 });
@@ -814,6 +817,138 @@ async function creditPostingJourney(page: Page) {
   await page.getByRole("button",{name:"Français",exact:true}).click();
   await page.getByRole("combobox",{name:"Apparence",exact:true}).selectOption("light");
   await expect(page.locator("html")).toHaveAttribute("data-theme","light");
+}
+
+/**
+ * Seeds a Stripe connection and its imported transactions straight into the browser-test database. The live service
+ * cannot be reached from a test (the server calls it, not the browser), and the sync itself is covered with fakes in
+ * the integration tests; what is left to prove here is what a person sees and does.
+ */
+async function seedStripeConnection(companyId: string) {
+  const db = new pg.Client({ connectionString: e2eUrls().owner });
+  await db.connect();
+  try {
+    const account = (await db.query("SELECT id FROM account WHERE company_id = $1 AND subtype = 'BANK' ORDER BY code LIMIT 1", [companyId])).rows[0].id as string;
+    const user = (await db.query("SELECT id FROM app_user WHERE email = $1", [EMAIL])).rows[0].id as string;
+    const connection = (await db.query(
+      `INSERT INTO integration_connection (id, company_id, provider, label, account_id, status, credentials_hint, import_from, created_by_id, updated_at)
+       VALUES (gen_random_uuid(), $1, 'STRIPE', 'Stripe boutique', $2, 'ACTIVE', 'ab12', '2026-01-01', $3, now()) RETURNING id`, [companyId, account, user])).rows[0].id as string;
+    // Not a real ciphertext: a sync must refuse it with a message, before it calls anybody.
+    await db.query("INSERT INTO integration_credential (id, company_id, connection_id, credentials_enc, updated_at) VALUES (gen_random_uuid(), $1, $2, decode('0102030405060708090a0b0c0d0e0f10', 'hex'), now())", [companyId, connection]);
+    const row = (external: string, date: string, net: number, gross: number, fee: number, type: string, description: string, kind: string, extra: Record<string, unknown> = {}) =>
+      db.query(
+        `INSERT INTO bank_transaction (id, company_id, account_id, txn_date, amount_cents, description, external_id, dedupe_key, connection_id, currency, source_type, gross_cents, fee_cents, provider_details, updated_at)
+         VALUES (gen_random_uuid(), $1, $2, $3::date, $4::bigint, $5, $6, $6, $7, 'CAD', $8, $9::bigint, $10::bigint, $11::jsonb, now())`,
+        [companyId, account, date, net, description, `stripe:${external}`, connection, type, gross, fee, JSON.stringify({ kind, ...extra })]);
+    await row("txn_e2e_1", "2026-06-10", 9680, 10000, 320, "charge", "Facture F-00002", "PAYMENT", { reference: "F-00002" });
+    await row("txn_e2e_2", "2026-06-12", -5000, -5000, 0, "refund", "Remboursement", "REFUND");
+    await row("txn_e2e_3", "2026-06-15", -4680, -4680, 0, "payout", "STRIPE PAYOUT", "PAYOUT");
+    await row("txn_e2e_4", "2026-06-16", 2060, 2000, -60, "charge", "Frais au signe inhabituel", "PAYMENT", { unusualFeeSign: true });
+    return connection;
+  } finally {
+    await db.end();
+  }
+}
+
+/**
+ * Integrations: the connections page, a connection's page, the transaction inbox, what a form refuses (and never
+ * gives back), the message for keys that cannot be read, setting a transaction aside, disconnecting, both languages.
+ */
+async function integrationsJourney(page: Page) {
+  const company = new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0] ?? "";
+  const connectionId = await seedStripeConnection(company.slice(3));
+  const alert = (text: string) => page.locator("form").getByRole("alert").filter({ hasText: text });
+
+  await page.goto(company);
+  await openSection(page, "Banque et transactions");
+  await page.getByRole("link", { name: "Intégrations", exact: true }).first().click();
+  await expect(page.getByRole("heading", { name: "Intégrations", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Stripe boutique/ })).toContainText("4 transactions");
+  await expectNoPageOverflow(page);
+  await captureReference(page, "integrations");
+
+  // what a form refuses, and never gives back: a publishable key, then a date in the future
+  await page.locator("summary", { hasText: "Connecter Stripe" }).click();
+  const stripe = page.locator("details", { hasText: "Connecter Stripe" });
+  await stripe.getByLabel("Nom de la connexion").fill("Stripe essai");
+  await stripe.getByLabel("Clé d’API Stripe").fill(`pk_live_${"a".repeat(30)}`);
+  await stripe.getByRole("button", { name: "Vérifier les clés et connecter", exact: true }).click();
+  await expect(alert("Vérifiez le nom, le compte, la date et les clés")).toBeVisible();
+  await expect(stripe.getByLabel("Nom de la connexion")).toHaveValue("Stripe essai");
+  await expect(stripe.getByLabel("Clé d’API Stripe")).toHaveValue(""); // the key is never sent back
+  await stripe.getByLabel("Importer à partir du").fill("2099-01-01");
+  await stripe.getByLabel("Clé d’API Stripe").fill(`sk_live_${"a1B2c3D4e5".repeat(3)}`);
+  await stripe.getByRole("button", { name: "Vérifier les clés et connecter", exact: true }).click();
+  await expect(alert("Choisissez un jour réel")).toBeVisible();
+  await expect(stripe.getByLabel("Clé d’API Stripe")).toHaveValue("");
+  const paypal = page.locator("details", { hasText: "Connecter PayPal" });
+  await page.locator("summary", { hasText: "Connecter PayPal" }).click();
+  await paypal.getByLabel("Environnement").selectOption("sandbox");
+  await paypal.getByLabel("Identifiant client PayPal").fill("trop-court");
+  await paypal.getByLabel("Secret client PayPal").fill("court");
+  await paypal.getByRole("button", { name: "Vérifier les clés et connecter", exact: true }).click();
+  await expect(alert("Vérifiez le nom, le compte, la date et les clés")).toBeVisible();
+  await expect(paypal.getByLabel("Environnement")).toHaveValue("sandbox");
+  await expect(paypal.getByLabel("Identifiant client PayPal")).toHaveValue("trop-court");
+  await expect(paypal.getByLabel("Secret client PayPal")).toHaveValue("");
+
+  // the connection's page; keys that cannot be read are refused before any call, and the failure stays on the page
+  await page.goto(`${company}/integrations/${connectionId}`);
+  await expect(page.getByRole("heading", { name: "Stripe boutique", exact: true })).toBeVisible();
+  await expect(page.getByText("Active", { exact: true })).toBeVisible();
+  await expect(page.getByText("…ab12", { exact: true })).toBeVisible();
+  await expect(page.getByText("Jamais", { exact: true })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "integration-connexion");
+  await page.getByRole("button", { name: "Synchroniser maintenant", exact: true }).click();
+  await expect(alert("Les clés enregistrées sont illisibles")).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("alert").filter({ hasText: "La dernière synchronisation a échoué. Les clés enregistrées sont illisibles" })).toBeVisible();
+  await page.locator("summary", { hasText: "Remplacer les clés" }).click();
+  await page.getByLabel("Clé d’API Stripe").fill("pas une clé");
+  await page.getByRole("button", { name: "Vérifier et remplacer", exact: true }).click();
+  await expect(alert("Vérifiez le nom, le compte, la date et les clés")).toBeVisible();
+
+  // the inbox: net amount, gross and fee, the flag, setting a transaction aside and bringing it back
+  await page.getByRole("link", { name: /4 transactions/ }).click();
+  await expect(page.getByRole("heading", { name: "Transactions importées", exact: true })).toBeVisible();
+  await expect(page.getByText("4 transactions", { exact: true })).toBeVisible();
+  const first = page.locator("li").filter({ hasText: "Facture F-00002" });
+  await expect(first).toContainText("96,80");
+  await expect(first).toContainText("Brut 100,00 $ · Frais 3,20 $");
+  await expect(first).toContainText("Référence : F-00002");
+  await expect(page.locator("li").filter({ hasText: "Remboursement" })).toContainText("-50,00");
+  await expect(page.getByRole("note").filter({ hasText: "le signe des frais est inhabituel" })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "transactions-importees");
+  await page.getByRole("button", { name: "Mettre de côté : Facture F-00002", exact: true }).click();
+  await expect(first).toContainText("Mise de côté");
+  await page.getByRole("combobox", { name: /^État/ }).selectOption("EXCLUDED");
+  await page.getByRole("button", { name: "Filtrer", exact: true }).click();
+  await expect(page.getByText("1 transaction", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Remettre à traiter : Facture F-00002", exact: true }).click();
+  await expect(page.getByText("Aucune transaction", { exact: true })).toBeVisible();
+
+  // disconnecting keeps what was imported and takes the key away
+  await page.goto(`${company}/integrations/${connectionId}`);
+  await page.locator("summary", { hasText: "Déconnecter" }).click();
+  await expect(page.getByLabel("Je confirme la déconnexion.")).toHaveAttribute("required", ""); // the browser refuses an unconfirmed submit
+  await page.getByLabel("Je confirme la déconnexion.").check();
+  await page.getByRole("button", { name: "Déconnecter le service", exact: true }).click();
+  await expect(page.getByText("Déconnectée", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Synchroniser maintenant", exact: true })).toHaveCount(0);
+  await expect(page.getByText("…ab12")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /4 transactions/ })).toBeVisible();
+
+  // English
+  await page.getByRole("button", { name: "English", exact: true }).click();
+  await expect(page.getByRole("link", { name: "Back to integrations" })).toBeVisible();
+  await page.getByRole("link", { name: /4 transactions/ }).click();
+  await expect(page.getByRole("heading", { name: "Imported transactions", exact: true })).toBeVisible();
+  await expect(page.locator("li").filter({ hasText: "STRIPE PAYOUT" })).toContainText("Payout");
+  await expectNoPageOverflow(page);
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Transactions importées", exact: true })).toBeVisible();
 }
 
 /**

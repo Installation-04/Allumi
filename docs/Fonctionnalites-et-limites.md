@@ -14,7 +14,7 @@ Cette page distingue les parcours livrés du schéma et des fonctionnalités pla
 | Ventes | Brouillons et validation comptable : [[Brouillons-de-factures]], [[Validation-des-factures]] | Brouillons et validation des avoirs disponibles; envoi à venir |
 | Achats | Contraintes de base préparées | Factures fournisseurs et dépenses : phase 4 |
 | Paiements et fichiers | Contraintes de base préparées | Paiements, dépôts, pièces jointes : phase 4 |
-| Banque | Planification | Import CSV/OFX, appariement, rapprochement : phase 5 |
+| Banque | Import des transactions Stripe et PayPal dans une boîte de réception, sans écriture comptable : [[Integrations]] | Import CSV/OFX, flux bancaires, appariement, rapprochement : phase 5 |
 | Rapports et exports | Balance de vérification à l’écran; sauvegardes PostgreSQL | Bilan, résultats, grand livre, âges, sommaire TPS/TVQ et CSV/PDF : phase 6 |
 | Mobilité | Navigateur connecté au serveur | Hors ligne et application native non livrés |
 

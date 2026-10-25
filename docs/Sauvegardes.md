@@ -5,7 +5,7 @@ Règle 3-2-1 : 3 copies, 2 supports différents, 1 copie **hors site**. Une sauv
 ## Ce qui est sauvegardé
 - La base PostgreSQL (`pg_dump` format custom).
 - Les pièces jointes (`/app/storage`).
-- **Pas** le fichier `.env` : garde-le séparément dans un gestionnaire de mots de passe (surtout `ENCRYPTION_KEY`).
+- **Pas** le fichier `.env` : garde-le séparément dans un gestionnaire de mots de passe (surtout `ENCRYPTION_KEY`, sans laquelle les secrets 2FA et les clés des [[Integrations]] contenus dans la sauvegarde sont illisibles).
 
 ## Mettre en place le chiffrement (age)
 Sur **ta machine** (pas sur le serveur) :

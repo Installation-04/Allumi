@@ -203,6 +203,15 @@ Voir [[Brouillons-d-avoirs]].
 
 Voir [[Validation-des-avoirs]].
 
+## Intégrations
+
+![Connexions](images/integrations-desktop.png)
+![Fiche d’une connexion](images/integration-connexion-desktop.png)
+![Transactions importées](images/transactions-importees-desktop.png)
+![Transactions importées sur téléphone](images/transactions-importees-mobile.png)
+
+Voir [[Integrations]].
+
 ## Avoirs annulés
 
 ![Avoir annulé et affectation retirée](images/avoir-annule-desktop.png)

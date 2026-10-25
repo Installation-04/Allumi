@@ -25,6 +25,8 @@ Ces règles sont non négociables : toute contribution qui les contourne est ref
 - Un document a deux dates : celle de la pièce (échéance, âge des comptes) et sa **date comptable** (celle de l'écriture). Une facture fournisseur reçue après la fermeture de sa période se comptabilise à la date d'aujourd'hui, sans fausser la date inscrite sur la pièce.
 - Les affectations de paiements et d'avoirs portent une date d'effet et ne s'effacent jamais : on les retire à une date, dans une période ouverte. L'âge des comptes à une date passée reste reproductible.
 
+- Les transactions importées d'un service externe ([[Integrations]]) ne créent **aucune écriture** : elles alimentent seulement la boîte de réception bancaire. Leur montant est l'effet net sur le solde du service (`brut − frais`), dans leur devise, sans conversion de change; une ligne importée ne change plus que de statut.
+
 ## Périodes
 - Une période fermée refuse toute nouvelle écriture.
 - La réouverture est une action privilégiée et auditée : propriétaire seulement, avec la vérification en deux étapes active et un code saisi à ce moment, un motif écrit d'au moins 10 caractères et un événement d'audit ([[Exercices-et-periodes]]). Ces conditions sont appliquées par l'application (la base garantit l'audit du changement, pas le 2FA).

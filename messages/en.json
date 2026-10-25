@@ -237,6 +237,26 @@
       "confirmCreditVoid": "Confirm permanently voiding the credit note.",
       "creditVoidDate": "The void date cannot precede posting, an application or its removal.",
       "creditVoidLinked": "An active refund or application to another invoice prevents voiding."
+    },
+    "integrations": {
+      "invalid": "Check the name, the account, the date and the keys. A Stripe key starts with sk_ or rk_ (not pk_).",
+      "notFound": "Connection not found.",
+      "importFrom": "Choose a real day, not in the future (PayPal: no more than three years back).",
+      "account": "Choose an active bank-type account of this company.",
+      "labelTaken": "A connection of this service already has this name.",
+      "unauthorized": "The service refused these credentials. Check the key or the secret.",
+      "forbidden": "The service refuses access: check the key's permissions (read balance transactions for Stripe, Transaction Search for PayPal).",
+      "rateLimited": "The service asks you to wait. Try again in a few minutes.",
+      "unavailable": "The service cannot be reached right now. Try again later.",
+      "invalidResponse": "The service's answer is not in the expected format: nothing was imported for this period. Try again; if it persists, report it.",
+      "tooMany": "This period holds too many transactions for one sync.",
+      "busy": "A sync of this connection is already running.",
+      "disabled": "This connection is disabled. Reconnect it with new keys.",
+      "credentials": "The stored keys cannot be read. Replace them.",
+      "failed": "The sync failed. Try again.",
+      "environment": "These keys are not from the same environment (test or live) as the connection.",
+      "transactionNotFound": "Transaction not found or already matched.",
+      "confirmDisconnect": "Confirm the disconnection."
     }
   },
   "nav": {
@@ -576,7 +596,7 @@
     "banque": {
       "title": "Banking and transactions",
       "description": "Open your chart of accounts and recorded entries.",
-      "planned": "CSV/OFX import and bank reconciliation: phase 5. No automatic bank feed currently."
+      "planned": "CSV/OFX import, bank feeds and reconciliation: phase 5. Available: importing Stripe and PayPal transactions (no journal entries)."
     },
     "tresorerie": {
       "title": "Cash flow",
@@ -629,8 +649,114 @@
       "catalogue": "Products and services",
       "taxes": "Taxes and rates",
       "factures": "Invoice drafts",
-      "avoirs": "Credit note drafts"
+      "avoirs": "Credit note drafts",
+      "integrations": "Integrations",
+      "transactions": "Imported transactions"
     }
+  },
+  "integrations": {
+    "title": "Integrations",
+    "intro": "Connect Stripe or PayPal to import their transactions (payments, fees, refunds, payouts) into an inbox. Nothing is posted to the books automatically.",
+    "openInbox": "View imported transactions",
+    "empty": "No connections",
+    "emptyOwner": "Connect a service below to import its transactions.",
+    "emptyOther": "The company owner can connect a service.",
+    "providers": {
+      "STRIPE": "Stripe",
+      "PAYPAL": "PayPal"
+    },
+    "test": "test",
+    "statuses": {
+      "ACTIVE": "Active",
+      "DISABLED": "Disconnected"
+    },
+    "transactionCount": "{count, plural, =0 {No transactions} one {# transaction} other {# transactions}}",
+    "lastFailed": "The last sync failed.",
+    "ownerOnly": "Only the owner connects a service, syncs it and replaces its keys.",
+    "connect": "Connect {provider}",
+    "connectSubmit": "Check the keys and connect",
+    "noAccount": "No bank-type account is active. Create one in the chart of accounts (for example \"Stripe\"), then come back.",
+    "hint": {
+      "STRIPE": "In Stripe, create a read-only restricted API key (\"Balance transactions\": read) and paste it here. Allumi checks the key, encrypts it and never shows it again. Imported transactions create no journal entries.",
+      "PAYPAL": "In PayPal Developer, create a REST app with the \"Transaction Search\" feature enabled, then copy the client ID and secret. PayPal's data can take up to three hours to show up."
+    },
+    "labelField": "Connection name",
+    "accountField": "Chart of accounts account",
+    "accountHint": "The service's balance is tracked in this account (bank type). If needed, first create a \"Stripe\" or \"PayPal\" bank-type account.",
+    "importFromField": "Import from",
+    "importFromHint": "Transactions before this date are not imported. PayPal keeps three years of history.",
+    "apiKeyField": "Stripe API key",
+    "apiKeyHint": "It starts with sk_ or rk_. It is encrypted and never shown again.",
+    "environmentField": "Environment",
+    "environments": {
+      "live": "Live",
+      "sandbox": "Sandbox (test)"
+    },
+    "clientIdField": "PayPal client ID",
+    "clientSecretField": "PayPal client secret",
+    "clientSecretHint": "It is encrypted and never shown again.",
+    "back": "Back to integrations",
+    "serviceLabel": "Service",
+    "keyHint": "Key (end)",
+    "lastSync": "Last sync",
+    "neverSynced": "Never",
+    "transactions": "Imported transactions",
+    "syncResult": "{count, plural, =0 {Sync complete: no new transactions.} one {Sync complete: # transaction imported.} other {Sync complete: # transactions imported.}}",
+    "syncSkipped": "{count, plural, one {# transaction skipped (currency without cents, or not settled).} other {# transactions skipped (currency without cents, or not settled).}}",
+    "syncMore": "The history is long: run the sync again to continue.",
+    "keysReplaced": "Keys replaced. The connection is active.",
+    "lastFailedWith": "The last sync failed. {reason}",
+    "testNotice": "Test connection (test keys or sandbox): its transactions are fictitious. Point it at a test account, not your real ones.",
+    "sync": "Sync now",
+    "syncHint": "Imports new transactions without creating journal entries. A long history continues when you run the sync again.",
+    "syncing": "A sync is running.",
+    "replaceKeys": "Replace the keys",
+    "replaceSubmit": "Check and replace",
+    "replaceHint": "For a rotated key or to reconnect a connection. The new keys are checked with the service and must be from the same environment (test or live).",
+    "disconnect": "Disconnect",
+    "disconnectSubmit": "Disconnect the service",
+    "disconnectWarning": "Disconnecting stops the import and erases the encrypted key. Transactions already imported are kept; you can reconnect with new keys.",
+    "confirmDisconnect": "I confirm the disconnection."
+  },
+  "transactions": {
+    "title": "Imported transactions",
+    "intro": "What Stripe and PayPal report: payments, fees, refunds, payouts. This inbox creates no journal entries; matching with invoices and the journal comes next.",
+    "connection": "Connection",
+    "allConnections": "All connections",
+    "status": "Status",
+    "allStatuses": "All statuses",
+    "apply": "Filter",
+    "count": "{count, plural, =0 {No transactions} one {# transaction} other {# transactions}}",
+    "empty": "No transactions in this view",
+    "emptyHint": "Connect a service and run a sync.",
+    "goToIntegrations": "Go to integrations",
+    "kinds": {
+      "PAYMENT": "Payment",
+      "REFUND": "Refund",
+      "PAYOUT": "Payout",
+      "FEE": "Fee",
+      "DISPUTE": "Dispute",
+      "ADJUSTMENT": "Adjustment",
+      "OTHER": "Other"
+    },
+    "statuses": {
+      "UNMATCHED": "To review",
+      "MATCHED": "Matched",
+      "EXCLUDED": "Set aside"
+    },
+    "test": "test",
+    "gross": "Gross",
+    "fee": "Fees",
+    "reference": "Reference",
+    "flagged": "To check: the fee's sign is unusual for this service.",
+    "setAside": "Set aside",
+    "setAsideNamed": "Set aside: {description}",
+    "restore": "Back to review",
+    "restoreNamed": "Back to review: {description}",
+    "pagination": "Imported transactions pagination",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {count}"
   },
   "updates": {
     "title": "Versions and updates",
