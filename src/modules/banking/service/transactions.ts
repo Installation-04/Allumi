@@ -3,7 +3,8 @@ import { z } from "zod";
 import { requireRole } from "@/modules/companies";
 import { AppError } from "@/platform/errors";
 import type { Prisma } from "@/platform/db";
-import { withCompany, type CompanyContext } from "@/platform/tenant";
+import { withCompany, type CompanyContext, type Tx } from "@/platform/tenant";
+import { loadMatches, loadSuggestions, type LedgerLineDto, type MatchedLineDto } from "./match-read";
 
 export const TRANSACTIONS_PER_PAGE = 50;
 export const TRANSACTION_STATUSES = ["UNMATCHED", "MATCHED", "EXCLUDED"] as const;
@@ -29,11 +30,56 @@ export type BankTransactionDto = {
     | { kind: "file"; fileName: string }
     | { kind: "service"; provider: string; label: string; sandbox: boolean; type: string; grossCents: bigint | null; feeCents: bigint | null; reference: string | null; flagged: boolean }
     | { kind: "none" };
+  /** The ledger lines it is matched to (a matched transaction), oldest first. */
+  matches: MatchedLineDto[];
+  /** The ledger line that most likely is it (an unmatched transaction), when there is one. */
+  suggestion: LedgerLineDto | null;
 };
 
 export type TransactionFilter = { accountId?: string; connectionId?: string; status?: TransactionStatus; q?: string; page?: number };
 
 const detail = (details: unknown, key: string): unknown => (details && typeof details === "object" && !Array.isArray(details) ? (details as Record<string, unknown>)[key] : null);
+
+const rowSelect = {
+  id: true, txnDate: true, description: true, payee: true, amountCents: true, currency: true, status: true, grossCents: true, feeCents: true, sourceType: true, providerDetails: true, accountId: true,
+  account: { select: { code: true, nameFr: true, nameEn: true } },
+  import: { select: { fileName: true } },
+  connection: { select: { provider: true, label: true, sandbox: true } },
+} as const;
+
+type Row = Prisma.BankTransactionGetPayload<{ select: typeof rowSelect }>;
+
+/** The rows as the pages show them, with what each is matched to (or most likely is) read for all of them at once. */
+async function describe(tx: Tx, companyId: string, rows: Row[]): Promise<BankTransactionDto[]> {
+  const matches = await loadMatches(tx, companyId, rows.filter((row) => row.status === "MATCHED").map((row) => row.id));
+  const suggestions = await loadSuggestions(tx, companyId, rows.filter((row) => row.status === "UNMATCHED").map((row) => row.id));
+  return rows.map((row) => {
+    const reference = detail(row.providerDetails, "reference");
+    const kind = detail(row.providerDetails, "kind");
+    return {
+      id: row.id, date: row.txnDate.toISOString().slice(0, 10), description: row.description, payee: row.payee, amountCents: row.amountCents, currency: row.currency, status: row.status,
+      accountId: row.accountId, accountCode: row.account.code, accountNameFr: row.account.nameFr, accountNameEn: row.account.nameEn,
+      source: row.connection
+        ? {
+            kind: "service", provider: row.connection.provider, label: row.connection.label, sandbox: row.connection.sandbox, type: (SERVICE_KINDS as readonly unknown[]).includes(kind) ? (kind as string) : "OTHER",
+            grossCents: row.grossCents, feeCents: row.feeCents, reference: typeof reference === "string" ? reference : null, flagged: detail(row.providerDetails, "unusualFeeSign") === true,
+          }
+        : row.import ? { kind: "file", fileName: row.import.fileName } : { kind: "none" },
+      matches: matches.get(row.id) ?? [],
+      suggestion: suggestions.get(row.id) ?? null,
+    };
+  });
+}
+
+/** One statement line, or null when there is none by that id in this company. Every member reads it. */
+export async function getBankTransaction(actor: CompanyContext, id: string): Promise<BankTransactionDto | null> {
+  if (!z.uuid().safeParse(id).success) return null;
+  return withCompany(actor, async (tx) => {
+    await requireRole(tx, "bank.read");
+    const row = await tx.bankTransaction.findFirst({ where: { companyId: actor.companyId, id }, select: rowSelect });
+    return row ? ((await describe(tx, actor.companyId, [row]))[0] ?? null) : null;
+  });
+}
 
 /** The accounts that hold statement lines, with how many lines wait for a match. */
 export async function listBankAccounts(actor: CompanyContext): Promise<BankAccountDto[]> {
@@ -66,32 +112,8 @@ export async function listBankTransactions(actor: CompanyContext, filter: Transa
     const total = await tx.bankTransaction.count({ where });
     const pageCount = Math.max(1, Math.ceil(total / TRANSACTIONS_PER_PAGE));
     const page = Math.min(Math.max(1, Math.trunc(filter.page ?? 1) || 1), pageCount);
-    const rows = await tx.bankTransaction.findMany({
-      where,
-      select: {
-        id: true, txnDate: true, description: true, payee: true, amountCents: true, currency: true, status: true, grossCents: true, feeCents: true, sourceType: true, providerDetails: true, accountId: true,
-        account: { select: { code: true, nameFr: true, nameEn: true } },
-        import: { select: { fileName: true } },
-        connection: { select: { provider: true, label: true, sandbox: true } },
-      },
-      orderBy: [{ txnDate: "desc" }, { createdAt: "desc" }, { id: "desc" }],
-      skip: (page - 1) * TRANSACTIONS_PER_PAGE,
-      take: TRANSACTIONS_PER_PAGE,
-    });
-    const transactions: BankTransactionDto[] = rows.map((row) => {
-      const reference = detail(row.providerDetails, "reference");
-      const kind = detail(row.providerDetails, "kind");
-      return {
-        id: row.id, date: row.txnDate.toISOString().slice(0, 10), description: row.description, payee: row.payee, amountCents: row.amountCents, currency: row.currency, status: row.status,
-        accountId: row.accountId, accountCode: row.account.code, accountNameFr: row.account.nameFr, accountNameEn: row.account.nameEn,
-        source: row.connection
-          ? {
-              kind: "service", provider: row.connection.provider, label: row.connection.label, sandbox: row.connection.sandbox, type: (SERVICE_KINDS as readonly unknown[]).includes(kind) ? (kind as string) : "OTHER",
-              grossCents: row.grossCents, feeCents: row.feeCents, reference: typeof reference === "string" ? reference : null, flagged: detail(row.providerDetails, "unusualFeeSign") === true,
-            }
-          : row.import ? { kind: "file", fileName: row.import.fileName } : { kind: "none" },
-      };
-    });
+    const rows = await tx.bankTransaction.findMany({ where, select: rowSelect, orderBy: [{ txnDate: "desc" }, { createdAt: "desc" }, { id: "desc" }], skip: (page - 1) * TRANSACTIONS_PER_PAGE, take: TRANSACTIONS_PER_PAGE });
+    const transactions = await describe(tx, actor.companyId, rows);
     return { transactions, total, page, pageCount };
   });
 }

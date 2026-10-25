@@ -5,6 +5,7 @@ import { keyLines, normalizeDescription } from "@/modules/banking/domain/dedupe"
 import { applyCsvMapping, guessDateOrder, suggestMapping, type CsvMapping } from "@/modules/banking/domain/mapping";
 import { guessDecimalSeparator, parseAmount, parseStatementDate } from "@/modules/banking/domain/money";
 import { parseOfx } from "@/modules/banking/domain/ofx";
+import { categorizeLines, MAX_MATCHED_LINES, matchProblem, transferLines, transferProblem } from "@/modules/banking/domain/matching";
 import { readStatement } from "@/modules/banking/domain/read";
 import { decodeStatement, detectFormat, MAX_STATEMENT_BYTES, StatementError } from "@/modules/banking/domain/statement";
 
@@ -285,5 +286,67 @@ describe("a whole statement", () => {
     const result = readStatement(SGML, { mapping: { hasHeader: true } });
     expect(result).toMatchObject({ format: "OFX", currency: "CAD", accountMask: "9012", table: null, mapping: null });
     expect(result.lines.map((line) => line.dedupeKey)).toEqual(["ofx:2026100201", "ofx:2026100501", "ofx:2026100701"]);
+  });
+});
+
+describe("matching a statement line to ledger lines", () => {
+  const lines = (...cents: bigint[]) => cents.map((value, i) => ({ id: `l${i}`, cents: value }));
+  it("accepts lines that together are exactly the amount, whatever their signs", () => {
+    expect(matchProblem(10_000n, lines(10_000n))).toBeNull();
+    expect(matchProblem(14_700n, lines(15_000n, -300n))).toBeNull();
+    expect(matchProblem(-4_599n, lines(-4_000n, -599n))).toBeNull();
+  });
+  it("refuses none, too many, one twice, and a sum that is off by a cent", () => {
+    expect(matchProblem(100n, [])).toBe("empty");
+    expect(matchProblem(BigInt(MAX_MATCHED_LINES + 1), Array.from({ length: MAX_MATCHED_LINES + 1 }, (_, i) => ({ id: `l${i}`, cents: 1n })))).toBe("tooMany");
+    expect(matchProblem(BigInt(MAX_MATCHED_LINES), Array.from({ length: MAX_MATCHED_LINES }, (_, i) => ({ id: `l${i}`, cents: 1n })))).toBeNull();
+    expect(matchProblem(200n, [{ id: "a", cents: 100n }, { id: "a", cents: 100n }])).toBe("duplicate");
+    expect(matchProblem(10_000n, lines(9_999n))).toBe("sum");
+    expect(matchProblem(10_000n, lines(10_001n))).toBe("sum");
+    expect(matchProblem(10_000n, lines(-10_000n))).toBe("sum");
+  });
+  it("adds beyond the safe range of a float without losing a cent", () => {
+    const big = 90_071_992_547_409_930n;
+    expect(matchProblem(big + 1n, lines(big, 1n))).toBeNull();
+    expect(matchProblem(big + 2n, lines(big, 1n))).toBe("sum");
+  });
+});
+
+describe("the entry that records a statement line", () => {
+  const total = (entry: { debitCents: bigint; creditCents: bigint }[]) => [entry.reduce((sum, l) => sum + l.debitCents, 0n), entry.reduce((sum, l) => sum + l.creditCents, 0n)];
+  it("debits the statement's account for money in and credits it for money out, and always balances", () => {
+    expect(categorizeLines(2_500n, "bank", "sales", "Dépôt")).toEqual([
+      { accountId: "bank", debitCents: 2_500n, creditCents: 0n, description: "Dépôt" },
+      { accountId: "sales", debitCents: 0n, creditCents: 2_500n, description: "Dépôt" },
+    ]);
+    expect(categorizeLines(-4_599n, "bank", "expenses", null)).toEqual([
+      { accountId: "bank", debitCents: 0n, creditCents: 4_599n, description: null },
+      { accountId: "expenses", debitCents: 4_599n, creditCents: 0n, description: null },
+    ]);
+    fc.assert(fc.property(fc.bigInt({ min: -99_999_999_999n, max: 99_999_999_999n }).filter((n) => n !== 0n), (amount) => {
+      const [debit, credit] = total(categorizeLines(amount, "a", "b", null));
+      expect(debit).toBe(credit);
+      expect(debit).toBe(amount < 0n ? -amount : amount);
+    }));
+  });
+  it("is a transfer only between two accounts, for exactly opposite amounts", () => {
+    const out = { accountId: "chequing", amountCents: -50_000n };
+    const into = { accountId: "card", amountCents: 50_000n };
+    expect(transferProblem(out, into)).toBeNull();
+    expect(transferProblem(into, out)).toBeNull();
+    expect(transferProblem(out, { ...into, accountId: "chequing" })).toBe("sameAccount");
+    expect(transferProblem(out, { ...into, amountCents: 50_001n })).toBe("amounts");
+    expect(transferProblem(out, { ...into, amountCents: -50_000n })).toBe("amounts");
+    expect(transferProblem({ accountId: "a", amountCents: 0n }, { accountId: "b", amountCents: 0n })).toBe("amounts");
+  });
+  it("puts one line on each account: a debit where money came in, a credit where it went out", () => {
+    const out = { accountId: "chequing", amountCents: -50_000n };
+    const into = { accountId: "card", amountCents: 50_000n };
+    expect(transferLines(out, into, "Paiement")).toEqual([
+      { accountId: "chequing", debitCents: 0n, creditCents: 50_000n, description: "Paiement" },
+      { accountId: "card", debitCents: 50_000n, creditCents: 0n, description: "Paiement" },
+    ]);
+    const [debit, credit] = total(transferLines(into, out, null));
+    expect(debit).toBe(credit);
   });
 });

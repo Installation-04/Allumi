@@ -105,6 +105,19 @@ describe("database catalog (guards against a migration that forgets a table)", (
       .toEqual(["external_id", "external_price_id", "last_error", "review_reason", "status", "updated_at", "url"]);
   });
 
+  it("lets the application add and remove matches but never edit one, and change only the status of a statement line", async () => {
+    const [match] = await q<{ ins: boolean; del: boolean; upd: boolean; trunc: boolean }>(
+      "SELECT has_table_privilege('allumi_app', 'public.bank_match', 'INSERT') AS ins, has_table_privilege('allumi_app', 'public.bank_match', 'DELETE') AS del, has_table_privilege('allumi_app', 'public.bank_match', 'UPDATE') AS upd, has_table_privilege('allumi_app', 'public.bank_match', 'TRUNCATE') AS trunc",
+    );
+    expect(match).toEqual({ ins: true, del: true, upd: false, trunc: false });
+    const columns = await q<{ column_name: string }>("SELECT column_name FROM information_schema.column_privileges WHERE grantee = 'allumi_app' AND privilege_type = 'UPDATE' AND table_name = 'bank_transaction'");
+    expect(columns.map((row) => row.column_name).sort()).toEqual(["status", "updated_at"]);
+    // removing a match is refused while a reconciliation counts its line
+    const triggers = await q<{ def: string }>("SELECT pg_get_triggerdef(oid) AS def FROM pg_trigger WHERE tgname = 'bank_match_reconciled' AND NOT tgisinternal");
+    expect(triggers).toHaveLength(1);
+    expect(triggers[0]?.def).toContain("BEFORE DELETE ON public.bank_match");
+  });
+
   it("denies EXECUTE on functions to PUBLIC (only the application role may call the few that it needs)", async () => {
     const rows = await q<{ proname: string }>(
       `SELECT p.proname FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace

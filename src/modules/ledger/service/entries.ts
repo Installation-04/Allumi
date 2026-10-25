@@ -75,7 +75,7 @@ async function nextEntryNumber(tx: Tx, companyId: string): Promise<bigint> {
 async function insertEntry(
   tx: Tx,
   actor: Actor,
-  entry: { date: IsoDate; source: "MANUAL" | "OPENING_BALANCE" | "REVERSAL" | "SALES_DOCUMENT" | "PAYMENT"; sourceId?: string; deferChecks?: boolean; memo: string | null; lines: EntryLine[]; reversesEntryId?: string },
+  entry: { date: IsoDate; source: "MANUAL" | "OPENING_BALANCE" | "REVERSAL" | "SALES_DOCUMENT" | "PAYMENT" | "BANK"; sourceId?: string; deferChecks?: boolean; memo: string | null; lines: EntryLine[]; reversesEntryId?: string },
 ): Promise<{ id: string; number: bigint }> {
   const period = await tx.fiscalPeriod.findFirst({
     where: { companyId: actor.companyId, startDate: { lte: toDbDate(entry.date) }, endDate: { gte: toDbDate(entry.date) } },
@@ -114,8 +114,8 @@ async function insertEntry(
       entryDate: toDbDate(entry.date),
     })),
   });
-  // Sales documents and payments link themselves to the entry before the deferred source checks fire.
-  if (entry.source !== "SALES_DOCUMENT" && entry.source !== "PAYMENT" && !entry.deferChecks) await tx.$executeRaw`SET CONSTRAINTS ALL IMMEDIATE`;
+  // Sales documents, payments and bank entries are linked (to the document, the payment, the transaction) before the deferred source checks fire.
+  if (entry.source !== "SALES_DOCUMENT" && entry.source !== "PAYMENT" && entry.source !== "BANK" && !entry.deferChecks) await tx.$executeRaw`SET CONSTRAINTS ALL IMMEDIATE`;
   return { id: created.id, number };
 }
 
@@ -160,7 +160,8 @@ export async function reverseEntry(actor: Actor, entryId: string, options: { dat
       include: { lines: { orderBy: { lineNo: "asc" } } },
     });
     if (!original) throw new AppError("ledger.entryNotFound");
-    if (original.sourceType !== "MANUAL" && original.sourceType !== "OPENING_BALANCE") throw new AppError("AL008");
+    // A document, payment or deposit is cancelled by voiding it; the entries a person makes (by hand, or from a bank line) are reversed.
+    if (original.sourceType !== "MANUAL" && original.sourceType !== "OPENING_BALANCE" && original.sourceType !== "BANK") throw new AppError("AL008");
     if (await tx.journalEntry.findFirst({ where: { companyId: actor.companyId, reversesEntryId: entryId }, select: { id: true } })) {
       throw new AppError("ledger.alreadyReversed");
     }
@@ -302,6 +303,27 @@ export async function createPaymentEntry(tx: Tx, actor: Actor, input: { paymentI
   const [problem] = checkEntry(input.lines);
   if (problem) throw new AppError(problemKey(problem));
   return insertEntry(tx, actor, { date: input.date, source: "PAYMENT", sourceId: input.paymentId, memo: input.memo, lines: input.lines });
+}
+
+/**
+ * An entry that comes from a bank transaction: categorizing it, or a transfer between two bank accounts. Its source is
+ * the transaction (the database checks that it exists). The accounts are the ones a manual entry may use (no receivable,
+ * payable or tax account) and the caller matches the transaction to the lines of the entry before commit, which fires
+ * the checks. Returns the lines with their ids, to match them.
+ */
+export async function createBankEntry(tx: Tx, actor: Actor, input: { transactionId: string; date: IsoDate; memo: string | null; lines: EntryLine[] }): Promise<{ id: string; number: bigint; lines: { id: string; accountId: string; lineNo: number }[] }> {
+  await requireRole(tx, "entry.post");
+  if (!isValidIsoDate(input.date)) throw new AppError("ledger.invalidDate");
+  const memo = memoSchema.nullish().safeParse(input.memo);
+  if (!memo.success) throw new AppError("ledger.memoTooLong");
+  const [problem] = checkEntry(input.lines);
+  if (problem) throw new AppError(problemKey(problem));
+  const ids = [...new Set(input.lines.map((line) => line.accountId))];
+  const accounts = await tx.account.findMany({ where: { companyId: actor.companyId, id: { in: ids } }, select: { id: true, subtype: true, isActive: true } });
+  if (accounts.length !== ids.length || accounts.some((account) => !acceptsManualEntries(account))) throw new AppError("ledger.accountNotAllowed");
+  const entry = await insertEntry(tx, actor, { date: input.date, source: "BANK", sourceId: input.transactionId, memo: memo.data || null, lines: input.lines });
+  const lines = await tx.journalLine.findMany({ where: { companyId: actor.companyId, entryId: entry.id }, select: { id: true, accountId: true, lineNo: true }, orderBy: { lineNo: "asc" } });
+  return { ...entry, lines };
 }
 
 /** Builds the exact reversal of a payment's entry; the caller must mark the payment void before commit. */
