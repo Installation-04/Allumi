@@ -2,6 +2,37 @@
 
 À partir de v0.4.0-alpha.10, la pile fournit **l’application en HTTP et PostgreSQL privé**, sans Caddy, certificat, domaine obligatoire ni service ACME. Le service ponctuel `migrate` applique les migrations avant le démarrage de l’application. Linux **AMD64 et ARM64** sont construits et testés nativement; Docker sélectionne l’architecture du serveur.
 
+## Installation en une commande
+
+`scripts/get.sh` détecte le système, le processeur et les prérequis, récupère la version la plus récente, puis lance l’installateur qui convient. Il s’exécute avec `sh` (sans Bash), donc directement depuis `curl` :
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh
+```
+
+Pour **voir ce qu’il ferait sans rien modifier ni télécharger** :
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --check
+```
+
+Le rapport indique le système (distribution, WSL), le processeur (`x86_64` ou `aarch64`, ramené à AMD64 ou ARM64), la mémoire, l’espace disque, la virtualisation (VM ou LXC), les droits (root ou sudo), Docker et Compose, un ancien conteneur Caddy éventuel, et si une installation existe déjà.
+
+| Détecté | Décision |
+|---|---|
+| Debian, Ubuntu ou dérivée | `install.sh` : installe Docker au besoin, configure Allumi, active le pare-feu `ufw` (SSH et port HTTP) et planifie les sauvegardes |
+| Autre Linux avec Docker | `install-docker.sh` (essais; demande `--force`) |
+| Autre Linux sans Docker | arrêt, avec le lien d’installation de Docker Engine |
+| macOS | réservé aux essais, avec `--force` et Docker Desktop ou OrbStack |
+| Windows (Git Bash) | arrêt : le serveur tourne sous Linux (VM ou WSL 2); le client Windows s’y connecte |
+| Processeur autre qu’AMD64 ou ARM64 | arrêt (ex. ARM 32 bits) |
+
+Options : `--version v0.4.0-alpha.10` (sinon la plus récente, préversions comprises), `--branch main` (essais), `--dir`, `--docker-only` (Docker déjà installé : ni pare-feu ni tâche planifiée), `--yes` (sans confirmation), `--force`. Ce qui suit `--` va à l’installateur : `-- --app-url http://192.168.1.20:28080 --prepare-only`.
+
+Avant d’agir, le script résume l’installateur retenu et demande confirmation sur le terminal; sans terminal, il exige `--yes`. Le dépôt est cloné dans `/opt/allumi` (ou `~/allumi` sans droits), sur l’étiquette de version. Un dépôt existant n’est mis à jour que s’il est sans modification locale, et une installation existante garde ses secrets, ses volumes et son `APP_URL`.
+
+Exécuter du code téléchargé revient à lui faire confiance : pour relire d’abord, télécharger le fichier (`curl -fsSLo get.sh …`), le lire, puis lancer `sh get.sh`. Pour figer la version du script lui-même, remplacer `main` dans l’adresse par une étiquette qui le contient.
+
 ## Assistant dans une VM Linux
 
 Prérequis : Docker Engine, Compose v2, Bash, OpenSSL et Git; un compte autorisé à utiliser Docker. Sur Proxmox, utiliser une VM dédiée, pas l’hôte Proxmox.
