@@ -195,3 +195,10 @@ Dans une VM Linux avec Docker et Compose installés, lancez `./scripts/install-d
 L’assistant Docker utilise les port HTTP **28080** pour les nouvelles installations et conserve les réglages existants. Le serveur cible Linux **AMD64 et ARM64** (builds et tests Docker natifs pour les deux architectures). Voir le [guide Docker](docs/Installation-Docker.md).
 
 La pile Docker contient uniquement l’application et PostgreSQL, avec un service ponctuel de migrations. Aucun SSL intégré : accès direct via `http://ADRESSE_VM:28080`; HTTPS peut être fourni par votre propre proxy. [Transition depuis Caddy](docs/Installation-Docker.md#passer-de-la-version-avec-caddy).
+
+## Sécurité du compte — prochaine préversion
+
+La branche `main` permet de consulter et déconnecter les appareils, ainsi que de changer le mot de passe en fermant les autres sessions. Ces fonctions seront distribuées après v0.4.0-alpha.10. [Guide illustré](docs/Authentification.md#appareils-connectés--références-visuelles).
+
+![Appareils connectés](docs/images/securite-appareils-desktop.png)
+![Sécurité du compte sur téléphone](docs/images/securite-mot-de-passe-mobile.png)
