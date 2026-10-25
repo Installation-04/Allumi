@@ -59,3 +59,21 @@ Voir aussi [[Architecture]] et [[Securite-et-Loi-25]].
 ![Vérification sur téléphone](images/connexion-deux-etapes-mobile.png)
 
 Captures issues de données fictives, avant saisie du code; aucune clé TOTP ni aucun code de récupération n’est affiché.
+
+## Appareils connectés — références visuelles
+
+Ces fonctions sont présentes sur `main` et seront distribuées dans la prochaine préversion après v0.4.0-alpha.10.
+
+Dans **Sécurité du compte**, consulter les appareils puis déconnecter celui qui n’est plus utilisé. Le navigateur et le système affichés proviennent de l’en-tête envoyé par le client : ce sont des indications, pas une identification matérielle garantie. Le badge **Cet appareil** indique la session conservée.
+
+![Deux appareils connectés sur ordinateur](images/securite-appareils-desktop.png)
+![Liste des appareils sur téléphone](images/securite-appareils-mobile.png)
+
+## Changement de mot de passe — références visuelles
+
+Saisir le mot de passe actuel puis le nouveau deux fois. Après confirmation, les autres appareils doivent se reconnecter; la session utilisée pour le changement reste ouverte. Les captures montrent la confirmation après effacement des champs.
+
+![Confirmation du changement sur ordinateur](images/securite-mot-de-passe-desktop.png)
+![Formulaire de mot de passe sur téléphone](images/securite-mot-de-passe-mobile.png)
+
+Captures produites par les tests avec une entreprise fictive. Aucun mot de passe, jeton de session, secret TOTP ni code de récupération n’est affiché.
