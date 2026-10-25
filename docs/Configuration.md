@@ -30,7 +30,7 @@ PostgreSQL n'est **pas** exposé hors du réseau Docker en production. Pourquoi 
 | Variable | Description |
 |---|---|
 | `AUTH_SECRET` | Clé des empreintes des compteurs anti-abus (adresses IP et courriels ne sont jamais stockés en clair). Générée par `install.sh`. Tu peux la changer à tout moment : les compteurs repartent à zéro, rien d'autre n'est touché. Les sessions sont des jetons aléatoires dans la base, pas des signatures : pour **déconnecter tout le monde**, vide la table des sessions (`DELETE FROM session;`, voir [[Depannage]]). |
-| `ENCRYPTION_KEY` | Chiffrement des champs sensibles (secrets 2FA) et empreinte des codes de récupération. **Ne la perds jamais ni ne la change** sans procédure : les secrets 2FA deviendraient illisibles et les codes de récupération, inutilisables. Garde-la dans ta copie de secrets. |
+| `ENCRYPTION_KEY` | Chiffrement des champs sensibles (secrets 2FA, clés d’API des [[Integrations]]) et empreinte des codes de récupération. **Ne la perds jamais ni ne la change** sans procédure : les secrets 2FA deviendraient illisibles, les codes de récupération inutilisables et les clés des intégrations à remplacer. Garde-la dans ta copie de secrets. |
 
 ## Application
 | Variable | Description |

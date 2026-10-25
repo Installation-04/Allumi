@@ -7,7 +7,7 @@
 | 2 | Squelette : auth, i18n, `/api/health`, `/setup`, build Docker ([[Premier-demarrage]], [[Authentification]]) | Fait |
 | 3 | Moteur comptable : plan comptable, journal, périodes, audit ([[Plan-comptable]], [[Journal-et-ecritures]], [[Exercices-et-periodes]], [[Piste-d-audit]]) | Fait (PR #2 intégrée) |
 | 4 | Contacts, taxes (moteur de calcul), factures, paiements, dépenses, pièces jointes | Contacts, taxes/catalogue et brouillons disponibles; validation des factures disponible; brouillons d’avoirs disponibles; validation, affectation et annulation des avoirs disponibles |
-| 5 | Banque (CSV/OFX), rapprochement | À faire |
+| 5 | Banque (CSV/OFX), rapprochement | Import des transactions Stripe et PayPal disponible ([[Integrations]]); le reste à faire |
 | 6 | Rapports (dont le sommaire TPS/TVQ), exports CSV/PDF | À faire |
 | 7 | Version bêta publique | À faire |
 
@@ -46,6 +46,6 @@ Lot 4.1 : implémentation intégrée à `main`, guide [[Contacts]].
 
 Lot 4.2 : taxes configurables, moteur de calcul exact et catalogue, guide [[Taxes-et-catalogue]].
 
-Lot 4.3a : brouillons de factures disponibles, guide [[Brouillons-de-factures]]. Validation comptable et numérotation définitive disponibles : [[Validation-des-factures]]. Brouillons d’avoirs disponibles : [[Brouillons-d-avoirs]]. Validation et annulation des avoirs disponibles : [[Validation-des-avoirs]]. Envoi et paiements restent à venir.
+Lot 4.3a : brouillons de factures disponibles, guide [[Brouillons-de-factures]]. Validation comptable et numérotation définitive disponibles : [[Validation-des-factures]]. Brouillons d’avoirs disponibles : [[Brouillons-d-avoirs]]. Validation et annulation des avoirs disponibles : [[Validation-des-avoirs]]. Encaissements de factures disponibles : [[Encaissements]]. L’envoi reste à venir.
 
 Annulation des factures validées disponible avec contre-passation et historique conservé : [[Annulation-des-factures]].

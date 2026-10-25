@@ -15,7 +15,7 @@ Voir aussi [[Architecture]], [[Regles-comptables]], [[Plan-de-tests]].
 - Les `CHECK` qui comparent une colonne d'enum à un littéral s'écrivent sur `::text` (voir [la recette de changement d'enum](#changer-un-enum)).
 
 ## Vue d'ensemble
-45 tables : 7 sans `company_id` (`instance` et `rate_limit` sans RLS; les 5 tables d'identité sous RLS par utilisateur) et 38 par entreprise (RLS par entreprise).
+49 tables : 7 sans `company_id` (`instance` et `rate_limit` sans RLS; les 5 tables d'identité sous RLS par utilisateur) et 42 par entreprise (RLS par entreprise).
 
 | Domaine | Tables |
 |---|---|
@@ -29,6 +29,7 @@ Voir aussi [[Architecture]], [[Regles-comptables]], [[Plan-de-tests]].
 | Achats | `purchase_document`, `purchase_document_line`, `purchase_document_tax`, `purchase_credit_application` |
 | Paiements | `payment`, `payment_allocation`, `payment_offset`, `bank_deposit`, `bank_deposit_item` |
 | Banque | `bank_account_profile`, `bank_import`, `bank_transaction`, `bank_match`, `bank_reconciliation`, `reconciled_line` |
+| Intégrations | `integration_connection`, `integration_credential`, `payment_link`, `online_payment` |
 | Pièces jointes | `attachment`, `attachment_link` |
 | Audit | `audit_log` |
 
@@ -54,6 +55,13 @@ erDiagram
   bank_deposit_item }o--|| payment : "fonds non déposés"
   tax ||--o{ tax_return : ""
   bank_transaction ||--o{ bank_match : ""
+  integration_connection ||--o{ bank_transaction : "transactions importées"
+  integration_connection ||--o| integration_credential : "identifiants chiffrés"
+  integration_connection ||--o{ payment_link : "liens de paiement"
+  sales_document ||--o{ payment_link : "solde à payer"
+  payment_link ||--o| online_payment : "paiement reçu"
+  online_payment ||--|| payment : "encaissement"
+  online_payment |o--o| journal_entry : "frais de traitement"
   bank_match |o--|| journal_line : ""
   bank_reconciliation ||--o{ reconciled_line : ""
   reconciled_line |o--|| journal_line : ""
@@ -83,6 +91,7 @@ erDiagram
 - **Remboursements** : `payment_offset` compense un encaissement et un décaissement du même contact et du même sous-grand livre (trop-perçu, acompte), sans faux avoir.
 - **Dépôts** : `bank_deposit` regroupe des paiements reçus dans « fonds non déposés ». Un dépôt contient au moins un paiement et son total égale la somme de ses éléments (`AL010`, vérifié au `COMMIT`). Chaque paiement n'est déposé qu'une fois; un paiement déposé ne s'annule qu'après l'annulation du dépôt.
 - **Banque** : `amount_cents` exprime l'effet sur le compte du grand livre (+ débit, − crédit). Une transaction `MATCHED` est égale à la somme des lignes appariées, toutes sur son compte. Un rapprochement complété est figé; son solde pointé doit égaler le solde du relevé. Seul le dernier rapprochement peut être rouvert.
+- **Intégrations** (`integration_connection`, `integration_credential`, colonnes ajoutées à `bank_transaction`) : une connexion à Stripe ou à PayPal alimente un compte de banque du grand livre (`AL005` sinon). Les identifiants chiffrés sont dans une table à part que seul le propriétaire lit; la piste d'audit ne les copie jamais (colonne déclarée secrète). Une connexion ne se supprime pas (on la désactive et on efface ses identifiants) et son service, son compte, son environnement de test et sa date de départ ne changent pas. Une transaction importée porte sa connexion, son type d'origine et un identifiant externe unique par compte (l'import est idempotent); `brut − frais = montant` (le montant est l'effet net sur le solde du service) et elle n'arrive que par une connexion active sur le compte de cette connexion (`AL010`). Comme tout relevé, elle ne change plus que de statut.
 - **Pièces jointes** : le justificatif d'une pièce validée ne se détache pas, et une pièce jointe est immuable (seul `deleted_at`, une fois détachée).
 
 ## Taxes
@@ -407,6 +416,32 @@ enum BankTransactionStatus {
   @@map("bank_transaction_status")
 }
 
+/// Services externes dont on importe les transactions.
+enum IntegrationProvider {
+  STRIPE
+  PAYPAL
+
+  @@map("integration_provider")
+}
+
+enum IntegrationStatus {
+  ACTIVE
+  DISABLED
+
+  @@map("integration_status")
+}
+
+/// Lien de paiement en ligne d'une facture validée, hébergé par le service (Stripe).
+enum PaymentLinkStatus {
+  PENDING
+  ACTIVE
+  PAID
+  REVIEW
+  CANCELLED
+
+  @@map("payment_link_status")
+}
+
 enum ReconciliationStatus {
   IN_PROGRESS
   COMPLETED
@@ -563,23 +598,26 @@ model Company {
   createdAt            DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt            DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  memberships       Membership[]
-  invitations       Invitation[]
-  numberSequences   NumberSequence[]
-  fiscalYears       FiscalYear[]
-  accounts          Account[]
-  journalEntries    JournalEntry[]
-  contacts          Contact[]
-  items             Item[]
-  taxes             Tax[]
-  taxCodes          TaxCode[]
-  salesDocuments    SalesDocument[]
-  purchaseDocuments PurchaseDocument[]
-  payments          Payment[]
-  bankDeposits      BankDeposit[]
-  taxReturns        TaxReturn[]
-  attachments       Attachment[]
-  auditLogs         AuditLog[]
+  memberships            Membership[]
+  invitations            Invitation[]
+  numberSequences        NumberSequence[]
+  fiscalYears            FiscalYear[]
+  accounts               Account[]
+  journalEntries         JournalEntry[]
+  contacts               Contact[]
+  items                  Item[]
+  taxes                  Tax[]
+  taxCodes               TaxCode[]
+  salesDocuments         SalesDocument[]
+  purchaseDocuments      PurchaseDocument[]
+  payments               Payment[]
+  bankDeposits           BankDeposit[]
+  integrationConnections IntegrationConnection[]
+  paymentLinks           PaymentLink[]
+  onlinePayments         OnlinePayment[]
+  taxReturns             TaxReturn[]
+  attachments            Attachment[]
+  auditLogs              AuditLog[]
 
   @@map("company")
 }
@@ -697,20 +735,22 @@ model Account {
   parent   Account?  @relation("AccountHierarchy", fields: [companyId, parentId], references: [companyId, id], onDelete: Restrict)
   children Account[] @relation("AccountHierarchy")
 
-  journalLines          JournalLine[]
-  itemsIncome           Item[]                 @relation("ItemIncomeAccount")
-  itemsExpense          Item[]                 @relation("ItemExpenseAccount")
-  taxesPayable          Tax[]                  @relation("TaxPayableAccount")
-  taxesRecoverable      Tax[]                  @relation("TaxRecoverableAccount")
-  salesLines            SalesDocumentLine[]
-  purchaseLines         PurchaseDocumentLine[]
-  purchaseDocumentsPaid PurchaseDocument[]     @relation("PurchasePaymentAccount")
-  payments              Payment[]
-  bankDeposits          BankDeposit[]
-  bankProfile           BankAccountProfile?
-  bankImports           BankImport[]
-  bankTransactions      BankTransaction[]
-  reconciliations       BankReconciliation[]
+  journalLines           JournalLine[]
+  itemsIncome            Item[]                  @relation("ItemIncomeAccount")
+  itemsExpense           Item[]                  @relation("ItemExpenseAccount")
+  taxesPayable           Tax[]                   @relation("TaxPayableAccount")
+  taxesRecoverable       Tax[]                   @relation("TaxRecoverableAccount")
+  salesLines             SalesDocumentLine[]
+  purchaseLines          PurchaseDocumentLine[]
+  purchaseDocumentsPaid  PurchaseDocument[]      @relation("PurchasePaymentAccount")
+  payments               Payment[]
+  bankDeposits           BankDeposit[]
+  bankProfile            BankAccountProfile?
+  bankImports            BankImport[]
+  bankTransactions       BankTransaction[]
+  integrationConnections IntegrationConnection[] @relation("ConnectionAccount")
+  feeConnections         IntegrationConnection[] @relation("ConnectionFeeAccount")
+  reconciliations        BankReconciliation[]
 
   @@unique([companyId, id])
   @@unique([companyId, code])
@@ -749,6 +789,7 @@ model JournalEntry {
   purchaseDocumentPosted PurchaseDocument? @relation("PurchaseDocumentPosting")
   purchaseDocumentVoided PurchaseDocument? @relation("PurchaseDocumentVoid")
   paymentPosted          Payment?          @relation("PaymentPosting")
+  onlinePaymentFees      OnlinePayment[]   @relation("OnlinePaymentFee")
   paymentVoided          Payment?          @relation("PaymentVoid")
   depositPosted          BankDeposit?      @relation("DepositPosting")
   depositVoided          BankDeposit?      @relation("DepositVoid")
@@ -1009,6 +1050,7 @@ model SalesDocument {
   lines           SalesDocumentLine[]
   taxes           SalesDocumentTax[]
   allocations     PaymentAllocation[]
+  paymentLinks    PaymentLink[]
   creditsApplied  SalesCreditApplication[] @relation("CreditNoteApplied")
   creditsReceived SalesCreditApplication[] @relation("InvoiceCredited")
   attachmentLinks AttachmentLink[]
@@ -1212,6 +1254,7 @@ model Payment {
   offsetsAsSent     PaymentOffset[]     @relation("OffsetSent")
   depositItems      BankDepositItem[]
   attachmentLinks   AttachmentLink[]
+  onlinePayment     OnlinePayment?
 
   @@unique([companyId, id])
   @@unique([companyId, direction, number])
@@ -1439,31 +1482,44 @@ model BankImport {
 
 /// amount_cents signé du point de vue du relevé : + dépôt, − retrait.
 model BankTransaction {
-  id          String                @id @default(uuid(7)) @db.Uuid
-  companyId   String                @map("company_id") @db.Uuid
-  accountId   String                @map("account_id") @db.Uuid
-  importId    String?               @map("import_id") @db.Uuid
-  txnDate     DateTime              @map("txn_date") @db.Date
-  amountCents BigInt                @map("amount_cents")
-  description String
-  payee       String?
+  id              String                @id @default(uuid(7)) @db.Uuid
+  companyId       String                @map("company_id") @db.Uuid
+  accountId       String                @map("account_id") @db.Uuid
+  importId        String?               @map("import_id") @db.Uuid
+  txnDate         DateTime              @map("txn_date") @db.Date
+  amountCents     BigInt                @map("amount_cents")
+  description     String
+  payee           String?
   /// Identifiant OFX (FITID) lorsqu'il existe.
-  externalId  String?               @map("external_id")
+  externalId      String?               @map("external_id")
   /// Empreinte (date, montant, description normalisée, rang d'occurrence) pour les CSV.
-  dedupeKey   String                @map("dedupe_key")
-  status      BankTransactionStatus @default(UNMATCHED)
-  createdAt   DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime              @updatedAt @map("updated_at") @db.Timestamptz(6)
+  dedupeKey       String                @map("dedupe_key")
+  status          BankTransactionStatus @default(UNMATCHED)
+  /// Transaction importée d'un service externe (Stripe, PayPal...) : sa connexion et son type d'origine vont ensemble.
+  connectionId    String?               @map("connection_id") @db.Uuid
+  /// Devise de la transaction. Le montant est exprimé dans cette devise; le rapprochement ne mélange pas les devises.
+  currency        String                @default("CAD") @db.Char(3)
+  /// Type chez le service (charge, payout, T0006...).
+  sourceType      String?               @map("source_type")
+  /// Montant brut et frais prélevés d'une transaction importée : montant (net) = brut − frais. Les frais sont négatifs quand ils sont remboursés.
+  grossCents      BigInt?               @map("gross_cents")
+  feeCents        BigInt?               @map("fee_cents")
+  /// Valeurs d'origine du service (sans renseignement personnel), pour vérifier ou recalculer.
+  providerDetails Json?                 @map("provider_details")
+  createdAt       DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime              @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  account Account     @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict)
-  import  BankImport? @relation(fields: [companyId, importId], references: [companyId, id], onDelete: Restrict)
-  matches BankMatch[]
+  account    Account                @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict)
+  import     BankImport?            @relation(fields: [companyId, importId], references: [companyId, id], onDelete: Restrict)
+  connection IntegrationConnection? @relation(fields: [companyId, connectionId], references: [companyId, id], onDelete: Restrict)
+  matches    BankMatch[]
 
   @@unique([companyId, id])
   @@unique([accountId, externalId])
   @@unique([accountId, dedupeKey])
   @@index([companyId, accountId, txnDate])
   @@index([companyId, status])
+  @@index([companyId, connectionId])
   @@map("bank_transaction")
 }
 
@@ -1481,6 +1537,134 @@ model BankMatch {
   @@unique([companyId, journalLineId])
   @@index([companyId, bankTransactionId])
   @@map("bank_match")
+}
+
+/// Connexion à un service externe (Stripe, PayPal...) dont les transactions sont importées dans un compte de banque
+/// du grand livre. Jamais supprimée : on la désactive. Réservée au propriétaire en écriture; les secrets sont
+/// dans `integration_credential`, que seul le propriétaire peut lire.
+model IntegrationConnection {
+  id                String              @id @default(uuid(7)) @db.Uuid
+  companyId         String              @map("company_id") @db.Uuid
+  provider          IntegrationProvider
+  label             String
+  /// Compte de banque du grand livre dont le service tient le solde.
+  accountId         String              @map("account_id") @db.Uuid
+  /// Compte de charges où vont les frais de traitement des paiements en ligne (obligatoire pour créer des liens de paiement).
+  feeAccountId      String?             @map("fee_account_id") @db.Uuid
+  status            IntegrationStatus   @default(ACTIVE)
+  /// Environnement de test du service (clés de test, bac à sable) : fixé à la création.
+  sandbox           Boolean             @default(false)
+  /// Fin de la clé ou de l'identifiant, pour la reconnaître à l'écran (jamais le secret).
+  credentialsHint   String?             @map("credentials_hint")
+  /// Premier jour importé.
+  importFrom        DateTime            @map("import_from") @db.Date
+  /// Tout ce qui précède est déjà importé (avec un chevauchement : l'import est idempotent).
+  syncCursor        DateTime?           @map("sync_cursor") @db.Timestamptz(6)
+  lastSyncedAt      DateTime?           @map("last_synced_at") @db.Timestamptz(6)
+  lastSyncOk        Boolean?            @map("last_sync_ok")
+  /// Code d'erreur seulement, jamais le texte renvoyé par le service.
+  lastError         String?             @map("last_error")
+  lastImportedCount Int?                @map("last_imported_count")
+  /// Verrou : une seule synchronisation à la fois par connexion.
+  syncingSince      DateTime?           @map("syncing_since") @db.Timestamptz(6)
+  createdById       String              @map("created_by_id") @db.Uuid
+  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  company      Company                @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  account      Account                @relation("ConnectionAccount", fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict)
+  feeAccount   Account?               @relation("ConnectionFeeAccount", fields: [companyId, feeAccountId], references: [companyId, id], onDelete: Restrict)
+  credential   IntegrationCredential?
+  transactions BankTransaction[]
+  paymentLinks PaymentLink[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, provider, label])
+  @@index([companyId, accountId])
+  @@map("integration_connection")
+}
+
+/// Lien de paiement en ligne d'une facture validée : une page de paiement hébergée par le service (Stripe), pour le
+/// solde de la facture au moment de la création. Jamais supprimé. Créé par le propriétaire (qui détient les clés);
+/// visible de tous les membres. `PENDING` : créé ici, pas encore chez le service; `ACTIVE` : payable; `PAID` : payé et
+/// enregistré; `REVIEW` : un paiement est arrivé mais ne peut pas être appliqué (la raison est un code); `CANCELLED`.
+model PaymentLink {
+  id              String            @id @default(uuid(7)) @db.Uuid
+  companyId       String            @map("company_id") @db.Uuid
+  invoiceId       String            @map("invoice_id") @db.Uuid
+  connectionId    String            @map("connection_id") @db.Uuid
+  status          PaymentLinkStatus @default(PENDING)
+  /// Solde de la facture à la création : le montant que le client paie.
+  amountCents     BigInt            @map("amount_cents")
+  currency        String            @default("CAD") @db.Char(3)
+  externalPriceId String?           @map("external_price_id")
+  /// Identifiant du lien chez le service (plink_...).
+  externalId      String?           @map("external_id")
+  url             String?
+  /// Codes seulement, jamais le texte du service.
+  lastError       String?           @map("last_error")
+  reviewReason    String?           @map("review_reason")
+  createdById     String            @map("created_by_id") @db.Uuid
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  company       Company               @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  invoice       SalesDocument         @relation(fields: [companyId, invoiceId], references: [companyId, id], onDelete: Restrict)
+  connection    IntegrationConnection @relation(fields: [companyId, connectionId], references: [companyId, id], onDelete: Restrict)
+  onlinePayment OnlinePayment?
+
+  @@unique([companyId, id])
+  @@unique([connectionId, externalId])
+  @@unique([companyId, invoiceId], map: "payment_link_one_live_per_invoice", where: raw("status = 'PENDING' OR status = 'ACTIVE'"))
+  @@index([companyId, invoiceId])
+  @@index([companyId, status])
+  @@map("payment_link")
+}
+
+/// Un paiement reçu par un lien : la session de paiement du service, l'encaissement qu'elle a créé et l'écriture des
+/// frais. Ajout seulement, une fois par lien et par session.
+model OnlinePayment {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  companyId   String   @map("company_id") @db.Uuid
+  linkId      String   @map("link_id") @db.Uuid
+  /// Session de paiement chez le service (cs_...).
+  providerRef String   @map("provider_ref")
+  paymentId   String   @map("payment_id") @db.Uuid
+  /// Écriture des frais de traitement (absente quand il n'y en a pas).
+  feeEntryId  String?  @map("fee_entry_id") @db.Uuid
+  grossCents  BigInt   @map("gross_cents")
+  feeCents    BigInt   @map("fee_cents")
+  netCents    BigInt   @map("net_cents")
+  currency    String   @db.Char(3)
+  paidAt      DateTime @map("paid_at") @db.Timestamptz(6)
+  createdById String   @map("created_by_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  company  Company       @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  link     PaymentLink   @relation(fields: [companyId, linkId], references: [companyId, id], onDelete: Restrict)
+  payment  Payment       @relation(fields: [companyId, paymentId], references: [companyId, id], onDelete: Restrict)
+  feeEntry JournalEntry? @relation("OnlinePaymentFee", fields: [companyId, feeEntryId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([companyId, id])
+  @@unique([companyId, linkId])
+  @@unique([companyId, providerRef])
+  @@unique([companyId, paymentId])
+  @@map("online_payment")
+}
+
+/// Identifiants chiffrés d'une connexion (clé d'API, secret client). Lisibles par le propriétaire seulement; jamais
+/// copiés dans la piste d'audit. Nuls quand la connexion est désactivée.
+model IntegrationCredential {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  companyId      String   @map("company_id") @db.Uuid
+  connectionId   String   @map("connection_id") @db.Uuid
+  credentialsEnc Bytes?   @map("credentials_enc")
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  connection IntegrationConnection @relation(fields: [companyId, connectionId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([companyId, connectionId])
+  @@map("integration_credential")
 }
 
 model BankReconciliation {
@@ -3666,6 +3850,512 @@ CREATE CONSTRAINT TRIGGER bank_deposit_complete
 
 -- Comme toutes les fonctions du schéma : rien n'est appelable par PUBLIC.
 REVOKE EXECUTE ON FUNCTION bank_deposit_complete() FROM PUBLIC;
+```
+
+### `20261025000000_integrations` (intégrations : import des transactions Stripe et PayPal)
+Deux tables (`integration_connection`, `integration_credential`) et des colonnes sur `bank_transaction` pour importer les transactions d'un service externe dans un compte de banque. Le propriétaire est le seul à créer une connexion et à lire ses identifiants; la piste d'audit n'en copie jamais le contenu chiffré.
+```sql
+-- CreateEnum
+CREATE TYPE "integration_provider" AS ENUM ('STRIPE', 'PAYPAL');
+
+-- CreateEnum
+CREATE TYPE "integration_status" AS ENUM ('ACTIVE', 'DISABLED');
+
+-- AlterTable
+ALTER TABLE "bank_transaction" ADD COLUMN     "connection_id" UUID,
+ADD COLUMN     "currency" CHAR(3) NOT NULL DEFAULT 'CAD',
+ADD COLUMN     "fee_cents" BIGINT,
+ADD COLUMN     "gross_cents" BIGINT,
+ADD COLUMN     "provider_details" JSONB,
+ADD COLUMN     "source_type" TEXT;
+
+-- CreateTable
+CREATE TABLE "integration_connection" (
+    "id" UUID NOT NULL,
+    "company_id" UUID NOT NULL,
+    "provider" "integration_provider" NOT NULL,
+    "label" TEXT NOT NULL,
+    "account_id" UUID NOT NULL,
+    "status" "integration_status" NOT NULL DEFAULT 'ACTIVE',
+    "sandbox" BOOLEAN NOT NULL DEFAULT false,
+    "credentials_hint" TEXT,
+    "import_from" DATE NOT NULL,
+    "sync_cursor" TIMESTAMPTZ(6),
+    "last_synced_at" TIMESTAMPTZ(6),
+    "last_sync_ok" BOOLEAN,
+    "last_error" TEXT,
+    "last_imported_count" INTEGER,
+    "syncing_since" TIMESTAMPTZ(6),
+    "created_by_id" UUID NOT NULL,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) NOT NULL,
+
+    CONSTRAINT "integration_connection_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "integration_credential" (
+    "id" UUID NOT NULL,
+    "company_id" UUID NOT NULL,
+    "connection_id" UUID NOT NULL,
+    "credentials_enc" BYTEA,
+    "updated_at" TIMESTAMPTZ(6) NOT NULL,
+
+    CONSTRAINT "integration_credential_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "integration_connection_company_id_account_id_idx" ON "integration_connection"("company_id", "account_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "integration_connection_company_id_id_key" ON "integration_connection"("company_id", "id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "integration_connection_company_id_provider_label_key" ON "integration_connection"("company_id", "provider", "label");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "integration_credential_company_id_connection_id_key" ON "integration_credential"("company_id", "connection_id");
+
+-- CreateIndex
+CREATE INDEX "bank_transaction_company_id_connection_id_idx" ON "bank_transaction"("company_id", "connection_id");
+
+-- AddForeignKey
+ALTER TABLE "bank_transaction" ADD CONSTRAINT "bank_transaction_company_id_connection_id_fkey" FOREIGN KEY ("company_id", "connection_id") REFERENCES "integration_connection"("company_id", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "integration_connection" ADD CONSTRAINT "integration_connection_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "integration_connection" ADD CONSTRAINT "integration_connection_company_id_account_id_fkey" FOREIGN KEY ("company_id", "account_id") REFERENCES "account"("company_id", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "integration_credential" ADD CONSTRAINT "integration_credential_company_id_connection_id_fkey" FOREIGN KEY ("company_id", "connection_id") REFERENCES "integration_connection"("company_id", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+-- ---------------------------------------------------------------------
+-- Intégrations : contraintes, gardes, isolation, droits et audit
+-- ---------------------------------------------------------------------
+ALTER TABLE integration_connection
+  ADD CONSTRAINT integration_connection_label CHECK (label = btrim(label) AND char_length(label) BETWEEN 1 AND 60),
+  ADD CONSTRAINT integration_connection_import_from CHECK (import_from >= DATE '2000-01-01'),
+  -- Un code (« integrations.unauthorized »), jamais le texte du service : il pourrait citer des données.
+  ADD CONSTRAINT integration_connection_last_error CHECK (last_error IS NULL OR last_error ~ '^[a-z][a-zA-Z0-9_.]{0,63}$'),
+  ADD CONSTRAINT integration_connection_imported_count CHECK (last_imported_count IS NULL OR last_imported_count >= 0),
+  -- Seulement de quoi reconnaître la clé : quelques caractères, jamais le secret.
+  ADD CONSTRAINT integration_connection_hint CHECK (credentials_hint IS NULL OR char_length(credentials_hint) <= 8);
+
+-- Une transaction importée porte sa connexion, son type d'origine et un identifiant externe; brut − frais = net.
+ALTER TABLE bank_transaction
+  ADD CONSTRAINT bank_transaction_currency CHECK (currency ~ '^[A-Z]{3}$'),
+  ADD CONSTRAINT bank_transaction_imported CHECK (
+    (connection_id IS NULL) = (source_type IS NULL)
+    AND (connection_id IS NULL OR external_id IS NOT NULL)),
+  ADD CONSTRAINT bank_transaction_gross_fee CHECK (
+    (gross_cents IS NULL) = (fee_cents IS NULL)
+    AND (gross_cents IS NULL OR connection_id IS NOT NULL)
+    AND (gross_cents IS NULL OR gross_cents - fee_cents = amount_cents));
+
+-- La connexion alimente un compte de banque, de caisse ou de carte (comme un relevé).
+CREATE TRIGGER integration_connection_account
+  BEFORE INSERT ON integration_connection FOR EACH ROW EXECUTE FUNCTION bank_account_check();
+
+-- Jamais supprimée; ni le service, ni le compte, ni l'environnement ne changent : on en crée une autre.
+CREATE FUNCTION integration_connection_guard() RETURNS trigger
+LANGUAGE plpgsql SET search_path = public, pg_temp AS $$
+DECLARE
+  v_mutable text[] := ARRAY['label', 'status', 'credentials_hint', 'sync_cursor', 'last_synced_at', 'last_sync_ok',
+                            'last_error', 'last_imported_count', 'syncing_since', 'updated_at'];
+BEGIN
+  IF TG_OP = 'DELETE' THEN
+    RAISE EXCEPTION 'integration connections are never deleted; disable them' USING ERRCODE = 'AL010';
+  END IF;
+  IF (to_jsonb(NEW) - v_mutable) IS DISTINCT FROM (to_jsonb(OLD) - v_mutable) THEN
+    RAISE EXCEPTION 'the service, the account and the environment of a connection do not change' USING ERRCODE = 'AL010';
+  END IF;
+  RETURN NEW;
+END $$;
+
+CREATE TRIGGER integration_connection_guard
+  BEFORE UPDATE OR DELETE ON integration_connection FOR EACH ROW EXECUTE FUNCTION integration_connection_guard();
+
+CREATE FUNCTION integration_credential_guard() RETURNS trigger
+LANGUAGE plpgsql SET search_path = public, pg_temp AS $$
+BEGIN
+  IF TG_OP = 'DELETE' THEN
+    RAISE EXCEPTION 'credentials are cleared, never deleted' USING ERRCODE = 'AL010';
+  END IF;
+  IF (to_jsonb(NEW) - ARRAY['credentials_enc', 'updated_at']) IS DISTINCT FROM (to_jsonb(OLD) - ARRAY['credentials_enc', 'updated_at']) THEN
+    RAISE EXCEPTION 'only the credentials of a connection can change' USING ERRCODE = 'AL010';
+  END IF;
+  RETURN NEW;
+END $$;
+
+CREATE TRIGGER integration_credential_guard
+  BEFORE UPDATE OR DELETE ON integration_credential FOR EACH ROW EXECUTE FUNCTION integration_credential_guard();
+
+-- Une transaction importée arrive sur le compte de sa connexion, et seulement par une connexion active.
+CREATE FUNCTION bank_transaction_connection_check() RETURNS trigger
+LANGUAGE plpgsql SET search_path = public, pg_temp AS $$
+DECLARE
+  c integration_connection%ROWTYPE;
+BEGIN
+  IF NEW.connection_id IS NULL THEN
+    RETURN NEW;
+  END IF;
+  SELECT * INTO c FROM integration_connection WHERE company_id = NEW.company_id AND id = NEW.connection_id;
+  IF NOT FOUND OR c.account_id IS DISTINCT FROM NEW.account_id THEN
+    RAISE EXCEPTION 'an imported transaction belongs to the account of its connection' USING ERRCODE = 'AL010';
+  END IF;
+  IF c.status::text <> 'ACTIVE' THEN
+    RAISE EXCEPTION 'a disabled connection imports nothing' USING ERRCODE = 'AL010';
+  END IF;
+  RETURN NEW;
+END $$;
+
+CREATE TRIGGER bank_transaction_connection
+  BEFORE INSERT ON bank_transaction FOR EACH ROW EXECUTE FUNCTION bank_transaction_connection_check();
+
+-- Isolation par entreprise. Tous les membres voient les connexions (service, étiquette, état de la dernière
+-- synchronisation); seul le propriétaire en crée et en modifie, et seul lui lit les identifiants chiffrés.
+ALTER TABLE integration_connection ENABLE ROW LEVEL SECURITY;
+ALTER TABLE integration_connection FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_read ON integration_connection FOR SELECT
+  USING (company_id = (SELECT app_tenant_id()));
+CREATE POLICY owner_insert ON integration_connection FOR INSERT
+  WITH CHECK (company_id = (SELECT app_tenant_id()) AND (SELECT app_tenant_role()) = 'OWNER');
+CREATE POLICY owner_update ON integration_connection FOR UPDATE
+  USING (company_id = (SELECT app_tenant_id()) AND (SELECT app_tenant_role()) = 'OWNER')
+  WITH CHECK (company_id = (SELECT app_tenant_id()) AND (SELECT app_tenant_role()) = 'OWNER');
+
+ALTER TABLE integration_credential ENABLE ROW LEVEL SECURITY;
+ALTER TABLE integration_credential FORCE ROW LEVEL SECURITY;
+CREATE POLICY owner_read ON integration_credential FOR SELECT
+  USING (company_id = (SELECT app_tenant_id()) AND (SELECT app_tenant_role()) = 'OWNER');
+CREATE POLICY owner_insert ON integration_credential FOR INSERT
+  WITH CHECK (company_id = (SELECT app_tenant_id()) AND (SELECT app_tenant_role()) = 'OWNER');
+CREATE POLICY owner_update ON integration_credential FOR UPDATE
+  USING (company_id = (SELECT app_tenant_id()) AND (SELECT app_tenant_role()) = 'OWNER')
+  WITH CHECK (company_id = (SELECT app_tenant_id()) AND (SELECT app_tenant_role()) = 'OWNER');
+
+-- Droits : ni suppression ni TRUNCATE. Les colonnes d'une connexion qui ne changent jamais restent hors d'UPDATE.
+GRANT SELECT, INSERT ON integration_connection TO allumi_app;
+GRANT UPDATE (label, status, credentials_hint, sync_cursor, last_synced_at, last_sync_ok, last_error,
+              last_imported_count, syncing_since, updated_at) ON integration_connection TO allumi_app;
+GRANT SELECT, INSERT ON integration_credential TO allumi_app;
+GRANT UPDATE (credentials_enc, updated_at) ON integration_credential TO allumi_app;
+
+-- Audit : le changement est consigné, mais jamais l'identifiant chiffré (seulement « _secrets_changed »), et les
+-- champs de synchronisation, qui bougent à chaque passage, n'ajoutent pas de bruit.
+CREATE TRIGGER integration_connection_audit
+  AFTER INSERT OR UPDATE OR DELETE ON integration_connection FOR EACH ROW
+  EXECUTE FUNCTION audit_row_change('--', 'sync_cursor', 'last_synced_at', 'last_sync_ok', 'last_error', 'last_imported_count', 'syncing_since');
+CREATE TRIGGER integration_credential_audit
+  AFTER INSERT OR UPDATE OR DELETE ON integration_credential FOR EACH ROW
+  EXECUTE FUNCTION audit_row_change('credentials_enc');
+
+-- Comme toutes les fonctions du schéma : rien n'est appelable par PUBLIC.
+REVOKE EXECUTE ON FUNCTION integration_connection_guard(), integration_credential_guard(), bank_transaction_connection_check() FROM PUBLIC;
+```
+
+### `20261026000000_online_payments` (paiement en ligne des factures par Stripe)
+Deux tables (`payment_link`, `online_payment`) et un compte de frais sur `integration_connection`. Un lien de paiement est une page hébergée par Stripe pour le solde d'une facture validée; quand le client a payé, l'application enregistre l'encaissement au brut sur le compte de la connexion et les frais de traitement dans une écriture à part (charge au compte des frais, crédit au compte de la connexion), de sorte que le solde du compte égale le net que Stripe verse. Le propriétaire, qui détient les clés, est le seul à créer un lien et à le faire avancer; tous les membres les voient. Un lien n'est jamais supprimé et un paiement en ligne ne change plus une fois ajouté; leurs gardes refusent les mêmes cas que le domaine (`domain/online-payment.ts`).
+```sql
+
+-- CreateEnum
+CREATE TYPE "payment_link_status" AS ENUM ('PENDING', 'ACTIVE', 'PAID', 'REVIEW', 'CANCELLED');
+
+-- AlterTable
+ALTER TABLE "integration_connection" ADD COLUMN     "fee_account_id" UUID;
+
+-- CreateTable
+CREATE TABLE "payment_link" (
+    "id" UUID NOT NULL,
+    "company_id" UUID NOT NULL,
+    "invoice_id" UUID NOT NULL,
+    "connection_id" UUID NOT NULL,
+    "status" "payment_link_status" NOT NULL DEFAULT 'PENDING',
+    "amount_cents" BIGINT NOT NULL,
+    "currency" CHAR(3) NOT NULL DEFAULT 'CAD',
+    "external_price_id" TEXT,
+    "external_id" TEXT,
+    "url" TEXT,
+    "last_error" TEXT,
+    "review_reason" TEXT,
+    "created_by_id" UUID NOT NULL,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) NOT NULL,
+
+    CONSTRAINT "payment_link_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "online_payment" (
+    "id" UUID NOT NULL,
+    "company_id" UUID NOT NULL,
+    "link_id" UUID NOT NULL,
+    "provider_ref" TEXT NOT NULL,
+    "payment_id" UUID NOT NULL,
+    "fee_entry_id" UUID,
+    "gross_cents" BIGINT NOT NULL,
+    "fee_cents" BIGINT NOT NULL,
+    "net_cents" BIGINT NOT NULL,
+    "currency" CHAR(3) NOT NULL,
+    "paid_at" TIMESTAMPTZ(6) NOT NULL,
+    "created_by_id" UUID NOT NULL,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "online_payment_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "payment_link_company_id_invoice_id_idx" ON "payment_link"("company_id", "invoice_id");
+
+-- CreateIndex
+CREATE INDEX "payment_link_company_id_status_idx" ON "payment_link"("company_id", "status");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "payment_link_company_id_id_key" ON "payment_link"("company_id", "id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "payment_link_connection_id_external_id_key" ON "payment_link"("connection_id", "external_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "payment_link_one_live_per_invoice" ON "payment_link"("company_id", "invoice_id") WHERE (status = 'PENDING' OR status = 'ACTIVE');
+
+-- CreateIndex
+CREATE UNIQUE INDEX "online_payment_company_id_id_key" ON "online_payment"("company_id", "id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "online_payment_company_id_link_id_key" ON "online_payment"("company_id", "link_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "online_payment_company_id_provider_ref_key" ON "online_payment"("company_id", "provider_ref");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "online_payment_company_id_payment_id_key" ON "online_payment"("company_id", "payment_id");
+
+-- AddForeignKey
+ALTER TABLE "integration_connection" ADD CONSTRAINT "integration_connection_company_id_fee_account_id_fkey" FOREIGN KEY ("company_id", "fee_account_id") REFERENCES "account"("company_id", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "payment_link" ADD CONSTRAINT "payment_link_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "payment_link" ADD CONSTRAINT "payment_link_company_id_invoice_id_fkey" FOREIGN KEY ("company_id", "invoice_id") REFERENCES "sales_document"("company_id", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "payment_link" ADD CONSTRAINT "payment_link_company_id_connection_id_fkey" FOREIGN KEY ("company_id", "connection_id") REFERENCES "integration_connection"("company_id", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "online_payment" ADD CONSTRAINT "online_payment_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "online_payment" ADD CONSTRAINT "online_payment_company_id_link_id_fkey" FOREIGN KEY ("company_id", "link_id") REFERENCES "payment_link"("company_id", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "online_payment" ADD CONSTRAINT "online_payment_company_id_payment_id_fkey" FOREIGN KEY ("company_id", "payment_id") REFERENCES "payment"("company_id", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "online_payment" ADD CONSTRAINT "online_payment_company_id_fee_entry_id_fkey" FOREIGN KEY ("company_id", "fee_entry_id") REFERENCES "journal_entry"("company_id", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+
+-- ---------------------------------------------------------------------
+-- Paiement en ligne : contraintes, gardes, isolation, droits et audit
+-- ---------------------------------------------------------------------
+ALTER TABLE payment_link
+  ADD CONSTRAINT payment_link_amount CHECK (amount_cents > 0 AND amount_cents <= 100000000000000),
+  ADD CONSTRAINT payment_link_currency CHECK (currency ~ '^[A-Z]{3}$'),
+  ADD CONSTRAINT payment_link_url CHECK (url IS NULL OR (url ~ '^https://[^[:space:]]+$' AND char_length(url) <= 500)),
+  ADD CONSTRAINT payment_link_external_id CHECK (external_id IS NULL OR external_id ~ '^[A-Za-z0-9_-]{1,100}$'),
+  ADD CONSTRAINT payment_link_external_price_id CHECK (external_price_id IS NULL OR external_price_id ~ '^[A-Za-z0-9_-]{1,100}$'),
+  -- Des codes (« integrations.unauthorized », « payments.exceeds »), jamais le texte du service : il pourrait citer des données.
+  ADD CONSTRAINT payment_link_last_error CHECK (last_error IS NULL OR last_error ~ '^[a-z][a-zA-Z0-9_.]{0,63}$'),
+  ADD CONSTRAINT payment_link_review_reason CHECK (review_reason IS NULL OR review_reason ~ '^[a-z][a-zA-Z0-9_.]{0,63}$'),
+  ADD CONSTRAINT payment_link_external_pair CHECK ((external_id IS NULL) = (url IS NULL)),
+  -- Créé ici (PENDING), puis lié au service (ACTIVE, avec son adresse); un paiement à vérifier (REVIEW) dit pourquoi.
+  ADD CONSTRAINT payment_link_state CHECK (
+    (status = 'PENDING' AND external_id IS NULL AND review_reason IS NULL)
+    OR (status IN ('ACTIVE', 'PAID') AND external_id IS NOT NULL AND review_reason IS NULL)
+    OR (status = 'REVIEW' AND external_id IS NOT NULL AND review_reason IS NOT NULL)
+    OR status = 'CANCELLED');
+
+ALTER TABLE online_payment
+  ADD CONSTRAINT online_payment_amounts CHECK (
+    gross_cents > 0 AND gross_cents <= 100000000000000 AND fee_cents >= 0 AND fee_cents <= gross_cents
+    AND net_cents = gross_cents - fee_cents),
+  ADD CONSTRAINT online_payment_currency CHECK (currency ~ '^[A-Z]{3}$'),
+  ADD CONSTRAINT online_payment_provider_ref CHECK (provider_ref ~ '^[A-Za-z0-9_-]{1,100}$'),
+  -- Une écriture de frais s'il y a des frais, et seulement alors.
+  ADD CONSTRAINT online_payment_fee_entry CHECK ((fee_cents = 0) = (fee_entry_id IS NULL));
+
+-- Les frais de traitement vont à un compte de charges (choisi par le propriétaire, modifiable : il ne vaut que pour la suite).
+CREATE FUNCTION integration_connection_fee_account_check() RETURNS trigger
+LANGUAGE plpgsql SET search_path = public, pg_temp AS $$
+BEGIN
+  IF NEW.fee_account_id IS NOT NULL AND (TG_OP = 'INSERT' OR NEW.fee_account_id IS DISTINCT FROM OLD.fee_account_id) THEN
+    PERFORM assert_account_subtype(NEW.company_id, NEW.fee_account_id,
+      ARRAY['OPERATING_EXPENSE', 'OTHER_EXPENSE']::account_subtype[], 'processing fee account');
+  END IF;
+  RETURN NEW;
+END $$;
+
+CREATE TRIGGER integration_connection_fee_account
+  BEFORE INSERT OR UPDATE ON integration_connection FOR EACH ROW EXECUTE FUNCTION integration_connection_fee_account_check();
+
+-- Même garde qu'avant; le compte des frais peut maintenant changer.
+CREATE OR REPLACE FUNCTION integration_connection_guard() RETURNS trigger
+LANGUAGE plpgsql SET search_path = public, pg_temp AS $$
+DECLARE
+  v_mutable text[] := ARRAY['label', 'status', 'credentials_hint', 'fee_account_id', 'sync_cursor', 'last_synced_at', 'last_sync_ok',
+                            'last_error', 'last_imported_count', 'syncing_since', 'updated_at'];
+BEGIN
+  IF TG_OP = 'DELETE' THEN
+    RAISE EXCEPTION 'integration connections are never deleted; disable them' USING ERRCODE = 'AL010';
+  END IF;
+  IF (to_jsonb(NEW) - v_mutable) IS DISTINCT FROM (to_jsonb(OLD) - v_mutable) THEN
+    RAISE EXCEPTION 'the service, the account and the environment of a connection do not change' USING ERRCODE = 'AL010';
+  END IF;
+  RETURN NEW;
+END $$;
+
+-- Un lien de paiement n'est jamais supprimé. Il naît « en attente » pour une facture validée et au plus son solde, sur
+-- une connexion Stripe active qui sait où mettre les frais; ensuite seuls son état et ce qui le lie au service changent,
+-- une seule fois, et un lien payé ou annulé ne bouge plus.
+CREATE FUNCTION payment_link_guard() RETURNS trigger
+LANGUAGE plpgsql SET search_path = public, pg_temp AS $$
+DECLARE
+  v_mutable text[] := ARRAY['status', 'external_price_id', 'external_id', 'url', 'last_error', 'review_reason', 'updated_at'];
+  inv sales_document%ROWTYPE;
+  c integration_connection%ROWTYPE;
+BEGIN
+  IF TG_OP = 'DELETE' THEN
+    RAISE EXCEPTION 'payment links are never deleted; cancel them' USING ERRCODE = 'AL010';
+  END IF;
+  IF TG_OP = 'INSERT' THEN
+    IF NEW.status <> 'PENDING' THEN
+      RAISE EXCEPTION 'payment links are created pending' USING ERRCODE = 'AL010';
+    END IF;
+    SELECT * INTO inv FROM sales_document WHERE company_id = NEW.company_id AND id = NEW.invoice_id;
+    IF NOT FOUND OR inv.kind <> 'INVOICE' OR inv.status <> 'POSTED' OR inv.currency IS DISTINCT FROM NEW.currency THEN
+      RAISE EXCEPTION 'a payment link is for a posted invoice, in its currency' USING ERRCODE = 'AL010';
+    END IF;
+    SELECT * INTO c FROM integration_connection WHERE company_id = NEW.company_id AND id = NEW.connection_id;
+    IF NOT FOUND OR c.provider::text <> 'STRIPE' OR c.status::text <> 'ACTIVE' OR c.fee_account_id IS NULL THEN
+      RAISE EXCEPTION 'a payment link needs an active Stripe connection with a processing fee account' USING ERRCODE = 'AL010';
+    END IF;
+    IF NEW.amount_cents > sales_document_open_cents(NEW.company_id, NEW.invoice_id) THEN
+      RAISE EXCEPTION 'a payment link is for at most the open balance of its invoice' USING ERRCODE = 'AL010';
+    END IF;
+    RETURN NEW;
+  END IF;
+
+  IF (to_jsonb(NEW) - v_mutable) IS DISTINCT FROM (to_jsonb(OLD) - v_mutable) THEN
+    RAISE EXCEPTION 'only the state of a payment link changes' USING ERRCODE = 'AL010';
+  END IF;
+  IF OLD.status::text IN ('PAID', 'CANCELLED') THEN
+    RAISE EXCEPTION 'a paid or cancelled payment link no longer changes' USING ERRCODE = 'AL010';
+  END IF;
+  IF OLD.status <> NEW.status AND (OLD.status::text, NEW.status::text) NOT IN
+       (('PENDING', 'ACTIVE'), ('PENDING', 'CANCELLED'), ('ACTIVE', 'PAID'), ('ACTIVE', 'REVIEW'), ('ACTIVE', 'CANCELLED'), ('REVIEW', 'CANCELLED')) THEN
+    RAISE EXCEPTION 'payment link: % cannot become %', OLD.status, NEW.status USING ERRCODE = 'AL010';
+  END IF;
+  IF (OLD.external_id IS NOT NULL AND NEW.external_id IS DISTINCT FROM OLD.external_id)
+     OR (OLD.url IS NOT NULL AND NEW.url IS DISTINCT FROM OLD.url)
+     OR (OLD.external_price_id IS NOT NULL AND NEW.external_price_id IS DISTINCT FROM OLD.external_price_id) THEN
+    RAISE EXCEPTION 'what ties a payment link to the service is set once' USING ERRCODE = 'AL010';
+  END IF;
+  IF NEW.status::text = 'PAID' AND NOT EXISTS (SELECT 1 FROM online_payment WHERE company_id = NEW.company_id AND link_id = NEW.id) THEN
+    RAISE EXCEPTION 'a payment link is paid by an online payment' USING ERRCODE = 'AL010';
+  END IF;
+  RETURN NEW;
+END $$;
+
+CREATE TRIGGER payment_link_guard
+  BEFORE INSERT OR UPDATE OR DELETE ON payment_link FOR EACH ROW EXECUTE FUNCTION payment_link_guard();
+
+-- Un paiement en ligne s'ajoute et ne change plus. Il arrive sur un lien actif, pour son montant, et son encaissement
+-- (reçu, au brut, sur le compte de la connexion) est appliqué à la facture du lien; les frais, s'il y en a, sont une
+-- écriture de deux lignes : charge au compte des frais, crédit au compte de la connexion.
+CREATE FUNCTION online_payment_guard() RETURNS trigger
+LANGUAGE plpgsql SET search_path = public, pg_temp AS $$
+DECLARE
+  l payment_link%ROWTYPE;
+  c integration_connection%ROWTYPE;
+  p payment%ROWTYPE;
+  e journal_entry%ROWTYPE;
+BEGIN
+  IF TG_OP <> 'INSERT' THEN
+    RAISE EXCEPTION 'online payments are never changed or deleted' USING ERRCODE = 'AL010';
+  END IF;
+  SELECT * INTO l FROM payment_link WHERE company_id = NEW.company_id AND id = NEW.link_id;
+  IF NOT FOUND OR l.status::text <> 'ACTIVE' THEN
+    RAISE EXCEPTION 'an online payment arrives on an active payment link' USING ERRCODE = 'AL010';
+  END IF;
+  IF NEW.gross_cents <> l.amount_cents OR NEW.currency <> l.currency THEN
+    RAISE EXCEPTION 'an online payment is for the amount of its payment link' USING ERRCODE = 'AL010';
+  END IF;
+  SELECT * INTO c FROM integration_connection WHERE company_id = NEW.company_id AND id = l.connection_id;
+  SELECT * INTO p FROM payment WHERE company_id = NEW.company_id AND id = NEW.payment_id;
+  IF NOT FOUND OR p.direction::text <> 'RECEIVED' OR p.ledger::text <> 'RECEIVABLE' OR p.status::text <> 'POSTED'
+     OR p.amount_cents <> NEW.gross_cents OR p.account_id <> c.account_id THEN
+    RAISE EXCEPTION 'the receipt of an online payment is for the gross amount, on the account of the connection' USING ERRCODE = 'AL010';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM payment_allocation a
+                  WHERE a.company_id = NEW.company_id AND a.payment_id = p.id AND a.sales_document_id = l.invoice_id
+                    AND a.amount_cents = NEW.gross_cents AND a.unapplied_date IS NULL) THEN
+    RAISE EXCEPTION 'the receipt of an online payment is applied to the invoice of its payment link' USING ERRCODE = 'AL010';
+  END IF;
+  IF NEW.fee_entry_id IS NOT NULL THEN
+    SELECT * INTO e FROM journal_entry WHERE company_id = NEW.company_id AND id = NEW.fee_entry_id;
+    IF NOT FOUND OR e.source_type::text <> 'MANUAL' OR e.reverses_entry_id IS NOT NULL
+       OR (SELECT count(*) FROM journal_line WHERE company_id = e.company_id AND entry_id = e.id) <> 2
+       OR NOT EXISTS (SELECT 1 FROM journal_line WHERE company_id = e.company_id AND entry_id = e.id
+                         AND account_id = c.fee_account_id AND debit_cents = NEW.fee_cents AND credit_cents = 0)
+       OR NOT EXISTS (SELECT 1 FROM journal_line WHERE company_id = e.company_id AND entry_id = e.id
+                         AND account_id = c.account_id AND credit_cents = NEW.fee_cents AND debit_cents = 0) THEN
+      RAISE EXCEPTION 'the fees of an online payment are one entry: processing fee account debited, connection account credited' USING ERRCODE = 'AL010';
+    END IF;
+  END IF;
+  RETURN NEW;
+END $$;
+
+CREATE TRIGGER online_payment_guard
+  BEFORE INSERT OR UPDATE OR DELETE ON online_payment FOR EACH ROW EXECUTE FUNCTION online_payment_guard();
+
+-- Isolation par entreprise. Tous les membres voient les liens et les paiements en ligne; seul le propriétaire (qui
+-- détient les clés) en crée et fait avancer les liens.
+ALTER TABLE payment_link ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payment_link FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_read ON payment_link FOR SELECT
+  USING (company_id = (SELECT app_tenant_id()));
+CREATE POLICY owner_insert ON payment_link FOR INSERT
+  WITH CHECK (company_id = (SELECT app_tenant_id()) AND (SELECT app_tenant_role()) = 'OWNER');
+CREATE POLICY owner_update ON payment_link FOR UPDATE
+  USING (company_id = (SELECT app_tenant_id()) AND (SELECT app_tenant_role()) = 'OWNER')
+  WITH CHECK (company_id = (SELECT app_tenant_id()) AND (SELECT app_tenant_role()) = 'OWNER');
+
+ALTER TABLE online_payment ENABLE ROW LEVEL SECURITY;
+ALTER TABLE online_payment FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_read ON online_payment FOR SELECT
+  USING (company_id = (SELECT app_tenant_id()));
+CREATE POLICY owner_insert ON online_payment FOR INSERT
+  WITH CHECK (company_id = (SELECT app_tenant_id()) AND (SELECT app_tenant_role()) = 'OWNER');
+
+-- Droits : ni suppression ni TRUNCATE; les colonnes d'un lien qui ne changent jamais restent hors d'UPDATE.
+GRANT UPDATE (fee_account_id) ON integration_connection TO allumi_app;
+GRANT SELECT, INSERT ON payment_link TO allumi_app;
+GRANT UPDATE (status, external_price_id, external_id, url, last_error, review_reason, updated_at) ON payment_link TO allumi_app;
+GRANT SELECT, INSERT ON online_payment TO allumi_app;
+
+-- Audit : toute création et tout changement d'état est consigné (rien de secret : l'adresse d'un lien est faite pour être partagée).
+CREATE TRIGGER payment_link_audit
+  AFTER INSERT OR UPDATE OR DELETE ON payment_link FOR EACH ROW EXECUTE FUNCTION audit_row_change();
+CREATE TRIGGER online_payment_audit
+  AFTER INSERT OR UPDATE OR DELETE ON online_payment FOR EACH ROW EXECUTE FUNCTION audit_row_change();
+
+-- Comme toutes les fonctions du schéma : rien n'est appelable par PUBLIC.
+REVOKE EXECUTE ON FUNCTION integration_connection_fee_account_check(), payment_link_guard(), online_payment_guard() FROM PUBLIC;
 ```
 
 ## Catalogue : contrôles supplémentaires

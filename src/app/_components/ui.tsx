@@ -39,7 +39,7 @@ export function Field(props: {
   defaultValue?: string;
   autoComplete?: string;
   hint?: string;
-  inputMode?: "numeric" | "text";
+  inputMode?: "numeric" | "decimal" | "text";
   required?: boolean;
 }) {
   const { name, label, type = "text", defaultValue, autoComplete, hint, inputMode, required = true } = props;

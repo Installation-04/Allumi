@@ -51,3 +51,7 @@
 - [[Brouillons-d-avoirs]]
 
 - [[Validation-des-avoirs]]
+
+- [[Encaissements]]
+
+- [[Integrations]]

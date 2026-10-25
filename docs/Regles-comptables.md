@@ -25,6 +25,17 @@ Ces règles sont non négociables : toute contribution qui les contourne est ref
 - Un document a deux dates : celle de la pièce (échéance, âge des comptes) et sa **date comptable** (celle de l'écriture). Une facture fournisseur reçue après la fermeture de sa période se comptabilise à la date d'aujourd'hui, sans fausser la date inscrite sur la pièce.
 - Les affectations de paiements et d'avoirs portent une date d'effet et ne s'effacent jamais : on les retire à une date, dans une période ouverte. L'âge des comptes à une date passée reste reproductible.
 
+## Encaissements
+- Un encaissement est une seule écriture équilibrée : débit du compte de réception (banque, caisse ou fonds non déposés), crédit des comptes clients avec le contact de la facture. Il porte le prochain numéro de la séquence `PAYMENT_RECEIVED`, sans trou. L'écriture, l'encaissement et l'affectation à la facture sont enregistrés dans la même transaction.
+- Le montant affecté ne dépasse jamais le solde ouvert de la facture (total moins encaissements et avoirs appliqués) : l'application le vérifie sous verrou de la facture, avec le solde que la personne a vu, et la base le vérifie encore à la validation. Pas de trop-perçu dans ce lot.
+- La date de réception ne précède pas la date comptable de la facture, n'est pas dans le futur et tombe dans une période ouverte.
+- Un encaissement ne se modifie pas : on l'annule. L'annulation retire l'affectation à une date, ajoute l'écriture inverse exacte et garde l'encaissement avec son motif. Une facture avec un encaissement appliqué ne peut pas être annulée.
+
+## Transactions importées
+- Un **paiement en ligne** (lien de paiement Stripe, [[Integrations]]) est un encaissement **au brut** sur le compte de la connexion, appliqué à la facture du lien, plus une **écriture de frais** de deux lignes (charge au compte des frais de traitement, crédit au compte de la connexion), le tout dans une transaction : le solde du compte égale le net versé par Stripe. Le domaine (`domain/online-payment.ts`) et la base (`online_payment_guard`, `payment_link_guard`) refusent les mêmes cas : un lien n'existe que pour une facture validée, son solde et sa devise, une seule fois en cours par facture; un paiement en ligne n'arrive que sur un lien actif, pour le montant du lien, avec un encaissement brut sur le bon compte appliqué à la bonne facture et, s'il y a des frais, une écriture exactement de ces deux lignes. Un paiement en ligne et un lien payé ou annulé ne changent plus; rien ne se supprime.
+- Les transactions importées d'un service externe ([[Integrations]]) ne créent **aucune écriture** : elles alimentent seulement la boîte de réception bancaire. Leur montant est l'effet net sur le solde du service (`brut − frais`), dans leur devise, sans conversion de change; une ligne importée ne change plus que de statut.
+
+
 ## Périodes
 - Une période fermée refuse toute nouvelle écriture.
 - La réouverture est une action privilégiée et auditée : propriétaire seulement, avec la vérification en deux étapes active et un code saisi à ce moment, un motif écrit d'au moins 10 caractères et un événement d'audit ([[Exercices-et-periodes]]). Ces conditions sont appliquées par l'application (la base garantit l'audit du changement, pas le 2FA).

@@ -1,7 +1,11 @@
 import "server-only";
-import { createCipheriv, createDecipheriv, createHash, createHmac, hkdfSync, randomBytes, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, hkdfSync, randomBytes, timingSafeEqual } from "node:crypto";
 import { hash, verify } from "@node-rs/argon2";
 import { env } from "@/platform/env";
+import { encryptionKey } from "@/platform/secrets";
+
+// The instance-key encryption itself lives in the platform (integrations use it too); auth keeps its import path.
+export { decrypt, encrypt } from "@/platform/secrets";
 
 // argon2id, OWASP parameters (19 MiB, 2 iterations).
 const ARGON2 = { algorithm: 2, memoryCost: 19_456, timeCost: 2, parallelism: 1 } as const;
@@ -60,27 +64,4 @@ export function rateLimitKey(value: string): string {
  */
 export function recoveryCodeHash(code: string): string {
   return keyedHash(encryptionKey(), "recovery-code", code);
-}
-
-// AES-256-GCM with ENCRYPTION_KEY. Layout: version (1) | iv (12) | tag (16) | ciphertext.
-const ENCRYPTION_VERSION = 1;
-
-function encryptionKey(): Buffer {
-  return Buffer.from(env().ENCRYPTION_KEY, "base64");
-}
-
-export function encrypt(plaintext: string): Uint8Array<ArrayBuffer> {
-  const iv = randomBytes(12);
-  const cipher = createCipheriv("aes-256-gcm", encryptionKey(), iv);
-  const ciphertext = Buffer.concat([cipher.update(plaintext, "utf8"), cipher.final()]);
-  const out = Buffer.concat([Buffer.from([ENCRYPTION_VERSION]), iv, cipher.getAuthTag(), ciphertext]);
-  return new Uint8Array(out);
-}
-
-export function decrypt(payload: Uint8Array): string {
-  const data = Buffer.from(payload);
-  if (data[0] !== ENCRYPTION_VERSION) throw new Error("Unsupported encryption version");
-  const decipher = createDecipheriv("aes-256-gcm", encryptionKey(), data.subarray(1, 13));
-  decipher.setAuthTag(data.subarray(13, 29));
-  return Buffer.concat([decipher.update(data.subarray(29)), decipher.final()]).toString("utf8");
 }

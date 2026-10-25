@@ -11,10 +11,10 @@ Cette page distingue les parcours livrés du schéma et des fonctionnalités pla
 | Entreprise | Identité, coordonnées et numéros fiscaux : [[Entreprise]] | Formats vérifiés, sans consultation des registres fiscaux |
 | Contacts et catalogue | Clients/fournisseurs et produits/services : [[Contacts]], [[Taxes-et-catalogue]] | Pas de suivi des stocks |
 | Taxes | Taux datés, codes, simulation et calcul exact : [[Taxes-et-catalogue]] | Déclarations : phase 6 |
-| Ventes | Brouillons et validation comptable : [[Brouillons-de-factures]], [[Validation-des-factures]] | Brouillons et validation des avoirs disponibles; envoi à venir |
+| Ventes | Brouillons, validation comptable et encaissements : [[Brouillons-de-factures]], [[Validation-des-factures]], [[Encaissements]] | Brouillons et validation des avoirs disponibles; envoi à venir |
 | Achats | Contraintes de base préparées | Factures fournisseurs et dépenses : phase 4 |
-| Paiements et fichiers | Contraintes de base préparées | Paiements, dépôts, pièces jointes : phase 4 |
-| Banque | Planification | Import CSV/OFX, appariement, rapprochement : phase 5 |
+| Paiements et fichiers | Encaissements de factures : [[Encaissements]] | Remboursements, dépôts, trop-perçus, paiements fournisseurs, pièces jointes : phase 4 |
+| Banque | Import des transactions Stripe et PayPal dans une boîte de réception, sans écriture comptable : [[Integrations]] | Import CSV/OFX, flux bancaires, appariement, rapprochement : phase 5 |
 | Rapports et exports | Balance de vérification à l’écran; sauvegardes PostgreSQL | Bilan, résultats, grand livre, âges, sommaire TPS/TVQ et CSV/PDF : phase 6 |
 | Mobilité | Navigateur connecté au serveur | Hors ligne et application native non livrés |
 

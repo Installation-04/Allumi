@@ -1,6 +1,8 @@
 import { mkdirSync, readFileSync } from "node:fs";
 import { expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
 import { Secret, TOTP } from "otpauth";
+import pg from "pg";
+import { e2eUrls } from "./db";
 
 const VERSION = (JSON.parse(readFileSync("package.json", "utf8")) as { version: string }).version;
 
@@ -241,7 +243,10 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await captureReference(page, "dashboard-en");
   await appearanceJourney(page);
   await postingJourney(page);
-  await creditPostingJourney(page);
+  const paidInvoiceUrl = await creditPostingJourney(page);
+  await paymentsJourney(page, paidInvoiceUrl);
+  await integrationsJourney(page);
+  await onlinePaymentsJourney(page, paidInvoiceUrl);
   // Nothing in the whole journey (both locales, every form, the security pages, a second browser) was blocked.
   expect(cspViolations, "Content-Security-Policy violations").toEqual([]);
 });
@@ -741,7 +746,7 @@ async function creditDraftJourney(page: Page) {
   return url;
 }
 
-async function creditPostingJourney(page: Page) {
+async function creditPostingJourney(page: Page): Promise<string> {
   await openSection(page,"Brouillons de factures");
   await page.getByRole("link",{name:"Nouveau brouillon",exact:true}).click();
   await page.getByLabel("Client",{exact:true}).selectOption({label:"Atelier Boréal"});
@@ -814,6 +819,356 @@ async function creditPostingJourney(page: Page) {
   await page.getByRole("button",{name:"Français",exact:true}).click();
   await page.getByRole("combobox",{name:"Apparence",exact:true}).selectOption("light");
   await expect(page.locator("html")).toHaveAttribute("data-theme","light");
+  return invoiceUrl;
+}
+
+/**
+ * Payments received on the posted invoice F-00002 (open balance 114,98 $ after its credit note was voided): a refused
+ * overpayment that keeps what was typed, two partial payments, a void that restores the balance, and the list in both
+ * languages.
+ */
+async function paymentsJourney(page: Page, invoiceUrl: string) {
+  const alert = (text: string) => page.locator("form").getByRole("alert").filter({ hasText: text });
+  const bank = "1000 · Banque – compte courant";
+  const fill = async (amount: string, date: string, method = "EFT", reference = "") => {
+    await page.getByLabel("Montant reçu", { exact: true }).fill(amount);
+    await page.getByLabel("Date de réception", { exact: true }).fill(date);
+    await page.getByLabel("Compte de réception", { exact: true }).selectOption({ label: bank });
+    await page.getByLabel("Mode de paiement", { exact: true }).selectOption(method);
+    if (reference) await page.getByLabel(/^Référence/).fill(reference);
+  };
+  await page.goto(invoiceUrl);
+  await expect(page.getByText("Non payée", { exact: true })).toBeVisible();
+  await expect(page.getByText("Aucun encaissement appliqué à cette facture.")).toBeVisible();
+  await page.locator("summary", { hasText: "Enregistrer un encaissement" }).click();
+  // the form proposes the whole balance, in the language's own notation
+  await expect(page.getByLabel("Montant reçu", { exact: true })).toHaveValue("114,98");
+  await expectNoPageOverflow(page);
+  await captureReference(page, "encaissement-formulaire");
+
+  // more than the balance: refused, and what was typed stays
+  await fill("200", "2026-06-15", "CHEQUE", "Chèque 1042");
+  await page.getByRole("button", { name: "Enregistrer l’encaissement", exact: true }).click();
+  await expect(alert("Le montant dépasse le solde restant")).toBeVisible();
+  await expect(page.getByLabel("Montant reçu", { exact: true })).toHaveValue("200");
+  await expect(page.getByLabel("Mode de paiement", { exact: true })).toHaveValue("CHEQUE");
+  await expect(page.getByLabel(/^Référence/)).toHaveValue("Chèque 1042");
+
+  // a first, partial payment
+  await fill("50", "2026-06-15", "CHEQUE", "Chèque 1042");
+  await page.getByRole("button", { name: "Enregistrer l’encaissement", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Encaissement E-00001", exact: true })).toBeVisible();
+  await expect(page.getByText("Chèque 1042", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: /50,00.*F-00002/ })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "encaissement");
+  await page.goto(invoiceUrl);
+  await expect(page.getByText("Partiellement payée", { exact: true })).toBeVisible();
+  await expect(page.getByText(/Solde restant:.*64,98/)).toBeVisible();
+  await expect(page.getByRole("link", { name: "E-00001", exact: true })).toBeVisible();
+
+  // the rest: the invoice is paid and the form is gone
+  await page.locator("summary", { hasText: "Enregistrer un encaissement" }).click();
+  await expect(page.getByLabel("Montant reçu", { exact: true })).toHaveValue("64,98");
+  await fill("64,98", "2026-06-20");
+  await page.getByRole("button", { name: "Enregistrer l’encaissement", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Encaissement E-00002", exact: true })).toBeVisible();
+  const secondUrl = page.url();
+  await page.goto(invoiceUrl);
+  await expect(page.getByText("Payée", { exact: true })).toBeVisible();
+  await expect(page.getByText("Cette facture est payée en entier.")).toBeVisible();
+  await expect(page.locator("summary", { hasText: "Enregistrer un encaissement" })).toHaveCount(0);
+  await captureReference(page, "facture-payee");
+
+  // voiding the second payment: a date before it is refused, then it restores the balance and keeps the reason
+  await page.goto(secondUrl);
+  await page.locator("summary", { hasText: "Annuler cet encaissement" }).click();
+  await page.getByLabel("Date d’annulation", { exact: true }).fill("2026-06-10");
+  await page.getByLabel("Motif (obligatoire, 500 caractères au plus)", { exact: true }).fill("Chèque sans provision");
+  await page.getByLabel("Je confirme l’annulation définitive de cet encaissement.").check();
+  await page.getByRole("button", { name: "Annuler l’encaissement", exact: true }).click();
+  await expect(alert("égale ou postérieure à l’encaissement")).toBeVisible();
+  await expect(page.getByLabel("Motif (obligatoire, 500 caractères au plus)", { exact: true })).toHaveValue("Chèque sans provision");
+  await page.getByLabel("Date d’annulation", { exact: true }).fill("2026-06-25");
+  await page.getByLabel("Je confirme l’annulation définitive de cet encaissement.").check();
+  await page.getByRole("button", { name: "Annuler l’encaissement", exact: true }).click();
+  await expect(page.getByText("Annulé le 2026-06-25")).toBeVisible();
+  await expect(page.getByText("Motif : Chèque sans provision")).toBeVisible();
+  await expect(page.locator("summary", { hasText: "Annuler cet encaissement" })).toHaveCount(0);
+  await expectNoPageOverflow(page);
+  await captureReference(page, "encaissement-annule");
+  await page.goto(invoiceUrl);
+  await expect(page.getByText("Partiellement payée", { exact: true })).toBeVisible();
+  await expect(page.getByText(/Solde restant:.*64,98/)).toBeVisible();
+  await expect(page.getByRole("link", { name: "E-00002", exact: true })).toHaveCount(0);
+
+  // the list, from the Sales area, in both languages
+  await openSection(page, "Ventes");
+  await page.getByRole("link", { name: "Encaissements", exact: true }).first().click();
+  await expect(page.getByRole("heading", { name: "Encaissements", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: /E-00001/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /E-00002.*Annulé/ })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "encaissements");
+  await page.getByRole("button", { name: "English", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Payments received", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: /E-00002.*Voided/ })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Encaissements", exact: true })).toBeVisible();
+}
+
+/**
+ * Seeds a Stripe connection and its imported transactions straight into the browser-test database. The live service
+ * cannot be reached from a test (the server calls it, not the browser), and the sync itself is covered with fakes in
+ * the integration tests; what is left to prove here is what a person sees and does.
+ */
+async function seedStripeConnection(companyId: string) {
+  const db = new pg.Client({ connectionString: e2eUrls().owner });
+  await db.connect();
+  try {
+    const account = (await db.query("SELECT id FROM account WHERE company_id = $1 AND subtype = 'BANK' ORDER BY code LIMIT 1", [companyId])).rows[0].id as string;
+    const user = (await db.query("SELECT id FROM app_user WHERE email = $1", [EMAIL])).rows[0].id as string;
+    const connection = (await db.query(
+      `INSERT INTO integration_connection (id, company_id, provider, label, account_id, status, credentials_hint, import_from, created_by_id, updated_at)
+       VALUES (gen_random_uuid(), $1, 'STRIPE', 'Stripe boutique', $2, 'ACTIVE', 'ab12', '2026-01-01', $3, now()) RETURNING id`, [companyId, account, user])).rows[0].id as string;
+    // Not a real ciphertext: a sync must refuse it with a message, before it calls anybody.
+    await db.query("INSERT INTO integration_credential (id, company_id, connection_id, credentials_enc, updated_at) VALUES (gen_random_uuid(), $1, $2, decode('0102030405060708090a0b0c0d0e0f10', 'hex'), now())", [companyId, connection]);
+    const row = (external: string, date: string, net: number, gross: number, fee: number, type: string, description: string, kind: string, extra: Record<string, unknown> = {}) =>
+      db.query(
+        `INSERT INTO bank_transaction (id, company_id, account_id, txn_date, amount_cents, description, external_id, dedupe_key, connection_id, currency, source_type, gross_cents, fee_cents, provider_details, updated_at)
+         VALUES (gen_random_uuid(), $1, $2, $3::date, $4::bigint, $5, $6, $6, $7, 'CAD', $8, $9::bigint, $10::bigint, $11::jsonb, now())`,
+        [companyId, account, date, net, description, `stripe:${external}`, connection, type, gross, fee, JSON.stringify({ kind, ...extra })]);
+    await row("txn_e2e_1", "2026-06-10", 9680, 10000, 320, "charge", "Facture F-00002", "PAYMENT", { reference: "F-00002" });
+    await row("txn_e2e_2", "2026-06-12", -5000, -5000, 0, "refund", "Remboursement", "REFUND");
+    await row("txn_e2e_3", "2026-06-15", -4680, -4680, 0, "payout", "STRIPE PAYOUT", "PAYOUT");
+    await row("txn_e2e_4", "2026-06-16", 2060, 2000, -60, "charge", "Frais au signe inhabituel", "PAYMENT", { unusualFeeSign: true });
+    return connection;
+  } finally {
+    await db.end();
+  }
+}
+
+/**
+ * Integrations: the connections page, a connection's page, the transaction inbox, what a form refuses (and never
+ * gives back), the message for keys that cannot be read, setting a transaction aside, disconnecting, both languages.
+ */
+async function integrationsJourney(page: Page) {
+  const company = new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0] ?? "";
+  const connectionId = await seedStripeConnection(company.slice(3));
+  const alert = (text: string) => page.locator("form").getByRole("alert").filter({ hasText: text });
+
+  await page.goto(company);
+  await openSection(page, "Banque et transactions");
+  await page.getByRole("link", { name: "Intégrations", exact: true }).first().click();
+  await expect(page.getByRole("heading", { name: "Intégrations", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Stripe boutique/ })).toContainText("4 transactions");
+  await expectNoPageOverflow(page);
+  await captureReference(page, "integrations");
+
+  // what a form refuses, and never gives back: a publishable key, then a date in the future
+  await page.locator("summary", { hasText: "Connecter Stripe" }).click();
+  const stripe = page.locator("details", { hasText: "Connecter Stripe" });
+  await stripe.getByLabel("Nom de la connexion").fill("Stripe essai");
+  await stripe.getByLabel("Clé d’API Stripe").fill(`pk_live_${"a".repeat(30)}`);
+  await stripe.getByRole("button", { name: "Vérifier les clés et connecter", exact: true }).click();
+  await expect(alert("Vérifiez le nom, le compte, la date et les clés")).toBeVisible();
+  await expect(stripe.getByLabel("Nom de la connexion")).toHaveValue("Stripe essai");
+  await expect(stripe.getByLabel("Clé d’API Stripe")).toHaveValue(""); // the key is never sent back
+  await stripe.getByLabel("Importer à partir du").fill("2099-01-01");
+  await stripe.getByLabel("Clé d’API Stripe").fill(`sk_live_${"a1B2c3D4e5".repeat(3)}`);
+  await stripe.getByRole("button", { name: "Vérifier les clés et connecter", exact: true }).click();
+  await expect(alert("Choisissez un jour réel")).toBeVisible();
+  await expect(stripe.getByLabel("Clé d’API Stripe")).toHaveValue("");
+  const paypal = page.locator("details", { hasText: "Connecter PayPal" });
+  await page.locator("summary", { hasText: "Connecter PayPal" }).click();
+  await paypal.getByLabel("Environnement").selectOption("sandbox");
+  await paypal.getByLabel("Identifiant client PayPal").fill("trop-court");
+  await paypal.getByLabel("Secret client PayPal").fill("court");
+  await paypal.getByRole("button", { name: "Vérifier les clés et connecter", exact: true }).click();
+  await expect(alert("Vérifiez le nom, le compte, la date et les clés")).toBeVisible();
+  await expect(paypal.getByLabel("Environnement")).toHaveValue("sandbox");
+  await expect(paypal.getByLabel("Identifiant client PayPal")).toHaveValue("trop-court");
+  await expect(paypal.getByLabel("Secret client PayPal")).toHaveValue("");
+
+  // the connection's page; keys that cannot be read are refused before any call, and the failure stays on the page
+  await page.goto(`${company}/integrations/${connectionId}`);
+  await expect(page.getByRole("heading", { name: "Stripe boutique", exact: true })).toBeVisible();
+  await expect(page.getByText("Active", { exact: true })).toBeVisible();
+  await expect(page.getByText("…ab12", { exact: true })).toBeVisible();
+  await expect(page.getByText("Jamais", { exact: true })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "integration-connexion");
+  await page.getByRole("button", { name: "Synchroniser maintenant", exact: true }).click();
+  await expect(alert("Les clés enregistrées sont illisibles")).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("alert").filter({ hasText: "La dernière synchronisation a échoué. Les clés enregistrées sont illisibles" })).toBeVisible();
+  await page.locator("summary", { hasText: "Remplacer les clés" }).click();
+  await page.getByLabel("Clé d’API Stripe").fill("pas une clé");
+  await page.getByRole("button", { name: "Vérifier et remplacer", exact: true }).click();
+  await expect(alert("Vérifiez le nom, le compte, la date et les clés")).toBeVisible();
+
+  // the inbox: net amount, gross and fee, the flag, setting a transaction aside and bringing it back
+  await page.getByRole("link", { name: /4 transactions/ }).click();
+  await expect(page.getByRole("heading", { name: "Transactions importées", exact: true })).toBeVisible();
+  await expect(page.getByText("4 transactions", { exact: true })).toBeVisible();
+  const first = page.locator("li").filter({ hasText: "Facture F-00002" });
+  await expect(first).toContainText("96,80");
+  await expect(first).toContainText("Brut 100,00 $ · Frais 3,20 $");
+  await expect(first).toContainText("Référence : F-00002");
+  await expect(page.locator("li").filter({ hasText: "Remboursement" })).toContainText("-50,00");
+  await expect(page.getByRole("note").filter({ hasText: "le signe des frais est inhabituel" })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "transactions-importees");
+  await page.getByRole("button", { name: "Mettre de côté : Facture F-00002", exact: true }).click();
+  await expect(first).toContainText("Mise de côté");
+  await page.getByRole("combobox", { name: /^État/ }).selectOption("EXCLUDED");
+  await page.getByRole("button", { name: "Filtrer", exact: true }).click();
+  await expect(page.getByText("1 transaction", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Remettre à traiter : Facture F-00002", exact: true }).click();
+  await expect(page.getByText("Aucune transaction", { exact: true })).toBeVisible();
+
+  // disconnecting keeps what was imported and takes the key away
+  await page.goto(`${company}/integrations/${connectionId}`);
+  await page.locator("summary", { hasText: "Déconnecter" }).click();
+  await expect(page.getByLabel("Je confirme la déconnexion.")).toHaveAttribute("required", ""); // the browser refuses an unconfirmed submit
+  await page.getByLabel("Je confirme la déconnexion.").check();
+  await page.getByRole("button", { name: "Déconnecter le service", exact: true }).click();
+  await expect(page.getByText("Déconnectée", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Synchroniser maintenant", exact: true })).toHaveCount(0);
+  await expect(page.getByText("…ab12")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /4 transactions/ })).toBeVisible();
+
+  // English
+  await page.getByRole("button", { name: "English", exact: true }).click();
+  await expect(page.getByRole("link", { name: "Back to integrations" })).toBeVisible();
+  await page.getByRole("link", { name: /4 transactions/ }).click();
+  await expect(page.getByRole("heading", { name: "Imported transactions", exact: true })).toBeVisible();
+  await expect(page.locator("li").filter({ hasText: "STRIPE PAYOUT" })).toContainText("Payout");
+  await expectNoPageOverflow(page);
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Transactions importées", exact: true })).toBeVisible();
+}
+
+/**
+ * Seeds a Stripe connection whose keys cannot be read, and, on demand, a live payment link on an invoice. The service
+ * is called by the server, not by the browser, so a test cannot reach it; what is left to prove here is what a person
+ * sees and does: the choice of the fee account, the refusal that keeps a link pending, the live link and its address,
+ * a payment under review, cancelling, both languages.
+ */
+async function seedOnlineConnection(companyId: string) {
+  const db = new pg.Client({ connectionString: e2eUrls().owner });
+  await db.connect();
+  try {
+    const account = (await db.query("SELECT id FROM account WHERE company_id = $1 AND subtype = 'BANK' ORDER BY code LIMIT 1", [companyId])).rows[0].id as string;
+    const user = (await db.query("SELECT id FROM app_user WHERE email = $1", [EMAIL])).rows[0].id as string;
+    const connection = (await db.query(
+      `INSERT INTO integration_connection (id, company_id, provider, label, account_id, status, credentials_hint, import_from, created_by_id, updated_at)
+       VALUES (gen_random_uuid(), $1, 'STRIPE', 'Stripe en ligne', $2, 'ACTIVE', 'cd34', '2026-01-01', $3, now()) RETURNING id`, [companyId, account, user])).rows[0].id as string;
+    await db.query("INSERT INTO integration_credential (id, company_id, connection_id, credentials_enc, updated_at) VALUES (gen_random_uuid(), $1, $2, decode('0102030405060708090a0b0c0d0e0f10', 'hex'), now())", [companyId, connection]);
+    return connection;
+  } finally {
+    await db.end();
+  }
+}
+
+async function seedPaymentLink(companyId: string, connectionId: string, invoiceId: string, state: "ACTIVE" | "REVIEW") {
+  const db = new pg.Client({ connectionString: e2eUrls().owner });
+  await db.connect();
+  try {
+    const user = (await db.query("SELECT id FROM app_user WHERE email = $1", [EMAIL])).rows[0].id as string;
+    const id = (await db.query(
+      `INSERT INTO payment_link (id, company_id, invoice_id, connection_id, amount_cents, created_by_id, updated_at)
+       VALUES (gen_random_uuid(), $1, $2, $3, 6498, $4, now()) RETURNING id`, [companyId, invoiceId, connectionId, user])).rows[0].id as string;
+    await db.query("UPDATE payment_link SET status = 'ACTIVE', external_price_id = 'price_e2e', external_id = 'plink_e2e', url = 'https://buy.stripe.com/test_e2e', updated_at = now() WHERE id = $1", [id]);
+    if (state === "REVIEW") await db.query("UPDATE payment_link SET status = 'REVIEW', review_reason = 'payments.exceeds', updated_at = now() WHERE id = $1", [id]);
+    return id;
+  } finally {
+    await db.end();
+  }
+}
+
+async function onlinePaymentsJourney(page: Page, invoiceUrl: string) {
+  const company = new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0] ?? "";
+  const invoiceId = new URL(invoiceUrl, page.url()).pathname.split("/").at(-1) ?? "";
+  const connectionId = await seedOnlineConnection(company.slice(3));
+  const alert = (text: string) => page.locator("form").getByRole("alert").filter({ hasText: text });
+  const panel = page.getByRole("region", { name: "Paiement en ligne", exact: true });
+
+  // no fee account yet: the invoice offers no link, and says what to do
+  await page.goto(invoiceUrl);
+  await expect(panel).toContainText("Aucune connexion Stripe n’est prête");
+  await expect(panel.getByRole("link", { name: "Aller aux intégrations" })).toBeVisible();
+
+  // the owner chooses where Stripe's fees are booked
+  await page.goto(`${company}/integrations/${connectionId}`);
+  await expect(page.getByRole("heading", { name: "Paiement en ligne des factures", exact: true })).toBeVisible();
+  await expect(page.getByText("Non choisi", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Vérifier les paiements en ligne", exact: true })).toHaveCount(0);
+  await page.getByLabel("Compte des frais de traitement").selectOption({ label: "6010 · Frais bancaires" });
+  await page.getByRole("button", { name: "Enregistrer le compte", exact: true }).click();
+  await expect(page.getByText("Réglages enregistrés.")).toBeVisible();
+  await page.reload();
+  await expect(page.getByText("6010 · Frais bancaires", { exact: true }).first()).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "paiement-en-ligne-connexion", "Paiement en ligne des factures");
+  // nothing to look at yet: no call, and the page says so
+  await page.getByRole("button", { name: "Vérifier les paiements en ligne", exact: true }).click();
+  await expect(page.getByText("Vérification terminée : aucun nouveau paiement.")).toBeVisible();
+
+  // a link needs the keys too: refused, and the link stays pending with the reason so it can be resumed
+  await page.goto(invoiceUrl);
+  await expect(panel).toBeVisible();
+  await panel.locator("summary", { hasText: "Créer un lien de paiement" }).click();
+  await expect(panel.getByText(/Le lien vaut pour le solde actuel, 64,98/)).toBeVisible();
+  await panel.getByRole("button", { name: "Créer le lien", exact: true }).click();
+  await expect(alert("Les clés enregistrées sont illisibles")).toBeVisible();
+  await page.goto(invoiceUrl);
+  await expect(panel.getByText(/^En préparation · /)).toBeVisible();
+  await expect(panel).toContainText("Ce lien n’a pas pu être créé chez Stripe");
+  await expect(panel).toContainText("Les clés enregistrées sont illisibles");
+  await expect(panel.getByRole("button", { name: "Reprendre la création", exact: true })).toBeVisible();
+  await expect(panel.locator("summary", { hasText: "Créer un lien de paiement" })).toHaveCount(0); // one live link per invoice
+  await expectNoPageOverflow(page);
+  await panel.getByRole("button", { name: "Annuler le lien", exact: true }).click();
+  await expect(panel.getByText("Lien annulé.")).toBeVisible();
+  await expect(panel.getByText(/^Annulé · /)).toBeVisible();
+
+  // a live link: its address, the buttons, and no second link; the check is refused without readable keys
+  const linkId = await seedPaymentLink(company.slice(3), connectionId, invoiceId, "ACTIVE");
+  await page.goto(invoiceUrl);
+  await expect(panel.getByText(/^Prêt à payer · /)).toBeVisible();
+  await expect(panel.getByRole("link", { name: "https://buy.stripe.com/test_e2e" })).toHaveAttribute("href", "https://buy.stripe.com/test_e2e");
+  await expect(panel.getByRole("link", { name: "https://buy.stripe.com/test_e2e" })).toHaveAttribute("rel", "noopener noreferrer");
+  await expect(panel.locator("summary", { hasText: "Créer un lien de paiement" })).toHaveCount(0);
+  await expectNoPageOverflow(page);
+  await captureReference(page, "paiement-en-ligne-facture", "Paiement en ligne");
+  await panel.getByRole("button", { name: "Vérifier le paiement", exact: true }).click();
+  await expect(alert("Les clés enregistrées sont illisibles")).toBeVisible();
+
+  // a payment that could not be booked: the reason, and nothing was recorded
+  const db = new pg.Client({ connectionString: e2eUrls().owner });
+  await db.connect();
+  try {
+    await db.query("UPDATE payment_link SET status = 'REVIEW', review_reason = 'payments.exceeds', updated_at = now() WHERE id = $1", [linkId]);
+  } finally {
+    await db.end();
+  }
+  await page.goto(invoiceUrl);
+  await expect(panel.getByText(/^À vérifier · /)).toBeVisible();
+  await expect(panel.getByRole("alert")).toContainText("Allumi n’a rien enregistré : Le montant dépasse le solde restant de la facture.");
+  await expect(page.getByText(/Solde restant:.*64,98/)).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "paiement-en-ligne-a-verifier", "Paiement en ligne");
+  await panel.getByRole("button", { name: "Fermer ce signalement", exact: true }).click();
+  await expect(panel.getByText("Lien annulé.")).toBeVisible();
+
+  // English
+  await page.getByRole("button", { name: "English", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Online payment", exact: true })).toContainText("Create a payment link");
+  await expectNoPageOverflow(page);
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await expect(panel).toBeVisible();
 }
 
 /**

@@ -203,6 +203,28 @@ Voir [[Brouillons-d-avoirs]].
 
 Voir [[Validation-des-avoirs]].
 
+## Encaissements
+
+![Formulaire d’encaissement sur la facture](images/encaissement-formulaire-desktop.png)
+![Facture payée](images/facture-payee-desktop.png)
+![Liste des encaissements](images/encaissements-desktop.png)
+![Encaissement sur téléphone](images/encaissement-mobile.png)
+![Encaissement annulé sur téléphone](images/encaissement-annule-mobile.png)
+
+Voir [[Encaissements]].
+
+## Intégrations
+
+![Connexions](images/integrations-desktop.png)
+![Fiche d’une connexion](images/integration-connexion-desktop.png)
+![Transactions importées](images/transactions-importees-desktop.png)
+![Transactions importées sur téléphone](images/transactions-importees-mobile.png)
+![Fiche d’une connexion : compte des frais et vérification des paiements](images/paiement-en-ligne-connexion-desktop.png)
+![Facture avec un lien de paiement prêt](images/paiement-en-ligne-facture-desktop.png)
+![Paiement à vérifier sur téléphone](images/paiement-en-ligne-a-verifier-mobile.png)
+
+Voir [[Integrations]].
+
 ## Avoirs annulés
 
 ![Avoir annulé et affectation retirée](images/avoir-annule-desktop.png)
