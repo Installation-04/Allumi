@@ -58,3 +58,12 @@ Les tests d'intégration clonent une base migrée par fichier de test : ils ne t
 bash -n scripts/*.sh        # syntaxe
 shellcheck -x -P SCRIPTDIR scripts/*.sh   # si installé
 ```
+
+## Logo et icônes
+Le logo (une flamme, « allumé », posée sur un signe égal, débit = crédit) est un dessin original défini **une seule fois**, dans `scripts/build-icons.mjs`. Ce script produit le SVG maître, les PNG (navigateur, iOS, PWA, « maskable » pour Android) et les `.ico` (onglet du navigateur, installateur du client Windows) :
+
+```bash
+npm run icons     # utilise Chromium de Playwright (PLAYWRIGHT_CHROMIUM_PATH pour en choisir un autre)
+```
+
+Ne retouche pas les fichiers de `public/icons/`, `public/favicon.ico` ni `desktop/icon.ico` à la main. Le logo affiché dans l’en-tête et le menu (`src/app/_components/logo.tsx`) reprend le même tracé en couleurs unies; un test vérifie que les deux restent identiques. Les captures de `docs/images/` sont régénérées par `ALLUMI_SCREENSHOTS=1 npm run test:e2e` (voir [[Plan-de-tests]]).

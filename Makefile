@@ -9,8 +9,8 @@ dev-up: ## Démarre PostgreSQL + Mailpit (dev)
 dev-down: ## Arrête les services de dev
 	docker compose -f docker-compose.dev.yml down
 
-up: ## Démarre la pile de production
-	docker compose up -d --build
+up: ## Démarre la pile de production (images publiées de la version, sinon construites)
+	./scripts/up.sh
 
 down: ## Arrête la pile de production
 	docker compose down

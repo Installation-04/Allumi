@@ -1,3 +1,5 @@
+<p align="center"><img src="public/icons/allumi.svg" alt="Logo d’Allumi : une flamme au-dessus d’un signe égal" width="112" height="112"></p>
+
 # Allumi
 
 Logiciel de comptabilité **open source** et **auto-hébergeable** pour les PME et les travailleurs autonomes du Québec et du Canada. Une alternative libre aux logiciels de comptabilité infonuagiques propriétaires.

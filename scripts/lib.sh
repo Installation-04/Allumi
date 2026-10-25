@@ -64,6 +64,75 @@ env_backfill() {
 
 compose() { docker compose --project-directory "$ALLUMI_DIR" "$@"; }
 
+# Les identifiants et réglages de déploiement viennent du fichier .env, jamais de l'environnement du shell :
+# Compose donne la priorité aux variables d'environnement sur celles de .env, si bien qu'un shell de développement
+# (ou une CI) qui exporte DATABASE_URL ferait migrer et servir la mauvaise base.
+isolate_deployment_env() {
+  unset DATABASE_URL APP_DATABASE_URL POSTGRES_PASSWORD POSTGRES_USER POSTGRES_DB APP_DB_PASSWORD AUTH_SECRET ENCRYPTION_KEY \
+    SETUP_TOKEN APP_URL ALLUMI_DOMAIN ACME_EMAIL ALLUMI_HTTP_PORT ALLUMI_HTTPS_PORT ALLUMI_BIND_ADDRESS DEFAULT_LOCALE \
+    ALLUMI_APP_IMAGE ALLUMI_MIGRATE_IMAGE
+}
+
+# --- Images : téléchargées (version publiée) ou construites sur place ------------------------------------------
+# Le workflow Release construit et publie, pour chaque version étiquetée, les images application et migrations
+# (AMD64 et ARM64) avant de publier la release. Une copie placée exactement sur une étiquette les télécharge au lieu
+# de les compiler. Toute autre copie (branche, commit quelconque, fichiers modifiés), --build, ou une image
+# introuvable (hors ligne, architecture non publiée) se construit sur place, comme avant.
+IMAGE_REPO="${ALLUMI_IMAGE_REPO:-ghcr.io/installation-04/allumi}"
+IMAGE_MODE=build
+
+# Retire une variable de .env (sans effet si elle est absente).
+env_unset() {
+  local key="$1" tmp
+  [ -f "$ENV_FILE" ] || return 0
+  tmp="$(mktemp)"
+  { grep -v -E "^${key}=" "$ENV_FILE" || true; } > "$tmp"
+  cat "$tmp" > "$ENV_FILE"; rm -f "$tmp"
+}
+
+# Étiquette de version si HEAD est exactement dessus, que ce dossier est bien la racine du dépôt (pas un dépôt
+# parent) et que les fichiers suivis ne sont pas modifiés : sinon rien. L'image publiée ne contient pas de
+# modifications locales.
+release_tag() {
+  local top
+  top="$(git -C "$ALLUMI_DIR" rev-parse --show-toplevel 2>/dev/null || true)"
+  [ -n "$top" ] && [ "$top" = "$(cd "$ALLUMI_DIR" && pwd -P)" ] || return 0
+  [ -z "$(git -C "$ALLUMI_DIR" status --porcelain --untracked-files=no 2>/dev/null)" ] || return 0
+  { git -C "$ALLUMI_DIR" describe --tags --exact-match HEAD 2>/dev/null || true; } |
+    { grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$' || true; } | head -n 1
+}
+
+# Choisit entre images publiées et construction locale, l'inscrit dans .env (ALLUMI_APP_IMAGE, ALLUMI_MIGRATE_IMAGE :
+# le Compose du dépôt les lit, donc « docker compose up -d » reste cohérent) et positionne IMAGE_MODE.
+# Argument : 1 pour forcer la construction locale.
+select_images() {
+  local force_build="${1:-0}" tag version=""
+  IMAGE_MODE=build
+  [ "$force_build" = 1 ] || [ "${ALLUMI_BUILD:-0}" = 1 ] || tag="$(release_tag)"
+  if [ -n "${tag:-}" ]; then
+    version="${tag#v}"
+    env_set ALLUMI_APP_IMAGE "${IMAGE_REPO}:${version}"
+    env_set ALLUMI_MIGRATE_IMAGE "${IMAGE_REPO}-migrate:${version}"
+    info "Téléchargement des images publiées de ${tag} (aucune compilation sur cette machine)…"
+    if docker compose --project-directory "$ALLUMI_DIR" --env-file "$ENV_FILE" pull --quiet app migrate; then
+      IMAGE_MODE=pull
+      return 0
+    fi
+    warn "images publiées de ${tag} indisponibles (hors ligne, version sans images ou architecture non publiée) : construction sur place."
+  else
+    info "Images construites sur place (copie non étiquetée ou modifiée, ou --build)."
+  fi
+  env_unset ALLUMI_APP_IMAGE
+  env_unset ALLUMI_MIGRATE_IMAGE
+}
+
+# Démarre (ou met à jour) la pile selon IMAGE_MODE : jamais de construction quand les images ont été téléchargées.
+compose_up() {
+  local build_flag=--build
+  [ "$IMAGE_MODE" != pull ] || build_flag=--no-build
+  docker compose --project-directory "$ALLUMI_DIR" -f "$ALLUMI_DIR/docker-compose.yml" --env-file "$ENV_FILE" up -d "$build_flag" --remove-orphans
+}
+
 require_root() { [ "$(id -u)" -eq 0 ] || die "lance ce script avec sudo."; }
 require_env()  { [ -f "$ENV_FILE" ] || die "fichier .env introuvable ($ENV_FILE). Lance d'abord install.sh."; }
 

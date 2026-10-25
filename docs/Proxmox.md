@@ -4,7 +4,7 @@ Allumi peut être testé dans une **VM Ubuntu 24.04 dédiée**, avec Docker Comp
 
 ## VM et accès
 
-Prévoir initialement 4 vCPU, 8 Go de RAM et 40 Go de disque, à ajuster selon les pièces jointes et sauvegardes. Relier la VM à votre pont réseau et lui attribuer une adresse stable. Ces valeurs sont un point de départ pour le build et les essais, pas un résultat de mesure de capacité.
+Prévoir initialement 4 vCPU, 8 Go de RAM et 40 Go de disque, à ajuster selon les pièces jointes et sauvegardes. Relier la VM à votre pont réseau et lui attribuer une adresse stable. Ces valeurs sont un point de départ, pas un résultat de mesure de capacité. Sur une version étiquetée, les images sont téléchargées et non compilées (voir [[Installation-Docker]]); le build local, plus gourmand en mémoire, ne sert qu’aux branches et aux essais de développement.
 
 Accès web direct : `http://ADRESSE_VM:28080`. Aucun domaine ni certificat obligatoire. Pour un HTTPS externe, voir [[Configuration]]. PostgreSQL reste privé.
 

@@ -2,6 +2,21 @@
 
 À partir de v0.4.0-alpha.10, la pile fournit **l’application en HTTP et PostgreSQL privé**, sans Caddy, certificat, domaine obligatoire ni service ACME. Le service ponctuel `migrate` applique les migrations avant le démarrage de l’application. Linux **AMD64 et ARM64** sont construits et testés nativement; Docker sélectionne l’architecture du serveur.
 
+## Images déjà construites
+
+Chaque version étiquetée a ses images **application** et **migrations** construites et publiées (`ghcr.io/installation-04/allumi` et `…-migrate`, AMD64 et ARM64) **avant** la publication de la release : le workflow Release garde la release en brouillon tant que les deux architectures et leurs manifestes ne sont pas vérifiés. Une copie placée exactement sur une version (`git checkout v0.4.0-alpha.10`) **télécharge** ces images au lieu de les compiler, ce qui évite le build sur la VM (minutes de calcul, mémoire, accès aux dépôts de paquets).
+
+L’installateur choisit seul, et l’indique dans sa sortie :
+
+| Situation | Résultat |
+|---|---|
+| Copie sur une étiquette de version, fichiers suivis non modifiés | images publiées téléchargées, aucune compilation |
+| Branche, commit quelconque, fichiers modifiés | images construites sur place |
+| `--build` | images construites sur place, même sur une version |
+| Images publiées introuvables (hors ligne, version sans images, architecture non publiée) | repli automatique sur la construction, avec un avertissement |
+
+Le choix est inscrit dans `.env` (`ALLUMI_APP_IMAGE`, `ALLUMI_MIGRATE_IMAGE`, gérés par les scripts) pour que `docker compose up -d` reste cohérent. `./scripts/install-docker.sh`, `./scripts/update.sh` et `./scripts/up.sh` le recalculent à chaque passage; après un `git checkout` manuel, utiliser `./scripts/up.sh` plutôt que `docker compose up -d --build`. Les images ne sont pas signées; elles proviennent du workflow Release du dépôt.
+
 ## Installation en une commande
 
 `scripts/get.sh` détecte le système, le processeur et les prérequis, récupère la version la plus récente, puis lance l’installateur qui convient. Il s’exécute avec `sh` (sans Bash), donc directement depuis `curl` :

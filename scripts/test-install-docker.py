@@ -14,7 +14,7 @@ DOCKER = r'''#!/usr/bin/env python3
 import os,sys
 from pathlib import Path
 args=sys.argv[1:]
-if any(os.environ.get(k) for k in ['DATABASE_URL','APP_DATABASE_URL','ALLUMI_HTTP_PORT','ALLUMI_HTTPS_PORT','ALLUMI_BIND_ADDRESS','DEFAULT_LOCALE']): sys.exit(97)
+if any(os.environ.get(k) for k in ['DATABASE_URL','APP_DATABASE_URL','ALLUMI_HTTP_PORT','ALLUMI_HTTPS_PORT','ALLUMI_BIND_ADDRESS','DEFAULT_LOCALE','ALLUMI_APP_IMAGE','ALLUMI_MIGRATE_IMAGE']): sys.exit(97)
 with open(os.environ['DOCKER_TEST_LOG'],'a') as f: f.write(' '.join(args)+'\n')
 if args==['info'] and os.environ.get('DOCKER_TEST_DENY'): sys.exit(1)
 if args[:2]==['ps','-aq'] or args[:2]==['volume','ls']:
@@ -22,6 +22,8 @@ if args[:2]==['ps','-aq'] or args[:2]==['volume','ls']:
 elif args and args[0]=='inspect': print(os.environ.get('DOCKER_TEST_HEALTH','healthy'))
 elif 'config' in args:
  if os.environ.get('DOCKER_TEST_BAD_CONFIG'): sys.exit(1)
+elif 'pull' in args:
+ if os.environ.get('DOCKER_TEST_BAD_PULL'): sys.exit(1)
 elif 'exec' in args:
  if os.environ.get('DOCKER_TEST_SETUP_CLOSED'): sys.exit(3)
  if os.environ.get('DOCKER_TEST_EXEC_FAIL'): sys.exit(2)
@@ -30,14 +32,14 @@ elif 'up' in args:
 elif 'ps' in args: print('app-container')
 '''
 
-class Installer(unittest.TestCase):
+class Harness(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         (self.root/'scripts').mkdir()
         (self.root/'bin').mkdir()
-        for path in ['scripts/install-docker.sh','scripts/installer-options.sh','scripts/lib.sh','.env.example','docker-compose.yml']:
+        for path in ['scripts/install-docker.sh','scripts/installer-options.sh','scripts/lib.sh','scripts/up.sh','scripts/update.sh','.env.example','docker-compose.yml']:
             shutil.copyfile(ROOT/path,self.root/path)
         docker=self.root/'bin/docker';docker.write_text(DOCKER);docker.chmod(0o755)
         self.log=self.root/'docker.log'
@@ -50,6 +52,8 @@ class Installer(unittest.TestCase):
         return subprocess.run(args+list(extra),env={**self.env,**env},text=True,capture_output=True,timeout=15,input=input_text)
     def config(self):
         return dict(line.split('=',1) for line in (self.root/'.env').read_text().splitlines() if line and not line.startswith('#'))
+
+class Installer(Harness):
     def test_new_install_and_repeat_preserve_secrets(self):
         first=self.run_install();self.assertEqual(first.returncode,0,first.stderr)
         original=self.config()
@@ -222,6 +226,126 @@ class Installer(unittest.TestCase):
         wrapper=(ROOT/'scripts/install.sh').read_text()
         self.assertIn('print_setup_token',wrapper);self.assertNotIn('SETUP_TOKEN_VALUE',wrapper)
         self.assertNotIn('env_get SETUP_TOKEN',wrapper)
+
+class PublishedImages(Harness):
+    """A copy sitting exactly on a release tag downloads the images the release published; anything else builds."""
+    # A developer shell or a CI job exports these; the scripts must not let them override the deployment's .env.
+    LEAKED={'DATABASE_URL':'postgresql://dev:dev@localhost/dev','APP_DATABASE_URL':'postgresql://dev:dev@localhost/dev','ALLUMI_HTTP_PORT':'9999','ALLUMI_APP_IMAGE':'evil/app:1','ALLUMI_MIGRATE_IMAGE':'evil/migrate:1'}
+    def setUp(self):
+        super().setUp();self.env.update(self.LEAKED)
+    GIT_ENV={'GIT_AUTHOR_NAME':'t','GIT_AUTHOR_EMAIL':'t@t','GIT_COMMITTER_NAME':'t','GIT_COMMITTER_EMAIL':'t@t'}
+    def git(self,*args):
+        subprocess.run(['git',*args],cwd=self.root,check=True,capture_output=True,env={**os.environ,**self.GIT_ENV})
+    def release(self,tag='v0.4.0-alpha.10'):
+        if not (self.root/'.git').exists():
+            self.git('init','-q');self.git('config','core.excludesFile','/dev/null')
+            (self.root/'.gitignore').write_text('.env\ndocker.log\nbin/\n*.install*\nresult\n')
+        self.git('add','-A');self.git('commit','-q','--allow-empty','-m',tag);self.git('tag','-a',tag,'-m',tag)
+    def commands(self):
+        return self.log.read_text().splitlines() if self.log.exists() else []
+    def pulled(self):
+        return [line for line in self.commands() if ' pull ' in f' {line} ']
+    def started(self):
+        return [line for line in self.commands() if ' up ' in f' {line} ']
+    def test_a_release_tag_downloads_the_published_images_and_never_builds(self):
+        self.release()
+        result=self.run_install();self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(len(self.pulled()),1);self.assertIn('pull --quiet app migrate',self.pulled()[0])
+        self.assertEqual(len(self.started()),1);self.assertIn('up -d --no-build --remove-orphans',self.started()[0])
+        self.assertNotIn('--build',self.started()[0])
+        config=self.config()
+        self.assertEqual(config['ALLUMI_APP_IMAGE'],'ghcr.io/installation-04/allumi:0.4.0-alpha.10')
+        self.assertEqual(config['ALLUMI_MIGRATE_IMAGE'],'ghcr.io/installation-04/allumi-migrate:0.4.0-alpha.10')
+        self.assertIn('aucune compilation',result.stdout)
+    def test_unavailable_published_images_fall_back_to_a_local_build_without_pinning_them(self):
+        self.release()
+        result=self.run_install(DOCKER_TEST_BAD_PULL='1');self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIn('up -d --build --remove-orphans',self.started()[0])
+        self.assertNotIn('ALLUMI_APP_IMAGE',self.config());self.assertNotIn('ALLUMI_MIGRATE_IMAGE',self.config())
+        self.assertIn('indisponibles',result.stderr)
+    def test_an_untagged_commit_builds_locally(self):
+        self.release();self.git('commit','-q','--allow-empty','-m','after the release')
+        self.assertEqual(self.run_install().returncode,0)
+        self.assertEqual(self.pulled(),[]);self.assertIn('up -d --build',self.started()[0])
+        self.assertNotIn('ALLUMI_APP_IMAGE',self.config())
+    def test_local_changes_to_tracked_files_build_locally_because_the_image_would_not_contain_them(self):
+        self.release();(self.root/'docker-compose.yml').write_text((self.root/'docker-compose.yml').read_text()+'# local edit\n')
+        self.assertEqual(self.run_install().returncode,0)
+        self.assertEqual(self.pulled(),[]);self.assertIn('up -d --build',self.started()[0])
+    def test_build_flag_forces_a_local_build_on_a_release(self):
+        self.release()
+        self.assertEqual(self.run_install('--build').returncode,0)
+        self.assertEqual(self.pulled(),[]);self.assertIn('up -d --build',self.started()[0])
+        self.assertNotIn('ALLUMI_APP_IMAGE',self.config())
+    def test_a_prerelease_and_a_final_tag_map_to_their_own_images(self):
+        self.release('v1.2.3')
+        self.assertEqual(self.run_install().returncode,0)
+        self.assertEqual(self.config()['ALLUMI_APP_IMAGE'],'ghcr.io/installation-04/allumi:1.2.3')
+    def test_a_repeat_install_follows_the_checked_out_version_and_drops_the_pin_off_a_release(self):
+        self.release();self.assertEqual(self.run_install().returncode,0)
+        self.git('commit','-q','--allow-empty','-m','next');self.git('tag','-a','v0.4.0-alpha.11','-m','next')
+        self.assertEqual(self.run_install().returncode,0)
+        self.assertEqual(self.config()['ALLUMI_APP_IMAGE'],'ghcr.io/installation-04/allumi:0.4.0-alpha.11')
+        self.assertEqual(self.config()['ALLUMI_MIGRATE_IMAGE'],'ghcr.io/installation-04/allumi-migrate:0.4.0-alpha.11')
+        self.git('commit','-q','--allow-empty','-m','work in progress')
+        self.assertEqual(self.run_install().returncode,0)
+        self.assertNotIn('ALLUMI_APP_IMAGE',self.config());self.assertNotIn('ALLUMI_MIGRATE_IMAGE',self.config())
+    def test_secrets_survive_switching_between_published_and_local_images(self):
+        self.release();self.assertEqual(self.run_install().returncode,0)
+        before={key:value for key,value in self.config().items() if key in ['POSTGRES_PASSWORD','APP_DB_PASSWORD','AUTH_SECRET','ENCRYPTION_KEY','SETUP_TOKEN']}
+        self.assertEqual(self.run_install('--build').returncode,0)
+        self.assertEqual(before,{key:self.config()[key] for key in before})
+    def test_prepare_only_does_not_pull(self):
+        self.release();self.assertEqual(self.run_install('--prepare-only').returncode,0)
+        self.assertFalse(self.log.exists());self.assertNotIn('ALLUMI_APP_IMAGE',self.config())
+    def test_a_parent_repository_is_not_mistaken_for_this_folder(self):
+        self.release();nested=self.root/'nested';nested.mkdir()
+        probe=lambda directory:subprocess.run(['bash','-c','. "$1/scripts/lib.sh"; release_tag','bash',str(self.root)],env={**self.env,'ALLUMI_DIR':str(directory)},text=True,capture_output=True,timeout=15).stdout.strip()
+        self.assertEqual(probe(self.root),'v0.4.0-alpha.10')
+        self.assertEqual(probe(nested),'')
+    def test_up_script_selects_images_for_the_checkout_and_needs_a_configuration(self):
+        self.release()
+        missing=subprocess.run(['bash',str(self.root/'scripts/up.sh')],env=self.env,text=True,capture_output=True,timeout=15)
+        self.assertNotEqual(missing.returncode,0)
+        self.assertEqual(self.run_install('--prepare-only').returncode,0)
+        result=subprocess.run(['bash',str(self.root/'scripts/up.sh')],env=self.env,text=True,capture_output=True,timeout=15)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIn('up -d --no-build',self.started()[0])
+        self.assertEqual(subprocess.run(['bash',str(self.root/'scripts/up.sh'),'--nope'],env=self.env,capture_output=True,timeout=15).returncode,1)
+    def remote_with_two_releases(self):
+        """self.root is a clone sitting on v0.4.0-alpha.10; the (bare, local) origin also has v0.4.0-alpha.11."""
+        self.release();self.git('commit','-q','--allow-empty','-m','next');self.git('tag','-a','v0.4.0-alpha.11','-m','next')
+        remote=self.root.parent/(self.root.name+'-remote.git')
+        subprocess.run(['git','clone','-q','--bare',str(self.root),str(remote)],check=True,capture_output=True)
+        self.git('remote','add','origin',str(remote));self.git('fetch','-q','origin')
+        self.git('checkout','-q','v0.4.0-alpha.10')
+        self.assertEqual(self.run_install('--prepare-only').returncode,0)
+    def update(self,*args,**env):
+        return subprocess.run(['bash',str(self.root/'scripts/update.sh'),'--no-backup',*args],env={**self.env,**env},text=True,capture_output=True,timeout=60)
+    def test_updating_to_a_release_downloads_its_images_instead_of_building(self):
+        self.remote_with_two_releases()
+        result=self.update('v0.4.0-alpha.11');self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(len(self.pulled()),1);self.assertIn('up -d --no-build',self.started()[0])
+        self.assertEqual(self.config()['ALLUMI_APP_IMAGE'],'ghcr.io/installation-04/allumi:0.4.0-alpha.11')
+        self.assertEqual(self.config()['ALLUMI_MIGRATE_IMAGE'],'ghcr.io/installation-04/allumi-migrate:0.4.0-alpha.11')
+    def test_updating_with_the_build_flag_builds_locally(self):
+        self.remote_with_two_releases()
+        result=self.update('--build','v0.4.0-alpha.11');self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(self.pulled(),[]);self.assertIn('up -d --build',self.started()[0])
+        self.assertNotIn('ALLUMI_APP_IMAGE',self.config())
+    def test_updating_with_unavailable_images_falls_back_to_a_build(self):
+        self.remote_with_two_releases()
+        result=self.update('v0.4.0-alpha.11',DOCKER_TEST_BAD_PULL='1');self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIn('up -d --build',self.started()[-1]);self.assertNotIn('ALLUMI_APP_IMAGE',self.config())
+    def test_a_rejected_update_argument_changes_nothing(self):
+        self.remote_with_two_releases()
+        self.assertNotEqual(self.update('--nope').returncode,0)
+        self.assertEqual(self.commands(),[])
+    def test_compose_file_keeps_local_names_as_the_default_for_development_and_ci(self):
+        text=(ROOT/'docker-compose.yml').read_text()
+        self.assertIn('${ALLUMI_APP_IMAGE:-allumi-app:local}',text);self.assertIn('${ALLUMI_MIGRATE_IMAGE:-allumi-migrate:local}',text)
+        for service in ['app','migrate']:
+            self.assertIn('build:',text.split(f'  {service}:')[1].split('\n\n')[0])
 
 
 if __name__=='__main__': unittest.main()

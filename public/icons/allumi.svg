@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>Allumi</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b9b72"/><stop offset="1" stop-color="#055b45"/></linearGradient>
+    <linearGradient id="fire" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcd34d"/><stop offset="1" stop-color="#f97316"/></linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <path fill="#fff" d="M268 46C296 104 380 150 380 250C380 322 326 368 256 368C186 368 132 322 132 250C132 202 156 164 186 134C188 168 206 190 226 194C208 144 232 90 268 46Z"/>
+  <path fill="url(#fire)" d="M262 204C280 238 310 262 310 302C310 334 286 350 256 350C226 350 202 334 202 302C202 268 234 248 262 204Z"/>
+  <rect x="132" y="396" width="248" height="26" rx="13" fill="#fff" fill-opacity=".94"/>
+  <rect x="132" y="438" width="248" height="26" rx="13" fill="#fff" fill-opacity=".94"/>
+</svg>

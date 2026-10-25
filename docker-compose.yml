@@ -24,7 +24,8 @@ services:
     build:
       context: .
       target: migrate
-    image: allumi-migrate:local
+    # Version publiée (voir scripts/lib.sh : select_images) ou, par défaut, image construite sur place.
+    image: ${ALLUMI_MIGRATE_IMAGE:-allumi-migrate:local}
     restart: "no"
     environment:
       # Identifiants propriétaire : réservés à ce service. L'application ne les reçoit jamais.
@@ -39,7 +40,7 @@ services:
     build:
       context: .
       target: runner
-    image: allumi-app:local
+    image: ${ALLUMI_APP_IMAGE:-allumi-app:local}
     ports:
       - "${ALLUMI_BIND_ADDRESS:-0.0.0.0}:${ALLUMI_HTTP_PORT:-28080}:3000"
     restart: unless-stopped

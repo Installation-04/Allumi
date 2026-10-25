@@ -100,7 +100,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build + démarrage de la pile + healthcheck
         run: |
-          ./scripts/install-docker.sh --app-url http://127.0.0.1:28080 --http-port 28080 --bind 127.0.0.1 --timeout 120
+          ./scripts/install-docker.sh --build --app-url http://127.0.0.1:28080 --http-port 28080 --bind 127.0.0.1 --timeout 120
       - name: Architecture native des images
         env:
           EXPECTED_ARCH: ${{ matrix.arch }}
