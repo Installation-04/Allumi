@@ -12,4 +12,4 @@ sudo ./scripts/install.sh --interactive
 
 Choisir l’URL de la VM, par exemple `http://192.168.1.20:28080`. Options hôte : `--no-firewall`, `--no-cron`; les autres options sont celles de [[Installation-Docker]]. OpenSSL doit être disponible pour préparer les secrets. Le pare-feu ouvre SSH et le port HTTP choisi; les ports publiés par Docker peuvent contourner UFW, donc filtrer l’accès au niveau du réseau/pare-feu Proxmox lorsque nécessaire.
 
-Ouvrir l’URL indiquée puis utiliser le jeton privé `SETUP_TOKEN` pour créer l’administrateur. Voir [[Premier-demarrage]], [[Sauvegardes]] et [[Mise-a-jour]]. Aucun domaine ni certificat n’est demandé. Le script ne doit pas être exécuté sur l’hôte Proxmox.
+Ouvrir l’URL indiquée puis saisir le jeton affiché à la fin de l’installation (ligne « Jeton »; aussi `SETUP_TOKEN` dans `.env`) pour créer l’administrateur. Voir [[Premier-demarrage]], [[Sauvegardes]] et [[Mise-a-jour]]. Aucun domaine ni certificat n’est demandé. Le script ne doit pas être exécuté sur l’hôte Proxmox.

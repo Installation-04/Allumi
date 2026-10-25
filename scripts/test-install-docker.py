@@ -24,6 +24,9 @@ elif 'config' in args:
  if os.environ.get('DOCKER_TEST_BAD_CONFIG'): sys.exit(1)
 elif 'pull' in args:
  if os.environ.get('DOCKER_TEST_BAD_PULL'): sys.exit(1)
+elif 'exec' in args:
+ if os.environ.get('DOCKER_TEST_SETUP_CLOSED'): sys.exit(3)
+ if os.environ.get('DOCKER_TEST_EXEC_FAIL'): sys.exit(2)
 elif 'up' in args:
  if os.environ.get('DOCKER_TEST_BAD_UP'): sys.exit(1)
 elif 'ps' in args: print('app-container')
@@ -55,7 +58,10 @@ class Installer(Harness):
         first=self.run_install();self.assertEqual(first.returncode,0,first.stderr)
         original=self.config()
         for key in ['POSTGRES_PASSWORD','APP_DB_PASSWORD','AUTH_SECRET','ENCRYPTION_KEY','SETUP_TOKEN']:
-            self.assertTrue(original[key]);self.assertNotIn('CHANGE_ME',original[key]);self.assertNotIn(original[key],first.stdout+first.stderr)
+            self.assertTrue(original[key]);self.assertNotIn('CHANGE_ME',original[key])
+            if key!='SETUP_TOKEN': self.assertNotIn(original[key],first.stdout+first.stderr)
+        # The one-time /setup token is the only secret shown: the person installing needs it right away.
+        self.assertEqual(first.stdout.count(original['SETUP_TOKEN']),1);self.assertNotIn(original['SETUP_TOKEN'],first.stderr)
         self.assertIn(original['POSTGRES_PASSWORD'],original['DATABASE_URL'])
         self.assertIn(original['APP_DB_PASSWORD'],original['APP_DATABASE_URL'])
         self.assertEqual(stat.S_IMODE((self.root/'.env').stat().st_mode),0o600)
@@ -178,6 +184,48 @@ class Installer(Harness):
         self.assertEqual(result.returncode,0,result.stderr)
         self.assertEqual(self.config()['ALLUMI_HTTP_PORT'],'28080')
         self.assertEqual(self.config()['DEFAULT_LOCALE'],'fr-CA')
+
+    # --- first-setup token: shown at the end of the install, only while /setup is open ---
+    def token(self):
+        return self.config()['SETUP_TOKEN']
+    def test_a_new_install_shows_the_token_once_and_says_what_it_is_for(self):
+        result=self.run_install();self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(result.stdout.count(self.token()),1)
+        self.assertRegex(result.stdout,r'Jeton\s+: '+self.token()+r'\s+\(à saisir une seule fois sur la page /setup\)')
+        self.assertLess(result.stdout.index('Début'),result.stdout.index(self.token()),'the token comes with the "open /setup" step')
+        self.assertNotIn('SETUP_TOKEN dans .env',result.stdout)
+    def test_the_token_is_the_only_secret_printed(self):
+        result=self.run_install()
+        for key in ['POSTGRES_PASSWORD','APP_DB_PASSWORD','AUTH_SECRET','ENCRYPTION_KEY']:
+            self.assertNotIn(self.config()[key],result.stdout+result.stderr)
+    def test_an_instance_that_is_already_configured_does_not_get_a_useless_secret_on_screen(self):
+        self.assertEqual(self.run_install().returncode,0)
+        again=self.run_install(DOCKER_TEST_SETUP_CLOSED='1');self.assertEqual(again.returncode,0,again.stderr)
+        self.assertNotIn(self.token(),again.stdout+again.stderr)
+        self.assertIn("inutile, l'instance est déjà configurée",again.stdout)
+    def test_a_probe_that_cannot_answer_points_to_the_file_instead_of_guessing(self):
+        result=self.run_install(DOCKER_TEST_EXEC_FAIL='1');self.assertEqual(result.returncode,0,result.stderr)
+        self.assertNotIn(self.token(),result.stdout+result.stderr)
+        self.assertIn('SETUP_TOKEN',result.stdout);self.assertIn(str(self.root/'.env'),result.stdout)
+    def test_the_probe_runs_in_the_app_container_against_the_real_page(self):
+        self.assertEqual(self.run_install().returncode,0)
+        probe=[line for line in self.log.read_text().splitlines() if ' exec -T app node -e ' in line]
+        self.assertEqual(len(probe),1)
+        self.assertIn('http://127.0.0.1:3000/setup',probe[0]);self.assertIn("redirect:'manual'",probe[0]);self.assertIn('setupToken',probe[0])
+    def test_under_install_sh_the_wrapper_prints_the_summary_so_there_is_no_duplicate(self):
+        # Like install.sh: the result goes to a private descriptor the wrapper reads.
+        result=subprocess.run(['bash','-c','exec 3>"$1"; shift; exec "$@"','bash',str(self.root/'result'),'bash',str(self.root/'scripts/install-docker.sh'),'--app-url','http://allumi.example.test:28080'],env={**self.env,'ALLUMI_REPORT_RESULT':'1'},text=True,capture_output=True,timeout=15)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual((self.root/'result').read_text().strip(),'started')
+        self.assertNotIn(self.config()['SETUP_TOKEN'],result.stdout+result.stderr)
+        self.assertFalse([line for line in self.log.read_text().splitlines() if ' exec -T app node -e ' in line],'the wrapper does the probe, once')
+    def test_prepare_only_starts_nothing_so_there_is_no_token_to_show(self):
+        result=self.run_install('--prepare-only');self.assertEqual(result.returncode,0)
+        self.assertNotIn(self.token(),result.stdout+result.stderr);self.assertFalse(self.log.exists())
+    def test_the_wrapper_uses_the_same_helper_and_not_its_own_unconditional_line(self):
+        wrapper=(ROOT/'scripts/install.sh').read_text()
+        self.assertIn('print_setup_token',wrapper);self.assertNotIn('SETUP_TOKEN_VALUE',wrapper)
+        self.assertNotIn('env_get SETUP_TOKEN',wrapper)
 
 class PublishedImages(Harness):
     """A copy sitting exactly on a release tag downloads the images the release published; anything else builds."""

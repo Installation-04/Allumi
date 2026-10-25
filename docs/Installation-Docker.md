@@ -87,7 +87,7 @@ Le script génère les secrets, prépare `.env` atomiquement avec permissions 60
 
 ## Premier accès
 
-Ouvrir `http://ADRESSE_VM:28080`. Relever `SETUP_TOKEN` dans le `.env` privé pour créer l’entreprise et l’administrateur. En production, `/setup` reste fermé sans ce jeton, même en HTTP. Les cookies de session fonctionnent en HTTP; l’URL `APP_URL` doit correspondre au protocole effectivement utilisé. Voir [[Premier-demarrage]].
+Ouvrir `http://ADRESSE_VM:28080`. **Le jeton d’installation est affiché à la fin de l’installation** (ligne « Jeton »); il se saisit une seule fois pour créer l’entreprise et l’administrateur. Il n’est montré que tant que la page `/setup` est ouverte : sur une instance déjà configurée, le script dit qu’il est inutile au lieu de l’afficher, et si l’application ne répond pas il renvoie vers `SETUP_TOKEN` dans le `.env` privé. C’est le seul secret affiché; les autres restent dans `.env`. Le résumé peut finir dans l’historique du terminal ou dans un journal : ne le copie pas dans un canal public. En production, `/setup` reste fermé sans ce jeton, même en HTTP. Les cookies de session fonctionnent en HTTP; l’URL `APP_URL` doit correspondre au protocole effectivement utilisé. Voir [[Premier-demarrage]].
 
 ```bash
 docker compose ps

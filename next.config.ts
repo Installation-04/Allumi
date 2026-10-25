@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
   reactStrictMode: true,
+  // Baseline for every response, including the static files the proxy does not see. HTML pages get the strict
+  // nonce-based Content-Security-Policy from src/proxy.ts, which replaces the one below on those responses.
   headers: async () => [{
     source: "/:path*",
     headers: [
