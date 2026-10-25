@@ -19,7 +19,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.10
+git checkout v0.4.0-alpha.11
 ./scripts/install-docker.sh
 ```
 
@@ -48,7 +48,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.10 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.11 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -196,9 +196,9 @@ L’assistant Docker utilise les port HTTP **28080** pour les nouvelles installa
 
 La pile Docker contient uniquement l’application et PostgreSQL, avec un service ponctuel de migrations. Aucun SSL intégré : accès direct via `http://ADRESSE_VM:28080`; HTTPS peut être fourni par votre propre proxy. [Transition depuis Caddy](docs/Installation-Docker.md#passer-de-la-version-avec-caddy).
 
-## Sécurité du compte — prochaine préversion
+## Sécurité du compte
 
-La branche `main` permet de consulter et déconnecter les appareils, ainsi que de changer le mot de passe en fermant les autres sessions. Ces fonctions seront distribuées après v0.4.0-alpha.10. [Guide illustré](docs/Authentification.md#appareils-connectés--références-visuelles).
+Depuis v0.4.0-alpha.11, consulter et déconnecter les appareils, ou changer le mot de passe en fermant les autres sessions. [Guide illustré](docs/Authentification.md#appareils-connectés--références-visuelles).
 
 ![Appareils connectés](docs/images/securite-appareils-desktop.png)
 ![Sécurité du compte sur téléphone](docs/images/securite-mot-de-passe-mobile.png)
