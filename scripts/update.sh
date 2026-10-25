@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Met à jour Allumi : sauvegarde, récupère la nouvelle version, reconstruit, migre, vérifie.
-# Usage : ./scripts/update.sh [--no-backup] [vX.Y.Z]
+# Met à jour Allumi : sauvegarde, récupère la nouvelle version et ses images, migre, vérifie.
+# Usage : ./scripts/update.sh [--no-backup] [--build] [vX.Y.Z]
 #   sans version : suit la branche courante (git pull --ff-only)
 #   avec une version : se place sur cette étiquette (production : voir docs/Mise-a-jour.md)
+#   une version étiquetée télécharge ses images publiées; --build les construit sur place
 set -euo pipefail
 
 # shellcheck source=lib.sh
@@ -11,12 +12,14 @@ require_env
 cd "$ALLUMI_DIR"
 
 BACKUP=1
+FORCE_BUILD=0
 TARGET=""
 for arg in "$@"; do
   case "$arg" in
     --no-backup) BACKUP=0 ;;
+    --build) FORCE_BUILD=1 ;;
     v[0-9]*) TARGET="$arg" ;;
-    *) die "argument inconnu : $arg (usage : $0 [--no-backup] [vX.Y.Z])" ;;
+    *) die "argument inconnu : $arg (usage : $0 [--no-backup] [--build] [vX.Y.Z])" ;;
   esac
 done
 
@@ -46,8 +49,10 @@ fi
 # shellcheck source=lib.sh
 ( . "$ALLUMI_DIR/scripts/lib.sh" && env_backfill )
 
-info "Reconstruction et redémarrage (les migrations passent par le service migrate)…"
-compose up -d --build --remove-orphans
+# Version étiquetée : images publiées téléchargées (rien à compiler). Branche, --build ou images introuvables : construction.
+select_images "$FORCE_BUILD"
+info "Redémarrage (les migrations passent par le service migrate)…"
+compose_up
 
 ok=0
 for _ in $(seq 1 60); do

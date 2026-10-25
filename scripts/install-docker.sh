@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Installe Allumi avec Docker Engine et Compose déjà disponibles, sans modifier le système hôte.
-# Usage: ./scripts/install-docker.sh [--app-url http://192.168.1.20:28080] [--http-port 28080] [--prepare-only]
+# Usage: ./scripts/install-docker.sh [--app-url http://192.168.1.20:28080] [--http-port 28080] [--prepare-only] [--build]
 set -euo pipefail
 umask 077
 
@@ -16,7 +16,7 @@ INSTALL_HTTP_PORT="$(env_get ALLUMI_HTTP_PORT)"; INSTALL_HTTP_PORT="${INSTALL_HT
 INSTALL_URL="${INSTALL_URL:-http://localhost:$INSTALL_HTTP_PORT}"
 INSTALL_BIND="$(env_get ALLUMI_BIND_ADDRESS)"; INSTALL_BIND="${INSTALL_BIND:-0.0.0.0}"
 INSTALL_LOCALE="$(env_get DEFAULT_LOCALE)"; INSTALL_LOCALE="${INSTALL_LOCALE:-fr-CA}"
-PREPARE_ONLY=0; WAIT_SECONDS=300; INTERACTIVE=0
+PREPARE_ONLY=0; WAIT_SECONDS=300; INTERACTIVE=0; FORCE_BUILD=0
 if [ "$#" -eq 0 ]; then
   [ -t 0 ] || die "aucun terminal interactif : utilise --interactive ou fournis une option explicite comme --app-url."
   INTERACTIVE=1
@@ -35,6 +35,7 @@ while [ "$#" -gt 0 ]; do
       shift 2 ;;
     --interactive) INTERACTIVE=1; shift ;;
     --prepare-only) PREPARE_ONLY=1; shift ;;
+    --build) FORCE_BUILD=1; shift ;;
     -h|--help)
       cat <<'HELP'
 Allumi — installation Docker (Docker Engine et Compose déjà installés).
@@ -45,6 +46,7 @@ Sans argument dans un terminal : assistant interactif.
 --bind IPV4               Adresse d’écoute (défaut : 0.0.0.0)
 --locale fr-CA|en         Langue initiale (défaut : fr-CA)
 --prepare-only            Préparer .env sans lancer Docker
+--build                   Construire les images sur cette machine au lieu de télécharger celles de la version
 --timeout SECONDES        Attente de santé après Compose (défaut : 300)
 Les réglages existants sont conservés si aucune option ne les remplace.
 HELP
@@ -131,7 +133,10 @@ if [ "$PREPARE_ONLY" -eq 1 ]; then
   exit 0
 fi
 # Explicit --env-file also supports the ENV_FILE path override used by administrative scripts.
-docker compose --project-directory "$ALLUMI_DIR" -f "$ALLUMI_DIR/docker-compose.yml" --env-file "$ENV_FILE" up -d --build --remove-orphans
+# Version étiquetée : images déjà construites et publiées par la release (téléchargées, pas compilées ici).
+# Autre copie, --build ou images introuvables : construction sur place.
+select_images "$FORCE_BUILD"
+compose_up
 info "Attente de l’application (maximum ${WAIT_SECONDS} s après le démarrage Compose)…"
 DEADLINE=$((SECONDS + WAIT_SECONDS))
 while :; do

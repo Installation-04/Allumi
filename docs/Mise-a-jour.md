@@ -16,13 +16,13 @@ Pour la production, utilise une version étiquetée plutôt que `main` :
 ```bash
 sudo ./scripts/update.sh v0.3.0
 ```
-Le script sauvegarde, se place sur l'étiquette, reconstruit et vérifie le healthcheck. Sur une version épinglée (HEAD détachée), lancer `update.sh` sans version ne tire rien : il reconstruit seulement.
+Le script sauvegarde, se place sur l'étiquette, **télécharge les images publiées de cette version** (aucune compilation; repli automatique sur la construction si elles sont introuvables, ou avec `--build`) et vérifie le healthcheck. Sur une version épinglée (HEAD détachée), lancer `update.sh` sans version ne tire rien : il redémarre seulement avec les images de la version courante. Voir [[Installation-Docker]], « Images déjà construites ». La première mise à jour depuis une version antérieure à ce changement construit encore sur place : c’est l’ancien script qui s’exécute.
 
 ## Retour arrière
 Les migrations de base de données ne sont pas toujours réversibles. Le retour arrière sûr est donc :
 1. `git checkout <ancienne-version>`
 2. Restaurer la sauvegarde faite juste avant la mise à jour ([[Sauvegardes]]).
-3. `docker compose up -d --build`
+3. `./scripts/up.sh` (images publiées de l'ancienne version, ou construites sur place si elles sont introuvables)
 
 ## Mises à jour du système
 - `sudo apt update && sudo apt upgrade` régulièrement; active `unattended-upgrades`.
