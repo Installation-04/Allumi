@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.12] - 2026-10-25
+
 - Publication : démarrage réel des images téléchargées depuis GHCR sur AMD64 et ARM64 avant publication des fichiers de release.
 
 - Sécurité : politique CSP stricte par nonce sur les pages (scripts et styles seulement avec un nonce neuf à chaque réponse, `strict-dynamic`, aucun `unsafe-inline` ni `unsafe-eval` en production), générée par `src/proxy.ts` à partir de `src/platform/csp.ts`. Sans `upgrade-insecure-requests` (HTTP direct par conception). Les images et icônes gardent la politique ciblée. Le parcours navigateur échoue à la moindre ressource bloquée. Aucune migration.
