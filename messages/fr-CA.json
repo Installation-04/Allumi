@@ -257,6 +257,19 @@
       "environment": "Ces clés ne sont pas du même environnement (essai ou production) que la connexion.",
       "transactionNotFound": "Transaction introuvable ou déjà rapprochée.",
       "confirmDisconnect": "Confirmez la déconnexion."
+    },
+    "payments": {
+      "invalid": "Vérifiez le montant (positif, deux décimales au plus), la date, le compte et le mode de paiement.",
+      "invoiceNotFound": "Facture introuvable.",
+      "invoiceNotOpen": "Seule une facture validée et non annulée peut recevoir un paiement.",
+      "stale": "Le solde de cette facture a changé depuis l’affichage du formulaire. Rechargez la page et vérifiez le solde.",
+      "exceeds": "Le montant dépasse le solde restant de la facture.",
+      "dateBeforeInvoice": "La date de réception ne peut précéder la date comptable de la facture.",
+      "futureDate": "La date de réception ne peut pas être dans le futur.",
+      "account": "Choisissez un compte bancaire, la caisse ou « Fonds non déposés » actif.",
+      "notFound": "Encaissement introuvable.",
+      "invalidVoid": "Indiquez un motif de 1 à 500 caractères et une date égale ou postérieure à l’encaissement et à ses affectations.",
+      "confirmVoid": "Confirmez l’annulation définitive de l’encaissement."
     }
   },
   "nav": {
@@ -586,7 +599,7 @@
     "ventes": {
       "title": "Ventes",
       "description": "Préparez vos brouillons et retrouvez vos clients et articles.",
-      "planned": "Envoi, remboursements et encaissements ne sont pas encore disponibles."
+      "planned": "L’envoi des factures et les remboursements ne sont pas encore disponibles."
     },
     "depenses": {
       "title": "Dépenses",
@@ -651,7 +664,8 @@
       "factures": "Brouillons de factures",
       "avoirs": "Brouillons d’avoirs",
       "integrations": "Intégrations",
-      "transactions": "Transactions importées"
+      "transactions": "Transactions importées",
+      "encaissements": "Encaissements"
     }
   },
   "integrations": {
@@ -757,6 +771,74 @@
     "previous": "Précédent",
     "next": "Suivant",
     "page": "Page {page} sur {count}"
+  },
+  "payments": {
+    "title": "Encaissements",
+    "intro": "Les paiements reçus de vos clients, appliqués à des factures validées. Chaque encaissement crée une écriture au journal.",
+    "back": "Retour aux encaissements",
+    "empty": "Aucun encaissement pour le moment",
+    "emptyHint": "Ouvrez une facture validée pour enregistrer un paiement reçu.",
+    "number": "Numéro",
+    "date": "Date",
+    "customer": "Client",
+    "amount": "Montant",
+    "status": "État",
+    "invoices": "Factures",
+    "method": "Mode de paiement",
+    "reference": "Référence",
+    "memo": "Note",
+    "account": "Reçu dans",
+    "statuses": {
+      "POSTED": "Comptabilisé",
+      "VOID": "Annulé"
+    },
+    "methods": {
+      "CASH": "Comptant",
+      "CHEQUE": "Chèque",
+      "EFT": "Virement",
+      "INTERAC": "Interac",
+      "CREDIT_CARD": "Carte de crédit",
+      "DEBIT_CARD": "Carte de débit",
+      "OTHER": "Autre"
+    },
+    "pagination": "Pagination des encaissements",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {page} sur {count}",
+    "count": "{count, plural, =0 {Aucun encaissement} one {# encaissement} other {# encaissements}}",
+    "invoiceTitle": "Encaissements de cette facture",
+    "balance": "Solde restant",
+    "settlement": {
+      "UNPAID": "Non payée",
+      "PARTIAL": "Partiellement payée",
+      "PAID": "Payée"
+    },
+    "none": "Aucun encaissement appliqué à cette facture.",
+    "paidInFull": "Cette facture est payée en entier.",
+    "record": "Enregistrer un encaissement",
+    "recordHint": "Le montant ne peut pas dépasser le solde restant. L’argent entre dans le compte choisi et le compte clients diminue : une écriture est ajoutée au journal.",
+    "amountField": "Montant reçu",
+    "amountHint": "Jusqu’au solde restant, avec deux décimales au plus.",
+    "dateField": "Date de réception",
+    "accountField": "Compte de réception",
+    "accountHint": "Un compte bancaire, la caisse, ou « Fonds non déposés » en attendant le dépôt.",
+    "methodField": "Mode de paiement",
+    "referenceField": "Référence (numéro de chèque, de transaction…)",
+    "memoField": "Note",
+    "submit": "Enregistrer l’encaissement",
+    "detail": "Encaissement {number}",
+    "journalEntry": "Écriture au journal",
+    "allocations": "Affectations",
+    "allocationLine": "{amount} appliqués à la facture {number}",
+    "released": "retiré le {date}",
+    "voidTitle": "Annuler cet encaissement",
+    "voidWarning": "L’annulation conserve l’encaissement et ajoute une écriture inverse; le solde de la facture est rétabli. La date ne peut précéder l’encaissement ni ses affectations.",
+    "voidDate": "Date d’annulation",
+    "voidReason": "Motif (obligatoire, 500 caractères au plus)",
+    "confirmVoid": "Je confirme l’annulation définitive de cet encaissement.",
+    "voidSubmit": "Annuler l’encaissement",
+    "voidedOn": "Annulé le {date}",
+    "voidedReason": "Motif : {reason}"
   },
   "updates": {
     "title": "Versions et mises à jour",
@@ -880,7 +962,7 @@
   "sales": {
     "title": "Brouillons de factures",
     "draft": "Brouillon — non comptabilisé",
-    "intro": "Préparez des factures puis validez-les pour les comptabiliser. Un brouillon ne modifie pas le grand livre. Envoi et paiements ne sont pas encore disponibles.",
+    "intro": "Préparez des factures puis validez-les pour les comptabiliser. Un brouillon ne modifie pas le grand livre. L’envoi des factures n’est pas encore disponible.",
     "new": "Nouveau brouillon",
     "edit": "Modifier le brouillon",
     "back": "Retour aux brouillons",
@@ -924,7 +1006,7 @@
     "journal": "Voir l’écriture comptable",
     "issuer": "Émetteur",
     "billedTo": "Facturé à",
-    "postedHint": "Les coordonnées ci-dessous sont figées à la validation. Envoi et paiements ne sont pas encore disponibles.",
+    "postedHint": "Les coordonnées ci-dessous sont figées à la validation. L’envoi des factures n’est pas encore disponible.",
     "void": "Annuler la facture",
     "voided": "Facture annulée",
     "voidDate": "Date de contre-passation",

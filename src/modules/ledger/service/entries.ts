@@ -75,7 +75,7 @@ async function nextEntryNumber(tx: Tx, companyId: string): Promise<bigint> {
 async function insertEntry(
   tx: Tx,
   actor: Actor,
-  entry: { date: IsoDate; source: "MANUAL" | "OPENING_BALANCE" | "REVERSAL" | "SALES_DOCUMENT"; sourceId?: string; deferChecks?: boolean; memo: string | null; lines: EntryLine[]; reversesEntryId?: string },
+  entry: { date: IsoDate; source: "MANUAL" | "OPENING_BALANCE" | "REVERSAL" | "SALES_DOCUMENT" | "PAYMENT"; sourceId?: string; deferChecks?: boolean; memo: string | null; lines: EntryLine[]; reversesEntryId?: string },
 ): Promise<{ id: string; number: bigint }> {
   const period = await tx.fiscalPeriod.findFirst({
     where: { companyId: actor.companyId, startDate: { lte: toDbDate(entry.date) }, endDate: { gte: toDbDate(entry.date) } },
@@ -114,8 +114,8 @@ async function insertEntry(
       entryDate: toDbDate(entry.date),
     })),
   });
-  // Sales links its document before firing the deferred source checks.
-  if (entry.source !== "SALES_DOCUMENT" && !entry.deferChecks) await tx.$executeRaw`SET CONSTRAINTS ALL IMMEDIATE`;
+  // Sales documents and payments link themselves to the entry before the deferred source checks fire.
+  if (entry.source !== "SALES_DOCUMENT" && entry.source !== "PAYMENT" && !entry.deferChecks) await tx.$executeRaw`SET CONSTRAINTS ALL IMMEDIATE`;
   return { id: created.id, number };
 }
 
@@ -271,11 +271,33 @@ export async function createInvoiceEntry(tx: Tx, actor: Actor, input: { document
   return insertEntry(tx, actor, { ...input, source: "SALES_DOCUMENT", sourceId: input.documentId });
 }
 
-/** Builds the exact reversal in the document transaction; the caller must link the void before commit. */
-export async function createInvoiceReversal(tx: Tx, actor: Actor, input: { documentId: string; entryId: string; date: IsoDate; memo: string }) {
+/** Builds the exact reversal of a document's or a payment's entry; the caller must link the void before commit. */
+async function reverseSourceEntry(tx: Tx, actor: Actor, input: { sourceType: "SALES_DOCUMENT" | "PAYMENT"; sourceId: string; entryId: string; date: IsoDate; memo: string }) {
   await requireRole(tx, "entry.reverse");
-  const original = await tx.journalEntry.findFirst({ where: { companyId: actor.companyId, id: input.entryId, sourceType: "SALES_DOCUMENT", sourceId: input.documentId }, include: { lines: true } });
+  const original = await tx.journalEntry.findFirst({ where: { companyId: actor.companyId, id: input.entryId, sourceType: input.sourceType, sourceId: input.sourceId }, include: { lines: true } });
   if (!original || !isValidIsoDate(input.date) || input.date < fromDbDate(original.entryDate)) throw new AppError("AL008");
   const lines = reversalLines(original.lines.map(line => ({ accountId: line.accountId, debitCents: line.debitCents, creditCents: line.creditCents, contactId: line.contactId, taxId: line.taxId, taxBox: line.taxBox, description: line.description })));
   return insertEntry(tx, actor, { date: input.date, source: "REVERSAL", memo: input.memo, lines, reversesEntryId: original.id, deferChecks: true });
+}
+
+/** Builds the exact reversal in the document transaction; the caller must link the void before commit. */
+export async function createInvoiceReversal(tx: Tx, actor: Actor, input: { documentId: string; entryId: string; date: IsoDate; memo: string }) {
+  return reverseSourceEntry(tx, actor, { sourceType: "SALES_DOCUMENT", sourceId: input.documentId, entryId: input.entryId, date: input.date, memo: input.memo });
+}
+
+/**
+ * Creates the entry of a payment inside the caller's tenant transaction. The caller chooses the payment's id first
+ * (the entry points to it), then inserts the payment before commit: the database checks the link, the amounts on
+ * the payment account and on receivables or payables, and the contact.
+ */
+export async function createPaymentEntry(tx: Tx, actor: Actor, input: { paymentId: string; date: IsoDate; memo: string; lines: EntryLine[] }) {
+  await requireRole(tx, "entry.post");
+  const [problem] = checkEntry(input.lines);
+  if (problem) throw new AppError(problemKey(problem));
+  return insertEntry(tx, actor, { date: input.date, source: "PAYMENT", sourceId: input.paymentId, memo: input.memo, lines: input.lines });
+}
+
+/** Builds the exact reversal of a payment's entry; the caller must mark the payment void before commit. */
+export async function createPaymentReversal(tx: Tx, actor: Actor, input: { paymentId: string; entryId: string; date: IsoDate; memo: string }) {
+  return reverseSourceEntry(tx, actor, { sourceType: "PAYMENT", sourceId: input.paymentId, entryId: input.entryId, date: input.date, memo: input.memo });
 }

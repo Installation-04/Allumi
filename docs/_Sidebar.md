@@ -52,4 +52,6 @@
 
 - [[Validation-des-avoirs]]
 
+- [[Encaissements]]
+
 - [[Integrations]]

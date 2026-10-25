@@ -257,6 +257,19 @@
       "environment": "These keys are not from the same environment (test or live) as the connection.",
       "transactionNotFound": "Transaction not found or already matched.",
       "confirmDisconnect": "Confirm the disconnection."
+    },
+    "payments": {
+      "invalid": "Check the amount (positive, at most two decimals), the date, the account and the payment method.",
+      "invoiceNotFound": "Invoice not found.",
+      "invoiceNotOpen": "Only a posted, non-voided invoice can receive a payment.",
+      "stale": "The balance of this invoice changed after the form was shown. Reload the page and check the balance.",
+      "exceeds": "The amount is more than the invoice's remaining balance.",
+      "dateBeforeInvoice": "The date received cannot precede the invoice's accounting date.",
+      "futureDate": "The date received cannot be in the future.",
+      "account": "Choose an active bank account, cash account or \"Undeposited funds\".",
+      "notFound": "Payment not found.",
+      "invalidVoid": "Give a reason of 1 to 500 characters and a date on or after the payment and its applications.",
+      "confirmVoid": "Confirm the permanent voiding of the payment."
     }
   },
   "nav": {
@@ -586,7 +599,7 @@
     "ventes": {
       "title": "Sales",
       "description": "Prepare invoice drafts and find your customers and items.",
-      "planned": "Sending, refunds and receiving payments are not yet available."
+      "planned": "Sending invoices and refunds are not yet available."
     },
     "depenses": {
       "title": "Expenses",
@@ -651,7 +664,8 @@
       "factures": "Invoice drafts",
       "avoirs": "Credit note drafts",
       "integrations": "Integrations",
-      "transactions": "Imported transactions"
+      "transactions": "Imported transactions",
+      "encaissements": "Payments received"
     }
   },
   "integrations": {
@@ -757,6 +771,74 @@
     "previous": "Previous",
     "next": "Next",
     "page": "Page {page} of {count}"
+  },
+  "payments": {
+    "title": "Payments received",
+    "intro": "Payments received from your customers, applied to posted invoices. Each payment adds an entry to the journal.",
+    "back": "Back to payments",
+    "empty": "No payments yet",
+    "emptyHint": "Open a posted invoice to record a payment received.",
+    "number": "Number",
+    "date": "Date",
+    "customer": "Customer",
+    "amount": "Amount",
+    "status": "Status",
+    "invoices": "Invoices",
+    "method": "Payment method",
+    "reference": "Reference",
+    "memo": "Note",
+    "account": "Received into",
+    "statuses": {
+      "POSTED": "Posted",
+      "VOID": "Voided"
+    },
+    "methods": {
+      "CASH": "Cash",
+      "CHEQUE": "Cheque",
+      "EFT": "Bank transfer",
+      "INTERAC": "Interac",
+      "CREDIT_CARD": "Credit card",
+      "DEBIT_CARD": "Debit card",
+      "OTHER": "Other"
+    },
+    "pagination": "Payments pagination",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {count}",
+    "count": "{count, plural, =0 {No payments} one {# payment} other {# payments}}",
+    "invoiceTitle": "Payments on this invoice",
+    "balance": "Remaining balance",
+    "settlement": {
+      "UNPAID": "Unpaid",
+      "PARTIAL": "Partially paid",
+      "PAID": "Paid"
+    },
+    "none": "No payment is applied to this invoice.",
+    "paidInFull": "This invoice is paid in full.",
+    "record": "Record a payment",
+    "recordHint": "The amount cannot exceed the remaining balance. The money goes into the chosen account and accounts receivable goes down: an entry is added to the journal.",
+    "amountField": "Amount received",
+    "amountHint": "Up to the remaining balance, with at most two decimals.",
+    "dateField": "Date received",
+    "accountField": "Account received into",
+    "accountHint": "A bank account, the cash account, or \"Undeposited funds\" until the deposit is made.",
+    "methodField": "Payment method",
+    "referenceField": "Reference (cheque or transaction number…)",
+    "memoField": "Note",
+    "submit": "Record the payment",
+    "detail": "Payment {number}",
+    "journalEntry": "Journal entry",
+    "allocations": "Applications",
+    "allocationLine": "{amount} applied to invoice {number}",
+    "released": "released on {date}",
+    "voidTitle": "Void this payment",
+    "voidWarning": "Voiding keeps the payment and adds a reversing entry; the invoice's balance is restored. The date cannot precede the payment or its applications.",
+    "voidDate": "Void date",
+    "voidReason": "Reason (required, up to 500 characters)",
+    "confirmVoid": "I confirm the permanent voiding of this payment.",
+    "voidSubmit": "Void the payment",
+    "voidedOn": "Voided on {date}",
+    "voidedReason": "Reason: {reason}"
   },
   "updates": {
     "title": "Versions and updates",
@@ -880,7 +962,7 @@
   "sales": {
     "title": "Invoice drafts",
     "draft": "Draft — not posted",
-    "intro": "Prepare invoices, then post them to the ledger. A draft does not change the ledger. Sending and payments are not yet available.",
+    "intro": "Prepare invoices, then post them to the ledger. A draft does not change the ledger. Sending invoices is not yet available.",
     "new": "New draft",
     "edit": "Edit draft",
     "back": "Back to drafts",
@@ -924,7 +1006,7 @@
     "journal": "View journal entry",
     "issuer": "Issuer",
     "billedTo": "Bill to",
-    "postedHint": "The details below were frozen when posted. Sending and payments are not yet available.",
+    "postedHint": "The details below were frozen when posted. Sending invoices is not yet available.",
     "void": "Void invoice",
     "voided": "Voided invoice",
     "voidDate": "Reversal date",
