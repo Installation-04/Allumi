@@ -3,3 +3,4 @@ export { csvMappingSchema, type CsvMapping, type RowError } from "./domain/mappi
 export { readStatement, type ReadStatement } from "./domain/read";
 export { decodeStatement, MAX_STATEMENT_BYTES, StatementError, type StatementErrorCode } from "./domain/statement";
 export { matchProblem, MAX_MATCHED_LINES, type MatchProblem } from "./domain/matching";
+export { balanceSign, MAX_WORKSHEET_LINES, reconciliationDifference } from "./domain/reconciliation";

@@ -20,7 +20,7 @@ export type LedgerLineDto = {
   cents: bigint;
   /** The entry was cancelled by a reversal, or is one. */
   reversed: boolean;
-  /** A reconciliation has counted the line. */
+  /** A completed reconciliation has counted the line. */
   reconciled: boolean;
 };
 
@@ -32,14 +32,14 @@ type LineRow = {
   id: string; debitCents: bigint; creditCents: bigint; description: string | null; entryDate: Date;
   entry: { id: string; entryNumber: bigint; sourceType: string; memo: string | null; reversesEntryId: string | null; reversedBy: { id: string } | null };
   contact: { displayName: string } | null;
-  reconciledLine: { id: string } | null;
+  reconciledLine: { reconciliation: { status: string } } | null;
 };
 
 export const lineSelect = {
   id: true, debitCents: true, creditCents: true, description: true, entryDate: true,
   entry: { select: { id: true, entryNumber: true, sourceType: true, memo: true, reversesEntryId: true, reversedBy: { select: { id: true } } } },
   contact: { select: { displayName: true } },
-  reconciledLine: { select: { id: true } },
+  reconciledLine: { select: { reconciliation: { select: { status: true } } } },
 } as const;
 
 type NumberFormat = { prefix: string; padding: number };
@@ -55,7 +55,7 @@ export function toLineDto(row: LineRow, format: NumberFormat): LedgerLineDto {
     lineId: row.id, entryId: row.entry.id, entryNumber: row.entry.entryNumber, entryLabel: formatNumber(format.prefix, format.padding, row.entry.entryNumber), entryDate: iso(row.entryDate), sourceType: row.entry.sourceType, memo: row.entry.memo,
     description: row.description, contactName: row.contact?.displayName ?? null, cents: row.debitCents - row.creditCents,
     reversed: row.entry.reversesEntryId !== null || row.entry.reversedBy !== null,
-    reconciled: row.reconciledLine !== null,
+    reconciled: row.reconciledLine?.reconciliation.status === "COMPLETED",
   };
 }
 

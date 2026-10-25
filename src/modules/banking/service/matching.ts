@@ -156,7 +156,7 @@ export async function matchTransaction(actor: CompanyContext, transactionId: str
 
 /**
  * Undoes a match (owner and accountant): the transaction waits again, and the ledger lines it was matched to are free
- * for another. Refused while a reconciliation counts one of the lines (reopen it first). The ledger is not touched: an
+ * for another. Refused while a completed reconciliation counts one of the lines (reopen it first). The ledger is not touched: an
  * entry that was made from the transaction stays, and is reversed from the ledger if it was wrong.
  */
 export async function unmatchTransaction(actor: CompanyContext, transactionId: string): Promise<void> {
@@ -167,7 +167,7 @@ export async function unmatchTransaction(actor: CompanyContext, transactionId: s
       const txn = await lockOne(tx, actor.companyId, transactionId);
       if (txn.status !== "MATCHED") throw new AppError("banking.notMatched");
       const matches = await tx.bankMatch.findMany({ where: { companyId: actor.companyId, bankTransactionId: txn.id }, select: { journalLineId: true } });
-      const reconciled = await tx.reconciledLine.count({ where: { companyId: actor.companyId, journalLineId: { in: matches.map((match) => match.journalLineId) } } });
+      const reconciled = await tx.reconciledLine.count({ where: { companyId: actor.companyId, journalLineId: { in: matches.map((match) => match.journalLineId) }, reconciliation: { status: "COMPLETED" } } });
       if (reconciled > 0) throw new AppError("banking.lineReconciled");
       await tx.bankMatch.deleteMany({ where: { companyId: actor.companyId, bankTransactionId: txn.id } });
       await tx.bankTransaction.updateMany({ where: { companyId: actor.companyId, id: txn.id }, data: { status: "UNMATCHED" } });

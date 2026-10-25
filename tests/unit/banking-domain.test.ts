@@ -7,6 +7,7 @@ import { guessDecimalSeparator, parseAmount, parseStatementDate } from "@/module
 import { parseOfx } from "@/modules/banking/domain/ofx";
 import { categorizeLines, MAX_MATCHED_LINES, matchProblem, transferLines, transferProblem } from "@/modules/banking/domain/matching";
 import { readStatement } from "@/modules/banking/domain/read";
+import { balanceSign, lineProblem, reconciliationDifference, statementDateProblem } from "@/modules/banking/domain/reconciliation";
 import { decodeStatement, detectFormat, MAX_STATEMENT_BYTES, StatementError } from "@/modules/banking/domain/statement";
 
 const bytes = (text: string) => new TextEncoder().encode(text);
@@ -348,5 +349,34 @@ describe("the entry that records a statement line", () => {
     ]);
     const [debit, credit] = total(transferLines(into, out, null));
     expect(debit).toBe(credit);
+  });
+});
+
+describe("reconciling an account against a statement", () => {
+  it("reads a card's balance as what is owed: the ledger adds up debit − credit, the other way round for a liability", () => {
+    expect(balanceSign("ASSET")).toBe(1n);
+    expect(balanceSign("LIABILITY")).toBe(-1n);
+    expect(balanceSign("EQUITY")).toBe(1n);
+  });
+  it("leaves nothing to explain when the earlier statements and the ticked lines come to the balance", () => {
+    expect(reconciliationDifference(11_500n, 10_000n, 1_500n)).toBe(0n);
+    expect(reconciliationDifference(11_500n, 10_000n, 1_499n)).toBe(1n);
+    expect(reconciliationDifference(11_500n, 0n, 12_000n)).toBe(-500n);
+    expect(reconciliationDifference(-52_340n, 0n, -52_340n)).toBe(0n);
+    const amount = fc.bigInt({ min: -1_000_000_000_000n, max: 1_000_000_000_000n });
+    fc.assert(fc.property(amount, amount, amount, (statement, previous, now) => {
+      expect(reconciliationDifference(statement, previous, now) === 0n).toBe(previous + now === statement);
+    }));
+  });
+  it("starts a statement on a day after the last one completed, and counts a line dated up to the statement's own day", () => {
+    expect(statementDateProblem("2026-04-30", "2026-03-31")).toBeNull();
+    expect(statementDateProblem("2026-03-31", "2026-03-31")).toBe("order");
+    expect(statementDateProblem("2026-02-28", "2026-03-31")).toBe("order");
+    expect(statementDateProblem("2026-01-31", null)).toBeNull();
+    const rec = { accountId: "a", statementDate: "2026-03-31" };
+    expect(lineProblem({ accountId: "a", entryDate: "2026-03-31" }, rec)).toBeNull();
+    expect(lineProblem({ accountId: "a", entryDate: "2026-04-01" }, rec)).toBe("after");
+    expect(lineProblem({ accountId: "b", entryDate: "2026-03-01" }, rec)).toBe("account");
+    expect(lineProblem({ accountId: "b", entryDate: "2026-04-01" }, rec)).toBe("account");
   });
 });

@@ -217,7 +217,7 @@ describe("undoing a match", () => {
     expect(await refusal(unmatchTransaction(actor, "pas-un-id"))).toBe("banking.transactionNotFound");
   });
 
-  it("refuses while a reconciliation counts one of the lines, in the service and in the database", async () => {
+  it("refuses while a completed reconciliation counts one of the lines, in the service and in the database", async () => {
     const bank = await account();
     const entry = await post(bank, "2026-03-10", 3_000n);
     const txn = await line(bank, "2026-03-10", 3_000n);
@@ -225,6 +225,12 @@ describe("undoing a match", () => {
     const reconciliation = randomUUID();
     await db.query("INSERT INTO bank_reconciliation (id, company_id, account_id, statement_date, statement_balance_cents, status, created_by_id) VALUES ($1, $2, $3, '2026-03-31', 3000, 'IN_PROGRESS', $4)", [reconciliation, W.companyA, bank, W.userOwnerA]);
     await db.query("INSERT INTO reconciled_line (id, company_id, reconciliation_id, journal_line_id) VALUES (gen_random_uuid(), $1, $2, $3)", [W.companyA, reconciliation, entry.lineId]);
+    // a reconciliation in progress is work: the match can still be undone, and done again
+    expect((await getBankTransaction(actor, txn))?.matches[0]?.reconciled).toBe(false);
+    await unmatchTransaction(actor, txn);
+    await matchTransaction(actor, txn, [entry.lineId]);
+    // completed, it is the statement's proof
+    await db.query("UPDATE bank_reconciliation SET status = 'COMPLETED', completed_at = now(), completed_by_id = $2 WHERE id = $1", [reconciliation, W.userOwnerA]);
     expect((await getBankTransaction(actor, txn))?.matches[0]?.reconciled).toBe(true);
     expect(await refusal(unmatchTransaction(actor, txn))).toBe("banking.lineReconciled");
     expect(await status(txn)).toBe("MATCHED");
@@ -233,10 +239,10 @@ describe("undoing a match", () => {
     await expect(inTransaction(async () => {
       await db.query("DELETE FROM bank_match WHERE bank_transaction_id = $1", [txn]);
       await db.query("UPDATE bank_transaction SET status = 'UNMATCHED' WHERE id = $1", [txn]);
-    })).rejects.toMatchObject({ code: "AL010", message: expect.stringContaining("reconciliation") });
+    })).rejects.toMatchObject({ code: "AL010", message: expect.stringContaining("completed reconciliation") });
     expect(await status(txn)).toBe("MATCHED");
-    // reopened (the counted line removed), the match can be undone
-    await db.query("DELETE FROM reconciled_line WHERE reconciliation_id = $1", [reconciliation]);
+    // reopened, the match can be undone
+    await db.query("UPDATE bank_reconciliation SET status = 'IN_PROGRESS', completed_at = NULL, completed_by_id = NULL WHERE id = $1", [reconciliation]);
     await unmatchTransaction(actor, txn);
     expect(await status(txn)).toBe("UNMATCHED");
   });

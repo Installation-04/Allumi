@@ -9,3 +9,7 @@ export {
   getBankTransaction, listBankAccounts, listBankTransactions, setTransactionStatus, TRANSACTIONS_PER_PAGE, TRANSACTION_STATUSES,
   type BankAccountDto, type BankTransactionDto, type TransactionFilter, type TransactionStatus,
 } from "./service/transactions";
+export {
+  clearMatchedLines, completeReconciliation, discardReconciliation, getWorksheet, listAccountReconciliations, listReconciliations, reopenReconciliation, saveCleared, startReconciliation,
+  type AccountReconciliation, type ReconciliationDto, type ReconciliationStatus, type Worksheet, type WorksheetLine,
+} from "./service/reconciliation";
