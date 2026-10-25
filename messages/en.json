@@ -255,7 +255,6 @@
       "credentials": "The stored keys cannot be read. Replace them.",
       "failed": "The sync failed. Try again.",
       "environment": "These keys are not from the same environment (test or live) as the connection.",
-      "transactionNotFound": "Transaction not found or already matched.",
       "confirmDisconnect": "Confirm the disconnection."
     },
     "payments": {
@@ -288,6 +287,19 @@
       "fee": "The fees reported by Stripe do not agree with the amount paid.",
       "settlementCurrency": "Stripe settled this payment in a currency other than Canadian dollars: record it by hand.",
       "rule": "The books refused the entry (a locked period, for example)."
+    },
+    "banking": {
+      "invalid": "Check the account and the file.",
+      "empty": "The file is empty.",
+      "tooLarge": "The file is over 4 MB or has too many lines (20,000 at most).",
+      "unreadable": "The file could not be read: an unclosed quote, a cell that is too long, too many columns or an unknown format.",
+      "noTransactions": "This file holds no transaction to import.",
+      "mapping": "Choose the columns of the file: date, description and amount.",
+      "currency": "This statement is not in Canadian dollars: Allumi keeps its books in a single currency.",
+      "unreadableRows": "Some lines of the file are unreadable: fix the columns or the file. The preview points them out.",
+      "account": "Choose an active bank, cash or credit card account of this company.",
+      "alreadyImported": "This file was already imported on this account.",
+      "transactionNotFound": "Transaction not found or already matched."
     }
   },
   "nav": {
@@ -751,8 +763,6 @@
     "confirmDisconnect": "I confirm the disconnection."
   },
   "transactions": {
-    "title": "Imported transactions",
-    "intro": "What Stripe and PayPal report: payments, fees, refunds, payouts. This inbox creates no journal entries; matching with invoices and the journal comes next.",
     "connection": "Connection",
     "allConnections": "All connections",
     "status": "Status",
@@ -760,8 +770,6 @@
     "apply": "Filter",
     "count": "{count, plural, =0 {No transactions} one {# transaction} other {# transactions}}",
     "empty": "No transactions in this view",
-    "emptyHint": "Connect a service and run a sync.",
-    "goToIntegrations": "Go to integrations",
     "kinds": {
       "PAYMENT": "Payment",
       "REFUND": "Refund",
@@ -785,10 +793,24 @@
     "setAsideNamed": "Set aside: {description}",
     "restore": "Back to review",
     "restoreNamed": "Back to review: {description}",
-    "pagination": "Imported transactions pagination",
     "previous": "Previous",
     "next": "Next",
-    "page": "Page {page} of {count}"
+    "page": "Page {page} of {count}",
+    "title": "Bank transactions",
+    "intro": "The lines of your statements (CSV or OFX files) and those that Stripe and PayPal report. Nothing here creates an entry: matching with the journal and bank reconciliation come next.",
+    "account": "Account",
+    "allAccounts": "All accounts",
+    "search": "Search",
+    "searchHint": "Description or payee",
+    "import": "Import a statement",
+    "importDone": "{imported, plural, =0 {Import complete: no new transaction.} one {Import complete: # new transaction.} other {Import complete: # new transactions.}}",
+    "importDuplicates": "{count, plural, one {# line was already on file and was left alone.} other {# lines were already on file and were left alone.}}",
+    "importSkipped": "{count, plural, one {# empty or zero line was ignored.} other {# empty or zero lines were ignored.}}",
+    "fromFile": "Statement: {file}",
+    "fromService": "Service: {label}",
+    "emptyHint": "Import a statement or connect a service.",
+    "goToIntegrations": "Go to integrations",
+    "pagination": "Bank transactions pagination"
   },
   "payments": {
     "title": "Payments received",
@@ -1120,5 +1142,59 @@
     "keysHint": "For online payment, the restricted key must also be able to write “Prices” and “Payment Links” and to read “Checkout Sessions” and “PaymentIntents”. Replace the key if needed.",
     "collectButton": "Check online payments",
     "collectConnectionHint": "Looks at the active payment links of this connection and records the payments received: the receipt at the gross amount, then the fees in an entry of their own. Nothing is recorded twice."
+  },
+  "banking": {
+    "title": "Import a statement",
+    "intro": "Import the statement of a bank account or a credit card (CSV or OFX/QFX). The lines arrive in the bank transactions; no entry is created. A file that was already imported is refused and a line already on file is left as it is, so statements that overlap can be imported.",
+    "back": "Back to bank transactions",
+    "accountField": "Chart of accounts account",
+    "accountHint": "Bank, cash or credit card. The amount of a line is its effect on this account: money in is positive, money out is negative.",
+    "noAccounts": "No bank, cash or credit card account is active. Create one in the chart of accounts, then come back.",
+    "fileField": "Statement file (.csv, .ofx or .qfx)",
+    "fileHint": "Up to 4 MB. The file is read in your browser for the preview, then read again by the server when you import.",
+    "submit": "Import the statement",
+    "format": "Format detected: {format}",
+    "ofxInfo": "Currency {currency} · account ending {mask} · closing balance stated {balance} on {date}",
+    "previewTitle": "Preview",
+    "summary": "{count, plural, one {# transaction} other {# transactions}} from {from} to {to} · money in {inflow} · money out {outflow}",
+    "none": "No readable transaction yet.",
+    "skipped": "{count, plural, one {# empty or zero line will be ignored.} other {# empty or zero lines will be ignored.}}",
+    "errorsTitle": "{count, plural, one {# line is unreadable.} other {# lines are unreadable.}} Fix the columns below or the file; the import is refused while any remain.",
+    "rowError": "Line {row}: {problem}",
+    "problems": {
+      "date": "unreadable date",
+      "amount": "unreadable amount"
+    },
+    "noMapping": "Allumi did not recognise the columns of this file: choose them below.",
+    "mappingTitle": "Columns of the file",
+    "hasHeader": "The first line is a header",
+    "dateColumn": "Date column",
+    "dateOrder": "Date order",
+    "dateOrders": {
+      "YMD": "year-month-day (2026-10-15)",
+      "DMY": "day/month/year (15/10/2026)",
+      "MDY": "month/day/year (10/15/2026)"
+    },
+    "descriptionColumn": "Description column",
+    "descriptionExtra": "Second description column (optional)",
+    "noColumn": "None",
+    "amountKind": "Amounts",
+    "amountKinds": {
+      "single": "One signed column",
+      "split": "Two columns (money out and money in)"
+    },
+    "amountColumn": "Amount column",
+    "outColumn": "Money out column (withdrawals)",
+    "inColumn": "Money in column (deposits)",
+    "decimal": "Decimal separator",
+    "decimals": {
+      "point": "Point (12.50)",
+      "comma": "Comma (12,50)"
+    },
+    "invert": "Flip the signs (a card statement that shows a purchase as positive)",
+    "column": "Column {n} · {sample}",
+    "recent": "Recently imported files",
+    "recentLine": "{file} · {date} · {count, plural, =0 {no new line} one {# new line} other {# new lines}}",
+    "unreadable": "This file could not be read."
   }
 }

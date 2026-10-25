@@ -6,7 +6,7 @@ import { requireSession } from "@/app/_lib/session";
 import { safeAction } from "@/app/_lib/safe-action";
 import { textValues, type FormState } from "@/app/_lib/form-state";
 import { AppError } from "@/platform/errors";
-import { cancelPaymentLink, collectPayments, createConnection, createPaymentLink, disconnect, replaceCredentials, setFeeAccount, setImportedStatus, syncConnection, type ProviderId } from "@/modules/integrations";
+import { cancelPaymentLink, collectPayments, createConnection, createPaymentLink, disconnect, replaceCredentials, setFeeAccount, syncConnection, type ProviderId } from "@/modules/integrations";
 
 /** The credentials as typed. A secret field is read from the form and goes nowhere else: never back to the page, never logged. */
 const credentialsOf = (provider: ProviderId, form: FormData) =>
@@ -56,15 +56,6 @@ export async function disconnectAction(companyId: string, connectionId: string, 
     const session = await requireSession();
     await disconnect({ userId: session.userId, companyId }, connectionId);
     revalidatePath(`/c/${companyId}`, "layout");
-    return undefined;
-  });
-}
-
-export async function setStatusAction(companyId: string, transactionId: string, status: "UNMATCHED" | "EXCLUDED", _previous: FormState, _form: FormData): Promise<FormState> {
-  return safeAction(async () => {
-    const session = await requireSession();
-    await setImportedStatus({ userId: session.userId, companyId }, transactionId, status);
-    revalidatePath(`/c/${companyId}/transactions`);
     return undefined;
   });
 }

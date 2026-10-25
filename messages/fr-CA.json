@@ -255,7 +255,6 @@
       "credentials": "Les clés enregistrées sont illisibles. Remplacez-les.",
       "failed": "La synchronisation a échoué. Réessayez.",
       "environment": "Ces clés ne sont pas du même environnement (essai ou production) que la connexion.",
-      "transactionNotFound": "Transaction introuvable ou déjà rapprochée.",
       "confirmDisconnect": "Confirmez la déconnexion."
     },
     "payments": {
@@ -288,6 +287,19 @@
       "fee": "Les frais rapportés par Stripe ne concordent pas avec le montant payé.",
       "settlementCurrency": "Stripe a réglé ce paiement dans une autre devise que le dollar canadien : enregistrez-le à la main.",
       "rule": "Les livres ont refusé l’enregistrement (période verrouillée, par exemple)."
+    },
+    "banking": {
+      "invalid": "Vérifiez le compte et le fichier.",
+      "empty": "Le fichier est vide.",
+      "tooLarge": "Le fichier dépasse 4 Mo ou contient trop de lignes (20 000 au plus).",
+      "unreadable": "Le fichier n’a pas pu être lu : guillemet non fermé, cellule trop longue, trop de colonnes ou format inconnu.",
+      "noTransactions": "Ce fichier ne contient aucune transaction à importer.",
+      "mapping": "Choisissez les colonnes du fichier : date, description et montant.",
+      "currency": "Ce relevé n’est pas en dollars canadiens : les livres d’Allumi sont tenus en une seule devise.",
+      "unreadableRows": "Certaines lignes du fichier sont illisibles : corrigez les colonnes ou le fichier. L’aperçu les indique.",
+      "account": "Choisissez un compte actif de type banque, caisse ou carte de crédit de cette entreprise.",
+      "alreadyImported": "Ce fichier a déjà été importé sur ce compte.",
+      "transactionNotFound": "Transaction introuvable ou déjà appariée."
     }
   },
   "nav": {
@@ -751,8 +763,6 @@
     "confirmDisconnect": "Je confirme la déconnexion."
   },
   "transactions": {
-    "title": "Transactions importées",
-    "intro": "Ce que Stripe et PayPal rapportent : paiements, frais, remboursements, virements. Cette boîte de réception ne crée aucune écriture; le rapprochement avec les factures et le journal viendra ensuite.",
     "connection": "Connexion",
     "allConnections": "Toutes les connexions",
     "status": "État",
@@ -760,8 +770,6 @@
     "apply": "Filtrer",
     "count": "{count, plural, =0 {Aucune transaction} one {# transaction} other {# transactions}}",
     "empty": "Aucune transaction dans cette vue",
-    "emptyHint": "Connectez un service et lancez une synchronisation.",
-    "goToIntegrations": "Aller aux intégrations",
     "kinds": {
       "PAYMENT": "Paiement",
       "REFUND": "Remboursement",
@@ -785,10 +793,24 @@
     "setAsideNamed": "Mettre de côté : {description}",
     "restore": "Remettre à traiter",
     "restoreNamed": "Remettre à traiter : {description}",
-    "pagination": "Pagination des transactions importées",
     "previous": "Précédent",
     "next": "Suivant",
-    "page": "Page {page} sur {count}"
+    "page": "Page {page} sur {count}",
+    "title": "Transactions bancaires",
+    "intro": "Les lignes de vos relevés (fichiers CSV ou OFX) et celles que Stripe et PayPal rapportent. Rien ici ne crée d’écriture : l’appariement avec le journal et le rapprochement bancaire viennent ensuite.",
+    "account": "Compte",
+    "allAccounts": "Tous les comptes",
+    "search": "Recherche",
+    "searchHint": "Description ou bénéficiaire",
+    "import": "Importer un relevé",
+    "importDone": "{imported, plural, =0 {Import terminé : aucune nouvelle transaction.} one {Import terminé : # nouvelle transaction.} other {Import terminé : # nouvelles transactions.}}",
+    "importDuplicates": "{count, plural, one {# ligne était déjà connue et n’a pas été touchée.} other {# lignes étaient déjà connues et n’ont pas été touchées.}}",
+    "importSkipped": "{count, plural, one {# ligne vide ou à zéro a été ignorée.} other {# lignes vides ou à zéro ont été ignorées.}}",
+    "fromFile": "Relevé : {file}",
+    "fromService": "Service : {label}",
+    "emptyHint": "Importez un relevé ou connectez un service.",
+    "goToIntegrations": "Aller aux intégrations",
+    "pagination": "Pagination des transactions bancaires"
   },
   "payments": {
     "title": "Encaissements",
@@ -1120,5 +1142,59 @@
     "keysHint": "Pour le paiement en ligne, la clé restreinte doit aussi pouvoir écrire « Prix » et « Liens de paiement » et lire « Sessions Checkout » et « PaymentIntents ». Remplacez la clé au besoin.",
     "collectButton": "Vérifier les paiements en ligne",
     "collectConnectionHint": "Regarde les liens de paiement actifs de cette connexion et enregistre les paiements reçus : l’encaissement au brut, puis les frais dans une écriture à part. Rien n’est enregistré deux fois."
+  },
+  "banking": {
+    "title": "Importer un relevé",
+    "intro": "Importez le relevé d’un compte bancaire ou d’une carte de crédit (CSV ou OFX/QFX). Les lignes arrivent dans les transactions bancaires; aucune écriture n’est créée. Un fichier déjà importé est refusé et une ligne déjà connue est laissée telle quelle : on peut donc importer des relevés qui se chevauchent.",
+    "back": "Retour aux transactions bancaires",
+    "accountField": "Compte du plan comptable",
+    "accountHint": "Banque, caisse ou carte de crédit. Le montant d’une ligne est son effet sur ce compte : une entrée est positive, une sortie négative.",
+    "noAccounts": "Aucun compte de type banque, caisse ou carte de crédit n’est actif. Créez-en un dans le plan comptable, puis revenez ici.",
+    "fileField": "Fichier du relevé (.csv, .ofx ou .qfx)",
+    "fileHint": "Jusqu’à 4 Mo. Le fichier est lu dans votre navigateur pour l’aperçu, puis relu par le serveur au moment de l’import.",
+    "submit": "Importer le relevé",
+    "format": "Format détecté : {format}",
+    "ofxInfo": "Devise {currency} · compte se terminant par {mask} · solde de clôture déclaré {balance} au {date}",
+    "previewTitle": "Aperçu",
+    "summary": "{count, plural, one {# transaction} other {# transactions}} du {from} au {to} · entrées {inflow} · sorties {outflow}",
+    "none": "Aucune transaction lisible pour l’instant.",
+    "skipped": "{count, plural, one {# ligne vide ou à zéro sera ignorée.} other {# lignes vides ou à zéro seront ignorées.}}",
+    "errorsTitle": "{count, plural, one {# ligne est illisible.} other {# lignes sont illisibles.}} Corrigez les colonnes ci-dessous ou le fichier; l’import est refusé tant qu’il en reste.",
+    "rowError": "Ligne {row} : {problem}",
+    "problems": {
+      "date": "date illisible",
+      "amount": "montant illisible"
+    },
+    "noMapping": "Allumi n’a pas reconnu les colonnes de ce fichier : choisissez-les ci-dessous.",
+    "mappingTitle": "Colonnes du fichier",
+    "hasHeader": "La première ligne est un en-tête",
+    "dateColumn": "Colonne de la date",
+    "dateOrder": "Ordre de la date",
+    "dateOrders": {
+      "YMD": "année-mois-jour (2026-10-15)",
+      "DMY": "jour/mois/année (15/10/2026)",
+      "MDY": "mois/jour/année (10/15/2026)"
+    },
+    "descriptionColumn": "Colonne de la description",
+    "descriptionExtra": "Deuxième colonne de description (facultatif)",
+    "noColumn": "Aucune",
+    "amountKind": "Montants",
+    "amountKinds": {
+      "single": "Une colonne signée",
+      "split": "Deux colonnes (sorties et entrées)"
+    },
+    "amountColumn": "Colonne du montant",
+    "outColumn": "Colonne des sorties (retraits)",
+    "inColumn": "Colonne des entrées (dépôts)",
+    "decimal": "Séparateur décimal",
+    "decimals": {
+      "point": "Point (12.50)",
+      "comma": "Virgule (12,50)"
+    },
+    "invert": "Inverser les signes (relevé de carte qui montre un achat en positif)",
+    "column": "Colonne {n} · {sample}",
+    "recent": "Derniers fichiers importés",
+    "recentLine": "{file} · {date} · {count, plural, =0 {aucune nouvelle ligne} one {# nouvelle ligne} other {# nouvelles lignes}}",
+    "unreadable": "Ce fichier n’a pas pu être lu."
   }
 }
