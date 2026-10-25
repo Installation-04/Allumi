@@ -4,13 +4,17 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.12] - 2026-10-25
+
+- Publication : démarrage réel des images téléchargées depuis GHCR sur AMD64 et ARM64 avant publication des fichiers de release.
+
 - Sécurité : politique CSP stricte par nonce sur les pages (scripts et styles seulement avec un nonce neuf à chaque réponse, `strict-dynamic`, aucun `unsafe-inline` ni `unsafe-eval` en production), générée par `src/proxy.ts` à partir de `src/platform/csp.ts`. Sans `upgrade-insecure-requests` (HTTP direct par conception). Les images et icônes gardent la politique ciblée. Le parcours navigateur échoue à la moindre ressource bloquée. Aucune migration.
 
 - Installation : le jeton de première configuration est affiché à la fin de l’installation (`install-docker.sh`, donc aussi `get.sh --docker-only`, et `install.sh`), avec ce à quoi il sert. Il n’apparaît que si la page `/setup` est encore ouverte, vérifiée sur la vraie page dans le conteneur : une instance déjà configurée n’affiche plus un secret inutile, et sans réponse le script renvoie vers `.env`. `install.sh` l’affichait toujours; il utilise maintenant la même vérification, sans doublon. C’est le seul secret imprimé.
 
 - Sécurité du déploiement : `update.sh` et `up.sh` ignorent désormais les variables de déploiement exportées par le shell (`DATABASE_URL`, `APP_DATABASE_URL`, `ALLUMI_APP_IMAGE`, etc.), comme le faisait déjà `install-docker.sh`. Compose donne la priorité à l’environnement sur `.env` : un shell de développement pouvait faire migrer et servir la mauvaise base. Fonction commune `isolate_deployment_env` dans `lib.sh`.
 
-- Nouveau logo, original : une flamme (« allumé ») posée sur un signe égal (débit = crédit), à la place de la lettre « a » sur fond vert. Logo dessiné dans l’en-tête et le menu, icône d’onglet (SVG et `favicon.ico`, jusque-là absentes), icônes iOS et PWA avec variante « maskable » pour Android, icône de l’installateur Windows. Tout est généré par `npm run icons` à partir d’une seule définition; tests de cohérence ajoutés. Les captures de la documentation montrent encore l’ancien logo jusqu’à leur prochaine régénération.
+- Nouveau logo, original : une flamme (« allumé ») posée sur un signe égal (débit = crédit), à la place de la lettre « a » sur fond vert. Logo dessiné dans l’en-tête et le menu, icône d’onglet (SVG et `favicon.ico`, jusque-là absentes), icônes iOS et PWA avec variante « maskable » pour Android, icône de l’installateur Windows. Tout est généré par `npm run icons` à partir d’une seule définition; tests de cohérence ajoutés. Les captures ordinateur et téléphone du README et du wiki ont été régénérées avec ce logo.
 
 - Images déjà construites : une copie placée sur une version étiquetée télécharge les images publiées par la release (application et migrations, AMD64/ARM64) au lieu de les compiler. `install-docker.sh`, `update.sh` (donc aussi la mise à jour depuis l’interface) et le nouveau `up.sh` choisissent seuls; repli sur la construction si les images sont introuvables, pour une branche ou des fichiers modifiés, ou avec `--build`. Le Compose lit `ALLUMI_APP_IMAGE`/`ALLUMI_MIGRATE_IMAGE` (noms locaux par défaut : développement et CI inchangés). La première mise à jour depuis une version antérieure construit encore sur place.
 
