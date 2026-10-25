@@ -11,8 +11,8 @@ describe("role matrix", () => {
     }
   });
 
-  it("keeps the privileged actions (reopening the past, closing a year) for the owner", () => {
-    for (const action of ["company.manage", "period.reopen", "fiscalYear.reopen", "fiscalYear.close"] as const) {
+  it("keeps the privileged actions (reopening the past, closing a year, erasing a contact) for the owner", () => {
+    for (const action of ["company.manage", "period.reopen", "fiscalYear.reopen", "fiscalYear.close", "contact.anonymize"] as const) {
       expect(can("OWNER", action), action).toBe(true);
       expect(can("ACCOUNTANT", action), action).toBe(false);
       expect(can("READ_ONLY", action), action).toBe(false);

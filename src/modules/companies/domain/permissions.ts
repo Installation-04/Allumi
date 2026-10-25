@@ -13,6 +13,7 @@ export type Action =
   | "catalog.manage"
   | "contact.read"
   | "contact.manage"
+  | "contact.anonymize"
   | "ledger.read"
   | "entry.post"
   | "entry.reverse"
@@ -33,6 +34,9 @@ const ALLOWED: Record<Action, readonly Role[]> = {
   "catalog.manage": ["OWNER", "ACCOUNTANT"],
   "contact.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
   "contact.manage": ["OWNER", "ACCOUNTANT"],
+  // Law 25 erasure is irreversible and rewrites the audit trail: owner only (the database enforces it too), and the
+  // service also asks for two-factor authentication and a code typed now.
+  "contact.anonymize": ["OWNER"],
   "ledger.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
   "entry.post": ["OWNER", "ACCOUNTANT"],
   "entry.reverse": ["OWNER", "ACCOUNTANT"],
