@@ -1,5 +1,5 @@
 import { mkdirSync, readFileSync } from "node:fs";
-import { expect, test, type Browser, type Page } from "@playwright/test";
+import { expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
 import { Secret, TOTP } from "otpauth";
 
 const VERSION = (JSON.parse(readFileSync("package.json", "utf8")) as { version: string }).version;
@@ -25,9 +25,43 @@ async function expectNoPageOverflow(page: Page) {
 }
 
 
+/** Everything the browser refuses because of the Content-Security-Policy, across every context the journey opens. */
+const cspViolations: string[] = [];
+function watchCsp(context: BrowserContext): BrowserContext {
+  context.on("console", (message) => {
+    if (/content security policy|refused to (?:execute|load|apply|connect|frame)/i.test(message.text())) cspViolations.push(`${message.location().url || "(page)"} — ${message.text()}`);
+  });
+  return context;
+}
+const newWatchedContext = async (browser: Browser) => watchCsp(await browser.newContext());
+
+/** Strict script policy, checked on the real response: fresh nonce, no unsafe-inline, every script stamped with it. */
+async function expectNonceCsp(page: Page, path: string) {
+  const nonceOf = (policy: string) => /'nonce-([^']+)'/.exec(policy)?.[1];
+  const [first, second] = [await page.request.get(path), await page.request.get(path)];
+  const policy = first.headers()["content-security-policy"] ?? "";
+  const nonce = nonceOf(policy);
+  expect(nonce, "nonce in the policy").toBeTruthy();
+  expect(nonceOf(second.headers()["content-security-policy"] ?? ""), "a new nonce for every response").not.toBe(nonce);
+  const scriptSrc = policy.split(";").map((directive) => directive.trim()).find((directive) => directive.startsWith("script-src")) ?? "";
+  expect(scriptSrc).toContain("'strict-dynamic'");
+  expect(scriptSrc).not.toMatch(/unsafe-inline|unsafe-eval/);
+  // Allumi is served over plain HTTP: this directive would make the browser ask for everything over https.
+  expect(policy).not.toContain("upgrade-insecure-requests");
+  expect(policy).toContain("frame-ancestors 'none'");
+  const html = await first.text();
+  const scripts = html.match(/<script\b[^>]*>/g) ?? [];
+  expect(scripts.length).toBeGreaterThan(0);
+  for (const tag of scripts) expect(tag, "every script carries the response's nonce").toContain(`nonce="${nonce}"`);
+  expect(html).not.toMatch(/\son[a-z]+="/);
+}
+
 test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ page, browser }) => {
   // This complete journey covers setup, MFA, accounting, both locales and optional reference captures.
   test.setTimeout(180_000);
+  cspViolations.length = 0;
+  watchCsp(page.context());
+  await expectNonceCsp(page, "/setup");
   // Install metadata must be public, including before the first session.
   const manifestResponse = await page.request.get('/manifest.webmanifest');
   expect(manifestResponse.status()).toBe(200);
@@ -95,7 +129,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   }
 
   // /setup is disabled for good: a visitor without a session is sent to the sign-in page...
-  const visitor = await browser.newContext();
+  const visitor = await newWatchedContext(browser);
   const visitorPage = await visitor.newPage();
   await visitorPage.goto("/setup");
   await expect(visitorPage).toHaveURL(/\/connexion$/);
@@ -201,6 +235,8 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await appearanceJourney(page);
   await postingJourney(page);
   await creditPostingJourney(page);
+  // Nothing in the whole journey (both locales, every form, the security pages, a second browser) was blocked.
+  expect(cspViolations, "Content-Security-Policy violations").toEqual([]);
 });
 
 /** Today in the company's time zone (the application uses America/Toronto), as YYYY-MM-DD. */
@@ -800,7 +836,7 @@ async function securityJourney(page: Page, browser: Browser, recoveryCodes: stri
   await expect(disconnect).toHaveCount(0);
 
   // Another device appears, and disconnecting it really closes its session.
-  const other = await browser.newContext();
+  const other = await newWatchedContext(browser);
   const otherPage = await other.newPage();
   await signInElsewhere(otherPage, PASSWORD, recoveryCodes[1] ?? "");
   await page.reload();
@@ -844,7 +880,7 @@ async function securityJourney(page: Page, browser: Browser, recoveryCodes: stri
 
   // Back to the password the rest of the journey uses.
   await fill(NEXT, PASSWORD);
-  const verifier = await browser.newContext();
+  const verifier = await newWatchedContext(browser);
   await signInElsewhere(await verifier.newPage(), PASSWORD);
   await verifier.close();
 

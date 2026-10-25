@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { sessionCookieName } from "@/app/_lib/cookie-name";
+import { contentSecurityPolicy, newNonce } from "@/platform/csp";
 
 // Paths reachable without a session cookie. The real check (database lookup) happens in the pages.
 const PUBLIC_PREFIXES = ["/connexion", "/setup", "/api/health", "/manifest.webmanifest"];
@@ -17,8 +18,16 @@ export function proxy(request: NextRequest) {
     return redirect;
   }
 
+  // Strict policy for this response. Next stamps the nonce on its own scripts and styles by reading it from the
+  // Content-Security-Policy header of the request it renders (see node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md).
+  const nonce = newNonce();
+  const policy = contentSecurityPolicy(nonce, { development: process.env.NODE_ENV === "development" });
+  headers.set("x-nonce", nonce);
+  headers.set("content-security-policy", policy);
+
   const response = NextResponse.next({ request: { headers } });
   response.headers.set("x-request-id", requestId);
+  response.headers.set("Content-Security-Policy", policy);
   return response;
 }
 
