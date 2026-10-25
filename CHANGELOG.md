@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Installation : le jeton de première configuration est affiché à la fin de l’installation (`install-docker.sh`, donc aussi `get.sh --docker-only`, et `install.sh`), avec ce à quoi il sert. Il n’apparaît que si la page `/setup` est encore ouverte, vérifiée sur la vraie page dans le conteneur : une instance déjà configurée n’affiche plus un secret inutile, et sans réponse le script renvoie vers `.env`. `install.sh` l’affichait toujours; il utilise maintenant la même vérification, sans doublon. C’est le seul secret imprimé.
+
 ## [0.4.0-alpha.11] - 2026-10-25
 
 - Documentation : captures ordinateur/téléphone de l’écran Sécurité du compte (appareils connectés et changement de mot de passe).

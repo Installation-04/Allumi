@@ -66,3 +66,19 @@ compose() { docker compose --project-directory "$ALLUMI_DIR" "$@"; }
 
 require_root() { [ "$(id -u)" -eq 0 ] || die "lance ce script avec sudo."; }
 require_env()  { [ -f "$ENV_FILE" ] || die "fichier .env introuvable ($ENV_FILE). Lance d'abord install.sh."; }
+
+# Affiche le jeton de première configuration, si la page /setup est encore ouverte. Le jeton ne sert qu'une fois :
+# sur une instance déjà configurée, l'afficher ne ferait qu'exposer un secret inutile (historique du terminal,
+# journaux). Le test est fait dans le conteneur de l'application, sur la vraie page : ouverte = formulaire avec le
+# champ du jeton. Réponse incertaine (conteneur injoignable) : on renvoie vers .env au lieu de deviner.
+print_setup_token() {
+  local token status=0
+  token="$(env_get SETUP_TOKEN)"
+  [ -n "$token" ] || return 0
+  docker compose --project-directory "$ALLUMI_DIR" --env-file "$ENV_FILE" exec -T app node -e "fetch('http://127.0.0.1:3000/setup',{redirect:'manual'}).then(async(r)=>process.exit(r.status===200&&(await r.text()).includes('setupToken')?0:3)).catch(()=>process.exit(2))" >/dev/null 2>&1 || status=$?
+  case "$status" in
+    0) printf '  Jeton    : %s  (à saisir une seule fois sur la page /setup)\n' "$token" ;;
+    3) printf "  Jeton    : inutile, l'instance est déjà configurée\n" ;;
+    *) printf '  Jeton    : à relever dans %s (SETUP_TOKEN)\n' "$ENV_FILE" ;;
+  esac
+}
