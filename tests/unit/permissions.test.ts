@@ -3,8 +3,8 @@ import { ACTIONS, can, type Role } from "@/modules/companies";
 
 describe("role matrix", () => {
   it("lets everybody read the ledger, and only the owner and the accountant write", () => {
-    for (const role of ["OWNER", "ACCOUNTANT", "READ_ONLY"] as const) { expect(can(role, "ledger.read")).toBe(true); expect(can(role, "contact.read")).toBe(true); }
-    for (const action of ["contact.manage", "entry.post", "entry.reverse", "account.manage", "period.lock", "fiscalYear.create"] as const) {
+    for (const role of ["OWNER", "ACCOUNTANT", "READ_ONLY"] as const) { expect(can(role, "ledger.read")).toBe(true); expect(can(role, "contact.read")).toBe(true); expect(can(role, "bank.read")).toBe(true); }
+    for (const action of ["contact.manage", "bank.manage", "entry.post", "entry.reverse", "account.manage", "period.lock", "fiscalYear.create"] as const) {
       expect(can("OWNER", action), action).toBe(true);
       expect(can("ACCOUNTANT", action), action).toBe(true);
       expect(can("READ_ONLY", action), action).toBe(false);
@@ -12,7 +12,7 @@ describe("role matrix", () => {
   });
 
   it("keeps the privileged actions (reopening the past, closing a year) for the owner", () => {
-    for (const action of ["company.manage", "period.reopen", "fiscalYear.reopen", "fiscalYear.close"] as const) {
+    for (const action of ["company.manage", "period.reopen", "fiscalYear.reopen", "fiscalYear.close", "integration.manage"] as const) {
       expect(can("OWNER", action), action).toBe(true);
       expect(can("ACCOUNTANT", action), action).toBe(false);
       expect(can("READ_ONLY", action), action).toBe(false);

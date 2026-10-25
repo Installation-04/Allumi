@@ -13,6 +13,9 @@ export type Action =
   | "catalog.manage"
   | "contact.read"
   | "contact.manage"
+  | "bank.read"
+  | "bank.manage"
+  | "integration.manage"
   | "ledger.read"
   | "entry.post"
   | "entry.reverse"
@@ -33,6 +36,10 @@ const ALLOWED: Record<Action, readonly Role[]> = {
   "catalog.manage": ["OWNER", "ACCOUNTANT"],
   "contact.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
   "contact.manage": ["OWNER", "ACCOUNTANT"],
+  "bank.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
+  "bank.manage": ["OWNER", "ACCOUNTANT"],
+  // A connection holds the keys to an outside account: the owner creates it, syncs it and can read its credentials (the database enforces it too).
+  "integration.manage": ["OWNER"],
   "ledger.read": ["OWNER", "ACCOUNTANT", "READ_ONLY"],
   "entry.post": ["OWNER", "ACCOUNTANT"],
   "entry.reverse": ["OWNER", "ACCOUNTANT"],
