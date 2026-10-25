@@ -18,7 +18,7 @@ sudo apt install -y git
 sudo git clone https://github.com/Installation-04/Allumi.git /opt/allumi
 cd /opt/allumi
 # Préversion de test; utiliser uniquement des données fictives.
-sudo git checkout v0.4.0-alpha.10
+sudo git checkout v0.4.0-alpha.11
 sudo ./scripts/install.sh --interactive
 ```
 

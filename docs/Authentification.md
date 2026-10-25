@@ -62,7 +62,7 @@ Captures issues de données fictives, avant saisie du code; aucune clé TOTP ni 
 
 ## Appareils connectés — références visuelles
 
-Ces fonctions sont présentes sur `main` et seront distribuées dans la prochaine préversion après v0.4.0-alpha.10.
+Ces fonctions sont disponibles à partir de v0.4.0-alpha.11.
 
 Dans **Sécurité du compte**, consulter les appareils puis déconnecter celui qui n’est plus utilisé. Le navigateur et le système affichés proviennent de l’en-tête envoyé par le client : ce sont des indications, pas une identification matérielle garantie. Le badge **Cet appareil** indique la session conservée.
 
