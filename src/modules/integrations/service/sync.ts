@@ -11,6 +11,7 @@ import type { ProviderId } from "../domain/provider";
 import type { ImportedTransaction, SkipReason } from "../domain/transaction";
 import { syncStart, windows, type Window } from "../domain/windows";
 import { credentialBinding, type Deps } from "./connections";
+import { failureCode } from "./failure";
 
 /** One run reads at most this many windows (about two years) and stops after this long: press again to continue. */
 const MAX_WINDOWS_PER_RUN = 24;
@@ -24,9 +25,6 @@ const MIN_SPLIT_MS = 2 * 3_600_000;
 export type SyncResult = { imported: number; skipped: Record<SkipReason, number>; windows: number; complete: boolean };
 
 type Claimed = { id: string; provider: ProviderId; account_id: string; sandbox: boolean; import_from: string; sync_cursor: Date | null };
-
-/** What is kept of a failure: a code the person can act on, never the service's text (it can quote a key). */
-const failureCode = (error: unknown): string => (error instanceof AppError && error.key.startsWith("integrations.") ? error.key : "integrations.failed");
 
 function merge(a: FetchedWindow, b: FetchedWindow): FetchedWindow {
   return {

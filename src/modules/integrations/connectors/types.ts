@@ -1,4 +1,5 @@
 import type { SkipReason, ImportedTransaction } from "../domain/transaction";
+import type { MappedSession } from "../domain/online-payment";
 import type { Window } from "../domain/windows";
 import type { HttpClient } from "./http";
 
@@ -14,3 +15,21 @@ export type Connector = {
 };
 
 export const emptySkips = (): Record<SkipReason, number> => ({ unsupportedCurrency: 0, notSettled: 0 });
+
+export type PaymentLinkInput = { linkId: string; amountCents: bigint; currency: string; name: string };
+
+/**
+ * What a service does to take a payment for an invoice on a page it hosts: no public address on our side, we ask
+ * and look. Built per call, like a `Connector`. Each creating call is idempotent on the link id, so a retry after a
+ * lost answer finds what the first one made instead of making a second.
+ */
+export type PaymentConnector = {
+  /** The price of a payment for exactly this amount; returns the service's id for it. */
+  createPrice(input: PaymentLinkInput): Promise<string>;
+  /** The payment page for a price, good for one completed payment. */
+  createLink(input: { linkId: string; priceId: string; description: string }): Promise<{ id: string; url: string }>;
+  /** The page stops taking payments. */
+  deactivateLink(externalId: string): Promise<void>;
+  /** The payments made on a page: those settled, and how many are still on their way. */
+  listPayments(externalId: string): Promise<{ payments: MappedSession[]; waiting: number }>;
+};

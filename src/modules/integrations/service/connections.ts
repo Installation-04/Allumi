@@ -39,6 +39,11 @@ export type ConnectionDto = {
   accountCode: string;
   accountNameFr: string;
   accountNameEn: string;
+  /** Where the processing fees of online payments are booked (null until the owner chooses). */
+  feeAccountId: string | null;
+  feeAccountCode: string | null;
+  feeAccountNameFr: string | null;
+  feeAccountNameEn: string | null;
   status: "ACTIVE" | "DISABLED";
   sandbox: boolean;
   credentialsHint: string | null;
@@ -52,20 +57,22 @@ export type ConnectionDto = {
 };
 
 const SELECT = {
-  id: true, provider: true, label: true, accountId: true, status: true, sandbox: true, credentialsHint: true, importFrom: true, lastSyncedAt: true,
+  id: true, provider: true, label: true, accountId: true, feeAccountId: true, status: true, sandbox: true, credentialsHint: true, importFrom: true, lastSyncedAt: true,
   lastSyncOk: true, lastError: true, lastImportedCount: true, syncingSince: true,
   account: { select: { code: true, nameFr: true, nameEn: true } },
+  feeAccount: { select: { code: true, nameFr: true, nameEn: true } },
   _count: { select: { transactions: true } },
 } as const;
 
 type Row = {
-  id: string; provider: ProviderId; label: string; accountId: string; status: "ACTIVE" | "DISABLED"; sandbox: boolean; credentialsHint: string | null; importFrom: Date;
+  id: string; provider: ProviderId; label: string; accountId: string; feeAccountId: string | null; status: "ACTIVE" | "DISABLED"; sandbox: boolean; credentialsHint: string | null; importFrom: Date;
   lastSyncedAt: Date | null; lastSyncOk: boolean | null; lastError: string | null; lastImportedCount: number | null; syncingSince: Date | null;
-  account: { code: string; nameFr: string; nameEn: string }; _count: { transactions: number };
+  account: { code: string; nameFr: string; nameEn: string }; feeAccount: { code: string; nameFr: string; nameEn: string } | null; _count: { transactions: number };
 };
 
 const toDto = (row: Row, now: Date): ConnectionDto => ({
   id: row.id, provider: row.provider, label: row.label, accountId: row.accountId, accountCode: row.account.code, accountNameFr: row.account.nameFr, accountNameEn: row.account.nameEn,
+  feeAccountId: row.feeAccountId, feeAccountCode: row.feeAccount?.code ?? null, feeAccountNameFr: row.feeAccount?.nameFr ?? null, feeAccountNameEn: row.feeAccount?.nameEn ?? null,
   status: row.status, sandbox: row.sandbox, credentialsHint: row.credentialsHint, importFrom: row.importFrom.toISOString().slice(0, 10), lastSyncedAt: row.lastSyncedAt,
   lastSyncOk: row.lastSyncOk, lastError: row.lastError, lastImportedCount: row.lastImportedCount,
   syncing: row.syncingSince !== null && now.getTime() - row.syncingSince.getTime() < 10 * 60_000, transactionCount: row._count.transactions,
@@ -175,6 +182,39 @@ export async function disconnect(actor: CompanyContext, id: string): Promise<voi
       if (!(await tx.integrationConnection.findFirst({ where: { companyId: actor.companyId, id }, select: { id: true } }))) throw new AppError("integrations.notFound");
       await tx.integrationCredential.update({ where: { companyId_connectionId: { companyId: actor.companyId, connectionId: id } }, data: { credentialsEnc: null } });
       await tx.integrationConnection.update({ where: { companyId_id: { companyId: actor.companyId, id } }, data: { status: "DISABLED", credentialsHint: null } });
+    });
+  } catch (error) {
+    throw toAppError(error);
+  }
+}
+
+/** The expense accounts processing fees can be booked to. */
+export async function listFeeAccounts(actor: CompanyContext) {
+  return withCompany(actor, async (tx) => {
+    await requireRole(tx, "bank.read");
+    return tx.account.findMany({
+      where: { companyId: actor.companyId, isActive: true, subtype: { in: ["OPERATING_EXPENSE", "OTHER_EXPENSE"] } },
+      select: { id: true, code: true, nameFr: true, nameEn: true },
+      orderBy: { code: "asc" },
+    });
+  });
+}
+
+/**
+ * Where the processing fees of online payments go: owner only. It applies to the payments collected from now on;
+ * the ones already booked keep the account they were booked to (an entry is never edited).
+ */
+export async function setFeeAccount(actor: CompanyContext, id: string, accountId: string): Promise<void> {
+  try {
+    await withCompany(actor, async (tx) => {
+      await requireRole(tx, "integration.manage");
+      const connection = await tx.integrationConnection.findFirst({ where: { companyId: actor.companyId, id }, select: { provider: true } });
+      if (!connection) throw new AppError("integrations.notFound");
+      if (connection.provider !== "STRIPE") throw new AppError("onlinePayments.provider");
+      if (!(await tx.account.findFirst({ where: { companyId: actor.companyId, id: accountId, isActive: true, subtype: { in: ["OPERATING_EXPENSE", "OTHER_EXPENSE"] } }, select: { id: true } }))) {
+        throw new AppError("onlinePayments.feeAccountInvalid");
+      }
+      await tx.integrationConnection.update({ where: { companyId_id: { companyId: actor.companyId, id } }, data: { feeAccountId: accountId } });
     });
   } catch (error) {
     throw toAppError(error);
