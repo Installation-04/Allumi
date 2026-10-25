@@ -9,7 +9,8 @@ import { ActionForm } from "@/app/_components/ui";
 import { FOCUS } from "@/app/_components/focus";
 import { accountName, loadCompany } from "../_lib";
 import { validId } from "../factures/editor";
-import { setStatusAction } from "./actions";
+import { matchAction, setStatusAction, unmatchAction } from "./actions";
+import { LedgerLine } from "./matched-lines";
 
 export async function generateMetadata() { return { title: (await getTranslations("transactions"))("title") }; }
 
@@ -113,6 +114,28 @@ export default async function TransactionsPage({ params, searchParams }: { param
                 {source.kind === "service" && source.grossCents !== null && source.feeCents !== null ? <p className="text-sm tabular-nums text-stone-600 dark:text-stone-400">{t("gross")} {money(source.grossCents, transaction.currency)} · {t("fee")} {money(source.feeCents, transaction.currency)}</p> : null}
                 {source.kind === "service" && source.reference ? <p className="text-sm break-words">{t("reference")} : {source.reference}</p> : null}
                 {source.kind === "service" && source.flagged ? <p role="note" className="text-sm text-amber-700 dark:text-amber-400">{t("flagged")}</p> : null}
+                {transaction.status === "UNMATCHED" && transaction.suggestion ? (
+                  <div className="space-y-2 rounded border border-stone-200 p-3 text-sm dark:border-stone-700">
+                    <p><span className="font-medium">{t("suggestion")}</span> <LedgerLine companyId={company.id} line={transaction.suggestion} locale={locale} /></p>
+                    {canManage ? (
+                      <ActionForm action={matchAction.bind(null, company.id, transaction.id)} label={t("match")} ariaLabel={t("matchNamed", { description: transaction.description })} variant="primary">
+                        <input type="hidden" name="line" value={transaction.suggestion.lineId} />
+                      </ActionForm>
+                    ) : null}
+                  </div>
+                ) : null}
+                {transaction.status === "MATCHED" && transaction.matches.length > 0 ? (
+                  <div className="space-y-2 rounded border border-stone-200 p-3 text-sm dark:border-stone-700">
+                    <p className="font-medium">{t("matchedTo")}</p>
+                    <ul className="space-y-1">
+                      {transaction.matches.map((match) => <li key={match.lineId}><LedgerLine companyId={company.id} line={match} locale={locale} /></li>)}
+                    </ul>
+                    {canManage && !transaction.matches.some((match) => match.reconciled) ? (
+                      <ActionForm action={unmatchAction.bind(null, company.id, transaction.id)} label={t("undo")} ariaLabel={t("undoNamed", { description: transaction.description })} />
+                    ) : null}
+                  </div>
+                ) : null}
+                <Link href={`${base}/${transaction.id}`} className={link} aria-label={t(canManage && transaction.status === "UNMATCHED" ? "processNamed" : "detailsNamed", { description: transaction.description })}>{t(canManage && transaction.status === "UNMATCHED" ? "process" : "details")}</Link>
                 {canManage && transaction.status === "UNMATCHED" ? <ActionForm action={setStatusAction.bind(null, company.id, transaction.id, "EXCLUDED")} label={t("setAside")} ariaLabel={t("setAsideNamed", { description: transaction.description })} /> : null}
                 {canManage && transaction.status === "EXCLUDED" ? <ActionForm action={setStatusAction.bind(null, company.id, transaction.id, "UNMATCHED")} label={t("restore")} ariaLabel={t("restoreNamed", { description: transaction.description })} /> : null}
               </li>

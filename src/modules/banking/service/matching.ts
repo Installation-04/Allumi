@@ -6,7 +6,7 @@ import { AppError, isConflict, toAppError } from "@/platform/errors";
 import { withCompany, type CompanyContext, type Tx } from "@/platform/tenant";
 import { categorizeLines, MAX_MATCHED_LINES, matchProblem, TRANSFER_DAYS, transferLines, transferProblem } from "../domain/matching";
 import { cleanText } from "../domain/statement";
-import { lineSelect, toLineDto, type LedgerLineDto } from "./match-read";
+import { entryNumberFormat, lineSelect, toLineDto, type LedgerLineDto } from "./match-read";
 import type { TransactionStatus } from "./transactions";
 
 /** The widest window the candidates can be asked for, in days either side of the transaction. */
@@ -88,11 +88,12 @@ export async function listMatchCandidates(actor: CompanyContext, transactionId: 
       orderBy: [{ entryDate: "asc" }, { entryId: "asc" }, { lineNo: "asc" }],
       take: CANDIDATES_SHOWN * 4,
     });
+    const format = await entryNumberFormat(tx, actor.companyId);
     const target = txn.txnDate.getTime();
     return rows
       .sort((a, b) => Math.abs(a.entryDate.getTime() - target) - Math.abs(b.entryDate.getTime() - target) || Number(a.entry.entryNumber - b.entry.entryNumber))
       .slice(0, CANDIDATES_SHOWN)
-      .map(toLineDto);
+      .map((row) => toLineDto(row, format));
   });
 }
 

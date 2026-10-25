@@ -1,4 +1,5 @@
 import "server-only";
+import { formatNumber } from "@/modules/ledger";
 import type { Tx } from "@/platform/tenant";
 import { SUGGESTION_DAYS } from "../domain/matching";
 
@@ -7,6 +8,8 @@ export type LedgerLineDto = {
   lineId: string;
   entryId: string;
   entryNumber: bigint;
+  /** The number as the journal shows it (`J-00042`). */
+  entryLabel: string;
   entryDate: string;
   /** The `journal_source` of the entry: MANUAL, PAYMENT, BANK… */
   sourceType: string;
@@ -39,9 +42,17 @@ export const lineSelect = {
   reconciledLine: { select: { id: true } },
 } as const;
 
-export function toLineDto(row: LineRow): LedgerLineDto {
+type NumberFormat = { prefix: string; padding: number };
+
+/** How this company writes its entry numbers. */
+export async function entryNumberFormat(tx: Tx, companyId: string): Promise<NumberFormat> {
+  const sequence = await tx.numberSequence.findUnique({ where: { companyId_key: { companyId, key: "JOURNAL_ENTRY" } }, select: { prefix: true, padding: true } });
+  return sequence ?? { prefix: "", padding: 0 };
+}
+
+export function toLineDto(row: LineRow, format: NumberFormat): LedgerLineDto {
   return {
-    lineId: row.id, entryId: row.entry.id, entryNumber: row.entry.entryNumber, entryDate: iso(row.entryDate), sourceType: row.entry.sourceType, memo: row.entry.memo,
+    lineId: row.id, entryId: row.entry.id, entryNumber: row.entry.entryNumber, entryLabel: formatNumber(format.prefix, format.padding, row.entry.entryNumber), entryDate: iso(row.entryDate), sourceType: row.entry.sourceType, memo: row.entry.memo,
     description: row.description, contactName: row.contact?.displayName ?? null, cents: row.debitCents - row.creditCents,
     reversed: row.entry.reversesEntryId !== null || row.entry.reversedBy !== null,
     reconciled: row.reconciledLine !== null,
@@ -52,6 +63,7 @@ export function toLineDto(row: LineRow): LedgerLineDto {
 export async function loadMatches(tx: Tx, companyId: string, transactionIds: string[]): Promise<Map<string, MatchedLineDto[]>> {
   const result = new Map<string, MatchedLineDto[]>();
   if (transactionIds.length === 0) return result;
+  const format = await entryNumberFormat(tx, companyId);
   const rows = await tx.bankMatch.findMany({
     where: { companyId, bankTransactionId: { in: transactionIds } },
     select: { bankTransactionId: true, journalLine: { select: lineSelect } },
@@ -59,7 +71,7 @@ export async function loadMatches(tx: Tx, companyId: string, transactionIds: str
   });
   for (const row of rows) {
     const list = result.get(row.bankTransactionId) ?? [];
-    list.push(toLineDto(row.journalLine));
+    list.push(toLineDto(row.journalLine, format));
     result.set(row.bankTransactionId, list);
   }
   return result;
@@ -92,7 +104,8 @@ export async function loadSuggestions(tx: Tx, companyId: string, transactionIds:
      WHERE t.company_id = ${companyId}::uuid AND t.status = 'UNMATCHED' AND t.id = ANY(${transactionIds}::uuid[])`;
   if (rows.length === 0) return result;
   const lines = await tx.journalLine.findMany({ where: { companyId, id: { in: rows.map((row) => row.line_id) } }, select: lineSelect });
-  const byId = new Map(lines.map((line) => [line.id, toLineDto(line)]));
+  const format = await entryNumberFormat(tx, companyId);
+  const byId = new Map(lines.map((line) => [line.id, toLineDto(line, format)]));
   for (const row of rows) {
     const line = byId.get(row.line_id);
     if (line) result.set(row.transaction_id, line);

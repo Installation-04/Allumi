@@ -29,8 +29,8 @@ export default async function EntryPage({ params }: { params: Promise<{ companyI
   // Numbers of the linked entries, for the "reversed by / reverses" sentences.
   const label = async (id: string | null) => (id ? ((await getEntry(actor, id))?.numberLabel ?? "") : "");
   const [reversedBy, reverses] = [await label(entry.reversedByEntryId), await label(entry.reversesEntryId)];
-  const canReverse = can(company.role, "entry.reverse") && (entry.source === "MANUAL" || entry.source === "OPENING_BALANCE") && !entry.reversedByEntryId;
-  const fromDocument = !["MANUAL", "OPENING_BALANCE", "REVERSAL"].includes(entry.source);
+  const canReverse = can(company.role, "entry.reverse") && (entry.source === "MANUAL" || entry.source === "OPENING_BALANCE" || entry.source === "BANK") && !entry.reversedByEntryId;
+  const fromDocument = !["MANUAL", "OPENING_BALANCE", "BANK", "REVERSAL"].includes(entry.source);
 
   return (
     <section className="space-y-6">
@@ -43,6 +43,7 @@ export default async function EntryPage({ params }: { params: Promise<{ companyI
         {reversedBy ? <p className="font-medium">{t("reversedBy", { number: reversedBy })}</p> : null}
         {reverses ? <p className="font-medium">{t("reverses", { number: reverses })}</p> : null}
         {fromDocument ? <p className="text-sm">{t("voidHint")}</p> : null}
+        {entry.source === "BANK" ? <p className="text-sm">{t("bankHint")}</p> : null}
       </div>
 
       <div className="overflow-x-auto">

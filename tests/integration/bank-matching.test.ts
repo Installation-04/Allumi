@@ -78,7 +78,7 @@ describe("matching a transaction to ledger lines", () => {
     expect(await matchesOf(txn)).toEqual([entry.lineId]);
     const shown = await getBankTransaction(reader, txn);
     expect(shown?.status).toBe("MATCHED");
-    expect(shown?.matches).toEqual([expect.objectContaining({ lineId: entry.lineId, entryId: entry.entryId, entryNumber: entry.number, entryDate: "2026-03-09", sourceType: "MANUAL", cents: 10_000n, reversed: false, reconciled: false })]);
+    expect(shown?.matches).toEqual([expect.objectContaining({ lineId: entry.lineId, entryId: entry.entryId, entryNumber: entry.number, entryLabel: expect.stringMatching(/^J-\d{5}$/), entryDate: "2026-03-09", sourceType: "MANUAL", cents: 10_000n, reversed: false, reconciled: false })]);
     expect(shown?.suggestion).toBeNull();
   });
 

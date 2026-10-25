@@ -2,7 +2,7 @@
 
 Un **relevé** est le fichier que votre banque ou l'émetteur de votre carte de crédit vous donne : les transactions d'un compte, sur une période. Allumi le lit et range chaque ligne dans **Banque et transactions → Transactions bancaires**, avec celles que Stripe et PayPal rapportent ([[Integrations]]).
 
-**Ce que cela fait** : lire le fichier, montrer ce qui sera importé, enregistrer les lignes nouvelles. **Ce que cela ne fait pas** : aucune **écriture comptable** n'est créée, rien n'est apparié aux factures ni au journal, rien n'est rapproché. L'appariement et le rapprochement de fin de période sont les étapes suivantes de la phase 5 ([[Feuille-de-route]]).
+**Ce que cela fait** : lire le fichier, montrer ce qui sera importé, enregistrer les lignes nouvelles. **Ce que cela ne fait pas** : l'import ne crée **aucune écriture comptable** et n'apparie rien : c'est l'affaire de la page suivante. L'**appariement** au journal ([[Appariement-bancaire]]) est l'étape suivante; le rapprochement de fin de période vient ensuite ([[Feuille-de-route]]).
 
 ## Importer un relevé
 
@@ -49,7 +49,7 @@ On peut importer le relevé d'octobre, puis celui d'octobre et novembre : une li
 
 ## Les transactions bancaires
 
-**Banque et transactions → Transactions bancaires** liste les lignes de tous les comptes, du plus récent au plus ancien, 50 par page : date, description, bénéficiaire, montant, **état** (à traiter, rapprochée, mise de côté), compte et **origine** (le fichier, ou le service Stripe/PayPal avec brut, frais et référence). Filtres : compte, connexion, état, recherche dans la description et le bénéficiaire (un texte, pas un motif). Tous les membres consultent; les propriétaires et les comptables **mettent de côté** une ligne (un doublon, ce qui n'est pas du ressort des livres) et la remettent à traiter. Une ligne importée ne change jamais d'autre façon et ne se supprime jamais.
+**Banque et transactions → Transactions bancaires** liste les lignes de tous les comptes, du plus récent au plus ancien, 50 par page : date, description, bénéficiaire, montant, **état** (à traiter, rapprochée, mise de côté), compte et **origine** (le fichier, ou le service Stripe/PayPal avec brut, frais et référence). Filtres : compte, connexion, état, recherche dans la description et le bénéficiaire (un texte, pas un motif). Tous les membres consultent; les propriétaires et les comptables **mettent de côté** une ligne (un doublon, ce qui n'est pas du ressort des livres), la remettent à traiter, ou la **traitent** ([[Appariement-bancaire]]). Une ligne importée ne change jamais d'autre façon et ne se supprime jamais.
 
 ## Sécurité et vie privée
 
