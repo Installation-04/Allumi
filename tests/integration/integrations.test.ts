@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
 import type pg from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createConnection, disconnect, getConnection, listConnectionAccounts, listConnections, listImportedTransactions, replaceCredentials, setImportedStatus, syncConnection, type HttpClient } from "@/modules/integrations";
+import { listBankTransactions, setTransactionStatus } from "@/modules/banking";
+import { createConnection, disconnect, getConnection, listConnectionAccounts, listConnections, replaceCredentials, syncConnection, type HttpClient } from "@/modules/integrations";
 import { credentialBinding } from "@/modules/integrations/service/connections";
 import { AppError } from "@/platform/errors";
 import { decrypt } from "@/platform/secrets";
@@ -438,7 +439,7 @@ describe("importing PayPal transactions", () => {
   });
 });
 
-describe("the inbox of imported transactions", () => {
+describe("the imported transactions among the bank transactions", () => {
   it("lists them newest first, 50 a page, with the filters, and flags what needs a look", async () => {
     const c = await stripeConnection({
       transactions: () => [
@@ -448,33 +449,37 @@ describe("the inbox of imported transactions", () => {
     }, { importFrom: "2026-05-01" });
     await sync(c.id, c.http);
 
-    const first = await listImportedTransactions(reader, { connectionId: c.id });
+    const first = await listBankTransactions(reader, { connectionId: c.id });
     expect(first).toMatchObject({ total: 121, page: 1, pageCount: 3 });
     expect(first.transactions).toHaveLength(50);
     const dates = first.transactions.map((t) => t.date);
     expect([...dates].sort().reverse()).toEqual(dates);
-    expect(first.transactions[0]).toMatchObject({ date: "2026-06-01", currency: "USD", amountCents: 1900n, grossCents: 2000n, feeCents: 100n, status: "UNMATCHED", kind: "PAYMENT", provider: "STRIPE", sandbox: false, flagged: false, connectionId: c.id });
-    expect((await listImportedTransactions(reader, { connectionId: c.id, page: 3 })).transactions).toHaveLength(21);
-    expect((await listImportedTransactions(reader, { connectionId: c.id, page: 99 })).page).toBe(3);
-    expect((await listImportedTransactions(reader, { connectionId: c.id, status: "EXCLUDED" })).total).toBe(0);
-    expect((await listImportedTransactions(otherOwner, { connectionId: c.id })).total).toBe(0);
+    expect(first.transactions[0]).toMatchObject({
+      date: "2026-06-01", currency: "USD", amountCents: 1900n, status: "UNMATCHED", accountId: c.account,
+      source: { kind: "service", provider: "STRIPE", sandbox: false, flagged: false, type: "PAYMENT", grossCents: 2000n, feeCents: 100n },
+    });
+    expect((await listBankTransactions(reader, { connectionId: c.id, page: 3 })).transactions).toHaveLength(21);
+    expect((await listBankTransactions(reader, { connectionId: c.id, page: 99 })).page).toBe(3);
+    expect((await listBankTransactions(reader, { connectionId: c.id, status: "EXCLUDED" })).total).toBe(0);
+    expect((await listBankTransactions(otherOwner, { connectionId: c.id })).total).toBe(0);
   });
 
   it("sets a transaction aside and brings it back, for owners and accountants only", async () => {
     const c = await stripeConnection({ transactions: () => [stripeTxn({ id: "txn_aside_001", created: sec("2026-06-01T10:00:00Z") })] });
     await sync(c.id, c.http);
-    const id = (await listImportedTransactions(reader, { connectionId: c.id })).transactions[0]?.id ?? "";
-    expect(await refusal(setImportedStatus(reader, id, "EXCLUDED"))).toBe("forbidden");
-    await setImportedStatus(accountant, id, "EXCLUDED");
-    expect((await listImportedTransactions(reader, { connectionId: c.id, status: "EXCLUDED" })).total).toBe(1);
-    await setImportedStatus(actor, id, "UNMATCHED");
-    expect((await listImportedTransactions(reader, { connectionId: c.id, status: "UNMATCHED" })).total).toBe(1);
-    // nobody else's, nothing unknown, and nothing that did not come from a connection
-    expect(await refusal(setImportedStatus(otherOwner, id, "EXCLUDED"))).toBe("integrations.transactionNotFound");
-    expect(await refusal(setImportedStatus(actor, randomUUID(), "EXCLUDED"))).toBe("integrations.transactionNotFound");
+    const id = (await listBankTransactions(reader, { connectionId: c.id })).transactions[0]?.id ?? "";
+    expect(await refusal(setTransactionStatus(reader, id, "EXCLUDED"))).toBe("forbidden");
+    await setTransactionStatus(accountant, id, "EXCLUDED");
+    expect((await listBankTransactions(reader, { connectionId: c.id, status: "EXCLUDED" })).total).toBe(1);
+    await setTransactionStatus(actor, id, "UNMATCHED");
+    expect((await listBankTransactions(reader, { connectionId: c.id, status: "UNMATCHED" })).total).toBe(1);
+    // nobody else's, nothing unknown
+    expect(await refusal(setTransactionStatus(otherOwner, id, "EXCLUDED"))).toBe("banking.transactionNotFound");
+    expect(await refusal(setTransactionStatus(actor, randomUUID(), "EXCLUDED"))).toBe("banking.transactionNotFound");
+    // a statement line that came from a file is set aside the same way, and is not one of the connection's
     const plain = randomUUID();
     await db.query("INSERT INTO bank_transaction (id, company_id, account_id, txn_date, amount_cents, description, dedupe_key, updated_at) VALUES ($1, $2, $3, '2026-06-01', 100, 'Relevé', 'plain-1', now())", [plain, W.companyA, c.account]);
-    expect(await refusal(setImportedStatus(actor, plain, "EXCLUDED"))).toBe("integrations.transactionNotFound");
-    expect((await listImportedTransactions(reader, { connectionId: c.id })).transactions.map((t) => t.id)).not.toContain(plain);
+    await setTransactionStatus(actor, plain, "EXCLUDED");
+    expect((await listBankTransactions(reader, { connectionId: c.id })).transactions.map((t) => t.id)).not.toContain(plain);
   });
 });

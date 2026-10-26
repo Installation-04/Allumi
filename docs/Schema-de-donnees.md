@@ -4358,6 +4358,55 @@ CREATE TRIGGER online_payment_audit
 REVOKE EXECUTE ON FUNCTION integration_connection_fee_account_check(), payment_link_guard(), online_payment_guard() FROM PUBLIC;
 ```
 
+### `20261027000000_bank_matching` (appariement des lignes de relevé)
+Aucune table ni colonne : un garde sur `bank_match`. Une transaction bancaire s'apparie à une ou plusieurs lignes du grand livre de son compte (`bank_transaction_match_check` en contrôle déjà la somme, le compte et l'état); ce lien ne se défait plus tant qu'un rapprochement terminé compte la ligne (`bank_match_reconciled_guard`, AL010; précisé par `20261028000000_bank_reconciliation`) : on rouvre d'abord le rapprochement. Le domaine (`domain/matching.ts`) et le service refusent les mêmes cas avec un message clair.
+```sql
+-- Rapprochement bancaire, étape 2 : l'appariement des lignes de relevé et des écritures.
+--
+-- Une transaction bancaire appariée à une ligne de grand livre garde son lien tant qu'un rapprochement compte cette
+-- ligne : défaire l'appariement changerait ce que le relevé a prouvé. Il faut d'abord rouvrir le rapprochement.
+-- (La somme des lignes appariées, leur compte et l'état de la transaction sont déjà contrôlés par
+-- `bank_transaction_match_check`; une écriture BANK vient toujours d'une transaction bancaire de la société.)
+
+CREATE FUNCTION bank_match_reconciled_guard() RETURNS trigger
+LANGUAGE plpgsql SET search_path = public, pg_temp AS $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM reconciled_line WHERE company_id = OLD.company_id AND journal_line_id = OLD.journal_line_id) THEN
+    RAISE EXCEPTION 'a match cannot be removed while a reconciliation counts its line' USING ERRCODE = 'AL010';
+  END IF;
+  RETURN OLD;
+END $$;
+
+CREATE TRIGGER bank_match_reconciled
+  BEFORE DELETE ON bank_match FOR EACH ROW EXECUTE FUNCTION bank_match_reconciled_guard();
+
+-- Comme toutes les fonctions du schéma : rien n'est appelable par PUBLIC.
+REVOKE EXECUTE ON FUNCTION bank_match_reconciled_guard() FROM PUBLIC;
+```
+
+### `20261028000000_bank_reconciliation` (rapprochement bancaire)
+Aucune table ni colonne : les tables `bank_reconciliation` et `reconciled_line` et leurs gardes (`bank_reconciliation_guard`, `reconciled_line_guard`) viennent de la migration initiale. Cette migration remplace `bank_match_reconciled_guard` (20261027000000) : un appariement n'est figé que par un rapprochement **terminé**; les coches d'un rapprochement en cours se changent librement, y compris pour défaire l'appariement d'une de leurs lignes. Les écritures de source `BANK` se contre-passent comme les écritures manuelles (le domaine du grand livre; la base l'acceptait déjà).
+```sql
+-- Rapprochement bancaire, étape 3 : seul un rapprochement complété fige un appariement.
+--
+-- `bank_match_reconciled_guard` (20261027000000) refusait de défaire un appariement dont une ligne figure dans
+-- n'importe quel rapprochement. Un rapprochement en cours n'est qu'un travail : ses coches se changent à volonté. Le
+-- garde ne vaut donc que pour un rapprochement complété (la preuve du relevé); pour défaire l'appariement d'une ligne
+-- d'un rapprochement complété, on rouvre d'abord le dernier rapprochement du compte.
+
+CREATE OR REPLACE FUNCTION bank_match_reconciled_guard() RETURNS trigger
+LANGUAGE plpgsql SET search_path = public, pg_temp AS $$
+BEGIN
+  IF EXISTS (SELECT 1
+               FROM reconciled_line rl
+               JOIN bank_reconciliation r ON r.company_id = rl.company_id AND r.id = rl.reconciliation_id
+              WHERE rl.company_id = OLD.company_id AND rl.journal_line_id = OLD.journal_line_id AND r.status = 'COMPLETED') THEN
+    RAISE EXCEPTION 'a match cannot be removed while a completed reconciliation counts its line' USING ERRCODE = 'AL010';
+  END IF;
+  RETURN OLD;
+END $$;
+```
+
 ## Catalogue : contrôles supplémentaires
 
 La migration `20261021000000_catalog_guards` borne le prix unitaire d’un article à un montant positif ou nul inférieur à 1 000 000 000 000 CAD, avec six décimales (`item_price_range`). Une valeur absente reste permise pour les anciennes données. L’interface exige un prix explicite.

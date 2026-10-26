@@ -1,8 +1,8 @@
 # Intégrations : Stripe et PayPal
 
-Une **intégration** relie Allumi à un service externe pour **importer ses transactions** (paiements reçus, frais, remboursements, virements) dans une boîte de réception. Les premiers services sont **Stripe** et **PayPal**; l’architecture est faite pour en ajouter d’autres (voir plus bas).
+Une **intégration** relie Allumi à un service externe pour **importer ses transactions** (paiements reçus, frais, remboursements, virements) dans les **transactions bancaires** (avec les lignes des relevés : [[Import-de-releves]]). Les premiers services sont **Stripe** et **PayPal**; l’architecture est faite pour en ajouter d’autres (voir plus bas).
 
-**Ce que cela fait** : lire les transactions du service, les convertir en un format commun (montant net, brut, frais, devise, date, type) et les ranger dans **Banque et transactions → Transactions importées**.
+**Ce que cela fait** : lire les transactions du service, les convertir en un format commun (montant net, brut, frais, devise, date, type) et les ranger dans **Banque et transactions → Transactions bancaires**.
 
 **Ce que cela ne fait pas** : l’**import** ne crée aucune **écriture comptable**, n’enregistre aucun paiement sur une facture et ne rapproche rien automatiquement. Le rapprochement avec les factures, les paiements enregistrés et le journal viendra ensuite (phase 5, voir [[Feuille-de-route]]). Il n’y a pas non plus de webhook : un serveur auto-hébergé n’est en général pas joignable depuis Internet, et tout ce qui est décrit ici ne demande que des appels **sortants**.
 
@@ -38,7 +38,7 @@ Il n’y a **pas de synchronisation planifiée** pour l’instant : c’est un b
 
 ## Transactions importées
 
-Chaque ligne montre le **montant net** (l’effet sur le solde du service, comme une ligne de relevé), le **brut** et les **frais** (`brut − frais = net`), la **devise**, le **type** (paiement, remboursement, virement, frais, litige, ajustement) et la **référence** quand le service en donne une (par exemple le numéro de facture de PayPal). On peut **mettre de côté** une transaction (un essai, un doublon) et la remettre à traiter; une transaction importée ne change jamais d’autre façon, comme n’importe quelle ligne de relevé.
+Les transactions d'un service sont listées avec celles des relevés dans **Transactions bancaires** ([[Import-de-releves]]). Chaque ligne montre le **montant net** (l’effet sur le solde du service, comme une ligne de relevé), le **brut** et les **frais** (`brut − frais = net`), la **devise**, le **type** (paiement, remboursement, virement, frais, litige, ajustement) et la **référence** quand le service en donne une (par exemple le numéro de facture de PayPal). On peut **mettre de côté** une transaction (un essai, un doublon) et la remettre à traiter; une transaction importée ne change jamais d’autre façon, comme n’importe quelle ligne de relevé.
 
 Les montants sont des **cents exacts** (jamais de décimale flottante). Les **devises sans cents** (yen, won…) ou à trois décimales sont **ignorées et comptées**, plutôt que mal converties. Une transaction dans une autre devise que le dollar canadien est importée telle quelle, avec sa devise : Allumi ne fait **aucune conversion de change**.
 

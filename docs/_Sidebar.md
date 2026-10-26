@@ -56,5 +56,10 @@
 
 - [[Integrations]]
 
+- [[Import-de-releves]]
+
+- [[Appariement-bancaire]]
+
+- [[Rapprochement-bancaire]]
 - [[Utilisateurs-et-permissions]]
 - [[Administration-serveur]]

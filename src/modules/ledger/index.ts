@@ -10,7 +10,7 @@ export * from "./domain/periods";
 export * from "./domain/schemas";
 
 export { createAccount, deleteAccount, getAccount, listAccounts, updateAccount, type AccountDto } from "./service/accounts";
-export { createInvoiceReversal, createInvoiceEntry, createPaymentEntry, createPaymentReversal, postManualEntryWithin, ENTRIES_PER_PAGE, getEntry, listEntries, postManualEntry, reverseEntry, type EntryDto, type EntryLineDto, type JournalSourceKind } from "./service/entries";
+export { createBankEntry, createInvoiceReversal, createInvoiceEntry, createPaymentEntry, createPaymentReversal, postManualEntryWithin, ENTRIES_PER_PAGE, getEntry, listEntries, postManualEntry, reverseEntry, type EntryDto, type EntryLineDto, type JournalSourceKind } from "./service/entries";
 export { closeFiscalYear, createFiscalYear, listFiscalYears, lockPeriod, reopenFiscalYear, reopenPeriod, type FiscalYearDto, type PeriodDto, type ReopenProof } from "./service/fiscal";
 export { getTrialBalance, type TrialBalance, type TrialBalanceLine } from "./service/reports";
 export { initializeLedger, ledgerStatus, type LedgerStatus } from "./service/setup";
