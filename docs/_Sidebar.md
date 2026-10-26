@@ -55,3 +55,6 @@
 - [[Encaissements]]
 
 - [[Integrations]]
+
+- [[Utilisateurs-et-permissions]]
+- [[Administration-serveur]]

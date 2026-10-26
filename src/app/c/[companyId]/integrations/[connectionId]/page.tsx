@@ -16,7 +16,7 @@ export async function generateMetadata() { return { title: (await getTranslation
 const stamp = (date: Date) => `${date.toISOString().replace("T", " ").slice(0, 16)} UTC`;
 
 export default async function ConnectionPage({ params, searchParams }: { params: Promise<{ companyId: string; connectionId: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "bank.read");
   const { connectionId } = await params;
   if (!validId(connectionId)) notFound();
   const connection = await getConnection(actor, connectionId);
@@ -26,7 +26,7 @@ export default async function ConnectionPage({ params, searchParams }: { params:
   const te = await getTranslations("errors");
   const to = await getTranslations("onlinePayments");
   const base = `/c/${company.id}`;
-  const isOwner = can(company.role, "integration.manage");
+  const isOwner = can(company, "integration.manage");
   const imported = Number(searchText(query.imported));
   const justSynced = searchText(query.imported) !== undefined && Number.isInteger(imported) && imported >= 0;
   const skipped = Number(searchText(query.skipped)) || 0;

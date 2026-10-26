@@ -41,10 +41,10 @@ enum Province {
 }
 
 enum MemberRole {
-  USER
   OWNER
   ACCOUNTANT
   READ_ONLY
+  USER
 
   @@map("member_role")
 }
@@ -309,6 +309,7 @@ model User {
   /// Administrateur de l'instance : crée des entreprises, désactive des comptes, réinitialise la 2FA.
   /// Le propriétaire créé par /setup l'est; il en reste toujours au moins un actif (trigger).
   isInstanceAdmin Boolean   @default(false) @map("is_instance_admin")
+  canManageServer Boolean   @default(false) @map("can_manage_server")
   /// Un utilisateur n'est jamais supprimé : il est désactivé.
   disabledAt      DateTime? @map("disabled_at") @db.Timestamptz(6)
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)

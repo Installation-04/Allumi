@@ -13,7 +13,7 @@ import { voidReceiptAction } from "../actions";
 export async function generateMetadata() { return { title: (await getTranslations("payments"))("title") }; }
 
 export default async function PaymentPage({ params }: { params: Promise<{ companyId: string; paymentId: string }> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "sales.read");
   const { paymentId } = await params;
   if (!validId(paymentId)) notFound();
   const payment = await getReceipt(actor, paymentId);
@@ -59,7 +59,7 @@ export default async function PaymentPage({ params }: { params: Promise<{ compan
           <p className="whitespace-pre-wrap">{t("voidedReason", { reason: payment.voidReason ?? "" })}</p>
           {payment.voidEntryId ? <Link href={`${base}/journal/${payment.voidEntryId}`} className={`inline-flex min-h-11 items-center rounded underline ${FOCUS}`}>{t("journalEntry")}</Link> : null}
         </div>
-      ) : can(company.role, "sales.manage") ? (
+      ) : can(company, "sales.manage") ? (
         <details className="rounded border border-stone-300 p-4 dark:border-stone-700">
           <summary className="min-h-11 cursor-pointer">{t("voidTitle")}</summary>
           <div className="mt-3">

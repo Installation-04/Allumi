@@ -60,3 +60,7 @@ Toute nouvelle variable consommée par l’application doit être ajoutée à `.
 Les variables de publication réseau sont propres à Compose. L’application écoute sur 3000 et PostgreSQL sur 5432 dans le réseau interne; seul le port de l’application est publié.
 
 Au démarrage, une variable manquante ou invalide arrête l'application avec un message qui les nomme toutes (voir [[Depannage]]).
+
+## Administration du serveur
+
+`ALLUMI_SERVER_ADMIN_ENABLED` vaut `0` par défaut. L’activation se fait avec `scripts/enable-server-admin.sh` sur un hôte systemd. Voir [[Administration-serveur]] pour les sauvegardes, la rétention et le journal d’opérations. Aucun secret de `.env` n’est modifiable ou visible depuis cette page.

@@ -9,7 +9,7 @@ import { loadCompany } from "../../_lib";
 import { validId } from "../../factures/editor";
 import { deleteCreditAction, postCreditAction } from "../actions";
 export default async function Page({ params }: { params: Promise<{ companyId: string; creditId: string }> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "sales.read");
   const { creditId } = await params;
   if (!validId(creditId)) notFound();
   const draft = await getCreditDraft(actor, creditId);

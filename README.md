@@ -204,3 +204,10 @@ Depuis v0.4.0-alpha.11, consulter et déconnecter les appareils, ou changer le m
 
 ![Appareils connectés](docs/images/securite-appareils-desktop.png)
 ![Sécurité du compte sur téléphone](docs/images/securite-mot-de-passe-mobile.png)
+
+### Utilisateurs et administration
+
+Profils admin, utilisateur, lecteur et comptable externe, permissions par module et invitations à usage unique : [guide illustré](docs/Utilisateurs-et-permissions.md). Le super admin peut déléguer séparément [l’administration du serveur](docs/Administration-serveur.md) : santé, sauvegardes, rétention et journal d’opérations.
+
+![Permissions des utilisateurs](docs/images/utilisateurs-permissions-desktop.png)
+![Administration serveur sur téléphone](docs/images/serveur-mobile.png)

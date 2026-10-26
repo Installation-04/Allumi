@@ -51,3 +51,6 @@ Le répertoire clients et fournisseurs (lot 4.1 livré) est décrit dans [[Conta
 Taxes et produits/services : [[Taxes-et-catalogue]].
 
 - [[Entreprise]]
+
+- [[Utilisateurs-et-permissions]]
+- [[Administration-serveur]]

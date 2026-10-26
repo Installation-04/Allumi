@@ -27,9 +27,9 @@ info "Archive des pièces jointes…"
 APP_CID="$(compose ps -aq app || true)"
 if [ -n "$APP_CID" ]; then
   docker run --rm --volumes-from "$APP_CID" -v "$WORK":/out alpine:3 \
-    tar -czf /out/storage.tar.gz --exclude=storage/update-control -C /app storage
+    tar -czf /out/storage.tar.gz --exclude=storage/update-control --exclude=storage/server-control -C /app storage
 else
-  warn "service app arrêté : pièces jointes ignorées."
+  die "conteneur app introuvable : sauvegarde des pièces jointes impossible."
 fi
 
 ARCHIVE="$BACKUP_DIR/allumi-$TS.tar"

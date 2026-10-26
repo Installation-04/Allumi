@@ -31,6 +31,7 @@ jobs:
       - name: Scripts shell
         run: |
           bash -n scripts/*.sh
+          python3 scripts/test-server-admin-agent.py
           python3 scripts/test-update-agent.py
           python3 scripts/test-install-docker.py
           python3 scripts/test-get.py

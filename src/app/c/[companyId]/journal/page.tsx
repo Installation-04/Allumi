@@ -17,7 +17,7 @@ type Search = { du?: string; au?: string; compte?: string; page?: string };
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default async function JournalPage({ params, searchParams }: { params: Promise<{ companyId: string }>; searchParams: Promise<Search> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "ledger.read");
   const search = await searchParams;
   const from = search.du && isValidIsoDate(search.du) ? search.du : undefined;
   const to = search.au && isValidIsoDate(search.au) ? search.au : undefined;

@@ -7,7 +7,7 @@ CREATE FUNCTION valid_module_access(value jsonb) RETURNS boolean
 LANGUAGE sql IMMUTABLE AS $$
  SELECT jsonb_typeof(value) = 'object' AND NOT EXISTS (
    SELECT 1 FROM jsonb_each_text(CASE WHEN jsonb_typeof(value) = 'object' THEN value ELSE '{}'::jsonb END)
-   WHERE key NOT IN ('contacts','catalog','sales','accounting','taxes','audit') OR value NOT IN ('none','read','write')
+   WHERE key NOT IN ('contacts','catalog','sales','accounting','taxes','audit') OR value IS NULL OR value NOT IN ('none','read','write')
  )
 $$;
 REVOKE ALL ON FUNCTION valid_module_access(jsonb) FROM PUBLIC;
@@ -32,7 +32,7 @@ BEGIN
  RETURN access;
 END $$;
 REVOKE ALL ON FUNCTION app_module_level(text) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION app_module_level(text) TO allumi_app;
+GRANT EXECUTE ON FUNCTION app_module_level(text) TO allumi_app, allumi_redactor;
 CREATE OR REPLACE FUNCTION app_can_write() RETURNS boolean LANGUAGE sql STABLE
 AS $$ SELECT coalesce(app_tenant_role()::text IN ('OWNER','ACCOUNTANT','USER'),false) $$;
 -- Restrictive policies are combined with the existing tenant policies, never replacing tenant isolation.
@@ -46,11 +46,11 @@ BEGIN
     WHEN t LIKE 'sales_%' THEN 'sales' WHEN t LIKE 'tax%' THEN 'taxes'
     WHEN t='audit_log' THEN 'audit' ELSE 'accounting' END;
    -- Global authentication events remain readable by their subject under the original policy.
-   EXECUTE format('CREATE POLICY module_read ON %I AS RESTRICTIVE FOR SELECT USING (company_id IS NULL OR app_module_level(%L) <> ''none'')',t,m);
+   EXECUTE format('CREATE POLICY module_read ON %I AS RESTRICTIVE FOR SELECT USING (company_id IS NULL OR (SELECT app_module_level(%L)) <> ''none'')',t,m);
    IF t <> 'audit_log' THEN
-     EXECUTE format('CREATE POLICY module_insert ON %I AS RESTRICTIVE FOR INSERT WITH CHECK (app_module_level(%L) = ''write'')',t,m);
-     EXECUTE format('CREATE POLICY module_update ON %I AS RESTRICTIVE FOR UPDATE USING (app_module_level(%L) = ''write'') WITH CHECK (app_module_level(%L) = ''write'')',t,m,m);
-     EXECUTE format('CREATE POLICY module_delete ON %I AS RESTRICTIVE FOR DELETE USING (app_module_level(%L) = ''write'')',t,m);
+     EXECUTE format('CREATE POLICY module_insert ON %I AS RESTRICTIVE FOR INSERT WITH CHECK ((SELECT app_module_level(%L)) = ''write'')',t,m);
+     EXECUTE format('CREATE POLICY module_update ON %I AS RESTRICTIVE FOR UPDATE USING ((SELECT app_module_level(%L)) = ''write'') WITH CHECK ((SELECT app_module_level(%L)) = ''write'')',t,m,m);
+     EXECUTE format('CREATE POLICY module_delete ON %I AS RESTRICTIVE FOR DELETE USING ((SELECT app_module_level(%L)) = ''write'')',t,m);
    END IF;
  END LOOP;
 END $$;
@@ -103,3 +103,12 @@ BEGIN
 END $$;
 REVOKE ALL ON FUNCTION app_accept_invitation(text, text, text, text, app_locale) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION app_accept_invitation(text, text, text, text, app_locale) TO allumi_app;
+-- A viewer may be explicitly given audit read access, but never writes.
+DROP POLICY audit_log_read ON audit_log;
+CREATE POLICY audit_log_read ON audit_log FOR SELECT
+ USING ((company_id=(SELECT app_tenant_id()) AND (SELECT app_module_level('audit')) <> 'none')
+ OR (company_id IS NULL AND (actor_user_id=app_current_user_id() OR subject_user_id=app_current_user_id())));
+-- Invitation digests are authentication material; never copy them into the audit payload.
+DROP TRIGGER invitation_audit ON invitation;
+CREATE TRIGGER invitation_audit AFTER INSERT OR UPDATE OR DELETE ON invitation
+ FOR EACH ROW EXECUTE FUNCTION audit_row_change('token_hash');

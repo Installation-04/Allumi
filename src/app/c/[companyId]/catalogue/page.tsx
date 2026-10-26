@@ -5,7 +5,7 @@ import { can } from "@/modules/companies";
 import { listItems, getTaxConfiguration } from "@/modules/taxes";
 
 export default async function Page({ params, searchParams }: { params: Promise<{ companyId: string }>; searchParams: Promise<{ q?: string; archived?: string }> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "catalog.read");
   const search = await searchParams;
   const q = typeof search.q === "string" ? search.q.slice(0, 100) : "";
   const { items, truncated } = await listItems(actor, q, search.archived === "1");

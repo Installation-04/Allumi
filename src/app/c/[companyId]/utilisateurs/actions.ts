@@ -27,3 +27,13 @@ export async function memberAction(companyId: string, id: string, operation: "sa
     return { notice: "saved" };
   });
 }
+
+export async function serverAccessAction(target: string, enabled: boolean, _state: FormState, form: FormData): Promise<FormState> {
+  return safeAction(async () => {
+    const session = await requireSession();
+    const { setServerAccess } = await import("@/modules/auth");
+    await setServerAccess(session.userId, target, enabled, String(form.get("password") ?? ""));
+    revalidatePath("/", "layout");
+    return { notice: "saved" };
+  });
+}

@@ -4377,3 +4377,5 @@ Le service valide et affecte intégralement l’avoir à sa facture d’origine 
 ## Accès modulaires
 
 La migration `20261027000000_user_management` ajoute le rôle `USER` et `module_access` (JSON validé) aux adhésions et invitations. Les politiques restrictives complètent l’isolation existante. `app_accept_invitation` consomme un code haché sous verrou, sans changer les identifiants d’un compte existant. Les invitations sont réservées aux admins.
+
+La migration `20261028000000_server_access` ajoute `app_user.can_manage_server`, hors des colonnes de profil modifiables. Seul `app_set_server_access` (super admin vérifié en base) délègue ce droit global; aucun rôle d’entreprise ne le donne automatiquement.

@@ -10,7 +10,7 @@ import { loadCompany } from "../_lib";
 export async function generateMetadata() { return { title: (await getTranslations("contacts"))("title") }; }
 
 export default async function ContactsPage({ params, searchParams }: { params: Promise<{ companyId: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const { company, actor } = await loadCompany(params);
+  const { company, actor } = await loadCompany(params, "contact.read");
   const query = await searchParams;
   const q = searchText(query.q, 100) ?? "";
   const rawKind = searchText(query.kind);

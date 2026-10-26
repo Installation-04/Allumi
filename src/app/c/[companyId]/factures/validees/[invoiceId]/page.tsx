@@ -16,7 +16,7 @@ function snapshot(value: unknown) {
   return ["name", "legalName", "addressLine1", "addressLine2", "city", "province", "postalCode", "country", "gstNumber", "qstNumber"].flatMap(key => typeof data[key] === "string" && data[key] ? [data[key] as string] : []);
 }
 export default async function Page({ params, searchParams }: { params: Promise<{ companyId: string; invoiceId: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "sales.read");
   const { invoiceId } = await params;
   const query = await searchParams;
   if (!validId(invoiceId)) notFound();

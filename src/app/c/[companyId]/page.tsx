@@ -19,6 +19,7 @@ const PANEL = "rounded-lg lg:rounded-none border border-stone-200 bg-white p-4 d
 export default async function CompanyPage({ params }: { params: Promise<{ companyId: string }> }) {
   const { company, actor, locale } = await loadCompany(params);
   const [t, tn, ts] = await Promise.all([getTranslations("dashboard"), getTranslations("nav"), getTranslations("ledgerSetup")]);
+  if (!can(company, "ledger.read")) return <section className="space-y-4"><h1 className="text-2xl font-semibold">{company.name}</h1><p>{t("role", { role: t(`roles.${company.role}`) })}</p><p>{(await getTranslations("members"))("limitedDashboard")}</p></section>;
   const status = await ledgerStatus(actor);
   const base = `/c/${company.id}`;
   const data = status.initialized ? await Promise.all([getTrialBalance(actor), listEntries(actor)]) : null;

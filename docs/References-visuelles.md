@@ -231,3 +231,10 @@ Voir [[Integrations]].
 ![Avoir annulé en anglais sombre sur téléphone](images/avoir-annule-en-dark-mobile.png)
 
 Voir [[Validation-des-avoirs]].
+
+## Utilisateurs et serveur
+
+Voir [[Utilisateurs-et-permissions]] et [[Administration-serveur]] pour les captures ordinateur/téléphone et anglaises des nouveaux écrans.
+
+![Permissions](images/utilisateurs-permissions-desktop.png)
+![Serveur mobile](images/serveur-mobile.png)

@@ -63,12 +63,12 @@ const ALLOWED: Record<Action, readonly Role[]> = {
 
 export function can(subject: Role | AccessContext, action: Action): boolean {
   const context = typeof subject === "string" ? { role: subject } : subject;
-  const ownerOnly: Action[] = ["contact.anonymize", "integration.manage", "members.manage", "company.manage", "period.reopen", "fiscalYear.reopen", "fiscalYear.close"];
-  if (ownerOnly.includes(action)) return context.role === "OWNER";
+  // Administrative capabilities cannot be granted through a module override, including future ones.
+  if (ALLOWED[action].length === 1 && ALLOWED[action][0] === "OWNER") return context.role === "OWNER";
   if (action === "company.read") return true;
   const prefix = action.split(".")[0];
-  const module: Module = prefix === "contact" ? "contacts" : prefix === "catalog" ? "catalog" : prefix === "sales" ? "sales" : prefix === "taxes" ? "taxes" : prefix === "audit" ? "audit" : "accounting";
-  const level = moduleLevel(context, module);
+  const moduleKey: Module = prefix === "contact" ? "contacts" : prefix === "catalog" ? "catalog" : prefix === "sales" ? "sales" : prefix === "taxes" ? "taxes" : prefix === "audit" ? "audit" : "accounting";
+  const level = moduleLevel(context, moduleKey);
   return action.endsWith(".read") ? level !== "none" : level === "write";
 }
 

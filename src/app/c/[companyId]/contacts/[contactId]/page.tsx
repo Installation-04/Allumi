@@ -12,7 +12,7 @@ import { anonymizeContactAction, setContactActiveAction } from "../actions";
 export async function generateMetadata() { return { title: (await getTranslations("contacts"))("details") }; }
 
 export default async function ContactPage({ params }: { params: Promise<{ companyId: string; contactId: string }> }) {
-  const { company, actor } = await loadCompany(params);
+  const { company, actor } = await loadCompany(params, "contact.read");
   const { contactId } = await params;
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(contactId)) notFound();
   const contact = await getContact(actor, contactId);
@@ -27,7 +27,7 @@ export default async function ContactPage({ params }: { params: Promise<{ compan
       {can(company, "contact.manage") ? <>
         <ContactForm companyId={company.id} contactId={contact.id} initial={initial} />
         <div className="space-y-3 rounded-lg border border-stone-200 p-4 dark:border-stone-800"><p className="text-sm">{t("archiveHint")}</p><ActionForm action={setContactActiveAction.bind(null, company.id, contact.id, !contact.isActive)} label={contact.isActive ? t("archive") : t("restore")} /></div>
-        {can(company.role, "contact.anonymize") && <details className="rounded-lg border border-red-300 p-4 dark:border-red-900">
+        {can(company, "contact.anonymize") && <details className="rounded-lg border border-red-300 p-4 dark:border-red-900">
           <summary className="min-h-11 cursor-pointer font-medium">{t("anonymize")}</summary>
           <div className="mt-3 space-y-3">
             <p className="text-sm">{t("anonymizeIntro")}</p>

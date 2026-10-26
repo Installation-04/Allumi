@@ -304,6 +304,12 @@
       "fee": "The fees reported by Stripe do not agree with the amount paid.",
       "settlementCurrency": "Stripe settled this payment in a currency other than Canadian dollars: record it by hand.",
       "rule": "The books refused the entry (a locked period, for example)."
+    },
+    "server": {
+      "password": "Incorrect current password.",
+      "invalid": "Invalid configuration value.",
+      "disabled": "Server agent is not enabled.",
+      "pending": "An operation is already pending."
     }
   },
   "nav": {
@@ -937,7 +943,7 @@
     "superAdmin": "You are a super administrator of this instance. Company permissions and server access are separate.",
     "role": "Role",
     "permissions": "Module permissions",
-    "permissionHint": "Admin: full access. Viewer: read access at most. Sales write access requires Accounting write access and at least read access to Contacts, Products and Taxes. Audit requires read access to every module.",
+    "permissionHint": "Admin: full access. Viewer: read access at most. Sales write access requires Accounting write access and at least read access to Contacts, Products and Taxes. Audit requires read access to every module. Reading Sales requires Contacts, Products, Accounting and Taxes read access; Products requires Accounting and Taxes, and Taxes requires Accounting.",
     "modules": {
       "contacts": "Contacts",
       "catalog": "Products and services",
@@ -976,7 +982,13 @@
     "name": "Display name",
     "password": "Password",
     "passwordHint": "At least 12 characters.",
-    "language": "Language"
+    "language": "Language",
+    "limitedDashboard": "Use the menu to open your authorized modules.",
+    "serverAccess": "Global server access",
+    "serverAccessHint": "Includes backups of all companies and server updates. Grant only to trusted operators.",
+    "grantServer": "Grant server administration",
+    "revokeServer": "Revoke server administration",
+    "adminPassword": "Your current password"
   },
   "integrations": {
     "title": "Integrations",
@@ -1199,5 +1211,48 @@
     "keysHint": "For online payment, the restricted key must also be able to write “Prices” and “Payment Links” and to read “Checkout Sessions” and “PaymentIntents”. Replace the key if needed.",
     "collectButton": "Check online payments",
     "collectConnectionHint": "Looks at the active payment links of this connection and records the payments received: the receipt at the gross amount, then the fees in an entry of their own. Nothing is recorded twice."
+  },
+  "server": {
+    "title": "Server administration",
+    "shortTitle": "Server",
+    "intro": "Global access is reserved for the super administrator and people they explicitly authorize.",
+    "back": "Back to Allumi",
+    "settings": "Settings and health",
+    "version": "Version",
+    "url": "Application address",
+    "locale": "Initial language",
+    "logLevel": "Logging level",
+    "proxies": "Trusted proxies",
+    "database": "Database",
+    "healthy": "Available",
+    "unhealthy": "Unavailable",
+    "hostSettings": "Edit the address, port, proxies and secrets in the host .env file, then recreate the container. No secrets are displayed here.",
+    "updates": "Versions and updates",
+    "backups": "Backups",
+    "backupHint": "The agent creates a host backup using the existing configuration (encryption and off-site copy when configured). Archives are not exposed to the web container.",
+    "disabled": "Enable the optional agent once from the Allumi folder on the server:",
+    "pending": "Request pending or running. Reload this page to see the result.",
+    "ready": "Agent enabled. Processing normally starts within one minute.",
+    "backupNow": "Back up now",
+    "saveRetention": "Save retention",
+    "retention": "Backup retention (days)",
+    "retentionHint": "From 1 to 3650 days. Cleanup occurs with the next successful backup.",
+    "confirm": "I confirm this server operation.",
+    "backupList": "Backups present on the host",
+    "snapshot": "Observed at: {date}",
+    "noBackups": "No backups reported by the agent.",
+    "logs": "Administration log",
+    "logsHint": "Backup and configuration events, without command output or secrets. Detailed application logs remain available on the host using docker compose logs app.",
+    "guide": "Administration and restore guide",
+    "operations": {
+      "backup": "Backup",
+      "retention": "Retention change"
+    },
+    "states": {
+      "running": "Running",
+      "success": "Succeeded",
+      "failed": "Failed — check the host configuration"
+    },
+    "awaiting": "Agent configured, but no host snapshot received. Check the timer if this persists."
   }
 }

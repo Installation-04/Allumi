@@ -21,7 +21,7 @@ async function lock(tx: Tx) {
 export function listMembers(actor: CompanyContext) {
   return withCompany(actor, async tx => {
     await requireRole(tx, "members.manage");
-    const members = await tx.membership.findMany({ where: { companyId: actor.companyId }, select: { id: true, userId: true, role: true, moduleAccess: true, user: { select: { displayName: true, email: true, disabledAt: true } } }, orderBy: { createdAt: "asc" } });
+    const members = await tx.membership.findMany({ where: { companyId: actor.companyId }, select: { id: true, userId: true, role: true, moduleAccess: true, user: { select: { displayName: true, email: true, disabledAt: true, canManageServer: true, isInstanceAdmin: true } } }, orderBy: { createdAt: "asc" } });
     const invitations = await tx.invitation.findMany({ where: { companyId: actor.companyId, acceptedAt: null, revokedAt: null, expiresAt: { gt: new Date() } }, select: { id: true, email: true, role: true, moduleAccess: true, expiresAt: true }, orderBy: { createdAt: "desc" } });
     return { members, invitations };
   });
@@ -43,7 +43,9 @@ export async function inviteMember(actor: CompanyContext, input: unknown) {
 export async function changeMemberRole(actor: CompanyContext, id: string, role: unknown, moduleAccess: unknown = {}) {
   const parsed = roleSchema.safeParse(role);
   if (!idSchema.safeParse(id).success || !parsed.success) throw new AppError("members.invalid");
-  const access = moduleSchema.parse(moduleAccess);
+  const permissionInput = moduleSchema.safeParse(moduleAccess);
+  if (!permissionInput.success) throw new AppError("members.invalid");
+  const access = permissionInput.data;
   validateModules(parsed.data, access);
   await withCompany(actor, async tx => {
     await lock(tx);
@@ -51,6 +53,7 @@ export async function changeMemberRole(actor: CompanyContext, id: string, role: 
     if (!member) throw new AppError("members.notFound");
     if (member.userId === actor.userId) throw new AppError("members.self");
     await tx.membership.update({ where: { id }, data: { role: parsed.data, moduleAccess: access } });
+    if (member.role === "OWNER" && parsed.data !== "OWNER") await tx.invitation.updateMany({ where: { companyId: actor.companyId, createdById: member.userId, acceptedAt: null, revokedAt: null }, data: { revokedAt: new Date() } });
   });
 }
 export async function removeMember(actor: CompanyContext, id: string) {
@@ -75,7 +78,9 @@ export async function revokeInvitation(actor: CompanyContext, id: string) {
 
 function validateModules(role: typeof MEMBER_ROLES[number], moduleAccess: ModuleAccess) {
   const level = (module: typeof MODULES[number]) => moduleLevel({ role, moduleAccess }, module);
-  if ((level("sales") === "write" && (level("accounting") !== "write" || ["contacts", "catalog", "taxes"].some(m => level(m as typeof MODULES[number]) === "none"))) ||
-      (level("catalog") === "write" && (level("accounting") === "none" || level("taxes") === "none")) ||
+  if ((level("sales") !== "none" && ["contacts", "catalog", "accounting", "taxes"].some(m => level(m as typeof MODULES[number]) === "none")) ||
+      (level("sales") === "write" && level("accounting") !== "write") ||
+      (level("catalog") !== "none" && (level("accounting") === "none" || level("taxes") === "none")) ||
+      (level("taxes") !== "none" && level("accounting") === "none") ||
       (level("audit") !== "none" && MODULES.some(m => m !== "audit" && level(m) === "none"))) throw new AppError("members.dependencies");
 }

@@ -18,7 +18,7 @@ export async function generateMetadata() {
 
 export default async function EditAccountPage({ params }: { params: Promise<{ companyId: string; accountId: string }> }) {
   const { accountId } = await params;
-  const { company, actor } = await loadCompany(params);
+  const { company, actor } = await loadCompany(params, "ledger.read");
   if (!UUID.test(accountId) || !can(company, "account.manage")) notFound();
   const account = await getAccount(actor, accountId);
   if (!account) notFound();

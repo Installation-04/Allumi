@@ -29,3 +29,4 @@ export { getProfile, type Profile } from "./service/profile";
 
 export { newToken, sha256Hex } from "./service/crypto";
 export { acceptInvitation } from "./service/invitation";
+export { requireServerAccess, setServerAccess } from "./service/server-access";

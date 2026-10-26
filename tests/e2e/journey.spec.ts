@@ -60,7 +60,7 @@ async function expectNonceCsp(page: Page, path: string) {
 
 test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ page, browser }) => {
   // This complete journey covers setup, MFA, accounting, both locales and optional reference captures.
-  test.setTimeout(180_000);
+  test.setTimeout(240_000);
   cspViolations.length = 0;
   watchCsp(page.context());
   await expectNonceCsp(page, "/setup");
@@ -122,7 +122,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   // Signed in on the company dashboard.
   await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
   await expect(page.getByRole("heading", { name: "Atelier Exemple inc." })).toBeVisible();
-  await expect(page.getByText("Ton rôle : Propriétaire")).toBeVisible();
+  await expect(page.getByText("Ton rôle : Admin")).toBeVisible();
 
   await expect(page.getByTestId("dashboard-assets")).toContainText("0,00");
   await expect(page.getByText("Un nouveau départ pour vos livres")).toBeVisible();
@@ -239,7 +239,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   // English interface.
   await page.goto("/");
   await page.getByRole("button", { name: "English" }).click();
-  await expect(page.getByText("Your role: Owner")).toBeVisible();
+  await expect(page.getByText("Your role: Admin")).toBeVisible();
   await captureReference(page, "dashboard-en");
   await appearanceJourney(page);
   await postingJourney(page);
@@ -247,6 +247,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await paymentsJourney(page, paidInvoiceUrl);
   await integrationsJourney(page);
   await onlinePaymentsJourney(page, paidInvoiceUrl);
+  await membersJourney(page, browser);
   // Nothing in the whole journey (both locales, every form, the security pages, a second browser) was blocked.
   expect(cspViolations, "Content-Security-Policy violations").toEqual([]);
 });
@@ -501,6 +502,7 @@ async function anonymizeJourney(page: Page, recoveryCode: string) {
   const erase = page.locator("details").filter({ hasText: "Anonymiser ce contact (Loi 25)" });
   await erase.getByText("Anonymiser ce contact (Loi 25)").click();
   await expect(erase.getByText("Les documents comptables sont conservés")).toBeVisible();
+  await captureReference(page, "contact-anonymiser");
   await expectNoPageOverflow(page);
   const submit = async (code: string) => {
     await erase.getByLabel("Motif").selectOption("SUBJECT_REQUEST");
@@ -1315,4 +1317,78 @@ async function securityJourney(page: Page, browser: Browser, recoveryCodes: stri
 
   // The next journeys start from the company's dashboard.
   await page.goto(dashboard);
+}
+
+async function membersJourney(page: Page, browser: Browser) {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  const company = new URL(page.url()).pathname;
+  await page.goto(`${company}/utilisateurs`);
+  await expect(page.getByRole("heading", { name: "Utilisateurs et permissions" })).toBeVisible();
+  const invite = page.locator("form").filter({ has: page.getByRole("button", { name: "Inviter un utilisateur", exact: true }) });
+  await invite.getByLabel("Courriel", { exact: true }).fill("collegue@exemple.test");
+  await invite.getByLabel("Rôle", { exact: true }).selectOption("USER");
+  await invite.getByText("Permissions par module", { exact: true }).click();
+  await invite.getByLabel("Contacts", { exact: true }).selectOption("read");
+  await expectNoPageOverflow(page);
+  await captureReference(page, "utilisateurs-permissions");
+  await invite.getByRole("button", { name: "Inviter un utilisateur", exact: true }).click();
+  const code = await page.getByTestId("invitation-code").textContent();
+  expect(code).toMatch(/^[A-Za-z0-9_-]{43}$/);
+  const context = await newWatchedContext(browser);
+  const guest = await context.newPage();
+  await guest.goto("/invitation");
+  await guest.getByLabel("Code d’invitation").fill(code!);
+  await guest.getByLabel("Courriel", { exact: true }).fill("collegue@exemple.test");
+  await guest.getByLabel("Nom affiché").fill("Collègue Exemple");
+  await guest.getByLabel("Mot de passe", { exact: true }).fill(PASSWORD);
+  await guest.getByRole("button", { name: "Accepter et continuer" }).click();
+  await expect(guest).toHaveURL(/\/connexion$/);
+  await guest.getByLabel("Courriel", { exact: true }).fill("collegue@exemple.test");
+  await guest.getByLabel("Mot de passe", { exact: true }).fill(PASSWORD);
+  await guest.getByRole("button", { name: "Se connecter", exact: true }).click();
+  await expect(guest.getByText("Ton rôle : Utilisateur")).toBeVisible();
+  expect((await guest.goto(`${company}/utilisateurs`))?.status()).toBe(404);
+  expect((await guest.goto("/administration/serveur"))?.status()).toBe(404);
+  await guest.goto(`${company}/contacts`);
+  await expect(guest.getByRole("link", { name: "Nouveau contact", exact: true })).toHaveCount(0);
+
+  await page.reload(); // the invitation code is deliberately not retained on a refreshed page
+  await expect(page.getByTestId("invitation-code")).toHaveCount(0);
+  const member = page.getByRole("article").filter({ has: page.getByRole("heading", { name: "Collègue Exemple" }) });
+  await member.getByLabel("Rôle", { exact: true }).selectOption("READ_ONLY");
+  await member.getByRole("button", { name: "Enregistrer les accès" }).click();
+  await expect(member.getByRole("status")).toBeVisible();
+  await guest.goto(company);
+  await expect(guest.getByText("Ton rôle : Lecteur")).toBeVisible();
+  await member.getByText("Accès global au serveur", { exact: true }).click();
+  await member.getByLabel("Votre mot de passe actuel").fill(PASSWORD);
+  await member.getByRole("button", { name: "Autoriser l’administration du serveur" }).click();
+  await expect(member.getByRole("button", { name: "Retirer l’administration du serveur" })).toBeVisible();
+  await guest.goto("/administration/serveur");
+  await expect(guest.getByRole("heading", { name: "Administration du serveur" })).toBeVisible();
+  await member.getByLabel("Votre mot de passe actuel").fill(PASSWORD);
+  await member.getByRole("button", { name: "Retirer l’administration du serveur" }).click();
+  await expect(member.getByRole("button", { name: "Autoriser l’administration du serveur" })).toBeVisible();
+  expect((await guest.goto("/administration/serveur"))?.status()).toBe(404);
+  await captureReference(page, "utilisateurs-membres");
+  await page.getByRole("button", { name: "English", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Users and permissions" })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "utilisateurs-en");
+  await page.goto("/administration/serveur");
+  await expect(page.getByRole("heading", { name: "Server administration" })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "serveur-en");
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Administration du serveur" })).toBeVisible();
+  await captureReference(page, "serveur");
+  await page.goto(`${company}/utilisateurs`);
+  await member.getByText("Retirer l’accès", { exact: true }).first().click();
+  const remove = member.locator("form").filter({ has: page.getByRole("button", { name: "Retirer l’accès", exact: true }) });
+  await remove.getByLabel("Je confirme cette action.").check();
+  await remove.getByRole("button", { name: "Retirer l’accès", exact: true }).click();
+  await expect(member).toHaveCount(0);
+  expect((await guest.goto(company))?.status()).toBe(404);
+  await context.close();
 }

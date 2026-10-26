@@ -8,7 +8,7 @@ import { TaxPreview } from "./preview";
 import { configureAction, archiveAction } from "./actions";
 
 export default async function TaxesPage({ params }: { params: Promise<{ companyId: string }> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "taxes.read");
   const t = await getTranslations("catalog");
   const { taxes, codes } = await getTaxConfiguration(actor);
   const accounts = await listAccounts(actor);

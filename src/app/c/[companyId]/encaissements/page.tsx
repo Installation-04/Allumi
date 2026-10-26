@@ -9,7 +9,7 @@ import { loadCompany } from "../_lib";
 export async function generateMetadata() { return { title: (await getTranslations("payments"))("title") }; }
 
 export default async function PaymentsPage({ params, searchParams }: { params: Promise<{ companyId: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "sales.read");
   const query = await searchParams;
   const rawPage = Number(searchText(query.page));
   const result = await listReceipts(actor, Number.isInteger(rawPage) && rawPage > 0 && rawPage <= 100000 ? rawPage : 1);

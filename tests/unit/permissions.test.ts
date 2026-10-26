@@ -11,10 +11,8 @@ describe("role matrix", () => {
     }
   });
 
-  it("keeps the privileged actions (reopening the past, closing a year) for the owner", () => {
-    for (const action of ["company.manage", "period.reopen", "fiscalYear.reopen", "fiscalYear.close", "integration.manage"] as const) {
-  it("keeps the privileged actions (reopening the past, closing a year, erasing a contact) for the owner", () => {
-    for (const action of ["company.manage", "period.reopen", "fiscalYear.reopen", "fiscalYear.close", "contact.anonymize"] as const) {
+  it("keeps privileged actions for administrators", () => {
+    for (const action of ["members.manage", "company.manage", "period.reopen", "fiscalYear.reopen", "fiscalYear.close", "contact.anonymize", "integration.manage"] as const) {
       expect(can("OWNER", action), action).toBe(true);
       expect(can("ACCOUNTANT", action), action).toBe(false);
       expect(can("READ_ONLY", action), action).toBe(false);
@@ -37,4 +35,12 @@ describe("role matrix", () => {
       }
     }
   });
+});
+
+it("honours modular permissions without elevating privileged actions or viewer writes", () => {
+  expect(can({role:"USER",moduleAccess:{accounting:"write"}},"entry.post")).toBe(true);
+  expect(can({role:"ACCOUNTANT",moduleAccess:{contacts:"none"}},"contact.read")).toBe(false);
+  expect(can({role:"READ_ONLY",moduleAccess:{contacts:"write"}},"contact.manage")).toBe(false);
+  expect(can({role:"USER",moduleAccess:{accounting:"write"}},"members.manage")).toBe(false);
+  expect(can({role:"USER",moduleAccess:{accounting:"write"}},"integration.manage")).toBe(false);
 });

@@ -6,7 +6,7 @@ import { checkPassword } from "../domain/password";
 import { hashPassword, sha256Hex } from "./crypto";
 import { hit } from "./rate-limit";
 
-const schema = z.object({ token: z.string().trim().regex(/^[A-Za-z0-9_-]{43}$/), email: z.string().trim().toLowerCase().email().max(254), displayName: z.string().trim().max(120).default(""), password: z.string().max(256).default(""), locale: z.enum(["fr_CA", "en"]).default("fr_CA") });
+const schema = z.object({ token: z.string().trim().regex(/^[A-Za-z0-9_-]{43}$/), email: z.string().trim().toLowerCase().email().max(254), displayName: z.string().trim().max(120).default(""), password: z.string().max(256).default(""), locale: z.enum(["fr-CA", "en"]).default("fr-CA") });
 /** Existing users must be fully authenticated by the caller, including their second factor. */
 export async function acceptInvitation(input: unknown, ip: string, userId?: string): Promise<string> {
   if (!(await hit("invitation:ip", ip, { max: 20, windowSeconds: 900 })).allowed) throw new AppError("members.rateLimited");

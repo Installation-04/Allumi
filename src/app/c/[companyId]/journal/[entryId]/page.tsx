@@ -19,7 +19,7 @@ export async function generateMetadata() {
 
 export default async function EntryPage({ params }: { params: Promise<{ companyId: string; entryId: string }> }) {
   const { entryId } = await params;
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "ledger.read");
   if (!UUID.test(entryId)) notFound();
   const entry = await getEntry(actor, entryId);
   if (!entry) notFound();

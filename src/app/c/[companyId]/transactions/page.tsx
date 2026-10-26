@@ -15,7 +15,7 @@ export async function generateMetadata() { return { title: (await getTranslation
 const STATUSES = ["UNMATCHED", "MATCHED", "EXCLUDED"] as const;
 
 export default async function TransactionsPage({ params, searchParams }: { params: Promise<{ companyId: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "bank.read");
   const query = await searchParams;
   const rawConnection = searchText(query.connection);
   const connectionId = rawConnection && validId(rawConnection) ? rawConnection : undefined;
@@ -37,7 +37,7 @@ export default async function TransactionsPage({ params, searchParams }: { param
   };
   const money = (cents: bigint, currency: string) => `${formatMoney(cents, locale)}${currency === "CAD" ? "" : ` ${currency}`}`;
   const link = `inline-flex min-h-11 items-center rounded px-3 text-sm underline ${FOCUS}`;
-  const canManage = can(company.role, "bank.manage");
+  const canManage = can(company, "bank.manage");
   return (
     <section className="space-y-5">
       <div><h1 className="text-2xl font-semibold">{t("title")}</h1><p className="mt-1 text-sm text-stone-600 dark:text-stone-400">{t("intro")}</p></div>

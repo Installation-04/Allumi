@@ -5,7 +5,7 @@ import { listDrafts } from "@/modules/sales";
 import { formatMoney } from "@/modules/ledger";
 import { loadCompany } from "../_lib";
 export default async function Page({ params, searchParams }: { params: Promise<{ companyId: string }>; searchParams: Promise<{ q?: string }> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "sales.read");
   const search = await searchParams;
   const q = typeof search.q === "string" ? search.q.slice(0, 100) : "";
   const result = await listDrafts(actor, q);

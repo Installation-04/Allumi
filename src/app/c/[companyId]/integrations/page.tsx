@@ -9,10 +9,10 @@ import { ConnectForm } from "./connect-form";
 export async function generateMetadata() { return { title: (await getTranslations("integrations"))("title") }; }
 
 export default async function IntegrationsPage({ params }: { params: Promise<{ companyId: string }> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "bank.read");
   const t = await getTranslations("integrations");
   const connections = await listConnections(actor);
-  const canConnect = can(company.role, "integration.manage");
+  const canConnect = can(company, "integration.manage");
   const accounts = canConnect ? await listConnectionAccounts(actor) : [];
   const base = `/c/${company.id}`;
   return (

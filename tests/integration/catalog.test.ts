@@ -72,7 +72,7 @@ describe("database catalog (guards against a migration that forgets a table)", (
 
   it("keeps the credentials of integrations for the owner alone, and never deletes a connection", async () => {
     const policies = await q<{ policyname: string; cmd: string; qual: string | null; with_check: string | null }>(
-      "SELECT policyname, cmd, qual, with_check FROM pg_policies WHERE schemaname = 'public' AND tablename = 'integration_credential'",
+      "SELECT policyname, cmd, qual, with_check FROM pg_policies WHERE schemaname = 'public' AND tablename = 'integration_credential' AND permissive = 'PERMISSIVE'",
     );
     expect(policies.map((row) => row.cmd).sort()).toEqual(["INSERT", "SELECT", "UPDATE"]);
     for (const row of policies) expect(`${row.qual ?? ""}${row.with_check ?? ""}`, row.policyname).toContain("OWNER");
@@ -88,7 +88,7 @@ describe("database catalog (guards against a migration that forgets a table)", (
   it("lets only the owner create and advance payment links, and never deletes a link or an online payment", async () => {
     for (const table of ["payment_link", "online_payment"]) {
       const policies = await q<{ policyname: string; cmd: string; qual: string | null; with_check: string | null }>(
-        "SELECT policyname, cmd, qual, with_check FROM pg_policies WHERE schemaname = 'public' AND tablename = $1", [table],
+        "SELECT policyname, cmd, qual, with_check FROM pg_policies WHERE schemaname = 'public' AND tablename = $1 AND permissive = 'PERMISSIVE'", [table],
       );
       expect(policies.map((row) => row.cmd).sort(), table).toEqual(table === "payment_link" ? ["INSERT", "SELECT", "UPDATE"] : ["INSERT", "SELECT"]);
       for (const row of policies.filter((policy) => policy.cmd !== "SELECT")) expect(`${row.qual ?? ""}${row.with_check ?? ""}`, `${table}.${row.policyname}`).toContain("OWNER");
@@ -150,4 +150,19 @@ it("guards cumulative linked credit limits and exact credit postings", async () 
   expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='credit_note_limits' AND NOT tgisinternal")).toHaveLength(1);
   const rows=await q<{ definition:string }>("SELECT pg_get_functiondef('invoice_posting_exact()'::regprocedure) AS definition");
   expect(rows[0]?.definition).toContain("CREDIT_NOTE");
+});
+
+describe("modular access and server delegation catalog", () => {
+  it("keeps module permissions validated and server grants outside profile privileges", async () => {
+    const columns = await q<{ table_name: string }>("SELECT table_name FROM information_schema.columns WHERE table_schema='public' AND column_name='module_access' ORDER BY table_name");
+    expect(columns.map(r => r.table_name)).toEqual(["invitation", "membership"]);
+    expect((await q<{ allowed: boolean }>("SELECT has_column_privilege('allumi_app','app_user','can_manage_server','UPDATE') AS allowed"))[0]?.allowed).toBe(false);
+    expect((await q<{ ok: boolean }>("SELECT valid_module_access('{\"contacts\":\"write\"}'::jsonb) AND NOT valid_module_access('{\"server\":\"write\"}'::jsonb) AS ok"))[0]?.ok).toBe(true);
+  });
+  it("keeps restrictive module policies on tenant business data", async () => {
+    const rows=await q<{ tablename: string }>("SELECT tablename FROM pg_policies WHERE policyname='module_read' AND permissive='RESTRICTIVE'");
+    expect(rows.map(r=>r.tablename)).toEqual(expect.arrayContaining(["contact","item","sales_document","journal_entry","account","tax","audit_log","integration_connection","online_payment"]));
+    const business = await q<{ table_name: string }>("SELECT table_name FROM information_schema.columns WHERE table_schema='public' AND column_name='company_id' AND table_name NOT IN ('membership','invitation')");
+    expect(business.filter(t=>!rows.some(r=>r.tablename===t.table_name))).toEqual([]);
+  });
 });

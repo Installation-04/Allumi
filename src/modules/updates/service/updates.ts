@@ -24,7 +24,7 @@ export async function updateStatus() {
 }
 export async function requestUpdate(userId: string, target: string) {
   const profile = await getProfile(userId);
-  if (!profile?.isInstanceAdmin) throw new AppError("updates.forbidden");
+  if (!profile?.isInstanceAdmin && !profile?.canManageServer) throw new AppError("updates.forbidden");
   const dir = updateDirectory();
   if (!dir) throw new AppError("updates.disabled");
   const release = await latestRelease();
