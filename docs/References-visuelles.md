@@ -160,6 +160,15 @@ Captures du serveur de test : l’agent hôte est désactivé et la consultation
 
 Voir [[Appearance-and-language]] pour le choix de langue et les modes clair, sombre et système.
 
+## États financiers
+
+![État des résultats](images/rapport-resultats-desktop.png)
+![Bilan](images/rapport-bilan-desktop.png)
+![État des résultats sur téléphone](images/rapport-resultats-mobile.png)
+![Bilan sur téléphone](images/rapport-bilan-mobile.png)
+
+Voir [[Etats-financiers]].
+
 ## Taxes et catalogue
 
 ![Taxes ordinateur](images/taxes-desktop.png)

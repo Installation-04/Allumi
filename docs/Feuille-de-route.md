@@ -8,7 +8,7 @@
 | 3 | Moteur comptable : plan comptable, journal, périodes, audit ([[Plan-comptable]], [[Journal-et-ecritures]], [[Exercices-et-periodes]], [[Piste-d-audit]]) | Fait (PR #2 intégrée) |
 | 4 | Contacts, taxes (moteur de calcul), factures, paiements, dépenses, pièces jointes | Contacts, taxes/catalogue et brouillons disponibles; validation des factures disponible; brouillons d’avoirs disponibles; validation, affectation et annulation des avoirs disponibles |
 | 5 | Banque (CSV/OFX), rapprochement | Import des transactions Stripe et PayPal ([[Integrations]]) et des relevés CSV et OFX ([[Import-de-releves]]) disponibles; appariement aux écritures, enregistrement d’une ligne et virements entre comptes disponibles ([[Appariement-bancaire]]); rapprochement de fin de période disponible ([[Rapprochement-bancaire]]) |
-| 6 | Rapports (dont le sommaire TPS/TVQ), exports CSV/PDF | À faire |
+| 6 | Rapports (dont le sommaire TPS/TVQ), exports CSV/PDF | État des résultats et bilan avec export CSV disponibles ([[Etats-financiers]]); grand livre, âges, sommaire TPS/TVQ et PDF à faire |
 | 7 | Version bêta publique | À faire |
 
 ## Idées pour plus tard

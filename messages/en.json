@@ -347,6 +347,9 @@
       "reconNotCompleted": "This reconciliation is not completed.",
       "reconNotLatest": "Only the latest completed reconciliation of an account can be reopened.",
       "reconReason": "Write the reason for reopening (at least ten characters)."
+    },
+    "reports": {
+      "period": "The period is not valid: both days must exist and the start must come before the end."
     }
   },
   "nav": {
@@ -760,7 +763,9 @@
       "integrations": "Integrations",
       "transactions": "Bank transactions",
       "encaissements": "Payments received",
-      "rapprochement": "Bank reconciliation"
+      "rapprochement": "Bank reconciliation",
+      "resultats": "Income statement",
+      "bilan": "Balance sheet"
     }
   },
   "updates": {
@@ -1462,5 +1467,50 @@
     "recent": "Recently imported files",
     "recentLine": "{file} · {date} · {count, plural, =0 {no new line} one {# new line} other {# new lines}}",
     "unreadable": "This file could not be read."
+  },
+  "statements": {
+    "incomeTitle": "Income statement",
+    "balanceTitle": "Balance sheet",
+    "incomeIntro": "Revenue less expenses over the chosen period, from the journal. Accounts that total zero are left out.",
+    "balanceIntro": "The company’s position on a given day, from the whole journal up to that day.",
+    "from": "From",
+    "to": "To",
+    "asOf": "As of",
+    "apply": "Show",
+    "export": "Export as CSV",
+    "fiscalYears": "Fiscal years:",
+    "period": "Period from {from} to {to}.",
+    "balanceAsOf": "Position as of {date}.",
+    "incomeEmpty": "No revenue or expense in the journal for this period.",
+    "balanceEmpty": "No journal entry up to this date.",
+    "code": "Account",
+    "account": "Name",
+    "amount": "Amount",
+    "total": "Total",
+    "operatingRevenue": "Operating revenue",
+    "costOfSales": "Cost of goods sold",
+    "grossProfit": "Gross profit",
+    "operatingExpenses": "Operating expenses",
+    "operatingIncome": "Operating income",
+    "otherRevenue": "Other revenue",
+    "otherExpenses": "Other expenses",
+    "netIncome": "Net income",
+    "currentAssets": "Current assets",
+    "fixedAssets": "Fixed assets",
+    "otherAssets": "Other assets",
+    "totalAssets": "Total assets",
+    "currentLiabilities": "Current liabilities",
+    "longTermLiabilities": "Long-term liabilities",
+    "totalLiabilities": "Total liabilities",
+    "equity": "Equity",
+    "priorEarnings": "Earnings of earlier fiscal years",
+    "currentEarnings": "Earnings of the current fiscal year",
+    "cumulativeEarnings": "Cumulative earnings",
+    "totalEquity": "Total equity",
+    "totalLiabilitiesAndEquity": "Total liabilities and equity",
+    "balanced": "The balance sheet balances: assets equal liabilities plus equity.",
+    "notBalanced": "The balance sheet does not balance: this is an incident to report.",
+    "incomeFile": "income-statement",
+    "balanceFile": "balance-sheet"
   }
 }

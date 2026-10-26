@@ -211,3 +211,10 @@ Profils admin, utilisateur, lecteur et comptable externe, permissions par module
 
 ![Permissions des utilisateurs](docs/images/utilisateurs-permissions-desktop.png)
 ![Administration serveur sur téléphone](docs/images/serveur-mobile.png)
+
+### États financiers
+
+[État des résultats et bilan](docs/Etats-financiers.md), avec exports CSV français/anglais et accès contrôlé par les permissions comptables.
+
+![État des résultats](docs/images/rapport-resultats-desktop.png)
+![Bilan sur téléphone](docs/images/rapport-bilan-mobile.png)

@@ -252,6 +252,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await bankMatchingJourney(page);
   await bankReconciliationJourney(page);
   await membersJourney(page, browser);
+  await financialStatementsJourney(page);
   // Nothing in the whole journey (both locales, every form, the security pages, a second browser) was blocked.
   expect(cspViolations, "Content-Security-Policy violations").toEqual([]);
 });
@@ -1583,6 +1584,106 @@ async function bankReconciliationJourney(page: Page) {
   await expectNoPageOverflow(page);
   await page.getByRole("button", { name: "Français", exact: true }).click();
   await expect(page.getByRole("heading", { name: `Rapprochement de 1000 · Banque – compte courant au ${day}`, exact: true })).toBeVisible();
+}
+
+/**
+ * The income statement and the balance sheet: entries made by hand on two days of the current month
+ * (a window no other journey writes in), the statement of exactly those days with every subtotal, the fiscal year
+ * shortcut, a bad address falling back to a sensible period, the CSV files (UTF-8 byte-order mark, the language's
+ * delimiter and decimal mark, a hostile account name defused), the balance sheet and its check, both languages, and
+ * no overflow.
+ */
+async function financialStatementsJourney(page: Page) {
+  const company = new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0] ?? "";
+  // Two days of the current month that no other journey writes in (they write on the first and on today): the 20th and 21st, or the 5th and 6th when today is later than the 15th.
+  const today = todayInToronto();
+  const [first, second] = Number(today.slice(8, 10)) <= 15 ? ["20", "21"] : ["05", "06"];
+  const [from, to] = [`${today.slice(0, 7)}-${first}`, `${today.slice(0, 7)}-${second}`];
+  const post = async (date: string, memo: string, debit: string, credit: string, amount: string) => {
+    await page.goto(`${company}/journal/nouvelle`);
+    await page.getByLabel("Date", { exact: true }).fill(date);
+    await page.getByLabel("Description").fill(memo);
+    await page.getByLabel("Ligne 1 – Compte").selectOption({ label: debit });
+    await page.getByLabel("Ligne 1 – Débit").fill(amount);
+    await page.getByLabel("Ligne 2 – Compte").selectOption({ label: credit });
+    await page.getByLabel("Ligne 2 – Crédit").fill(amount);
+    await page.getByRole("button", { name: "Enregistrer l'écriture" }).click();
+    await expect(page.getByRole("heading", { name: /^Écriture J-\d{5}$/ })).toBeVisible();
+  };
+  await post(from, "Vente de services", "1000 – Banque – compte courant", "4000 – Revenus de services", "1 000,00");
+  await post(from, "Frais du compte", "6010 – Frais bancaires", "1000 – Banque – compte courant", "25,00");
+  await post(to, "Achat de marchandises", "5000 – Coût des marchandises vendues", "1000 – Banque – compte courant", "400,00");
+  await post(to, "Intérêts reçus", "1000 – Banque – compte courant", "4910 – Revenus d'intérêts", "5,00");
+
+  // the income statement of exactly those days
+  await page.goto(`${company}/resultats?${new URLSearchParams({ du: from, au: to })}`);
+  await expect(page.getByRole("heading", { name: "État des résultats", exact: true })).toBeVisible();
+  await expect(page.getByText(`Période du ${from} au ${to}.`)).toBeVisible();
+  const row = (label: string | RegExp) => page.getByRole("row").filter({ hasText: label });
+  const amount = (text: string) => new RegExp(text.replace(/ /g, "\\s").replace(/\$/g, "\\$"));
+  await expect(row(/4000 – Revenus de services/)).toContainText(amount("1 000,00 $"));
+  await expect(row(/5000 – Coût des marchandises vendues/)).toContainText(amount("400,00 $"));
+  await expect(row(/^Bénéfice brut/)).toContainText(amount("600,00 $"));
+  await expect(row(/6010 – Frais bancaires/)).toContainText(amount("25,00 $"));
+  await expect(row(/^Bénéfice d’exploitation/)).toContainText(amount("575,00 $"));
+  await expect(row(/4910 – Revenus d'intérêts/)).toContainText(amount("5,00 $"));
+  await expect(row(/^Résultat net/)).toContainText(amount("580,00 $"));
+  await expectNoPageOverflow(page);
+  await captureReference(page, "rapport-resultats", "État des résultats");
+  // a fiscal year in one click, and a bad address that does not break the page
+  const fiscalYear = page.getByRole("link", { name: /^\d{4}-\d{2}-\d{2} → \d{4}-\d{2}-\d{2}$/ }).first();
+  const [yearStart, yearEnd] = ((await fiscalYear.textContent()) ?? "").split(" → ");
+  await fiscalYear.click();
+  await expect(page.getByText(`Période du ${yearStart} au ${yearEnd}.`)).toBeVisible();
+  await page.goto(`${company}/resultats?du=${to}&au=${from}`);
+  await expect(page.getByRole("heading", { name: "État des résultats", exact: true })).toBeVisible();
+  await expect(page.getByText(`Période du ${to} au ${from}.`)).toHaveCount(0);
+  await page.goto(`${company}/resultats?du=pas-une-date`);
+  await expect(page.getByText(/^Période du \d{4}-\d{2}-\d{2} au \d{4}-\d{2}-\d{2}\.$/)).toBeVisible();
+
+  // the CSV file: French spreadsheets split on semicolons and read the comma as the decimal mark
+  await page.goto(`${company}/resultats?${new URLSearchParams({ du: from, au: to })}`);
+  const href = await page.getByRole("link", { name: "Exporter en CSV", exact: true }).getAttribute("href");
+  const file = await page.request.get(href ?? "");
+  expect(file.status()).toBe(200);
+  expect(file.headers()["content-type"]).toContain("text/csv");
+  expect(file.headers()["content-disposition"]).toContain(`etat-des-resultats_${from}_${to}.csv`);
+  expect(file.headers()["cache-control"]).toContain("no-store");
+  const csv = await file.text();
+  expect(csv.charCodeAt(0)).toBe(0xfeff);
+  expect(csv).toContain("\r\n4000;Revenus de services;1000,00\r\n");
+  expect(csv).toContain(";Résultat net;580,00\r\n");
+
+  // the balance sheet at the end of those days: it balances whatever the other journeys wrote
+  await page.goto(`${company}/bilan?au=${to}`);
+  await expect(page.getByRole("heading", { name: "Bilan", exact: true })).toBeVisible();
+  await expect(page.getByText(`Situation au ${to}.`)).toBeVisible();
+  await expect(row(/1000 – Banque – compte courant/)).toBeVisible();
+  await expect(row(/^Total de l’actif/)).toBeVisible();
+  await expect(row(/^Résultat de l’exercice en cours/)).toBeVisible();
+  await expect(page.getByText("Le bilan est équilibré : l’actif égale le passif plus les capitaux propres.")).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "rapport-bilan", "Bilan");
+  const sheetFile = await page.request.get((await page.getByRole("link", { name: "Exporter en CSV", exact: true }).getAttribute("href")) ?? "");
+  expect(sheetFile.headers()["content-disposition"]).toContain(`bilan_${to}.csv`);
+  expect(await sheetFile.text()).toContain(";Total du passif et des capitaux propres;");
+  await page.goto(`${company}/bilan?au=2026-02-30`);
+  await expect(page.getByText(/^Situation au \d{4}-\d{2}-\d{2}\.$/)).toBeVisible();
+
+  // English: titles, labels and a file with commas and points
+  await page.goto(`${company}/resultats?${new URLSearchParams({ du: from, au: to })}`);
+  await page.getByRole("button", { name: "English", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Income statement", exact: true })).toBeVisible();
+  await expect(row(/^Net income/)).toContainText(/580\.00/);
+  const english = await page.request.get((await page.getByRole("link", { name: "Export as CSV", exact: true }).getAttribute("href")) ?? "");
+  expect(english.headers()["content-disposition"]).toContain(`income-statement_${from}_${to}.csv`);
+  expect(await english.text()).toContain("\r\n4000,Service revenue,1000.00\r\n");
+  await page.goto(`${company}/bilan?au=${to}`);
+  await expect(page.getByRole("heading", { name: "Balance sheet", exact: true })).toBeVisible();
+  await expect(page.getByText("The balance sheet balances: assets equal liabilities plus equity.")).toBeVisible();
+  await expectNoPageOverflow(page);
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Bilan", exact: true })).toBeVisible();
 }
 
 /**

@@ -88,6 +88,12 @@ La phase 1 a validé le schéma avec 58 cas SQL exécutés **connecté en `allum
 
 **Performance** : une écriture de 2 lignes insérée 8 000 fois dans une transaction se valide en moins de 5 s (index commençant par `company_id`).
 
+## États financiers (phase 6, lot 6a)
+
+- **Unitaires** (`reports-statements`) : état des résultats (bénéfice brut, d'exploitation, résultat net, sens naturel de chaque compte, comptes à zéro omis, remboursements et pertes négatifs, tri par code); bilan (regroupements, taxes à recevoir et à payer du bon côté, résultats ajoutés aux capitaux propres, répartition entre exercices précédents et exercice en cours); **propriété** : pour tout grand livre équilibré, sur des comptes de tout genre, l'actif égale le passif plus les capitaux propres et la répartition des résultats s'additionne; CSV (montants exacts en cents, virgule ou point, **injection de formule** désamorcée, guillemets, fins de ligne, les deux fichiers dans les deux langues).
+- **Service** (`reports`, vraie base) : période d'un état des résultats aux bornes incluses (un jour de plus ou de moins change le résultat), seulement revenus et charges, une seule journée, une période vide, isolation par entreprise, rôles (lecture seule permise, étranger refusé), dates invalides et période à l'envers refusées; bilan (regroupements, résultats de l'exercice, exercice précédent séparé du courant, le premier jour de l'exercice est de l'exercice, jour hors exercice, avant la première écriture). Vingt et un bris volontaires du code sont chacun détectés.
+- **Navigateur** (ordinateur et téléphone) : écritures saisies à la main sur deux jours que nul autre parcours n'utilise, état des résultats de ces deux jours avec chaque sous-total, exercice en un clic, adresse invalide qui ne casse pas la page, fichier CSV (marque d'ordre des octets, séparateur et décimale de la langue, en-têtes, jamais mis en cache), bilan et son contrôle d'équilibre, français et anglais, aucun débordement.
+
 ## Non-régression des rapports
 Un scénario fictif figé (une année d'activité d'« Atelier Exemple inc. ») produit la balance de vérification, le bilan, l'état des résultats, le grand livre, l'âge des comptes et le sommaire des taxes. Les sorties CSV sont comparées à des fichiers de référence versionnés. Tout changement de rapport doit être voulu et visible dans le diff.
 

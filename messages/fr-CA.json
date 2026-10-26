@@ -347,6 +347,9 @@
       "reconNotCompleted": "Ce rapprochement n’est pas terminé.",
       "reconNotLatest": "Seul le dernier rapprochement terminé d’un compte peut être rouvert.",
       "reconReason": "Écrivez le motif de la réouverture (dix caractères au moins)."
+    },
+    "reports": {
+      "period": "La période n’est pas valide : les deux jours doivent exister et le début précède la fin."
     }
   },
   "nav": {
@@ -760,7 +763,9 @@
       "integrations": "Intégrations",
       "transactions": "Transactions bancaires",
       "encaissements": "Encaissements",
-      "rapprochement": "Rapprochement bancaire"
+      "rapprochement": "Rapprochement bancaire",
+      "resultats": "État des résultats",
+      "bilan": "Bilan"
     }
   },
   "updates": {
@@ -1462,5 +1467,50 @@
     "recent": "Derniers fichiers importés",
     "recentLine": "{file} · {date} · {count, plural, =0 {aucune nouvelle ligne} one {# nouvelle ligne} other {# nouvelles lignes}}",
     "unreadable": "Ce fichier n’a pas pu être lu."
+  },
+  "statements": {
+    "incomeTitle": "État des résultats",
+    "balanceTitle": "Bilan",
+    "incomeIntro": "Les revenus moins les charges de la période choisie, d’après le journal. Les comptes dont le total est nul n’y figurent pas.",
+    "balanceIntro": "La situation de l’entreprise à un jour donné, d’après tout le journal jusqu’à ce jour.",
+    "from": "Du",
+    "to": "Au",
+    "asOf": "Au",
+    "apply": "Afficher",
+    "export": "Exporter en CSV",
+    "fiscalYears": "Exercices :",
+    "period": "Période du {from} au {to}.",
+    "balanceAsOf": "Situation au {date}.",
+    "incomeEmpty": "Aucun revenu ni charge au journal sur cette période.",
+    "balanceEmpty": "Aucune écriture au journal à cette date.",
+    "code": "Compte",
+    "account": "Libellé",
+    "amount": "Montant",
+    "total": "Total",
+    "operatingRevenue": "Revenus d’exploitation",
+    "costOfSales": "Coût des marchandises vendues",
+    "grossProfit": "Bénéfice brut",
+    "operatingExpenses": "Charges d’exploitation",
+    "operatingIncome": "Bénéfice d’exploitation",
+    "otherRevenue": "Autres revenus",
+    "otherExpenses": "Autres charges",
+    "netIncome": "Résultat net",
+    "currentAssets": "Actif à court terme",
+    "fixedAssets": "Immobilisations",
+    "otherAssets": "Autres actifs",
+    "totalAssets": "Total de l’actif",
+    "currentLiabilities": "Passif à court terme",
+    "longTermLiabilities": "Passif à long terme",
+    "totalLiabilities": "Total du passif",
+    "equity": "Capitaux propres",
+    "priorEarnings": "Résultats des exercices précédents",
+    "currentEarnings": "Résultat de l’exercice en cours",
+    "cumulativeEarnings": "Résultats cumulés",
+    "totalEquity": "Total des capitaux propres",
+    "totalLiabilitiesAndEquity": "Total du passif et des capitaux propres",
+    "balanced": "Le bilan est équilibré : l’actif égale le passif plus les capitaux propres.",
+    "notBalanced": "Le bilan n’est pas équilibré : c’est un incident à signaler.",
+    "incomeFile": "etat-des-resultats",
+    "balanceFile": "bilan"
   }
 }
