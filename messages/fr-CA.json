@@ -616,6 +616,42 @@
     "file": "grand-livre",
     "allFile": "tous-les-comptes"
   },
+  "aging": {
+    "title": "Âge des comptes clients",
+    "intro": "Ce que vos clients vous doivent à une date, selon le nombre de jours écoulés depuis l’échéance de chaque facture (à défaut, depuis sa date). Les paiements et les avoirs comptent à partir du jour où ils ont été appliqués : le rapport d’une date passée redonne ce qu’il était alors.",
+    "asOf": "Au",
+    "apply": "Afficher",
+    "export": "Exporter en CSV",
+    "status": "Soldes au {date}.",
+    "empty": "Aucun solde client à cette date.",
+    "customer": "Client",
+    "current": "Courant",
+    "d1_30": "1–30 jours",
+    "d31_60": "31–60 jours",
+    "d61_90": "61–90 jours",
+    "d91_plus": "91 jours et plus",
+    "unapplied": "Non appliqué",
+    "total": "Total",
+    "detail": "Détail par client",
+    "document": "Pièce",
+    "number": "Numéro",
+    "date": "Date",
+    "dueDate": "Échéance",
+    "daysPastDue": "Jours de retard",
+    "notDue": "Non échue",
+    "amount": "Montant",
+    "kinds": {
+      "INVOICE": "Facture",
+      "CREDIT_NOTE": "Avoir non appliqué",
+      "PAYMENT": "Encaissement non appliqué",
+      "REFUND": "Remboursement non appliqué"
+    },
+    "ledgerBalance": "Solde des comptes clients au grand livre",
+    "difference": "Écart",
+    "agrees": "Le total concorde avec le solde des comptes clients du grand livre.",
+    "differs": "Le total ne concorde pas avec le grand livre (écart de {amount}) : les écritures des comptes clients doivent être vérifiées.",
+    "file": "age-des-comptes-clients"
+  },
   "audit": {
     "title": "Piste d'audit",
     "intro": "Chaque création, modification ou suppression est inscrite ici par la base de données elle-même. Lecture seule : rien ne s'efface.",
@@ -798,7 +834,7 @@
     "rapports": {
       "title": "Rapports",
       "description": "Consultez les rapports disponibles pour votre entreprise.",
-      "planned": "Bilan, état des résultats, grand livre, âges des comptes et exports : phase 6."
+      "planned": "Sommaire TPS/TVQ, âge des comptes fournisseurs, comparaisons de périodes et exports PDF : phase 6."
     },
     "taxes": {
       "title": "Taxes",
@@ -848,7 +884,8 @@
       "rapprochement": "Rapprochement bancaire",
       "resultats": "État des résultats",
       "bilan": "Bilan",
-      "grand-livre": "Grand livre"
+      "grand-livre": "Grand livre",
+      "age-clients": "Âge des comptes clients"
     }
   },
   "updates": {

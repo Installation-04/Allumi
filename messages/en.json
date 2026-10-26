@@ -616,6 +616,42 @@
     "file": "general-ledger",
     "allFile": "all-accounts"
   },
+  "aging": {
+    "title": "Receivables aging",
+    "intro": "What your customers owe you on a given day, by the number of days since each invoice fell due (or since its date when it has no due date). Payments and credit notes count from the day they were applied: the report for a past day gives what it was then.",
+    "asOf": "As of",
+    "apply": "Show",
+    "export": "Export as CSV",
+    "status": "Balances as of {date}.",
+    "empty": "No customer balance on this day.",
+    "customer": "Customer",
+    "current": "Current",
+    "d1_30": "1–30 days",
+    "d31_60": "31–60 days",
+    "d61_90": "61–90 days",
+    "d91_plus": "91 days and over",
+    "unapplied": "Not applied",
+    "total": "Total",
+    "detail": "Detail by customer",
+    "document": "Document",
+    "number": "Number",
+    "date": "Date",
+    "dueDate": "Due date",
+    "daysPastDue": "Days past due",
+    "notDue": "Not due",
+    "amount": "Amount",
+    "kinds": {
+      "INVOICE": "Invoice",
+      "CREDIT_NOTE": "Credit note not applied",
+      "PAYMENT": "Payment not applied",
+      "REFUND": "Refund not applied"
+    },
+    "ledgerBalance": "Receivable accounts balance in the general ledger",
+    "difference": "Difference",
+    "agrees": "The total agrees with the balance of the receivable accounts in the general ledger.",
+    "differs": "The total does not agree with the general ledger (difference of {amount}): the entries on the receivable accounts need to be checked.",
+    "file": "receivables-aging"
+  },
   "audit": {
     "title": "Audit trail",
     "intro": "Every creation, change or deletion is written here by the database itself. Read-only: nothing is erased.",
@@ -798,7 +834,7 @@
     "rapports": {
       "title": "Reports",
       "description": "Consult the reports available for your company.",
-      "planned": "Balance sheet, profit and loss, general ledger, aging and exports: phase 6."
+      "planned": "GST/QST summary, payables aging, period comparisons and PDF exports: phase 6."
     },
     "taxes": {
       "title": "Taxes",
@@ -848,7 +884,8 @@
       "rapprochement": "Bank reconciliation",
       "resultats": "Income statement",
       "bilan": "Balance sheet",
-      "grand-livre": "General ledger"
+      "grand-livre": "General ledger",
+      "age-clients": "Receivables aging"
     }
   },
   "updates": {

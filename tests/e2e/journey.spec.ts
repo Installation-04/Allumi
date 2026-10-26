@@ -253,6 +253,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await bankReconciliationJourney(page);
   await financialStatementsJourney(page);
   await generalLedgerJourney(page);
+  await receivablesAgingJourney(page);
   await membersJourney(page, browser);
   // Nothing in the whole journey (both locales, every form, the security pages, a second browser) was blocked.
   expect(cspViolations, "Content-Security-Policy violations").toEqual([]);
@@ -1760,6 +1761,108 @@ async function generalLedgerJourney(page: Page) {
   await expectNoPageOverflow(page);
   await page.getByRole("button", { name: "Français", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Grand livre", exact: true })).toBeVisible();
+}
+
+/**
+ * The receivables aging, on what the earlier journeys left: invoices F-00001 (241,45 $, voided July 2) and F-00002
+ * (114,98 $) of Atelier Boréal, both posted June 1st and due July 1st, payment E-00001 (50,00 $, June 15), payment
+ * E-00002 (64,98 $, June 20, voided June 25) and credit note AV-00001 (28,74 $, July 1st, voided July 2). The report of
+ * past days gives what it was then: before anything, with nothing due, the day a payment void took effect, the due
+ * date, and the day after, when an invoice and a credit note were voided. Then the details with their links, the CSV
+ * file in both languages, and no overflow.
+ */
+async function receivablesAgingJourney(page: Page) {
+  const company = new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0] ?? "";
+  const row = (label: string | RegExp) => page.getByRole("row").filter({ hasText: label });
+  const figures = async (label: RegExp) => (await row(label).first().locator("td").allTextContents()).map((text) => text.replace(/\s/g, " "));
+  const agrees = page.getByText("Le total concorde avec le solde des comptes clients du grand livre.");
+  const money = (...values: string[]) => values.map((value) => `${value} $`);
+  const zero = "0,00";
+
+  // from the Reports area
+  await openSection(page, "Rapports");
+  await page.getByRole("link", { name: "Âge des comptes clients", exact: true }).first().click();
+  await expect(page.getByRole("heading", { name: "Âge des comptes clients", exact: true })).toBeVisible();
+  await expect(agrees).toBeVisible(); // whatever day it is today, the aging agrees with the ledger
+  await expectNoPageOverflow(page);
+
+  // before anything was posted
+  await page.goto(`${company}/age-clients?au=2026-05-31`);
+  await expect(page.getByText("Soldes au 2026-05-31.")).toBeVisible();
+  await expect(page.getByText("Aucun solde client à cette date.")).toBeVisible();
+  await expect(agrees).toBeVisible();
+
+  // both invoices posted, nothing due yet
+  await page.goto(`${company}/age-clients?au=2026-06-01`);
+  expect(await figures(/^Atelier Boréal/)).toEqual(money("356,43", zero, zero, zero, zero, zero, "356,43"));
+  // the last day before the second payment was voided: only the first invoice is still open
+  await page.goto(`${company}/age-clients?au=2026-06-24`);
+  expect(await figures(/^Atelier Boréal/)).toEqual(money("241,45", zero, zero, zero, zero, zero, "241,45"));
+  // the day it was voided, the invoice it had settled is open again, less the first payment
+  await page.goto(`${company}/age-clients?au=2026-06-25`);
+  expect(await figures(/^Atelier Boréal/)).toEqual(money("306,43", zero, zero, zero, zero, zero, "306,43"));
+  // the due date itself, with the credit note applied that day: due today is zero days late, not yet in a late column
+  await page.goto(`${company}/age-clients?au=2026-07-01`);
+  expect(await figures(/^Atelier Boréal/)).toEqual(money("277,69", zero, zero, zero, zero, zero, "277,69"));
+  await page.locator("summary").filter({ hasText: "Atelier Boréal" }).locator("span").last().click();
+  await expect(row(/F-00001/).getByRole("cell").nth(4)).toHaveText("0");
+  await expect(row(/F-00002/)).toContainText(/36,24\s\$/);
+
+  // the day after: one day late; the first invoice was voided that day and the credit note with it
+  await page.goto(`${company}/age-clients?au=2026-07-02`);
+  expect(await figures(/^Atelier Boréal/)).toEqual(money(zero, "64,98", zero, zero, zero, zero, "64,98"));
+  expect(await figures(/^Total/)).toEqual(money(zero, "64,98", zero, zero, zero, zero, "64,98"));
+  await expect(agrees).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "rapport-age-clients", "Âge des comptes clients");
+
+  // the form moves to another day
+  await page.getByLabel("Au", { exact: true }).fill("2026-06-01");
+  await page.getByRole("button", { name: "Afficher", exact: true }).click();
+  await expect(page.getByText("Soldes au 2026-06-01.")).toBeVisible();
+  expect(await figures(/^Atelier Boréal/)).toEqual(money("356,43", zero, zero, zero, zero, zero, "356,43"));
+  await page.goto(`${company}/age-clients?au=2026-07-02`);
+
+  // the detail of a customer: each open invoice with its dates and days late, linked to the invoice
+  await page.locator("summary").filter({ hasText: "Atelier Boréal" }).locator("span").last().click();
+  await expect(row(/F-00001/)).toHaveCount(0); // voided that day
+  await expect(row(/F-00002/)).toContainText("2026-06-01");
+  await expect(row(/F-00002/)).toContainText("2026-07-01");
+  await expect(row(/F-00002/)).toContainText(/64,98\s\$/);
+  await expect(row(/F-00002/).getByRole("cell").nth(4)).toHaveText("1");
+  await row(/F-00002/).getByRole("link", { name: "F-00002", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "F-00002", exact: true })).toBeVisible();
+  await page.goBack();
+
+  // the file: one row per open invoice, in its column
+  const file = await page.request.get((await page.getByRole("link", { name: "Exporter en CSV", exact: true }).getAttribute("href")) ?? "");
+  expect(file.status()).toBe(200);
+  expect(file.headers()["content-type"]).toContain("text/csv");
+  expect(file.headers()["content-disposition"]).toContain("age-des-comptes-clients_2026-07-02.csv");
+  expect(file.headers()["cache-control"]).toContain("no-store");
+  const csv = await file.text();
+  expect(csv.charCodeAt(0)).toBe(0xfeff);
+  expect(csv).toContain("\r\nClient;Pièce;Numéro;Date;Échéance;Jours de retard;Courant;1–30 jours;31–60 jours;61–90 jours;91 jours et plus;Non appliqué;Total\r\n");
+  expect(csv).toContain("\r\nAtelier Boréal;Facture;F-00002;2026-06-01;2026-07-01;1;0,00;64,98;0,00;0,00;0,00;0,00;64,98\r\n");
+  expect(csv).not.toContain("F-00001");
+  expect(csv).toContain("\r\nTotal;;;;;;0,00;64,98;0,00;0,00;0,00;0,00;64,98\r\n");
+
+  // a bad address falls back to today
+  await page.goto(`${company}/age-clients?au=2026-13-01`);
+  await expect(page.getByText(/^Soldes au \d{4}-\d{2}-\d{2}\.$/)).toBeVisible();
+
+  // English: labels, and a file with commas and points
+  await page.goto(`${company}/age-clients?au=2026-07-02`);
+  await page.getByRole("button", { name: "English", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Receivables aging", exact: true })).toBeVisible();
+  await expect(page.getByText("The total agrees with the balance of the receivable accounts in the general ledger.")).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "91 days and over", exact: true })).toBeVisible();
+  const english = await page.request.get((await page.getByRole("link", { name: "Export as CSV", exact: true }).getAttribute("href")) ?? "");
+  expect(english.headers()["content-disposition"]).toContain("receivables-aging_2026-07-02.csv");
+  expect(await english.text()).toContain("\r\nAtelier Boréal,Invoice,F-00002,2026-06-01,2026-07-01,1,0.00,64.98,0.00,0.00,0.00,0.00,64.98\r\n");
+  await expectNoPageOverflow(page);
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Âge des comptes clients", exact: true })).toBeVisible();
 }
 
 /**
