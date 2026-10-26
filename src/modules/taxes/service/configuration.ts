@@ -7,7 +7,7 @@ import { codeSchema, itemSchema, rateSchema, taxSchema } from "../domain/schemas
 import { percentageRate } from "../domain/calculation";
 
 async function transaction<T>(actor: CompanyContext, write: boolean, fn: (tx: Tx) => Promise<T>) {
-  try { return await withCompany(actor, async (tx) => { await requireRole(tx, write ? "catalog.manage" : "catalog.read"); return fn(tx); }); }
+  try { return await withCompany(actor, async (tx) => { await requireRole(tx, write ? "taxes.manage" : "taxes.read"); return fn(tx); }); }
   catch (error) { if (isConflict(error)) throw new AppError("catalog.conflict"); throw toAppError(error); }
 }
 export async function getTaxConfiguration(actor: CompanyContext) {

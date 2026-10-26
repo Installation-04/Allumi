@@ -3,16 +3,16 @@ import { ACTIONS, can, type Role } from "@/modules/companies";
 
 describe("role matrix", () => {
   it("lets everybody read the ledger, and only the owner and the accountant write", () => {
-    for (const role of ["OWNER", "ACCOUNTANT", "READ_ONLY"] as const) { expect(can(role, "ledger.read")).toBe(true); expect(can(role, "contact.read")).toBe(true); }
-    for (const action of ["contact.manage", "entry.post", "entry.reverse", "account.manage", "period.lock", "fiscalYear.create"] as const) {
+    for (const role of ["OWNER", "ACCOUNTANT", "READ_ONLY"] as const) { expect(can(role, "ledger.read")).toBe(true); expect(can(role, "contact.read")).toBe(true); expect(can(role, "bank.read")).toBe(true); }
+    for (const action of ["contact.manage", "bank.manage", "entry.post", "entry.reverse", "account.manage", "period.lock", "fiscalYear.create"] as const) {
       expect(can("OWNER", action), action).toBe(true);
       expect(can("ACCOUNTANT", action), action).toBe(true);
       expect(can("READ_ONLY", action), action).toBe(false);
     }
   });
 
-  it("keeps the privileged actions (reopening the past, closing a year) for the owner", () => {
-    for (const action of ["company.manage", "period.reopen", "fiscalYear.reopen", "fiscalYear.close"] as const) {
+  it("keeps privileged actions for administrators", () => {
+    for (const action of ["members.manage", "company.manage", "period.reopen", "fiscalYear.reopen", "fiscalYear.close", "contact.anonymize", "integration.manage"] as const) {
       expect(can("OWNER", action), action).toBe(true);
       expect(can("ACCOUNTANT", action), action).toBe(false);
       expect(can("READ_ONLY", action), action).toBe(false);
@@ -35,4 +35,12 @@ describe("role matrix", () => {
       }
     }
   });
+});
+
+it("honours modular permissions without elevating privileged actions or viewer writes", () => {
+  expect(can({role:"USER",moduleAccess:{accounting:"write"}},"entry.post")).toBe(true);
+  expect(can({role:"ACCOUNTANT",moduleAccess:{contacts:"none"}},"contact.read")).toBe(false);
+  expect(can({role:"READ_ONLY",moduleAccess:{contacts:"write"}},"contact.manage")).toBe(false);
+  expect(can({role:"USER",moduleAccess:{accounting:"write"}},"members.manage")).toBe(false);
+  expect(can({role:"USER",moduleAccess:{accounting:"write"}},"integration.manage")).toBe(false);
 });

@@ -214,9 +214,47 @@ Voir [[Brouillons-d-avoirs]].
 
 Voir [[Validation-des-avoirs]].
 
+## Encaissements
+
+![Formulaire d’encaissement sur la facture](images/encaissement-formulaire-desktop.png)
+![Facture payée](images/facture-payee-desktop.png)
+![Liste des encaissements](images/encaissements-desktop.png)
+![Encaissement sur téléphone](images/encaissement-mobile.png)
+![Encaissement annulé sur téléphone](images/encaissement-annule-mobile.png)
+
+Voir [[Encaissements]].
+
+## Intégrations
+
+![Connexions](images/integrations-desktop.png)
+![Fiche d’une connexion](images/integration-connexion-desktop.png)
+![Transactions importées](images/transactions-importees-desktop.png)
+![Transactions importées sur téléphone](images/transactions-importees-mobile.png)
+![Import d’un relevé sur téléphone](images/releves-import-mobile.png)
+![Transactions bancaires](images/releves-transactions-desktop.png)
+![Transactions avec l’écriture probable](images/appariement-liste-desktop.png)
+![Appariement de plusieurs écritures à un dépôt](images/appariement-detail-desktop.png)
+![Fiche d’une transaction sur téléphone](images/appariement-detail-mobile.png)
+![Feuille de rapprochement bancaire](images/rapprochement-feuille-desktop.png)
+![Rapprochement terminé](images/rapprochement-termine-desktop.png)
+![Les rapprochements d’une entreprise](images/rapprochement-liste-desktop.png)
+![Feuille de rapprochement sur téléphone](images/rapprochement-feuille-mobile.png)
+![Fiche d’une connexion : compte des frais et vérification des paiements](images/paiement-en-ligne-connexion-desktop.png)
+![Facture avec un lien de paiement prêt](images/paiement-en-ligne-facture-desktop.png)
+![Paiement à vérifier sur téléphone](images/paiement-en-ligne-a-verifier-mobile.png)
+
+Voir [[Integrations]].
+
 ## Avoirs annulés
 
 ![Avoir annulé et affectation retirée](images/avoir-annule-desktop.png)
 ![Avoir annulé en anglais sombre sur téléphone](images/avoir-annule-en-dark-mobile.png)
 
 Voir [[Validation-des-avoirs]].
+
+## Utilisateurs et serveur
+
+Voir [[Utilisateurs-et-permissions]] et [[Administration-serveur]] pour les captures ordinateur/téléphone et anglaises des nouveaux écrans.
+
+![Permissions](images/utilisateurs-permissions-desktop.png)
+![Serveur mobile](images/serveur-mobile.png)

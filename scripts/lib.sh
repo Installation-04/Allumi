@@ -70,7 +70,7 @@ compose() { docker compose --project-directory "$ALLUMI_DIR" "$@"; }
 isolate_deployment_env() {
   unset DATABASE_URL APP_DATABASE_URL POSTGRES_PASSWORD POSTGRES_USER POSTGRES_DB APP_DB_PASSWORD AUTH_SECRET ENCRYPTION_KEY \
     SETUP_TOKEN APP_URL ALLUMI_DOMAIN ACME_EMAIL ALLUMI_HTTP_PORT ALLUMI_HTTPS_PORT ALLUMI_BIND_ADDRESS DEFAULT_LOCALE \
-    ALLUMI_APP_IMAGE ALLUMI_MIGRATE_IMAGE
+    ALLUMI_APP_IMAGE ALLUMI_MIGRATE_IMAGE ALLUMI_SERVER_ADMIN_ENABLED
 }
 
 # --- Images : téléchargées (version publiée) ou construites sur place ------------------------------------------

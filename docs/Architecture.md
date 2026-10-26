@@ -235,7 +235,7 @@ Ce que l'application garantit à l'infrastructure :
 | Formats bancaires CSV/OFX variés | Imports ratés ou en double | Profils de colonnes, FITID, clé de dédoublonnage, SHA-256 du fichier |
 | Module natif argon2 dans l'image standalone | Échec au démarrage | `serverExternalPackages`, vérifié par le healthcheck de la CI |
 | Clean-room (gabarit de plan comptable, libellés) | Contenu protégé copié par mégarde | Gabarit original fondé sur la numérotation usuelle et l'IGRF public de l'ARC; revue à chaque PR |
-| Perte d'`ENCRYPTION_KEY` | Secrets 2FA illisibles | Documenté dans [[Configuration]]; codes de récupération; rotation de clé prévue plus tard |
+| Perte d'`ENCRYPTION_KEY` | Secrets 2FA et clés d'intégrations illisibles | Documenté dans [[Configuration]]; codes de récupération; clés d'intégrations à remplacer; rotation de clé prévue plus tard |
 | Fuseaux horaires | Écriture datée du mauvais jour | Dates comptables en `DATE`, saisie en date locale; « aujourd'hui » à l'heure de Montréal pour toutes les entreprises tant qu'il n'y a pas de réglage par entreprise |
 | Multidevise reportée | Refonte partielle plus tard | Colonnes `currency` présentes, contraintes `CAD` à relâcher par migration |
 | PostgreSQL 16 en session cloud, 17 en production | Écart de comportement | Aucune fonction propre à PG 17; la CI teste sur PG 17 |

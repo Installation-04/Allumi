@@ -4,7 +4,7 @@ import { listInvoices } from "@/modules/sales";
 import { formatMoney } from "@/modules/ledger";
 import { loadCompany } from "../../_lib";
 export default async function Page({ params }: { params: Promise<{ companyId: string }> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "sales.read");
   const rows = await listInvoices(actor);
   const t = await getTranslations("sales");
   const base = `/c/${company.id}/factures`;

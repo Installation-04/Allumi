@@ -10,7 +10,7 @@ import { validId } from "../../../factures/editor";
 import { voidCreditAction } from "../../actions";
 
 export default async function Page({ params }: { params: Promise<{ companyId: string; creditId: string }> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "sales.read");
   const { creditId } = await params;
   if (!validId(creditId)) notFound();
   const credit = await getPostedCredit(actor, creditId);
@@ -38,7 +38,7 @@ export default async function Page({ params }: { params: Promise<{ companyId: st
       <p>{a.unappliedDate ? t("unapplied", { date: a.unappliedDate.toISOString().slice(0, 10) }) : t("active")}</p>
     </div>)}</section>
     <Link className="inline-flex min-h-11 items-center underline" href={`/c/${company.id}/journal/${credit.journalEntryId}`}>{s("journal")}</Link>
-    {credit.status === "POSTED" && can(company.role, "sales.manage") && <details className="rounded border p-4">
+    {credit.status === "POSTED" && can(company, "sales.manage") && <details className="rounded border p-4">
       <summary className="min-h-11 cursor-pointer">{t("void")}</summary>
       <ActionForm action={voidCreditAction.bind(null, company.id, creditId)} label={t("void")}>
         <p>{t("voidWarning")}</p><Field name="voidDate" label={s("voidDate")} type="date" defaultValue={todayIso() > credit.postingDate.toISOString().slice(0, 10) ? todayIso() : credit.postingDate.toISOString().slice(0, 10)} />

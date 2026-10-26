@@ -29,3 +29,26 @@ export const contactFilterSchema = z.object({
 });
 export type ContactInput = z.output<typeof contactSchema>;
 export type ContactFilter = z.output<typeof contactFilterSchema>;
+
+/**
+ * Law 25: the columns of `contact` that identify a person (database names, which are also the keys of the audit
+ * trail's before/after). Anonymizing clears them in the row AND removes them from every audit entry of the contact.
+ * Notes and registration numbers count: free text names people, and a sole proprietor's GST/QST number is theirs.
+ */
+export const PERSONAL_COLUMNS = [
+  "display_name", "legal_name", "email", "phone", "address_line1", "address_line2", "city", "province",
+  "postal_code", "notes", "gst_number", "qst_number", "tax_exemption_number",
+] as const;
+
+/** The columns that stay: no personal data, or what keeps accounting documents and tax rules consistent. */
+export const RETAINED_COLUMNS = [
+  "id", "company_id", "is_customer", "is_supplier", "country", "locale", "default_tax_code_id", "payment_terms_days",
+  "is_active", "anonymized_at", "created_at", "updated_at",
+] as const;
+
+export const ANONYMIZED_NAME = "Contact anonymisé";
+
+/** A fixed list, not free text: a reason typed into the audit trail could itself name the person being forgotten. */
+export const ANONYMIZATION_REASONS = ["SUBJECT_REQUEST", "RETENTION_ENDED", "OTHER"] as const;
+export const anonymizeSchema = z.object({ reason: z.enum(ANONYMIZATION_REASONS), confirm: z.literal("yes") });
+export type AnonymizationReason = (typeof ANONYMIZATION_REASONS)[number];

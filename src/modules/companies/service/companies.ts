@@ -2,7 +2,7 @@ import "server-only";
 import type { MemberRole } from "@/platform/db";
 import { withCompany, withUser } from "@/platform/tenant";
 
-export type CompanySummary = { id: string; name: string; role: MemberRole };
+export type CompanySummary = { id: string; name: string; role: MemberRole; moduleAccess?: unknown };
 
 export async function listCompaniesFor(userId: string): Promise<CompanySummary[]> {
   const memberships = await withUser({ userId }, (tx) =>
@@ -18,7 +18,8 @@ export async function getCompanyFor(userId: string, companyId: string): Promise<
     const role = roles[0]?.role ?? null;
     if (!role) return null;
     const company = await tx.company.findUnique({ where: { id: companyId }, select: { id: true, name: true } });
-    return company ? { ...company, role } : null;
+    const membership = await tx.membership.findUnique({ where: { companyId_userId: { companyId, userId } }, select: { moduleAccess: true } });
+    return company ? { ...company, role, moduleAccess: membership?.moduleAccess } : null;
   });
   return row;
 }
