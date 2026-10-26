@@ -237,6 +237,9 @@
       "confirmCreditVoid": "Confirmez l’annulation définitive de l’avoir.",
       "creditVoidDate": "La date d’annulation ne peut précéder la comptabilisation, une affectation ou son retrait.",
       "creditVoidLinked": "Un remboursement actif ou une affectation à une autre facture empêche l’annulation."
+    },
+    "reports": {
+      "period": "La période n’est pas valide : les deux jours doivent exister et le début précède la fin."
     }
   },
   "nav": {
@@ -418,6 +421,51 @@
     "equationBroken": "ALERTE : l'équation comptable n'est pas vérifiée.",
     "empty": "Aucune écriture pour l'instant.",
     "netHint": "Chaque compte affiche son solde net, au débit ou au crédit."
+  },
+  "statements": {
+    "incomeTitle": "État des résultats",
+    "balanceTitle": "Bilan",
+    "incomeIntro": "Les revenus moins les charges de la période choisie, d’après le journal. Les comptes dont le total est nul n’y figurent pas.",
+    "balanceIntro": "La situation de l’entreprise à un jour donné, d’après tout le journal jusqu’à ce jour.",
+    "from": "Du",
+    "to": "Au",
+    "asOf": "Au",
+    "apply": "Afficher",
+    "export": "Exporter en CSV",
+    "fiscalYears": "Exercices :",
+    "period": "Période du {from} au {to}.",
+    "balanceAsOf": "Situation au {date}.",
+    "incomeEmpty": "Aucun revenu ni charge au journal sur cette période.",
+    "balanceEmpty": "Aucune écriture au journal à cette date.",
+    "code": "Compte",
+    "account": "Libellé",
+    "amount": "Montant",
+    "total": "Total",
+    "operatingRevenue": "Revenus d’exploitation",
+    "costOfSales": "Coût des marchandises vendues",
+    "grossProfit": "Bénéfice brut",
+    "operatingExpenses": "Charges d’exploitation",
+    "operatingIncome": "Bénéfice d’exploitation",
+    "otherRevenue": "Autres revenus",
+    "otherExpenses": "Autres charges",
+    "netIncome": "Résultat net",
+    "currentAssets": "Actif à court terme",
+    "fixedAssets": "Immobilisations",
+    "otherAssets": "Autres actifs",
+    "totalAssets": "Total de l’actif",
+    "currentLiabilities": "Passif à court terme",
+    "longTermLiabilities": "Passif à long terme",
+    "totalLiabilities": "Total du passif",
+    "equity": "Capitaux propres",
+    "priorEarnings": "Résultats des exercices précédents",
+    "currentEarnings": "Résultat de l’exercice en cours",
+    "cumulativeEarnings": "Résultats cumulés",
+    "totalEquity": "Total des capitaux propres",
+    "totalLiabilitiesAndEquity": "Total du passif et des capitaux propres",
+    "balanced": "Le bilan est équilibré : l’actif égale le passif plus les capitaux propres.",
+    "notBalanced": "Le bilan n’est pas équilibré : c’est un incident à signaler.",
+    "incomeFile": "etat-des-resultats",
+    "balanceFile": "bilan"
   },
   "audit": {
     "title": "Piste d'audit",
@@ -629,7 +677,9 @@
       "catalogue": "Produits et services",
       "taxes": "Taxes et taux",
       "factures": "Brouillons de factures",
-      "avoirs": "Brouillons d’avoirs"
+      "avoirs": "Brouillons d’avoirs",
+      "resultats": "État des résultats",
+      "bilan": "Bilan"
     }
   },
   "updates": {

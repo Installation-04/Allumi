@@ -27,6 +27,7 @@ Une instance d'Allumi contient des renseignements personnels (clients, fournisse
 - **Hébergement** : privilégier une région canadienne; si les données sortent du Québec, une évaluation des facteurs relatifs à la vie privée est requise.
 - **Sauvegardes** : chiffrées et hors site dans une juridiction acceptable.
 - **Piste d'audit et droit à l'effacement** : la piste d'audit est en ajout seulement, mais le propriétaire peut en caviarder les renseignements personnels d'un contact anonymisé (fonction `audit_redact`, elle-même journalisée); les champs comptables ne sont jamais touchés.
+- **Exports CSV des rapports** ([[Etats-financiers]]) : réservés aux membres qui lisent le journal, filtrés par entreprise, jamais mis en cache (`no-store`); ils ne contiennent que des montants et des noms de comptes, ceux-ci précédés d'une apostrophe s'ils commençaient par `=`, `+`, `-`, `@` ou une tabulation, pour qu'un tableur ne les exécute pas.
 - **Incidents de confidentialité** : tenir un registre et aviser la Commission d'accès à l'information et les personnes touchées en cas de risque de préjudice sérieux.
 - **Conservation** : les pièces comptables ont des durées de conservation légales (consulte Revenu Québec et l'ARC).
 - **Politique de confidentialité** publiée si tu collectes des renseignements auprès du public.

@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Rapports (phase 6, lot 6a) : état des résultats (revenus, coût des ventes, charges, autres éléments, bénéfice brut, bénéfice d'exploitation et résultat net d'une période, du jour au jour inclus, par défaut l'exercice en cours) et bilan (actif, passif et capitaux propres à un jour, avec les résultats des exercices précédents et celui de l'exercice en cours, puisqu'aucune écriture de clôture n'est passée), sous Rapports et Comptabilité; tous les membres qui lisent le journal les consultent. Calculés à l'ouverture depuis le grand livre en cents exacts; le bilan confirme que l'actif égale le passif plus les capitaux propres. Export CSV de chacun : UTF-8 avec marque d'ordre des octets, séparateur et décimale selon la langue (point-virgule et virgule en français), montants exacts sans séparateur de milliers, protection des noms de compte contre l'injection de formule, jamais mis en cache. Aucune migration.
+
 ## [0.4.0-alpha.12] - 2026-10-25
 
 - Publication : démarrage réel des images téléchargées depuis GHCR sur AMD64 et ARM64 avant publication des fichiers de release.

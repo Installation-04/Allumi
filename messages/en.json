@@ -237,6 +237,9 @@
       "confirmCreditVoid": "Confirm permanently voiding the credit note.",
       "creditVoidDate": "The void date cannot precede posting, an application or its removal.",
       "creditVoidLinked": "An active refund or application to another invoice prevents voiding."
+    },
+    "reports": {
+      "period": "The period is not valid: both days must exist and the start must come before the end."
     }
   },
   "nav": {
@@ -418,6 +421,51 @@
     "equationBroken": "ALERT: the accounting equation does not hold.",
     "empty": "No entries yet.",
     "netHint": "Each account shows its net balance, in the debit or the credit column."
+  },
+  "statements": {
+    "incomeTitle": "Income statement",
+    "balanceTitle": "Balance sheet",
+    "incomeIntro": "Revenue less expenses over the chosen period, from the journal. Accounts that total zero are left out.",
+    "balanceIntro": "The company’s position on a given day, from the whole journal up to that day.",
+    "from": "From",
+    "to": "To",
+    "asOf": "As of",
+    "apply": "Show",
+    "export": "Export as CSV",
+    "fiscalYears": "Fiscal years:",
+    "period": "Period from {from} to {to}.",
+    "balanceAsOf": "Position as of {date}.",
+    "incomeEmpty": "No revenue or expense in the journal for this period.",
+    "balanceEmpty": "No journal entry up to this date.",
+    "code": "Account",
+    "account": "Name",
+    "amount": "Amount",
+    "total": "Total",
+    "operatingRevenue": "Operating revenue",
+    "costOfSales": "Cost of goods sold",
+    "grossProfit": "Gross profit",
+    "operatingExpenses": "Operating expenses",
+    "operatingIncome": "Operating income",
+    "otherRevenue": "Other revenue",
+    "otherExpenses": "Other expenses",
+    "netIncome": "Net income",
+    "currentAssets": "Current assets",
+    "fixedAssets": "Fixed assets",
+    "otherAssets": "Other assets",
+    "totalAssets": "Total assets",
+    "currentLiabilities": "Current liabilities",
+    "longTermLiabilities": "Long-term liabilities",
+    "totalLiabilities": "Total liabilities",
+    "equity": "Equity",
+    "priorEarnings": "Earnings of earlier fiscal years",
+    "currentEarnings": "Earnings of the current fiscal year",
+    "cumulativeEarnings": "Cumulative earnings",
+    "totalEquity": "Total equity",
+    "totalLiabilitiesAndEquity": "Total liabilities and equity",
+    "balanced": "The balance sheet balances: assets equal liabilities plus equity.",
+    "notBalanced": "The balance sheet does not balance: this is an incident to report.",
+    "incomeFile": "income-statement",
+    "balanceFile": "balance-sheet"
   },
   "audit": {
     "title": "Audit trail",
@@ -629,7 +677,9 @@
       "catalogue": "Products and services",
       "taxes": "Taxes and rates",
       "factures": "Invoice drafts",
-      "avoirs": "Credit note drafts"
+      "avoirs": "Credit note drafts",
+      "resultats": "Income statement",
+      "bilan": "Balance sheet"
     }
   },
   "updates": {
