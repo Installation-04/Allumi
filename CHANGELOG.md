@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.14] - 2026-10-26
+
 - Tests : vérifier les index valides du grand livre dans le catalogue PostgreSQL plutôt que le choix de plan sur un petit jeu de données; le test de durée des écritures reste inchangé.
 
 - Rapports (phase 6, lot 6c) : âge des comptes clients (Rapports et Ventes → Âge des comptes clients) : ce que chaque client doit à un jour donné, par tranche de jours écoulés depuis l'échéance (courant, 1–30, 31–60, 61–90, 91 et plus), avec le détail des pièces et leurs liens, une colonne pour les avoirs et encaissements non appliqués, et la concordance avec le solde des comptes clients du grand livre. Le rapport d'un jour passé redonne ce qu'il était alors (paiements et avoirs comptés à partir du jour où ils ont été appliqués, pièces annulées jusqu'à la veille). Export CSV d'une ligne par pièce ouverte (mêmes règles d'encodage et de protection que les autres exports). Correction : un jour impossible comme `2026-13-01` donne maintenant le refus « période invalide » dans les rapports au lieu d'une erreur inattendue. Aucune migration.
