@@ -1,0 +1,17 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
+import { requireSession } from "@/app/_lib/session";
+import { getProfile } from "@/modules/auth";
+import { serverOverview } from "@/modules/server";
+import { ActionForm, Field } from "@/app/_components/ui";
+import { serverAction } from "./actions";
+export default async function ServerPage() {
+  const session = await requireSession();
+  const profile = await getProfile(session.userId);
+  if (!profile?.isInstanceAdmin && !profile?.canManageServer) notFound();
+  const data = await serverOverview(session.userId);
+  const t = await getTranslations("server");
+  const confirm = <label className="flex min-h-11 items-center gap-3"><input type="checkbox" name="confirm" value="yes" required />{t("confirm")}</label>;
+  return <section className="mx-auto max-w-5xl space-y-6 p-4"><Link href="/" className="inline-flex min-h-11 items-center underline">{t("back")}</Link><h1 className="text-2xl font-semibold">{t("title")}</h1><p>{t("intro")}</p><div className="grid gap-4 md:grid-cols-2"><section className="space-y-3 rounded-lg border p-4"><h2 className="text-xl font-semibold">{t("settings")}</h2><dl className="space-y-2">{[[t("version"), data.version], [t("url"), data.url], [t("locale"), data.locale], [t("logLevel"), data.logLevel], [t("proxies"), data.trustedProxies], [t("database"), t(data.databaseHealthy ? "healthy" : "unhealthy")]].map(([label,value]) => <div key={label}><dt className="font-semibold">{label}</dt><dd className="break-all">{value}</dd></div>)}</dl><p className="text-sm">{t("hostSettings")}</p><Link href="/versions" className="inline-flex min-h-11 items-center underline">{t("updates")}</Link></section><section className="space-y-4 rounded-lg border p-4"><h2 className="text-xl font-semibold">{t("backups")}</h2><p>{t("backupHint")}</p>{!data.enabled ? <><p>{t("disabled")}</p><code className="block break-all">sudo ./scripts/enable-server-admin.sh</code></> : <><p role="status">{t(data.pending ? "pending" : data.snapshot ? "ready" : "awaiting")}</p>{!data.pending && <><ActionForm action={serverAction} label={t("backupNow")}><input type="hidden" name="operation" value="backup" />{confirm}</ActionForm><ActionForm action={serverAction} label={t("saveRetention")}><input type="hidden" name="operation" value="retention" /><Field name="days" label={t("retention")} type="number" defaultValue={String(data.snapshot?.retentionDays ?? 30)} hint={t("retentionHint")} />{confirm}</ActionForm></>}</> }</section></div><section className="space-y-3"><h2 className="text-xl font-semibold">{t("backupList")}</h2>{data.snapshot && <p>{t("snapshot", { date: data.snapshot.at })}</p>}{!data.snapshot?.backups.length && <p>{t("noBackups")}</p>}<ul className="space-y-2">{data.snapshot?.backups.map(b => <li key={b.name} className="rounded border p-3 break-all">{b.name} · {(b.bytes / 1048576).toFixed(1)} MiB · {b.at}</li>)}</ul></section><section className="space-y-3"><h2 className="text-xl font-semibold">{t("logs")}</h2><p>{t("logsHint")}</p><ul className="space-y-2">{data.snapshot?.events.slice().reverse().map((e,i) => <li key={i} className="rounded border p-3">{e.at} · {t(`operations.${e.operation}`)} · {t(`states.${e.state}`)}</li>)}</ul></section><Link href="https://github.com/Installation-04/Allumi/wiki/Administration-serveur" className="inline-flex min-h-11 items-center underline">{t("guide")}</Link></section>;
+}

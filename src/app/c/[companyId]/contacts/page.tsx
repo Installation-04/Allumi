@@ -10,7 +10,7 @@ import { loadCompany } from "../_lib";
 export async function generateMetadata() { return { title: (await getTranslations("contacts"))("title") }; }
 
 export default async function ContactsPage({ params, searchParams }: { params: Promise<{ companyId: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const { company, actor } = await loadCompany(params);
+  const { company, actor } = await loadCompany(params, "contact.read");
   const query = await searchParams;
   const q = searchText(query.q, 100) ?? "";
   const rawKind = searchText(query.kind);
@@ -24,7 +24,7 @@ export default async function ContactsPage({ params, searchParams }: { params: P
   const url = (change: Partial<ContactFilter>) => `${base}?${new URLSearchParams({ q, kind, status, page: String(result.page), ...Object.fromEntries(Object.entries(change).map(([k, v]) => [k, String(v)])) })}`;
   return (
     <section className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-2xl font-semibold">{t("title")}</h1><p className="mt-1 text-sm text-stone-500 dark:text-stone-400">{t("intro")}</p></div>{can(company.role, "contact.manage") && <Link href={`${base}/nouveau`} className={`inline-flex min-h-11 items-center rounded-full bg-brand-700 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-800 ${FOCUS}`}>{t("new")}</Link>}</div>
+      <div className="flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-2xl font-semibold">{t("title")}</h1><p className="mt-1 text-sm text-stone-500 dark:text-stone-400">{t("intro")}</p></div>{can(company, "contact.manage") && <Link href={`${base}/nouveau`} className={`inline-flex min-h-11 items-center rounded-full bg-brand-700 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-800 ${FOCUS}`}>{t("new")}</Link>}</div>
       <nav aria-label={t("typesLabel")} className="flex gap-4 border-b border-stone-200 dark:border-stone-800">
         {(["ALL", "CUSTOMER", "SUPPLIER"] as const).map((value) => <Link key={value} href={url({ kind: value, page: 1 })} aria-current={kind === value ? "page" : undefined} className={`inline-flex min-h-11 items-center border-b-2 px-1 text-sm ${FOCUS} ${kind === value ? "border-brand-700 font-semibold" : "border-transparent"}`}>{t(`filters.${value}`)}</Link>)}
       </nav>
@@ -34,6 +34,7 @@ export default async function ContactsPage({ params, searchParams }: { params: P
         <label className="text-sm"><span className="mb-1 block">{t("status")}</span><select key={status} name="status" defaultValue={status} className={`min-h-11 rounded border border-stone-300 bg-white px-3 dark:border-stone-700 dark:bg-stone-900 ${FOCUS}`}>{(["ACTIVE", "ARCHIVED", "ALL"] as const).map((value) => <option key={value} value={value}>{t(`statuses.${value}`)}</option>)}</select></label>
         <button className={`min-h-11 rounded border border-stone-300 px-4 text-sm dark:border-stone-700 ${FOCUS}`}>{t("apply")}</button>
       </form>
+      {query.anonymized === "1" && <p role="status" className="rounded border border-brand-700 p-3 text-sm">{t("anonymized")}</p>}
       <p className="text-sm text-stone-500 dark:text-stone-400" role="status">{t("count", { count: result.total })}</p>
       {result.contacts.length === 0 ? <div className="border border-dashed border-stone-300 bg-white p-8 text-center dark:border-stone-700 dark:bg-stone-900"><h2 className="font-semibold">{t("empty")}</h2><p className="mt-2 text-sm text-stone-500 dark:text-stone-400">{t("emptyHint")}</p></div> : <>
         <div className="hidden overflow-x-auto lg:block"><table className={TABLE_CLASS}><caption className="sr-only">{t("title")}</caption><thead><tr>{(["displayName", "kind", "email", "phone", "status"] as const).map((key) => <th scope="col" key={key} className={TH_CLASS}>{t(key)}</th>)}</tr></thead><tbody>

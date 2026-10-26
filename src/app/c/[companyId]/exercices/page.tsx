@@ -13,7 +13,7 @@ export async function generateMetadata() {
 }
 
 export default async function FiscalPage({ params }: { params: Promise<{ companyId: string }> }) {
-  const { company, actor } = await loadCompany(params);
+  const { company, actor } = await loadCompany(params, "ledger.read");
   const t = await getTranslations("fiscal");
   const years = await listFiscalYears(actor);
   const role = company.role;

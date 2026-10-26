@@ -12,8 +12,8 @@ export async function generateMetadata() {
 }
 
 export default async function NewEntryPage({ params }: { params: Promise<{ companyId: string }> }) {
-  const { company, actor, locale } = await loadCompany(params);
-  if (!can(company.role, "entry.post")) redirect(`/c/${company.id}/journal`);
+  const { company, actor, locale } = await loadCompany(params, "ledger.read");
+  if (!can(company, "entry.post")) redirect(`/c/${company.id}/journal`);
   const t = await getTranslations("entry");
   const accounts = (await listAccounts(actor)).filter(acceptsManualEntries);
   return (

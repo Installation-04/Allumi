@@ -9,7 +9,7 @@ import { DraftForm } from "./form";
 export const validId = (id: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 export async function DraftEditor({ params, id }: { params: Promise<{ companyId: string }>; id?: string }) {
   const { company, actor, locale } = await loadCompany(params);
-  if (!can(company.role, "sales.manage") || (id && !validId(id))) notFound();
+  if (!can(company, "sales.manage") || (id && !validId(id))) notFound();
   const draft = id ? await getDraft(actor, id) : null;
   if (id && !draft) notFound();
   const options = await getDraftOptions(actor);

@@ -35,7 +35,7 @@ Détails de sécurité :
 - À la connexion, la consommation du code et l’autorisation de la session sont atomiques. Une session expirée, révoquée, d’un autre utilisateur ou d’un compte désactivé est refusée avant de consommer un code de récupération.
 - Les tentatives de code sont limitées (8 par 15 minutes).
 - Pour **désactiver** la 2FA, il faut le mot de passe et un code actuel.
-- **Rouvrir une période ou un exercice** ([[Exercices-et-periodes]]) demande aussi un code saisi à ce moment, même si la session est déjà vérifiée : un témoin de connexion volé ne suffit pas à rouvrir le passé. Chaque essai de code, à la connexion ou pour rouvrir le passé, compte dans la même limite de 8 essais par 15 minutes.
+- **Rouvrir une période ou un exercice** ([[Exercices-et-periodes]]) et **anonymiser un contact** ([[Contacts]]) demandent aussi un code saisi à ce moment, même si la session est déjà vérifiée : un témoin de connexion volé ne suffit pas à rouvrir le passé ni à effacer une personne. Chaque essai de code, à la connexion ou pour une action privilégiée, compte dans la même limite de 8 essais par 15 minutes.
 - Tant que la deuxième étape n'est pas faite, la session ne donne accès qu'à la page de vérification.
 
 ## Ce qui n'est pas encore là

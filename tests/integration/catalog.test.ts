@@ -70,6 +70,54 @@ describe("database catalog (guards against a migration that forgets a table)", (
     expect(tables.filter((table) => !exempt.has(table) && !audited.has(table))).toEqual([]);
   });
 
+  it("keeps the credentials of integrations for the owner alone, and never deletes a connection", async () => {
+    const policies = await q<{ policyname: string; cmd: string; qual: string | null; with_check: string | null }>(
+      "SELECT policyname, cmd, qual, with_check FROM pg_policies WHERE schemaname = 'public' AND tablename = 'integration_credential' AND permissive = 'PERMISSIVE'",
+    );
+    expect(policies.map((row) => row.cmd).sort()).toEqual(["INSERT", "SELECT", "UPDATE"]);
+    for (const row of policies) expect(`${row.qual ?? ""}${row.with_check ?? ""}`, row.policyname).toContain("OWNER");
+    for (const table of ["integration_connection", "integration_credential"]) {
+      const [row] = await q<{ del: boolean; trunc: boolean }>("SELECT has_table_privilege('allumi_app', $1, 'DELETE') AS del, has_table_privilege('allumi_app', $1, 'TRUNCATE') AS trunc", [`public.${table}`]);
+      expect(row, table).toEqual({ del: false, trunc: false });
+    }
+    // the secret itself is outside every audit trigger's payload: the trigger names it as a secret column
+    const [trigger] = await q<{ def: string }>("SELECT pg_get_triggerdef(oid) AS def FROM pg_trigger WHERE tgname = 'integration_credential_audit'");
+    expect(trigger?.def).toContain("credentials_enc");
+  });
+
+  it("lets only the owner create and advance payment links, and never deletes a link or an online payment", async () => {
+    for (const table of ["payment_link", "online_payment"]) {
+      const policies = await q<{ policyname: string; cmd: string; qual: string | null; with_check: string | null }>(
+        "SELECT policyname, cmd, qual, with_check FROM pg_policies WHERE schemaname = 'public' AND tablename = $1 AND permissive = 'PERMISSIVE'", [table],
+      );
+      expect(policies.map((row) => row.cmd).sort(), table).toEqual(table === "payment_link" ? ["INSERT", "SELECT", "UPDATE"] : ["INSERT", "SELECT"]);
+      for (const row of policies.filter((policy) => policy.cmd !== "SELECT")) expect(`${row.qual ?? ""}${row.with_check ?? ""}`, `${table}.${row.policyname}`).toContain("OWNER");
+      const [grants] = await q<{ del: boolean; trunc: boolean; upd: boolean }>("SELECT has_table_privilege('allumi_app', $1, 'DELETE') AS del, has_table_privilege('allumi_app', $1, 'TRUNCATE') AS trunc, has_table_privilege('allumi_app', $1, 'UPDATE') AS upd", [`public.${table}`]);
+      expect(grants, table).toMatchObject({ del: false, trunc: false });
+    }
+    // an online payment is never updated, not even column by column; a link changes its state, not its amount or its invoice
+    const columns = await q<{ table_name: string; column_name: string }>(
+      `SELECT table_name, column_name FROM information_schema.column_privileges
+        WHERE grantee = 'allumi_app' AND privilege_type = 'UPDATE' AND table_name IN ('payment_link', 'online_payment')`,
+    );
+    expect(columns.filter((row) => row.table_name === "online_payment")).toEqual([]);
+    expect(columns.filter((row) => row.table_name === "payment_link").map((row) => row.column_name).sort())
+      .toEqual(["external_id", "external_price_id", "last_error", "review_reason", "status", "updated_at", "url"]);
+  });
+
+  it("lets the application add and remove matches but never edit one, and change only the status of a statement line", async () => {
+    const [match] = await q<{ ins: boolean; del: boolean; upd: boolean; trunc: boolean }>(
+      "SELECT has_table_privilege('allumi_app', 'public.bank_match', 'INSERT') AS ins, has_table_privilege('allumi_app', 'public.bank_match', 'DELETE') AS del, has_table_privilege('allumi_app', 'public.bank_match', 'UPDATE') AS upd, has_table_privilege('allumi_app', 'public.bank_match', 'TRUNCATE') AS trunc",
+    );
+    expect(match).toEqual({ ins: true, del: true, upd: false, trunc: false });
+    const columns = await q<{ column_name: string }>("SELECT column_name FROM information_schema.column_privileges WHERE grantee = 'allumi_app' AND privilege_type = 'UPDATE' AND table_name = 'bank_transaction'");
+    expect(columns.map((row) => row.column_name).sort()).toEqual(["status", "updated_at"]);
+    // removing a match is refused while a reconciliation counts its line
+    const triggers = await q<{ def: string }>("SELECT pg_get_triggerdef(oid) AS def FROM pg_trigger WHERE tgname = 'bank_match_reconciled' AND NOT tgisinternal");
+    expect(triggers).toHaveLength(1);
+    expect(triggers[0]?.def).toContain("BEFORE DELETE ON public.bank_match");
+  });
+
   it("denies EXECUTE on functions to PUBLIC (only the application role may call the few that it needs)", async () => {
     const rows = await q<{ proname: string }>(
       `SELECT p.proname FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
@@ -115,4 +163,19 @@ it("guards cumulative linked credit limits and exact credit postings", async () 
   expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='credit_note_limits' AND NOT tgisinternal")).toHaveLength(1);
   const rows=await q<{ definition:string }>("SELECT pg_get_functiondef('invoice_posting_exact()'::regprocedure) AS definition");
   expect(rows[0]?.definition).toContain("CREDIT_NOTE");
+});
+
+describe("modular access and server delegation catalog", () => {
+  it("keeps module permissions validated and server grants outside profile privileges", async () => {
+    const columns = await q<{ table_name: string }>("SELECT table_name FROM information_schema.columns WHERE table_schema='public' AND column_name='module_access' ORDER BY table_name");
+    expect(columns.map(r => r.table_name)).toEqual(["invitation", "membership"]);
+    expect((await q<{ allowed: boolean }>("SELECT has_column_privilege('allumi_app','app_user','can_manage_server','UPDATE') AS allowed"))[0]?.allowed).toBe(false);
+    expect((await q<{ ok: boolean }>("SELECT valid_module_access('{\"contacts\":\"write\"}'::jsonb) AND NOT valid_module_access('{\"server\":\"write\"}'::jsonb) AS ok"))[0]?.ok).toBe(true);
+  });
+  it("keeps restrictive module policies on tenant business data", async () => {
+    const rows=await q<{ tablename: string }>("SELECT tablename FROM pg_policies WHERE policyname='module_read' AND permissive='RESTRICTIVE'");
+    expect(rows.map(r=>r.tablename)).toEqual(expect.arrayContaining(["contact","item","sales_document","journal_entry","account","tax","audit_log","integration_connection","online_payment"]));
+    const business = await q<{ table_name: string }>("SELECT table_name FROM information_schema.columns WHERE table_schema='public' AND column_name='company_id' AND table_name NOT IN ('membership','invitation')");
+    expect(business.filter(t=>!rows.some(r=>r.tablename===t.table_name))).toEqual([]);
+  });
 });

@@ -34,6 +34,7 @@ export default async function HomePage() {
           </li>
         ))}
       </ul>
+      <Link href="/invitation" className="block min-h-11 underline">{(await getTranslations("members"))("join")}</Link>
       <Link href="/compte/securite" className="text-sm underline">
         {t("security")}
       </Link>

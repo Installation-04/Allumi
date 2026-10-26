@@ -16,11 +16,11 @@ export async function generateMetadata() {
 }
 
 export default async function AccountsPage({ params, searchParams }: { params: Promise<{ companyId: string }>; searchParams: Promise<{ inactifs?: string }> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "ledger.read");
   const showInactive = (await searchParams).inactifs === "1";
   const [t, types, subtypes] = [await getTranslations("accounts"), await getTranslations("enums.accountType"), await getTranslations("enums.accountSubtype")];
   const accounts = await listAccounts(actor, { includeInactive: showInactive });
-  const manage = can(company.role, "account.manage");
+  const manage = can(company, "account.manage");
   const base = `/c/${company.id}/comptes`;
 
   return (

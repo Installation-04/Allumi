@@ -39,7 +39,7 @@ export function Field(props: {
   defaultValue?: string;
   autoComplete?: string;
   hint?: string;
-  inputMode?: "numeric" | "text";
+  inputMode?: "numeric" | "decimal" | "text";
   required?: boolean;
 }) {
   const { name, label, type = "text", defaultValue, autoComplete, hint, inputMode, required = true } = props;
@@ -162,13 +162,15 @@ export function ActionForm(props: {
   children?: React.ReactNode;
   /** Dynamic controlled fields must keep their DOM selection after a refused action. */
   preserveOnReset?: boolean;
+  /** What is said when the action saved something, when "Settings saved." is not the right sentence. */
+  savedMessage?: string;
 }) {
   const { state, formAction, scope } = useScopedAction(props.action);
   const t = useTranslations("form");
   return (
     <form action={formAction} onReset={props.preserveOnReset ? event => event.preventDefault() : undefined} className="space-y-3">
       <StateError state={state} />
-      {state?.notice === "saved" && <p role="status" className="text-brand-700 dark:text-brand-500">{t("saved")}</p>}
+      {state?.notice === "saved" && <p role="status" className="text-brand-700 dark:text-brand-500">{props.savedMessage ?? t("saved")}</p>}
       <FormScopeProvider scope={scope}>{props.children}</FormScopeProvider>
       <SubmitButton variant={props.variant ?? "secondary"} ariaLabel={props.ariaLabel}>
         {props.label}

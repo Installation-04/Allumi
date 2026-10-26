@@ -17,7 +17,7 @@ type Search = { du?: string; au?: string; compte?: string; page?: string };
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default async function JournalPage({ params, searchParams }: { params: Promise<{ companyId: string }>; searchParams: Promise<Search> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "ledger.read");
   const search = await searchParams;
   const from = search.du && isValidIsoDate(search.du) ? search.du : undefined;
   const to = search.au && isValidIsoDate(search.au) ? search.au : undefined;
@@ -43,7 +43,7 @@ export default async function JournalPage({ params, searchParams }: { params: Pr
     <section className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold">{t("title")}</h1>
-        {can(company.role, "entry.post") ? (
+        {can(company, "entry.post") ? (
           <Link href={`${base}/nouvelle`} className={`rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-800 ${FOCUS}`}>
             {t("new")}
           </Link>

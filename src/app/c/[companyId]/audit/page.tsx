@@ -17,8 +17,8 @@ export async function generateMetadata() {
 type Search = { objet?: string | string[]; action?: string | string[]; avant?: string | string[] };
 
 export default async function AuditPage({ params, searchParams }: { params: Promise<{ companyId: string }>; searchParams: Promise<Search> }) {
-  const { company, actor } = await loadCompany(params);
-  if (!can(company.role, "audit.read")) notFound();
+  const { company, actor } = await loadCompany(params, "audit.read");
+  if (!can(company, "audit.read")) notFound();
   const search = await searchParams;
   // a repeated or odd parameter is read as its first, clean value (an array would reach the query as is)
   const [objet, action, avant] = [searchText(search.objet), searchText(search.action), searchText(search.avant, 18)];

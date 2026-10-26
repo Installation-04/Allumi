@@ -10,7 +10,7 @@ import { validId } from "../factures/editor";
 import { saveCreditAction } from "./actions";
 export async function CreditEditor({ params, invoiceId, id }: { params: Promise<{ companyId: string }>; invoiceId?: string; id?: string }) {
   const { company, actor, locale } = await loadCompany(params);
-  if (!can(company.role, "sales.manage") || (id && !validId(id))) notFound();
+  if (!can(company, "sales.manage") || (id && !validId(id))) notFound();
   const draft = id ? await getCreditDraft(actor, id) : null;
   if (id && !draft) notFound();
   const sourceId = draft?.creditedDocumentId ?? invoiceId;

@@ -11,7 +11,7 @@ export async function generateMetadata() {
 }
 
 export default async function TrialBalancePage({ params, searchParams }: { params: Promise<{ companyId: string }>; searchParams: Promise<{ au?: string }> }) {
-  const { actor, locale } = await loadCompany(params);
+  const { actor, locale } = await loadCompany(params, "ledger.read");
   const asOf = (await searchParams).au;
   const t = await getTranslations("trial");
   const trial = await getTrialBalance(actor, { asOf: asOf && isValidIsoDate(asOf) ? asOf : undefined });

@@ -1,8 +1,8 @@
 /** Product areas and real shortcuts; planned capabilities are described separately in the hub. */
 export const AREAS = {
-  ventes: { icon: "contacts", links: ["factures", "avoirs", "contacts", "catalogue", "journal"] },
+  ventes: { icon: "contacts", links: ["factures", "avoirs", "encaissements", "contacts", "catalogue", "journal"] },
   depenses: { icon: "journal", links: ["contacts", "catalogue", "journal"] },
-  banque: { icon: "accounts", links: ["comptes", "journal"] },
+  banque: { icon: "accounts", links: ["integrations", "transactions", "rapprochement", "comptes", "journal"] },
   tresorerie: { icon: "trial", links: ["balance", "journal"] },
   rapports: { icon: "trial", links: ["resultats", "bilan", "balance"] },
   taxes: { icon: "fiscal", links: ["taxes", "comptes"] },
