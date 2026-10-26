@@ -1,7 +1,7 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { ACCOUNT_SUBTYPES, SUBTYPES_OF, type AccountSubtype, type AccountType } from "@/modules/ledger/client";
-import { balanceSheetCsv, buildBalanceSheet, buildIncomeStatement, csvAmount, csvFormatFor, csvText, incomeStatementCsv, toCsv, type AccountTotals, type StatementLabels } from "@/modules/reports";
+import { balanceSheetCsv, buildBalanceSheet, buildIncomeStatement, csvAmount, csvFormatFor, csvText, incomeStatementCsv, ledgerCsv, lineEffect, runLedger, toCsv, type AccountTotals, type LedgerLabels, type LedgerLine, type StatementLabels } from "@/modules/reports";
 
 const account = (code: string, type: AccountType, subtype: AccountSubtype, debitCents: bigint, creditCents: bigint, name = `Compte ${code}`): AccountTotals => ({
   accountId: `id-${code}`, code, nameFr: name, nameEn: `Account ${code}`, type, subtype, debitCents, creditCents,
@@ -153,5 +153,52 @@ describe("CSV", () => {
     expect(lines).toContain("1000,Account 1000,100.00");
     expect(lines).toContain(",L:totalAssets,100.00");
     expect(lines).toContain(",L:totalLiabilitiesAndEquity,100.00");
+  });
+});
+
+describe("the ledger of an account", () => {
+  const line = (n: number, debitCents: bigint, creditCents: bigint, over: Partial<LedgerLine> = {}): LedgerLine => ({
+    lineId: `l${n}`, entryId: `e${n}`, entryNumber: BigInt(n), entryLabel: `J-${String(n).padStart(5, "0")}`, date: "2026-03-10", sourceType: "MANUAL", memo: null, description: null, contactName: null, debitCents, creditCents, reversed: false, ...over,
+  });
+  it("adds a debit to an asset or an expense and a credit to the other accounts", () => {
+    expect(lineEffect("ASSET", line(1, 500n, 200n))).toBe(300n);
+    expect(lineEffect("EXPENSE", line(1, 0n, 200n))).toBe(-200n);
+    expect(lineEffect("LIABILITY", line(1, 500n, 200n))).toBe(-300n);
+    expect(lineEffect("REVENUE", line(1, 0n, 900n))).toBe(900n);
+    expect(lineEffect("EQUITY", line(1, 100n, 0n))).toBe(-100n);
+  });
+  it("runs the balance from the opening balance, line after line, and may go negative", () => {
+    const run = runLedger("ASSET", 1_000n, [line(1, 500n, 0n), line(2, 0n, 2_000n), line(3, 300n, 0n)]);
+    expect(run.rows.map((row) => row.balanceCents)).toEqual([1_500n, -500n, -200n]);
+    expect(run.closingCents).toBe(-200n);
+    expect(runLedger("REVENUE", 0n, []).closingCents).toBe(0n);
+    expect(runLedger("REVENUE", 70n, []).closingCents).toBe(70n);
+  });
+  it("closes on the opening balance plus the effect of every line, and a page of lines continues the run of the pages before it", () => {
+    const type = fc.constantFrom<AccountType>("ASSET", "LIABILITY", "EQUITY", "REVENUE", "EXPENSE");
+    const amounts = fc.bigInt({ min: 0n, max: 1_000_000_000n });
+    fc.assert(fc.property(type, fc.bigInt({ min: -1_000_000_000n, max: 1_000_000_000n }), fc.array(fc.tuple(amounts, amounts), { maxLength: 60 }), fc.nat(60), (kind, opening, moves, cut) => {
+      const lines = moves.map(([debit, credit], i) => line(i + 1, debit, credit));
+      const whole = runLedger(kind, opening, lines);
+      expect(whole.closingCents).toBe(opening + lines.reduce((sum, item) => sum + lineEffect(kind, item), 0n));
+      const at = Math.min(cut, lines.length);
+      const first = runLedger(kind, opening, lines.slice(0, at));
+      const second = runLedger(kind, first.closingCents, lines.slice(at));
+      expect([...first.rows, ...second.rows]).toEqual(whole.rows);
+      expect(second.closingCents).toBe(whole.closingCents);
+    }));
+  });
+  const labels: LedgerLabels = { code: "L:code", account: "L:account", date: "L:date", entry: "L:entry", description: "L:description", contact: "L:contact", debit: "L:debit", credit: "L:credit", balance: "L:balance", opening: "L:opening", closing: "L:closing" };
+  it("exports a flat file: the account on every row, an opening row and a closing row with the period's totals", () => {
+    const run = runLedger("ASSET", 10_000n, [line(1, 5_000n, 0n, { memo: "Dépôt", contactName: "Client; Un" }), line(2, 0n, 1_250n, { description: "=Frais", date: "2026-03-11" })]);
+    const csv = ledgerCsv([{ account: { code: "1000", nameFr: "Banque", nameEn: "Bank" }, openingCents: 10_000n, closingCents: run.closingCents, rows: run.rows }], { from: "2026-03-01", to: "2026-03-31" }, "Grand livre", labels, "fr-CA");
+    const lines = csv.split("\r\n");
+    expect(lines[0]).toBe("Grand livre;;;;;;;;");
+    expect(lines[2]).toBe("L:code;L:account;L:date;L:entry;L:description;L:contact;L:debit;L:credit;L:balance");
+    expect(lines[3]).toBe("1000;Banque;2026-03-01;;L:opening;;;;100,00");
+    expect(lines[4]).toBe('1000;Banque;2026-03-10;J-00001;Dépôt;"Client; Un";50,00;0,00;150,00');
+    expect(lines[5]).toBe("1000;Banque;2026-03-11;J-00002;'=Frais;;0,00;12,50;137,50");
+    expect(lines[6]).toBe("1000;Banque;2026-03-31;;L:closing;;50,00;12,50;137,50");
+    expect(csvFormatFor("en").delimiter).toBe(",");
   });
 });

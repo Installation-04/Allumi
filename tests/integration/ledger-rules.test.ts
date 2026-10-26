@@ -1499,36 +1499,38 @@ describe("properties", () => {
 // ---------------------------------------------------------------------------------------------------------
 
 describe("performance", () => {
-  // Timing depends on the runner; the indexes that the checks rely on do not. Without them every deferred check
-  // scans the whole journal and 2000 entries in a transaction become quadratic (the plan asks for indexes that start with company_id).
+  // Check available indexes, not a cost-based plan on a tiny fixture: PostgreSQL may reasonably choose
+  // another index and filter by id. The bulk insert test below separately guards execution performance.
   it("keeps an index for each lookup of the entry checks and of the reports", async () => {
-    const a = `company_id = '${W.companyA}'`;
-    const noId = "00000000-0000-7000-8000-0000000fffff"; // no row has it: only the plan matters
-    const lookups: [what: string, column: string, sql: string][] = [
-      ["lines of an entry", "entry_id", `SELECT * FROM journal_line WHERE ${a} AND entry_id = '${noId}'`],
-      ["an entry by id", "id", `SELECT * FROM journal_entry WHERE ${a} AND id = '${noId}'`],
-      ["an entry by number", "entry_number", `SELECT * FROM journal_entry WHERE ${a} AND entry_number = 1`],
-      ["entries by date", "entry_date", `SELECT * FROM journal_entry WHERE ${a} AND entry_date BETWEEN '2026-01-01' AND '2026-01-31'`],
-      ["the entry that reverses another", "reverses_entry_id", `SELECT * FROM journal_entry WHERE ${a} AND reverses_entry_id = '${noId}'`],
-      ["lines of an account", "account_id", `SELECT * FROM journal_line WHERE ${a} AND account_id = '${W.bank}' AND entry_date BETWEEN '2026-01-01' AND '2026-01-31'`],
-      ["lines of a contact", "contact_id", `SELECT * FROM journal_line WHERE ${a} AND contact_id = '${W.customer}' AND entry_date BETWEEN '2026-01-01' AND '2026-01-31'`],
-      ["lines of a tax", "tax_id", `SELECT * FROM journal_line WHERE ${a} AND tax_id = '${W.gst}' AND entry_date BETWEEN '2026-01-01' AND '2026-01-31'`],
-      ["the period of a date", "start_date", `SELECT * FROM fiscal_period WHERE ${a} AND start_date <= '2026-02-10' AND end_date >= '2026-02-10'`],
+    const lookups = [
+      ["journal_line", "entry_id"],
+      ["journal_entry", "id"],
+      ["journal_entry", "entry_number"],
+      ["journal_entry", "entry_date"],
+      ["journal_entry", "reverses_entry_id"],
+      ["journal_line", "account_id"],
+      ["journal_line", "contact_id"],
+      ["journal_line", "tax_id"],
+      ["fiscal_period", "start_date"],
     ];
-    /** The index conditions of a plan: what the chosen indexes really search on (the rest is filtered afterwards). */
-    const indexConditions = (node: unknown): string[] => {
-      if (Array.isArray(node)) return node.flatMap(indexConditions);
-      if (node && typeof node === "object") return Object.entries(node).flatMap(([key, value]) => (key === "Index Cond" && typeof value === "string" ? [value] : indexConditions(value)));
-      return [];
-    };
-    await inContext(app, asOwnerA, async () => {
-      await app.query("SET LOCAL enable_seqscan = off"); // with no usable index the plan is still a sequential scan
-      for (const [what, column, sql] of lookups) {
-        const { rows } = await app.query(`EXPLAIN (FORMAT JSON) ${sql}`);
-        const searched = indexConditions(rows).some((condition) => new RegExp(`\\b${column}\\b`).test(condition));
-        expect({ what, searchedByIndex: searched }).toEqual({ what, searchedByIndex: true });
-      }
-    });
+    const { rows } = await db.query<{ table_name: string; columns: string[] }>(`
+      SELECT t.relname AS table_name, array_agg(a.attname::text ORDER BY k.ordinality) AS columns
+        FROM pg_index i
+        JOIN pg_class t ON t.oid = i.indrelid
+        JOIN pg_namespace n ON n.oid = t.relnamespace
+        JOIN pg_class idx ON idx.oid = i.indexrelid
+        JOIN pg_am am ON am.oid = idx.relam
+        CROSS JOIN LATERAL unnest(i.indkey) WITH ORDINALITY k(attnum, ordinality)
+        JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = k.attnum
+       WHERE n.nspname = 'public' AND t.relname IN ('journal_entry', 'journal_line', 'fiscal_period')
+         AND i.indisvalid AND i.indisready AND i.indpred IS NULL AND am.amname = 'btree'
+         AND k.ordinality <= i.indnkeyatts
+       GROUP BY t.relname, i.indexrelid
+    `);
+    for (const [table, column] of lookups) {
+      expect(rows.some(row => row.table_name === table && row.columns[0] === "company_id" && row.columns[1] === column),
+        `${table}: usable index starting with company_id, ${column}`).toBe(true);
+    }
   });
 
   it("validates 2000 two-line entries inserted in one transaction without quadratic slowdown", { timeout: 120_000 }, async () => {

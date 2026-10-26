@@ -251,14 +251,26 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await bankImportJourney(page);
   await bankMatchingJourney(page);
   await bankReconciliationJourney(page);
-  await membersJourney(page, browser);
   await financialStatementsJourney(page);
+  await generalLedgerJourney(page);
+  await receivablesAgingJourney(page);
+  await membersJourney(page, browser);
   // Nothing in the whole journey (both locales, every form, the security pages, a second browser) was blocked.
   expect(cspViolations, "Content-Security-Policy violations").toEqual([]);
 });
 
 /** Today in the company's time zone (the application uses America/Toronto), as YYYY-MM-DD. */
 const todayInToronto = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
+
+/**
+ * Two days of the current month that no other journey writes in (they write on the 1st, the 2nd to the 6th and today): the
+ * 20th and the 21st, or the 7th and the 8th when today is later than the 15th. The report journeys put their entries there.
+ */
+const reportDays = (): [string, string] => {
+  const today = todayInToronto();
+  const [first, second] = Number(today.slice(8, 10)) <= 15 ? ["20", "21"] : ["07", "08"];
+  return [`${today.slice(0, 7)}-${first}`, `${today.slice(0, 7)}-${second}`];
+};
 
 /** A link of the company navigation (the dashboard cards carry the same names). */
 const openSection = async (page: Page, name: string) => {
@@ -1595,10 +1607,7 @@ async function bankReconciliationJourney(page: Page) {
  */
 async function financialStatementsJourney(page: Page) {
   const company = new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0] ?? "";
-  // Two days of the current month that no other journey writes in (they write on the first and on today): the 20th and 21st, or the 5th and 6th when today is later than the 15th.
-  const today = todayInToronto();
-  const [first, second] = Number(today.slice(8, 10)) <= 15 ? ["20", "21"] : ["05", "06"];
-  const [from, to] = [`${today.slice(0, 7)}-${first}`, `${today.slice(0, 7)}-${second}`];
+  const [from, to] = reportDays();
   const post = async (date: string, memo: string, debit: string, credit: string, amount: string) => {
     await page.goto(`${company}/journal/nouvelle`);
     await page.getByLabel("Date", { exact: true }).fill(date);
@@ -1684,6 +1693,176 @@ async function financialStatementsJourney(page: Page) {
   await expectNoPageOverflow(page);
   await page.getByRole("button", { name: "Français", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Bilan", exact: true })).toBeVisible();
+}
+
+/**
+ * The general ledger, on the entries the statements journey made: an account with nothing chosen, the ledger of an
+ * account over those two days with its opening and closing balances, the entry linked to the journal, a customer's
+ * name on a receivable line, the CSV of one account and of every account, both languages, and no overflow.
+ */
+async function generalLedgerJourney(page: Page) {
+  const company = new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0] ?? "";
+  const [from, to] = reportDays();
+  const amount = (text: string) => new RegExp(text.replace(/ /g, "\\s").replace(/\$/g, "\\$"));
+
+  // nothing chosen: a hint, and the file of every account is one click away
+  await page.goto(`${company}/grand-livre?${new URLSearchParams({ du: from, au: to })}`);
+  await expect(page.getByRole("heading", { name: "Grand livre", exact: true })).toBeVisible();
+  await expect(page.getByText("Choisissez un compte pour voir son grand livre")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Exporter tous les comptes en CSV", exact: true })).toBeVisible();
+
+  // the interest account: nothing before, one line in the period
+  await page.locator('select[name="compte"]').selectOption({ label: "4910 – Revenus d'intérêts" });
+  await page.getByRole("button", { name: "Afficher", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "4910 – Revenus d'intérêts", exact: true })).toBeVisible();
+  await expect(page.getByText("1 ligne", { exact: true })).toBeVisible();
+  const ledgerRow = (text: string | RegExp) => page.getByRole("row").filter({ hasText: text });
+  await expect(ledgerRow(/^Solde d’ouverture/)).toContainText(amount("0,00 $"));
+  await expect(ledgerRow(/Intérêts reçus/)).toContainText(amount("5,00 $"));
+  await expect(ledgerRow(/^Solde de clôture/)).toContainText(amount("5,00 $"));
+  await expectNoPageOverflow(page);
+  await captureReference(page, "rapport-grand-livre", "Grand livre");
+
+  // the entry of a line is one click away
+  await ledgerRow(/Intérêts reçus/).getByRole("link", { name: /^J-\d{5}$/ }).click();
+  await expect(page.getByRole("heading", { name: /^Écriture J-\d{5}$/ })).toBeVisible();
+  await page.goBack();
+
+  // the files: one account, and every account
+  const one = await page.request.get((await page.getByRole("link", { name: "Exporter ce compte en CSV", exact: true }).getAttribute("href")) ?? "");
+  expect(one.status()).toBe(200);
+  expect(one.headers()["content-disposition"]).toContain(`grand-livre_4910_${from}_${to}.csv`);
+  const oneCsv = await one.text();
+  expect(oneCsv.charCodeAt(0)).toBe(0xfeff);
+  expect(oneCsv).toContain(`\r\n4910;Revenus d'intérêts;${from};;Solde d’ouverture;;;;0,00\r\n`);
+  expect(oneCsv).toMatch(new RegExp(`\\r\\n4910;Revenus d'intérêts;${to};J-\\d{5};Intérêts reçus;;0,00;5,00;5,00\\r\\n`));
+  expect(oneCsv).toContain(`;Solde de clôture;;0,00;5,00;5,00\r\n`);
+  const all = await page.request.get((await page.getByRole("link", { name: "Exporter tous les comptes en CSV", exact: true }).getAttribute("href")) ?? "");
+  expect(all.headers()["content-disposition"]).toContain(`grand-livre_tous-les-comptes_${from}_${to}.csv`);
+  const allCsv = await all.text();
+  expect(allCsv).toContain("\r\n1000;Banque – compte courant;");
+  expect(allCsv).toContain("\r\n4000;Revenus de services;");
+  expect(allCsv).toContain("\r\n6010;Frais bancaires;");
+
+  // a customer's name on a receivable line, over the whole fiscal year
+  await page.getByRole("link", { name: /^\d{4}-\d{2}-\d{2} → \d{4}-\d{2}-\d{2}$/ }).first().click();
+  await expect(page.locator('input[name="du"]')).not.toHaveValue(from); // the page is the fiscal year's before the form is used again
+  await page.locator('select[name="compte"]').selectOption({ label: "1100 – Comptes clients" });
+  await page.getByRole("button", { name: "Afficher", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "1100 – Comptes clients", exact: true })).toBeVisible();
+  await expect(ledgerRow(/Atelier Boréal/).first()).toBeVisible();
+  await expectNoPageOverflow(page);
+
+  // English
+  await page.getByRole("button", { name: "English", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "General ledger", exact: true })).toBeVisible();
+  await expect(ledgerRow(/^Closing balance/)).toBeVisible();
+  await expect(page.getByRole("link", { name: "Export all accounts as CSV", exact: true })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Grand livre", exact: true })).toBeVisible();
+}
+
+/**
+ * The receivables aging, on what the earlier journeys left: invoices F-00001 (241,45 $, voided July 2) and F-00002
+ * (114,98 $) of Atelier Boréal, both posted June 1st and due July 1st, payment E-00001 (50,00 $, June 15), payment
+ * E-00002 (64,98 $, June 20, voided June 25) and credit note AV-00001 (28,74 $, July 1st, voided July 2). The report of
+ * past days gives what it was then: before anything, with nothing due, the day a payment void took effect, the due
+ * date, and the day after, when an invoice and a credit note were voided. Then the details with their links, the CSV
+ * file in both languages, and no overflow.
+ */
+async function receivablesAgingJourney(page: Page) {
+  const company = new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0] ?? "";
+  const row = (label: string | RegExp) => page.getByRole("row").filter({ hasText: label });
+  const figures = async (label: RegExp) => (await row(label).first().locator("td").allTextContents()).map((text) => text.replace(/\s/g, " "));
+  const agrees = page.getByText("Le total concorde avec le solde des comptes clients du grand livre.");
+  const money = (...values: string[]) => values.map((value) => `${value} $`);
+  const zero = "0,00";
+
+  // from the Reports area
+  await openSection(page, "Rapports");
+  await page.getByRole("link", { name: "Âge des comptes clients", exact: true }).first().click();
+  await expect(page.getByRole("heading", { name: "Âge des comptes clients", exact: true })).toBeVisible();
+  await expect(agrees).toBeVisible(); // whatever day it is today, the aging agrees with the ledger
+  await expectNoPageOverflow(page);
+
+  // before anything was posted
+  await page.goto(`${company}/age-clients?au=2026-05-31`);
+  await expect(page.getByText("Soldes au 2026-05-31.")).toBeVisible();
+  await expect(page.getByText("Aucun solde client à cette date.")).toBeVisible();
+  await expect(agrees).toBeVisible();
+
+  // both invoices posted, nothing due yet
+  await page.goto(`${company}/age-clients?au=2026-06-01`);
+  expect(await figures(/^Atelier Boréal/)).toEqual(money("356,43", zero, zero, zero, zero, zero, "356,43"));
+  // the last day before the second payment was voided: only the first invoice is still open
+  await page.goto(`${company}/age-clients?au=2026-06-24`);
+  expect(await figures(/^Atelier Boréal/)).toEqual(money("241,45", zero, zero, zero, zero, zero, "241,45"));
+  // the day it was voided, the invoice it had settled is open again, less the first payment
+  await page.goto(`${company}/age-clients?au=2026-06-25`);
+  expect(await figures(/^Atelier Boréal/)).toEqual(money("306,43", zero, zero, zero, zero, zero, "306,43"));
+  // the due date itself, with the credit note applied that day: due today is zero days late, not yet in a late column
+  await page.goto(`${company}/age-clients?au=2026-07-01`);
+  expect(await figures(/^Atelier Boréal/)).toEqual(money("277,69", zero, zero, zero, zero, zero, "277,69"));
+  await page.locator("summary").filter({ hasText: "Atelier Boréal" }).locator("span").last().click();
+  await expect(row(/F-00001/).getByRole("cell").nth(4)).toHaveText("0");
+  await expect(row(/F-00002/)).toContainText(/36,24\s\$/);
+
+  // the day after: one day late; the first invoice was voided that day and the credit note with it
+  await page.goto(`${company}/age-clients?au=2026-07-02`);
+  expect(await figures(/^Atelier Boréal/)).toEqual(money(zero, "64,98", zero, zero, zero, zero, "64,98"));
+  expect(await figures(/^Total/)).toEqual(money(zero, "64,98", zero, zero, zero, zero, "64,98"));
+  await expect(agrees).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "rapport-age-clients", "Âge des comptes clients");
+
+  // the form moves to another day
+  await page.getByLabel("Au", { exact: true }).fill("2026-06-01");
+  await page.getByRole("button", { name: "Afficher", exact: true }).click();
+  await expect(page.getByText("Soldes au 2026-06-01.")).toBeVisible();
+  expect(await figures(/^Atelier Boréal/)).toEqual(money("356,43", zero, zero, zero, zero, zero, "356,43"));
+  await page.goto(`${company}/age-clients?au=2026-07-02`);
+
+  // the detail of a customer: each open invoice with its dates and days late, linked to the invoice
+  await page.locator("summary").filter({ hasText: "Atelier Boréal" }).locator("span").last().click();
+  await expect(row(/F-00001/)).toHaveCount(0); // voided that day
+  await expect(row(/F-00002/)).toContainText("2026-06-01");
+  await expect(row(/F-00002/)).toContainText("2026-07-01");
+  await expect(row(/F-00002/)).toContainText(/64,98\s\$/);
+  await expect(row(/F-00002/).getByRole("cell").nth(4)).toHaveText("1");
+  await row(/F-00002/).getByRole("link", { name: "F-00002", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "F-00002", exact: true })).toBeVisible();
+  await page.goBack();
+
+  // the file: one row per open invoice, in its column
+  const file = await page.request.get((await page.getByRole("link", { name: "Exporter en CSV", exact: true }).getAttribute("href")) ?? "");
+  expect(file.status()).toBe(200);
+  expect(file.headers()["content-type"]).toContain("text/csv");
+  expect(file.headers()["content-disposition"]).toContain("age-des-comptes-clients_2026-07-02.csv");
+  expect(file.headers()["cache-control"]).toContain("no-store");
+  const csv = await file.text();
+  expect(csv.charCodeAt(0)).toBe(0xfeff);
+  expect(csv).toContain("\r\nClient;Pièce;Numéro;Date;Échéance;Jours de retard;Courant;1–30 jours;31–60 jours;61–90 jours;91 jours et plus;Non appliqué;Total\r\n");
+  expect(csv).toContain("\r\nAtelier Boréal;Facture;F-00002;2026-06-01;2026-07-01;1;0,00;64,98;0,00;0,00;0,00;0,00;64,98\r\n");
+  expect(csv).not.toContain("F-00001");
+  expect(csv).toContain("\r\nTotal;;;;;;0,00;64,98;0,00;0,00;0,00;0,00;64,98\r\n");
+
+  // a bad address falls back to today
+  await page.goto(`${company}/age-clients?au=2026-13-01`);
+  await expect(page.getByText(/^Soldes au \d{4}-\d{2}-\d{2}\.$/)).toBeVisible();
+
+  // English: labels, and a file with commas and points
+  await page.goto(`${company}/age-clients?au=2026-07-02`);
+  await page.getByRole("button", { name: "English", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Receivables aging", exact: true })).toBeVisible();
+  await expect(page.getByText("The total agrees with the balance of the receivable accounts in the general ledger.")).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "91 days and over", exact: true })).toBeVisible();
+  const english = await page.request.get((await page.getByRole("link", { name: "Export as CSV", exact: true }).getAttribute("href")) ?? "");
+  expect(english.headers()["content-disposition"]).toContain("receivables-aging_2026-07-02.csv");
+  expect(await english.text()).toContain("\r\nAtelier Boréal,Invoice,F-00002,2026-06-01,2026-07-01,1,0.00,64.98,0.00,0.00,0.00,0.00,64.98\r\n");
+  await expectNoPageOverflow(page);
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Âge des comptes clients", exact: true })).toBeVisible();
 }
 
 /**

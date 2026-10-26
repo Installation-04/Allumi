@@ -15,7 +15,7 @@ Cette page distingue les parcours livrés du schéma et des fonctionnalités pla
 | Achats | Contraintes de base préparées | Factures fournisseurs et dépenses : phase 4 |
 | Paiements et fichiers | Encaissements de factures : [[Encaissements]] | Remboursements, dépôts, trop-perçus, paiements fournisseurs, pièces jointes : phase 4 |
 | Banque | Import des transactions Stripe et PayPal ([[Integrations]]) et des relevés CSV et OFX ([[Import-de-releves]]) dans les transactions bancaires; appariement à des écritures existantes, écriture créée depuis une ligne et virement entre comptes ([[Appariement-bancaire]]); rapprochement de fin de période ([[Rapprochement-bancaire]]) | Flux bancaires directs, taxes réparties sur une ligne, règles automatiques : phase 5 |
-| Rapports et exports | Balance de vérification, état des résultats et bilan à l’écran avec export CSV ([[Etats-financiers]]); sauvegardes PostgreSQL | Grand livre, âges, sommaire TPS/TVQ, comparaisons et PDF : phase 6 |
+| Rapports et exports | Balance de vérification, état des résultats, bilan ([[Etats-financiers]]), grand livre ([[Grand-livre]]) et âge des comptes clients ([[Age-des-comptes]]) à l’écran avec export CSV; sauvegardes PostgreSQL | Sommaire TPS/TVQ, âge des comptes fournisseurs, comparaisons et PDF : phase 6 |
 | Mobilité | Navigateur connecté au serveur | Hors ligne et application native non livrés |
 
 Les permissions et l’isolation par entreprise sont appliquées côté serveur et en base. La présence de tables pour une fonctionnalité ne signifie pas qu’un utilisateur peut déjà l’utiliser.

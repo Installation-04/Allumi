@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.13
+git checkout v0.4.0-alpha.14
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.13 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.14 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -218,3 +218,8 @@ Profils admin, utilisateur, lecteur et comptable externe, permissions par module
 
 ![État des résultats](docs/images/rapport-resultats-desktop.png)
 ![Bilan sur téléphone](docs/images/rapport-bilan-mobile.png)
+
+Le [grand livre](docs/Grand-livre.md) détaille les mouvements et soldes par compte. L’[âge des comptes clients](docs/Age-des-comptes.md) répartit les soldes dus par retard et les rapproche du grand livre. Les deux offrent un export CSV.
+
+![Grand livre](docs/images/rapport-grand-livre-desktop.png)
+![Âge des comptes clients sur téléphone](docs/images/rapport-age-clients-mobile.png)

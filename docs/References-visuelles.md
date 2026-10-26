@@ -166,8 +166,12 @@ Voir [[Appearance-and-language]] pour le choix de langue et les modes clair, som
 ![Bilan](images/rapport-bilan-desktop.png)
 ![État des résultats sur téléphone](images/rapport-resultats-mobile.png)
 ![Bilan sur téléphone](images/rapport-bilan-mobile.png)
+![Grand livre d’un compte](images/rapport-grand-livre-desktop.png)
+![Grand livre sur téléphone](images/rapport-grand-livre-mobile.png)
+![Âge des comptes clients](images/rapport-age-clients-desktop.png)
+![Âge des comptes clients sur téléphone](images/rapport-age-clients-mobile.png)
 
-Voir [[Etats-financiers]].
+Voir [[Etats-financiers]], [[Grand-livre]] et [[Age-des-comptes]].
 
 ## Taxes et catalogue
 
