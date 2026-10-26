@@ -29,7 +29,7 @@ export default async function IncomeStatementPage({ params, searchParams }: { pa
         <h1 className="text-2xl font-semibold">{t("incomeTitle")}</h1>
         <p className="text-sm text-stone-600 dark:text-stone-400">{t("incomeIntro")}</p>
       </div>
-      <form method="get" className="flex flex-wrap items-end gap-3">
+      <form key={`${from}|${to}`} method="get" className="flex flex-wrap items-end gap-3">
         <label className="text-sm"><span className="mb-1 block font-medium">{t("from")}</span><input type="date" name="du" defaultValue={from} required className={control} /></label>
         <label className="text-sm"><span className="mb-1 block font-medium">{t("to")}</span><input type="date" name="au" defaultValue={to} required className={control} /></label>
         <button type="submit" className={`min-h-11 rounded-md border border-stone-300 px-4 text-sm font-medium hover:bg-stone-100 dark:border-stone-700 dark:hover:bg-stone-800 ${FOCUS}`}>{t("apply")}</button>

@@ -27,7 +27,7 @@ export default async function BalanceSheetPage({ params, searchParams }: { param
         <h1 className="text-2xl font-semibold">{t("balanceTitle")}</h1>
         <p className="text-sm text-stone-600 dark:text-stone-400">{t("balanceIntro")}</p>
       </div>
-      <form method="get" className="flex flex-wrap items-end gap-3">
+      <form key={asOf} method="get" className="flex flex-wrap items-end gap-3">
         <label className="text-sm"><span className="mb-1 block font-medium">{t("asOf")}</span><input type="date" name="au" defaultValue={asOf} required className={control} /></label>
         <button type="submit" className={`min-h-11 rounded-md border border-stone-300 px-4 text-sm font-medium hover:bg-stone-100 dark:border-stone-700 dark:hover:bg-stone-800 ${FOCUS}`}>{t("apply")}</button>
         <a href={`${base}/export?${new URLSearchParams({ au: asOf })}`} className={`inline-flex min-h-11 items-center rounded-md border border-stone-300 px-4 text-sm font-medium hover:bg-stone-100 dark:border-stone-700 dark:hover:bg-stone-800 ${FOCUS}`}>{t("export")}</a>
