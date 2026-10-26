@@ -40,7 +40,7 @@ La référence produit est l’ergonomie familière d’un logiciel de comptabil
 
 Chaque lot doit livrer un parcours réel complet sur ordinateur et téléphone. Pas de boutons factices ni de montants de démonstration dans les écrans de production. La validation comprend lint, types, tests métier et d’isolation, parcours navigateur, documentation et CI Docker verte.
 
-Les phases 5 (imports et rapprochement), 6 (rapports et exports) et 7 (bêta) suivent ces lots. Avant la bêta, vérifier aussi les parcours d’administration prévus mais non encore livrés : invitations, gestion multi-entreprise et récupération de mot de passe; compléter les essais sur appareils physiques et Safari iOS. Le schéma existant ne constitue pas à lui seul une fonctionnalité livrée.
+Les phases 5 (imports et rapprochement), 6 (rapports et exports) et 7 (bêta) suivent ces lots. Les invitations, permissions modulaires et la récupération de mot de passe sont disponibles. Avant la bêta, compléter les essais d’administration multi-entreprise sur appareils physiques et Safari iOS. Le schéma existant ne constitue pas à lui seul une fonctionnalité livrée.
 
 Lot 4.1 : implémentation intégrée à `main`, guide [[Contacts]].
 

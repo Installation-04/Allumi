@@ -23,7 +23,7 @@ export async function generateMetadata() {
 
 export default async function TransactionPage({ params, searchParams }: { params: Promise<{ companyId: string; transactionId: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { transactionId } = await params;
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "bank.read");
   if (!UUID.test(transactionId)) notFound();
   const transaction = await getBankTransaction(actor, transactionId);
   if (!transaction) notFound();
@@ -33,8 +33,8 @@ export default async function TransactionPage({ params, searchParams }: { params
   const t = await getTranslations("transactionDetail");
   const ts = await getTranslations("transactions");
   const base = `/c/${company.id}/transactions`;
-  const canManage = can(company.role, "bank.manage");
-  const canPost = can(company.role, "entry.post");
+  const canManage = can(company, "bank.manage");
+  const canPost = can(company, "entry.post");
   const waiting = transaction.status === "UNMATCHED";
   const money = (cents: bigint) => `${formatMoney(cents, locale)}${transaction.currency === "CAD" ? "" : ` ${transaction.currency}`}`;
   const inflow = transaction.amountCents > 0n;

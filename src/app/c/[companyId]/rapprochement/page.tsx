@@ -13,10 +13,10 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata() { return { title: (await getTranslations("reconciliation"))("title") }; }
 
 export default async function ReconciliationPage({ params }: { params: Promise<{ companyId: string }> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "bank.read");
   const t = await getTranslations("reconciliation");
   const accounts = await listAccountReconciliations(actor);
-  const canManage = can(company.role, "bank.manage");
+  const canManage = can(company, "bank.manage");
   const base = `/c/${company.id}/rapprochement`;
   const link = `inline-flex min-h-11 items-center rounded px-1 underline ${FOCUS}`;
   const history = new Map(await Promise.all(accounts.map(async (account) => [account.accountId, await listReconciliations(actor, account.accountId)] as const)));

@@ -1676,7 +1676,7 @@ async function membersJourney(page: Page, browser: Browser) {
   await invite.getByText("Permissions par module", { exact: true }).click();
   await invite.getByLabel("Contacts", { exact: true }).selectOption("read");
   await expectNoPageOverflow(page);
-  await captureReference(page, "utilisateurs-permissions");
+  await captureReference(page, "utilisateurs-permissions", "Inviter un utilisateur");
   await invite.getByRole("button", { name: "Inviter un utilisateur", exact: true }).click();
   const code = await page.getByTestId("invitation-code").textContent();
   expect(code).toMatch(/^[A-Za-z0-9_-]{43}$/);

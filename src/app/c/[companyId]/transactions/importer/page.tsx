@@ -10,8 +10,8 @@ import { ImportForm } from "./import-form";
 export async function generateMetadata() { return { title: (await getTranslations("banking"))("title") }; }
 
 export default async function ImportPage({ params }: { params: Promise<{ companyId: string }> }) {
-  const { company, actor, locale } = await loadCompany(params);
-  if (!can(company.role, "bank.manage")) notFound();
+  const { company, actor, locale } = await loadCompany(params, "bank.read");
+  if (!can(company, "bank.manage")) notFound();
   const t = await getTranslations("banking");
   const [accounts, recent] = await Promise.all([listBankAccounts(actor), listImports(actor)]);
   const saved = Object.fromEntries(await Promise.all(accounts.map(async (account) => [account.id, await getSavedMapping(actor, account.id)] as const)));

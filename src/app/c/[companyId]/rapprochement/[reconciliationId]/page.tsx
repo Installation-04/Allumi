@@ -20,14 +20,14 @@ const label = (line: WorksheetLine) => [line.entryLabel, line.entryDate, line.me
 
 export default async function WorksheetPage({ params }: { params: Promise<{ companyId: string; reconciliationId: string }> }) {
   const { reconciliationId } = await params;
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "bank.read");
   if (!UUID.test(reconciliationId)) notFound();
   const sheet = await getWorksheet(actor, reconciliationId);
   if (!sheet) notFound();
   const t = await getTranslations("reconciliation");
   const rec = sheet.reconciliation;
   const base = `/c/${company.id}/rapprochement`;
-  const canManage = can(company.role, "bank.manage");
+  const canManage = can(company, "bank.manage");
   const inProgress = rec.status === "IN_PROGRESS";
   const sign = BigInt(rec.sign);
   const difference = sheet.statementLedgerCents - sheet.previousCents - sheet.clearedCents; // as saved, in ledger terms
