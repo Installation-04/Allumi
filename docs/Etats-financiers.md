@@ -2,7 +2,7 @@
 
 Deux rapports calculés **à chaque ouverture** depuis le journal, sans copie ni cache : ils reflètent toujours les écritures validées. Tous les membres de l'entreprise qui peuvent lire le journal (propriétaires, comptables, lecture seule) les consultent et les exportent. Ils se trouvent sous **Rapports** (et sous **Comptabilité**) : `/c/<entreprise>/resultats` et `/c/<entreprise>/bilan`.
 
-Ils s'ajoutent à la **balance de vérification** ([[Journal-et-ecritures]]). Le grand livre, l'âge des comptes, le sommaire des taxes et les PDF suivent ([[Feuille-de-route]]).
+Ils s'ajoutent à la **balance de vérification** ([[Journal-et-ecritures]]). Le grand livre ([[Grand-livre]]) et l'âge des comptes clients ([[Age-des-comptes]]) sont disponibles; le sommaire des taxes et les PDF suivent ([[Feuille-de-route]]).
 
 ## État des résultats
 
