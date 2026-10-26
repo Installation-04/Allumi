@@ -3,7 +3,7 @@ import { sessionCookieName } from "@/app/_lib/cookie-name";
 import { contentSecurityPolicy, newNonce } from "@/platform/csp";
 
 // Paths reachable without a session cookie. The real check (database lookup) happens in the pages.
-const PUBLIC_PREFIXES = ["/connexion", "/setup", "/api/health", "/manifest.webmanifest"];
+const PUBLIC_PREFIXES = ["/invitation", "/connexion", "/setup", "/api/health", "/manifest.webmanifest"];
 
 export function proxy(request: NextRequest) {
   const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();

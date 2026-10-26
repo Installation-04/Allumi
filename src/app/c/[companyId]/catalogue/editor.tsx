@@ -14,7 +14,7 @@ export async function ItemEditor({ params, id }: { params: Promise<{ companyId: 
   const t = await getTranslations("catalog");
   const item = id ? await getItem(actor, id) : null;
   if (id && !item) notFound();
-  const manage = can(company.role, "catalog.manage");
+  const manage = can(company, "catalog.manage");
   if (!manage && !item) notFound();
   const accounts = await listAccounts(actor, { includeInactive: true });
   const { codes } = await getTaxConfiguration(actor);

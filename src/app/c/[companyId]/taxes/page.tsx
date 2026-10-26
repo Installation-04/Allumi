@@ -8,11 +8,11 @@ import { TaxPreview } from "./preview";
 import { configureAction, archiveAction } from "./actions";
 
 export default async function TaxesPage({ params }: { params: Promise<{ companyId: string }> }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "taxes.read");
   const t = await getTranslations("catalog");
   const { taxes, codes } = await getTaxConfiguration(actor);
   const accounts = await listAccounts(actor);
-  const manage = can(company.role, "catalog.manage");
+  const manage = can(company, "taxes.manage");
   const none = { value: "", label: t("none") };
   const taxOptions = [none, ...taxes.filter((tax) => tax.isActive).map((tax) => ({ value: tax.id, label: `${tax.code} — ${locale === "en" ? tax.nameEn : tax.nameFr}` }))];
   const accountOptions = (type: "ASSET" | "LIABILITY") => [none, ...accounts.filter((a) => a.subtype === "SALES_TAX" && a.type === type).map((a) => ({ value: a.id, label: `${a.code} — ${accountName(a, locale)}` }))];

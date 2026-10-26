@@ -16,7 +16,7 @@ export default async function VersionsPage() {
   let unavailable = false;
   try { release = await latestRelease(); } catch { unavailable = true; }
   const newer = release && compareVersions(release.tag, current) > 0;
-  const status = profile?.isInstanceAdmin ? await updateStatus() : "disabled";
+  const status = (profile?.isInstanceAdmin || profile?.canManageServer) ? await updateStatus() : "disabled";
   return <section className="mx-auto max-w-2xl space-y-5 p-4">
     <Link className="inline-flex min-h-11 items-center underline" href="/">{t("back")}</Link>
     <h1 className="text-2xl font-semibold">{t("title")}</h1>
@@ -24,7 +24,7 @@ export default async function VersionsPage() {
     <p>{t("web")}</p>
     <p role="status">{unavailable ? t("unavailable") : release ? t(newer ? "available" : "upToDate", { version: release.tag }) : t("noRelease")}</p>
     <Link className="inline-flex min-h-11 items-center underline" href={release?.url ?? "https://github.com/Installation-04/Allumi/releases"}>{t("downloads")}</Link>
-    {profile?.isInstanceAdmin && <div className="space-y-4 rounded-lg border border-stone-200 p-5 dark:border-stone-700">
+    {(profile?.isInstanceAdmin || profile?.canManageServer) && <div className="space-y-4 rounded-lg border border-stone-200 p-5 dark:border-stone-700">
       <h2 className="font-semibold">{t("server")}</h2><p>{t(`status.${status as "disabled" | "pending" | "running" | "success" | "failed" | "ready"}`)}</p>
       {newer && release && status !== "disabled" && status !== "pending" && status !== "running" && <ActionForm action={updateServerAction} label={t("install")}>
         <input type="hidden" name="target" value={release.tag} />

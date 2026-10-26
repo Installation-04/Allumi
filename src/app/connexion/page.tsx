@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Card } from "@/app/_components/ui";
@@ -19,6 +20,7 @@ export default async function LoginPage() {
   return (
     <Card title={t("title")}>
       <LoginForm />
+      <Link href="/invitation" className="inline-flex min-h-11 items-center underline">{(await getTranslations("members"))("join")}</Link>
     </Card>
   );
 }

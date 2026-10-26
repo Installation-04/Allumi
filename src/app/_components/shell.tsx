@@ -1,3 +1,4 @@
+import { getProfile } from "@/modules/auth";
 import { cookies } from "next/headers";
 import { isTheme } from "@/app/_lib/theme";
 import { ThemePicker } from "./theme-picker";
@@ -15,6 +16,7 @@ export async function Header({ global = false, companyName }: { global?: boolean
   const locale = await getLocale();
   const session = await getSession();
   const preference = (await cookies()).get("allumi_theme")?.value;
+  const profile = session && !session.mfaPending ? await getProfile(session.userId) : null;
   return (
     <header className={`${global ? "global-header" : "workspace-header"} border-b border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900`}>
       <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-1 sm:px-6">
@@ -25,6 +27,7 @@ export async function Header({ global = false, companyName }: { global?: boolean
         </Link>
         )}
         <div className="flex flex-wrap items-center gap-3 text-sm">
+        {(profile?.isInstanceAdmin || profile?.canManageServer) && <Link href="/administration/serveur" className={`inline-flex min-h-11 items-center underline ${FOCUS}`}>{(await getTranslations("server"))("shortTitle")}</Link>}
         <nav aria-label={t("language")} className="flex items-center gap-3">
           {(["fr-CA", "en"] as const).map((code) => (
             <form key={code} action={setLocale.bind(null, code)}>

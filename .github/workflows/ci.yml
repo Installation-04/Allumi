@@ -31,6 +31,7 @@ jobs:
       - name: Scripts shell
         run: |
           bash -n scripts/*.sh
+          python3 scripts/test-server-admin-agent.py
           python3 scripts/test-update-agent.py
           python3 scripts/test-install-docker.py
           python3 scripts/test-get.py
@@ -119,6 +120,14 @@ jobs:
           docker compose port app 3000 | grep -Fx '127.0.0.1:28080'
           docker inspect "$(docker compose ps -q db)" --format '{{json .NetworkSettings.Ports}}' | jq -e 'to_entries | all(.value == null or .value == [])'
           docker compose config --format json | jq -e '.services | keys == ["app", "db", "migrate"]'
+      - name: Agent serveur et sauvegarde réelle
+        run: |
+          sudo ./scripts/enable-server-admin.sh
+          sudo systemctl stop allumi-server-admin.timer
+          docker compose exec -T app node -e "require('node:fs').writeFileSync('/app/storage/server-control/request.json', JSON.stringify({operation:'backup',actor:'00000000-0000-4000-8000-000000000001',requestedAt:new Date().toISOString()}), {mode:0o600,flag:'wx'})"
+          sudo systemctl start allumi-server-admin.service
+          docker compose exec -T app node -e "const s=JSON.parse(require('node:fs').readFileSync('/app/storage/server-control/snapshot.json')); if(!s.backups.length || s.events.at(-1)?.state !== 'success') process.exit(1)"
+          sudo systemctl disable allumi-server-admin.timer
       - name: Journaux en cas d'échec
         if: failure()
         run: docker compose logs migrate app

@@ -44,6 +44,7 @@ enum MemberRole {
   OWNER
   ACCOUNTANT
   READ_ONLY
+  USER
 
   @@map("member_role")
 }
@@ -248,6 +249,32 @@ enum BankTransactionStatus {
   @@map("bank_transaction_status")
 }
 
+/// Services externes dont on importe les transactions.
+enum IntegrationProvider {
+  STRIPE
+  PAYPAL
+
+  @@map("integration_provider")
+}
+
+enum IntegrationStatus {
+  ACTIVE
+  DISABLED
+
+  @@map("integration_status")
+}
+
+/// Lien de paiement en ligne d'une facture validée, hébergé par le service (Stripe).
+enum PaymentLinkStatus {
+  PENDING
+  ACTIVE
+  PAID
+  REVIEW
+  CANCELLED
+
+  @@map("payment_link_status")
+}
+
 enum ReconciliationStatus {
   IN_PROGRESS
   COMPLETED
@@ -282,6 +309,7 @@ model User {
   /// Administrateur de l'instance : crée des entreprises, désactive des comptes, réinitialise la 2FA.
   /// Le propriétaire créé par /setup l'est; il en reste toujours au moins un actif (trigger).
   isInstanceAdmin Boolean   @default(false) @map("is_instance_admin")
+  canManageServer Boolean   @default(false) @map("can_manage_server")
   /// Un utilisateur n'est jamais supprimé : il est désactivé.
   disabledAt      DateTime? @map("disabled_at") @db.Timestamptz(6)
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -404,23 +432,26 @@ model Company {
   createdAt            DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt            DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  memberships       Membership[]
-  invitations       Invitation[]
-  numberSequences   NumberSequence[]
-  fiscalYears       FiscalYear[]
-  accounts          Account[]
-  journalEntries    JournalEntry[]
-  contacts          Contact[]
-  items             Item[]
-  taxes             Tax[]
-  taxCodes          TaxCode[]
-  salesDocuments    SalesDocument[]
-  purchaseDocuments PurchaseDocument[]
-  payments          Payment[]
-  bankDeposits      BankDeposit[]
-  taxReturns        TaxReturn[]
-  attachments       Attachment[]
-  auditLogs         AuditLog[]
+  memberships            Membership[]
+  invitations            Invitation[]
+  numberSequences        NumberSequence[]
+  fiscalYears            FiscalYear[]
+  accounts               Account[]
+  journalEntries         JournalEntry[]
+  contacts               Contact[]
+  items                  Item[]
+  taxes                  Tax[]
+  taxCodes               TaxCode[]
+  salesDocuments         SalesDocument[]
+  purchaseDocuments      PurchaseDocument[]
+  payments               Payment[]
+  bankDeposits           BankDeposit[]
+  integrationConnections IntegrationConnection[]
+  paymentLinks           PaymentLink[]
+  onlinePayments         OnlinePayment[]
+  taxReturns             TaxReturn[]
+  attachments            Attachment[]
+  auditLogs              AuditLog[]
 
   @@map("company")
 }
@@ -430,6 +461,7 @@ model Membership {
   companyId String     @map("company_id") @db.Uuid
   userId    String     @map("user_id") @db.Uuid
   role      MemberRole
+  moduleAccess Json @default("{}") @map("module_access")
   createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -446,6 +478,7 @@ model Invitation {
   companyId   String     @map("company_id") @db.Uuid
   email       String
   role        MemberRole
+  moduleAccess Json @default("{}") @map("module_access")
   /// SHA-256 (hex) du jeton envoyé par courriel.
   tokenHash   String     @unique @map("token_hash") @db.Char(64)
   expiresAt   DateTime   @map("expires_at") @db.Timestamptz(6)
@@ -538,20 +571,22 @@ model Account {
   parent   Account?  @relation("AccountHierarchy", fields: [companyId, parentId], references: [companyId, id], onDelete: Restrict)
   children Account[] @relation("AccountHierarchy")
 
-  journalLines          JournalLine[]
-  itemsIncome           Item[]                 @relation("ItemIncomeAccount")
-  itemsExpense          Item[]                 @relation("ItemExpenseAccount")
-  taxesPayable          Tax[]                  @relation("TaxPayableAccount")
-  taxesRecoverable      Tax[]                  @relation("TaxRecoverableAccount")
-  salesLines            SalesDocumentLine[]
-  purchaseLines         PurchaseDocumentLine[]
-  purchaseDocumentsPaid PurchaseDocument[]     @relation("PurchasePaymentAccount")
-  payments              Payment[]
-  bankDeposits          BankDeposit[]
-  bankProfile           BankAccountProfile?
-  bankImports           BankImport[]
-  bankTransactions      BankTransaction[]
-  reconciliations       BankReconciliation[]
+  journalLines           JournalLine[]
+  itemsIncome            Item[]                  @relation("ItemIncomeAccount")
+  itemsExpense           Item[]                  @relation("ItemExpenseAccount")
+  taxesPayable           Tax[]                   @relation("TaxPayableAccount")
+  taxesRecoverable       Tax[]                   @relation("TaxRecoverableAccount")
+  salesLines             SalesDocumentLine[]
+  purchaseLines          PurchaseDocumentLine[]
+  purchaseDocumentsPaid  PurchaseDocument[]      @relation("PurchasePaymentAccount")
+  payments               Payment[]
+  bankDeposits           BankDeposit[]
+  bankProfile            BankAccountProfile?
+  bankImports            BankImport[]
+  bankTransactions       BankTransaction[]
+  integrationConnections IntegrationConnection[] @relation("ConnectionAccount")
+  feeConnections         IntegrationConnection[] @relation("ConnectionFeeAccount")
+  reconciliations        BankReconciliation[]
 
   @@unique([companyId, id])
   @@unique([companyId, code])
@@ -590,6 +625,7 @@ model JournalEntry {
   purchaseDocumentPosted PurchaseDocument? @relation("PurchaseDocumentPosting")
   purchaseDocumentVoided PurchaseDocument? @relation("PurchaseDocumentVoid")
   paymentPosted          Payment?          @relation("PaymentPosting")
+  onlinePaymentFees      OnlinePayment[]   @relation("OnlinePaymentFee")
   paymentVoided          Payment?          @relation("PaymentVoid")
   depositPosted          BankDeposit?      @relation("DepositPosting")
   depositVoided          BankDeposit?      @relation("DepositVoid")
@@ -850,6 +886,7 @@ model SalesDocument {
   lines           SalesDocumentLine[]
   taxes           SalesDocumentTax[]
   allocations     PaymentAllocation[]
+  paymentLinks    PaymentLink[]
   creditsApplied  SalesCreditApplication[] @relation("CreditNoteApplied")
   creditsReceived SalesCreditApplication[] @relation("InvoiceCredited")
   attachmentLinks AttachmentLink[]
@@ -1053,6 +1090,7 @@ model Payment {
   offsetsAsSent     PaymentOffset[]     @relation("OffsetSent")
   depositItems      BankDepositItem[]
   attachmentLinks   AttachmentLink[]
+  onlinePayment     OnlinePayment?
 
   @@unique([companyId, id])
   @@unique([companyId, direction, number])
@@ -1280,31 +1318,44 @@ model BankImport {
 
 /// amount_cents signé du point de vue du relevé : + dépôt, − retrait.
 model BankTransaction {
-  id          String                @id @default(uuid(7)) @db.Uuid
-  companyId   String                @map("company_id") @db.Uuid
-  accountId   String                @map("account_id") @db.Uuid
-  importId    String?               @map("import_id") @db.Uuid
-  txnDate     DateTime              @map("txn_date") @db.Date
-  amountCents BigInt                @map("amount_cents")
-  description String
-  payee       String?
+  id              String                @id @default(uuid(7)) @db.Uuid
+  companyId       String                @map("company_id") @db.Uuid
+  accountId       String                @map("account_id") @db.Uuid
+  importId        String?               @map("import_id") @db.Uuid
+  txnDate         DateTime              @map("txn_date") @db.Date
+  amountCents     BigInt                @map("amount_cents")
+  description     String
+  payee           String?
   /// Identifiant OFX (FITID) lorsqu'il existe.
-  externalId  String?               @map("external_id")
+  externalId      String?               @map("external_id")
   /// Empreinte (date, montant, description normalisée, rang d'occurrence) pour les CSV.
-  dedupeKey   String                @map("dedupe_key")
-  status      BankTransactionStatus @default(UNMATCHED)
-  createdAt   DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime              @updatedAt @map("updated_at") @db.Timestamptz(6)
+  dedupeKey       String                @map("dedupe_key")
+  status          BankTransactionStatus @default(UNMATCHED)
+  /// Transaction importée d'un service externe (Stripe, PayPal...) : sa connexion et son type d'origine vont ensemble.
+  connectionId    String?               @map("connection_id") @db.Uuid
+  /// Devise de la transaction. Le montant est exprimé dans cette devise; le rapprochement ne mélange pas les devises.
+  currency        String                @default("CAD") @db.Char(3)
+  /// Type chez le service (charge, payout, T0006...).
+  sourceType      String?               @map("source_type")
+  /// Montant brut et frais prélevés d'une transaction importée : montant (net) = brut − frais. Les frais sont négatifs quand ils sont remboursés.
+  grossCents      BigInt?               @map("gross_cents")
+  feeCents        BigInt?               @map("fee_cents")
+  /// Valeurs d'origine du service (sans renseignement personnel), pour vérifier ou recalculer.
+  providerDetails Json?                 @map("provider_details")
+  createdAt       DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime              @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  account Account     @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict)
-  import  BankImport? @relation(fields: [companyId, importId], references: [companyId, id], onDelete: Restrict)
-  matches BankMatch[]
+  account    Account                @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict)
+  import     BankImport?            @relation(fields: [companyId, importId], references: [companyId, id], onDelete: Restrict)
+  connection IntegrationConnection? @relation(fields: [companyId, connectionId], references: [companyId, id], onDelete: Restrict)
+  matches    BankMatch[]
 
   @@unique([companyId, id])
   @@unique([accountId, externalId])
   @@unique([accountId, dedupeKey])
   @@index([companyId, accountId, txnDate])
   @@index([companyId, status])
+  @@index([companyId, connectionId])
   @@map("bank_transaction")
 }
 
@@ -1322,6 +1373,134 @@ model BankMatch {
   @@unique([companyId, journalLineId])
   @@index([companyId, bankTransactionId])
   @@map("bank_match")
+}
+
+/// Connexion à un service externe (Stripe, PayPal...) dont les transactions sont importées dans un compte de banque
+/// du grand livre. Jamais supprimée : on la désactive. Réservée au propriétaire en écriture; les secrets sont
+/// dans `integration_credential`, que seul le propriétaire peut lire.
+model IntegrationConnection {
+  id                String              @id @default(uuid(7)) @db.Uuid
+  companyId         String              @map("company_id") @db.Uuid
+  provider          IntegrationProvider
+  label             String
+  /// Compte de banque du grand livre dont le service tient le solde.
+  accountId         String              @map("account_id") @db.Uuid
+  /// Compte de charges où vont les frais de traitement des paiements en ligne (obligatoire pour créer des liens de paiement).
+  feeAccountId      String?             @map("fee_account_id") @db.Uuid
+  status            IntegrationStatus   @default(ACTIVE)
+  /// Environnement de test du service (clés de test, bac à sable) : fixé à la création.
+  sandbox           Boolean             @default(false)
+  /// Fin de la clé ou de l'identifiant, pour la reconnaître à l'écran (jamais le secret).
+  credentialsHint   String?             @map("credentials_hint")
+  /// Premier jour importé.
+  importFrom        DateTime            @map("import_from") @db.Date
+  /// Tout ce qui précède est déjà importé (avec un chevauchement : l'import est idempotent).
+  syncCursor        DateTime?           @map("sync_cursor") @db.Timestamptz(6)
+  lastSyncedAt      DateTime?           @map("last_synced_at") @db.Timestamptz(6)
+  lastSyncOk        Boolean?            @map("last_sync_ok")
+  /// Code d'erreur seulement, jamais le texte renvoyé par le service.
+  lastError         String?             @map("last_error")
+  lastImportedCount Int?                @map("last_imported_count")
+  /// Verrou : une seule synchronisation à la fois par connexion.
+  syncingSince      DateTime?           @map("syncing_since") @db.Timestamptz(6)
+  createdById       String              @map("created_by_id") @db.Uuid
+  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  company      Company                @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  account      Account                @relation("ConnectionAccount", fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict)
+  feeAccount   Account?               @relation("ConnectionFeeAccount", fields: [companyId, feeAccountId], references: [companyId, id], onDelete: Restrict)
+  credential   IntegrationCredential?
+  transactions BankTransaction[]
+  paymentLinks PaymentLink[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, provider, label])
+  @@index([companyId, accountId])
+  @@map("integration_connection")
+}
+
+/// Lien de paiement en ligne d'une facture validée : une page de paiement hébergée par le service (Stripe), pour le
+/// solde de la facture au moment de la création. Jamais supprimé. Créé par le propriétaire (qui détient les clés);
+/// visible de tous les membres. `PENDING` : créé ici, pas encore chez le service; `ACTIVE` : payable; `PAID` : payé et
+/// enregistré; `REVIEW` : un paiement est arrivé mais ne peut pas être appliqué (la raison est un code); `CANCELLED`.
+model PaymentLink {
+  id              String            @id @default(uuid(7)) @db.Uuid
+  companyId       String            @map("company_id") @db.Uuid
+  invoiceId       String            @map("invoice_id") @db.Uuid
+  connectionId    String            @map("connection_id") @db.Uuid
+  status          PaymentLinkStatus @default(PENDING)
+  /// Solde de la facture à la création : le montant que le client paie.
+  amountCents     BigInt            @map("amount_cents")
+  currency        String            @default("CAD") @db.Char(3)
+  externalPriceId String?           @map("external_price_id")
+  /// Identifiant du lien chez le service (plink_...).
+  externalId      String?           @map("external_id")
+  url             String?
+  /// Codes seulement, jamais le texte du service.
+  lastError       String?           @map("last_error")
+  reviewReason    String?           @map("review_reason")
+  createdById     String            @map("created_by_id") @db.Uuid
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  company       Company               @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  invoice       SalesDocument         @relation(fields: [companyId, invoiceId], references: [companyId, id], onDelete: Restrict)
+  connection    IntegrationConnection @relation(fields: [companyId, connectionId], references: [companyId, id], onDelete: Restrict)
+  onlinePayment OnlinePayment?
+
+  @@unique([companyId, id])
+  @@unique([connectionId, externalId])
+  @@unique([companyId, invoiceId], map: "payment_link_one_live_per_invoice", where: raw("status = 'PENDING' OR status = 'ACTIVE'"))
+  @@index([companyId, invoiceId])
+  @@index([companyId, status])
+  @@map("payment_link")
+}
+
+/// Un paiement reçu par un lien : la session de paiement du service, l'encaissement qu'elle a créé et l'écriture des
+/// frais. Ajout seulement, une fois par lien et par session.
+model OnlinePayment {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  companyId   String   @map("company_id") @db.Uuid
+  linkId      String   @map("link_id") @db.Uuid
+  /// Session de paiement chez le service (cs_...).
+  providerRef String   @map("provider_ref")
+  paymentId   String   @map("payment_id") @db.Uuid
+  /// Écriture des frais de traitement (absente quand il n'y en a pas).
+  feeEntryId  String?  @map("fee_entry_id") @db.Uuid
+  grossCents  BigInt   @map("gross_cents")
+  feeCents    BigInt   @map("fee_cents")
+  netCents    BigInt   @map("net_cents")
+  currency    String   @db.Char(3)
+  paidAt      DateTime @map("paid_at") @db.Timestamptz(6)
+  createdById String   @map("created_by_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  company  Company       @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  link     PaymentLink   @relation(fields: [companyId, linkId], references: [companyId, id], onDelete: Restrict)
+  payment  Payment       @relation(fields: [companyId, paymentId], references: [companyId, id], onDelete: Restrict)
+  feeEntry JournalEntry? @relation("OnlinePaymentFee", fields: [companyId, feeEntryId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([companyId, id])
+  @@unique([companyId, linkId])
+  @@unique([companyId, providerRef])
+  @@unique([companyId, paymentId])
+  @@map("online_payment")
+}
+
+/// Identifiants chiffrés d'une connexion (clé d'API, secret client). Lisibles par le propriétaire seulement; jamais
+/// copiés dans la piste d'audit. Nuls quand la connexion est désactivée.
+model IntegrationCredential {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  companyId      String   @map("company_id") @db.Uuid
+  connectionId   String   @map("connection_id") @db.Uuid
+  credentialsEnc Bytes?   @map("credentials_enc")
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  connection IntegrationConnection @relation(fields: [companyId, connectionId], references: [companyId, id], onDelete: Restrict)
+
+  @@unique([companyId, connectionId])
+  @@map("integration_credential")
 }
 
 model BankReconciliation {
