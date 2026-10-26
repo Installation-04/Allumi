@@ -160,6 +160,19 @@ Captures du serveur de test : l’agent hôte est désactivé et la consultation
 
 Voir [[Appearance-and-language]] pour le choix de langue et les modes clair, sombre et système.
 
+## États financiers
+
+![État des résultats](images/rapport-resultats-desktop.png)
+![Bilan](images/rapport-bilan-desktop.png)
+![État des résultats sur téléphone](images/rapport-resultats-mobile.png)
+![Bilan sur téléphone](images/rapport-bilan-mobile.png)
+![Grand livre d’un compte](images/rapport-grand-livre-desktop.png)
+![Grand livre sur téléphone](images/rapport-grand-livre-mobile.png)
+![Âge des comptes clients](images/rapport-age-clients-desktop.png)
+![Âge des comptes clients sur téléphone](images/rapport-age-clients-mobile.png)
+
+Voir [[Etats-financiers]], [[Grand-livre]] et [[Age-des-comptes]].
+
 ## Taxes et catalogue
 
 ![Taxes ordinateur](images/taxes-desktop.png)

@@ -63,3 +63,8 @@
 - [[Rapprochement-bancaire]]
 - [[Utilisateurs-et-permissions]]
 - [[Administration-serveur]]
+
+- [[Etats-financiers]]
+
+- [[Grand-livre]]
+- [[Age-des-comptes]]
