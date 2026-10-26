@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import type pg from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createFiscalYear, postManualEntry } from "@/modules/ledger";
-import { getBalanceSheet, getIncomeStatement } from "@/modules/reports";
+import { createFiscalYear, postManualEntry, reverseEntry } from "@/modules/ledger";
+import { getAccountLedger, getBalanceSheet, getIncomeStatement, getLedgerExport, LEDGER_PAGE_SIZE } from "@/modules/reports";
 import { AppError } from "@/platform/errors";
 import type { CompanyContext } from "@/platform/tenant";
 import { owner } from "./helpers";
@@ -31,6 +31,8 @@ beforeAll(async () => {
   extra.otherRevenue = await add(W.companyA, "4900", "Intérêts reçus", "Interest received", "REVENUE", "OTHER_REVENUE");
   extra.otherExpense = await add(W.companyA, "7000", "Intérêts payés", "Interest paid", "EXPENSE", "OTHER_EXPENSE");
   extra.salesB = await add(W.companyB, "4000", "Ventes B", "Sales B", "REVENUE", "OPERATING_REVENUE");
+  extra.pager = await add(W.companyA, "1800", "Compte long", "Long account", "ASSET", "CURRENT_ASSET");
+  extra.idle = await add(W.companyA, "1900", "Compte inactif", "Idle account", "ASSET", "CURRENT_ASSET");
 });
 afterAll(async () => { await db?.end(); });
 
@@ -141,5 +143,147 @@ describe("the balance sheet", () => {
     expect(await refusal(getBalanceSheet(intruder, "2026-03-31"))).toBe("forbidden");
     expect((await getBalanceSheet(reader, "2026-03-31")).sheet.balanced).toBe(true);
     expect((await getBalanceSheet(otherOwner, "2026-03-31")).sheet.totalAssetsCents).toBe(999_999n);
+  });
+});
+
+describe("the ledger of an account", () => {
+  const march = { from: "2026-03-01", to: "2026-03-31" };
+
+  it("shows the balance at the start, each line in date order with the balance after it, and the balance at the end", async () => {
+    const ledger = await getAccountLedger(actor, { accountId: W.bank, ...march });
+    expect(ledger.account).toMatchObject({ code: "1000", type: "ASSET" });
+    expect(ledger.openingCents).toBe(5_400_000n); // the capital, the loan and the equipment of January
+    // by date first: the sale of the 31st was posted before the expense of the 15th, and comes last
+    expect(ledger.rows.map((row) => [row.date, row.debitCents, row.creditCents, row.balanceCents])).toEqual([
+      ["2026-03-10", 100_000n, 0n, 5_500_000n],
+      ["2026-03-15", 0n, 30_000n, 5_470_000n],
+      ["2026-03-20", 0n, 20_000n, 5_450_000n],
+      ["2026-03-25", 500n, 0n, 5_450_500n],
+      ["2026-03-26", 0n, 200n, 5_450_300n],
+      ["2026-03-31", 20_000n, 0n, 5_470_300n],
+    ]);
+    expect(ledger).toMatchObject({ closingCents: 5_470_300n, debitCents: 120_500n, creditCents: 50_200n, lineCount: 6, page: 1, pageCount: 1 });
+    expect(ledger.rows[0]).toMatchObject({ entryLabel: expect.stringMatching(/^J-\d{5}$/), memo: "Essai", sourceType: "MANUAL", reversed: false, contactName: null });
+    // the closing balance is the balance sheet's bank line
+    expect((await getBalanceSheet(actor, "2026-03-31")).sheet.currentAssets.lines[0]?.cents).toBe(ledger.closingCents);
+  });
+
+  it("reads an account in the direction its type holds: a revenue account grows with credits", async () => {
+    const ledger = await getAccountLedger(actor, { accountId: W.sales, from: "2026-01-01", to: "2026-12-31" });
+    expect(ledger.openingCents).toBe(0n);
+    expect(ledger.rows.map((row) => row.balanceCents)).toEqual([100_000n, 120_000n, 170_000n]);
+    expect(ledger.closingCents).toBe(170_000n);
+    const expenses = await getAccountLedger(actor, { accountId: W.expenses, ...march });
+    expect(expenses.rows.map((row) => row.balanceCents)).toEqual([30_000n]); // an expense grows with debits
+  });
+
+  it("orders lines of one day by the entry's number, flags what was reversed and a reversal, and starts from the balance before the first line", async () => {
+    const first = await post(actor, "2026-05-05", W.bank, W.sales, 1_000n);
+    const second = await post(actor, "2026-05-05", W.expenses, W.bank, 400n);
+    await reverseEntry(actor, first.id, { date: "2026-05-06" });
+    const ledger = await getAccountLedger(actor, { accountId: W.bank, from: "2026-05-05", to: "2026-05-06" });
+    expect(ledger.rows.map((row) => [row.entryId, row.date, row.reversed])).toEqual([[first.id, "2026-05-05", true], [second.id, "2026-05-05", false], [expect.any(String), "2026-05-06", true]]);
+    expect(ledger.rows.map((row) => row.balanceCents)).toEqual([ledger.openingCents + 1_000n, ledger.openingCents + 600n, ledger.openingCents - 400n]);
+    expect(ledger.openingCents).toBe(5_470_300n + 50_000n); // what is in the bank at the end of March plus the April sale
+  });
+
+  it("puts the lines of one day in the order of the entries' numbers, whatever order they were stored in", async () => {
+    // two entries stored in the opposite order to their numbers, each with its line number 1 on the bank
+    await db.query("BEGIN");
+    try {
+      for (const [number, cents] of [[800_001, 111], [800_000, 222]] as const) {
+        const id = randomUUID();
+        await db.query(
+          "INSERT INTO journal_entry (id, company_id, entry_number, entry_date, fiscal_period_id, source_type, created_by_id) SELECT $1, $2, $3, '2026-07-07', id, 'MANUAL', $4 FROM fiscal_period WHERE company_id = $2 AND start_date = '2026-07-01'",
+          [id, W.companyA, number, W.userOwnerA],
+        );
+        await db.query("INSERT INTO journal_line (id, company_id, entry_id, line_no, account_id, debit_cents, credit_cents, entry_date) VALUES (gen_random_uuid(), $1, $2, 1, $3, $5, 0, '2026-07-07'), (gen_random_uuid(), $1, $2, 2, $4, 0, $5, '2026-07-07')", [W.companyA, id, W.bank, W.sales, cents]);
+      }
+      await db.query("COMMIT");
+    } catch (error) {
+      await db.query("ROLLBACK");
+      throw error;
+    }
+    const ledger = await getAccountLedger(actor, { accountId: W.bank, from: "2026-07-07", to: "2026-07-07" });
+    expect(ledger.rows.map((row) => [row.entryNumber, row.debitCents])).toEqual([[800_000n, 222n], [800_001n, 111n]]);
+    expect(ledger.rows.map((row) => row.balanceCents)).toEqual([ledger.openingCents + 222n, ledger.openingCents + 333n]);
+  });
+
+  it("keeps the balance running across pages, with exact figures", async () => {
+    // 230 lines of different days and different amounts, so the order of the lines before a page matters to its balances
+    const expected: { date: string; n: number; cents: bigint }[] = [];
+    for (let i = 0; i < 230; i += 1) {
+      const date = `2026-06-${String(1 + ((i * 7) % 28)).padStart(2, "0")}`;
+      const cents = BigInt(100 + (i % 13) * 17);
+      await post(actor, date, extra.pager ?? "", W.sales, cents);
+      expected.push({ date, n: i, cents });
+    }
+    expected.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.n - b.n));
+    let running = 0n;
+    const balances = expected.map((line) => (running += line.cents));
+    const range = { accountId: extra.pager ?? "", from: "2026-06-01", to: "2026-06-30" };
+    const [one, two, three] = [await getAccountLedger(actor, { ...range, page: 1 }), await getAccountLedger(actor, { ...range, page: 2 }), await getAccountLedger(actor, { ...range, page: 3 })];
+    expect([one.rows.length, two.rows.length, three.rows.length]).toEqual([LEDGER_PAGE_SIZE, LEDGER_PAGE_SIZE, 30]);
+    expect([one.lineCount, one.pageCount, three.page]).toEqual([230, 3, 3]);
+    expect([...one.rows, ...two.rows, ...three.rows].map((row) => row.balanceCents)).toEqual(balances);
+    expect([...one.rows, ...two.rows, ...three.rows].map((row) => row.debitCents)).toEqual(expected.map((line) => line.cents));
+    expect([one.closingCents, two.closingCents, three.closingCents]).toEqual([running, running, running]);
+    // no line twice, none missing
+    expect(new Set([...one.rows, ...two.rows, ...three.rows].map((row) => row.lineId)).size).toBe(230);
+    // a page out of range is the last, a page that is not a number the first
+    expect((await getAccountLedger(actor, { ...range, page: 99 })).page).toBe(3);
+    expect((await getAccountLedger(actor, { ...range, page: 0 })).page).toBe(1);
+    expect((await getAccountLedger(actor, { ...range, page: Number.NaN })).page).toBe(1);
+  });
+
+  it("is empty for a period with nothing in it, but still has its balance", async () => {
+    const ledger = await getAccountLedger(actor, { accountId: W.bank, from: "2026-02-01", to: "2026-02-28" });
+    expect(ledger).toMatchObject({ rows: [], lineCount: 0, pageCount: 1, openingCents: 5_400_000n, closingCents: 5_400_000n, debitCents: 0n, creditCents: 0n });
+    const none = await getAccountLedger(actor, { accountId: extra.idle ?? "", ...march });
+    expect(none).toMatchObject({ rows: [], openingCents: 0n, closingCents: 0n });
+  });
+
+  it("is read by the members who read the ledger, never across companies, and refuses a bad account or period", async () => {
+    expect((await getAccountLedger(reader, { accountId: W.bank, ...march })).closingCents).toBe(5_470_300n);
+    expect(await refusal(getAccountLedger(intruder, { accountId: W.bank, ...march }))).toBe("forbidden");
+    expect(await refusal(getAccountLedger(otherOwner, { accountId: W.bank, ...march }))).toBe("reports.account"); // another company's account
+    expect((await getAccountLedger(otherOwner, { accountId: W.bankB, ...march })).closingCents).toBe(999_999n);
+    expect(await refusal(getAccountLedger(actor, { accountId: randomUUID(), ...march }))).toBe("reports.account");
+    expect(await refusal(getAccountLedger(actor, { accountId: "pas-un-id", ...march }))).toBe("reports.account");
+    for (const period of [{ from: "2026-02-30", to: "2026-03-31" }, { from: "2026-03-31", to: "2026-03-01" }, { from: "", to: "" }]) expect(await refusal(getAccountLedger(actor, { accountId: W.bank, ...period }))).toBe("reports.period");
+  });
+
+  it("exports one account whole, or every account that moved or holds a balance, by code", async () => {
+    const one = await getLedgerExport(actor, { accountId: W.bank, ...march });
+    expect(one).toHaveLength(1);
+    expect(one[0]).toMatchObject({ openingCents: 5_400_000n, closingCents: 5_470_300n });
+    expect(one[0]?.rows).toHaveLength(6);
+    const all = await getLedgerExport(actor, { accountId: null, ...march });
+    const codes = all.map((ledger) => ledger.account.code);
+    expect(codes).toEqual([...codes].sort());
+    // the bank moved; the capital holds a balance from January; the pager account and the idle one have nothing
+    expect(codes).toEqual(expect.arrayContaining(["1000", "1500", "2500", "3000", "4000", "4900", "5000", "5100", "7000"]));
+    expect(codes).not.toContain("1800");
+    expect(codes).not.toContain("1900");
+    expect(all.find((ledger) => ledger.account.code === "3000")).toMatchObject({ openingCents: 5_000_000n, closingCents: 5_000_000n, rows: [] });
+    // the one account asked for is given even with nothing in it
+    expect((await getLedgerExport(actor, { accountId: extra.idle ?? "", ...march })).map((ledger) => ledger.account.code)).toEqual(["1900"]);
+    // a line dated the first day of the period belongs to the period, not to its opening balance
+    const fromTenth = await getLedgerExport(actor, { accountId: W.bank, from: "2026-03-10", to: "2026-03-31" });
+    expect(fromTenth[0]?.openingCents).toBe(5_400_000n);
+    expect(fromTenth[0]?.rows[0]).toMatchObject({ date: "2026-03-10", balanceCents: 5_500_000n });
+    // each account's closing balance is the last of its lines' balances
+    for (const ledger of all) expect(ledger.rows.at(-1)?.balanceCents ?? ledger.openingCents).toBe(ledger.closingCents);
+  });
+
+  it("refuses a file that would hold too many lines, and keeps to the roles and the company", async () => {
+    expect(await refusal(getLedgerExport(actor, { accountId: null, ...march }, { maxLines: 5 }))).toBe("reports.tooManyLines");
+    expect(await getLedgerExport(actor, { accountId: null, ...march }, { maxLines: 1_000 })).not.toHaveLength(0);
+    expect(await refusal(getLedgerExport(intruder, { accountId: null, ...march }))).toBe("forbidden");
+    expect(await refusal(getLedgerExport(otherOwner, { accountId: W.bank, ...march }))).toBe("reports.account");
+    expect(await refusal(getLedgerExport(actor, { accountId: "pas-un-id", ...march }))).toBe("reports.account");
+    expect(await refusal(getLedgerExport(actor, { accountId: null, from: "2026-03-31", to: "2026-03-01" }))).toBe("reports.period");
+    const foreign = await getLedgerExport(otherOwner, { accountId: null, ...march });
+    expect(foreign.map((ledger) => ledger.account.code).sort()).toEqual(["1000", "4000"]); // B's own, never A's
   });
 });

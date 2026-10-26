@@ -15,7 +15,7 @@ Cette page distingue les parcours livrés du schéma et des fonctionnalités pla
 | Achats | Contraintes de base préparées | Factures fournisseurs et dépenses : phase 4 |
 | Paiements et fichiers | Contraintes de base préparées | Paiements, dépôts, pièces jointes : phase 4 |
 | Banque | Planification | Import CSV/OFX, appariement, rapprochement : phase 5 |
-| Rapports et exports | Balance de vérification, état des résultats et bilan à l’écran avec export CSV ([[Etats-financiers]]); sauvegardes PostgreSQL | Grand livre, âges, sommaire TPS/TVQ, comparaisons et PDF : phase 6 |
+| Rapports et exports | Balance de vérification, état des résultats, bilan ([[Etats-financiers]]) et grand livre ([[Grand-livre]]) à l’écran avec export CSV; sauvegardes PostgreSQL | Âges, sommaire TPS/TVQ, comparaisons et PDF : phase 6 |
 | Mobilité | Navigateur connecté au serveur | Hors ligne et application native non livrés |
 
 Les permissions et l’isolation par entreprise sont appliquées côté serveur et en base. La présence de tables pour une fonctionnalité ne signifie pas qu’un utilisateur peut déjà l’utiliser.

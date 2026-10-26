@@ -239,7 +239,9 @@
       "creditVoidLinked": "Un remboursement actif ou une affectation à une autre facture empêche l’annulation."
     },
     "reports": {
-      "period": "La période n’est pas valide : les deux jours doivent exister et le début précède la fin."
+      "period": "La période n’est pas valide : les deux jours doivent exister et le début précède la fin.",
+      "account": "Choisissez un compte de cette entreprise.",
+      "tooManyLines": "La période contient trop d’écritures pour un seul fichier (200 000 lignes au plus) : choisissez une période plus courte ou un seul compte."
     }
   },
   "nav": {
@@ -467,6 +469,41 @@
     "incomeFile": "etat-des-resultats",
     "balanceFile": "bilan"
   },
+  "ledgerReport": {
+    "title": "Grand livre",
+    "intro": "Le détail d’un compte sur une période : son solde au début, chaque ligne du journal avec le solde qui suit, son solde à la fin. Les soldes sont dans le sens habituel du compte (un actif ou une charge augmente par le débit, les autres comptes par le crédit).",
+    "account": "Compte",
+    "chooseAccount": "Choisir un compte",
+    "from": "Du",
+    "to": "Au",
+    "apply": "Afficher",
+    "exportAccount": "Exporter ce compte en CSV",
+    "exportAll": "Exporter tous les comptes en CSV",
+    "fiscalYears": "Exercices :",
+    "pickAccount": "Choisissez un compte pour voir son grand livre, ou exportez tous les comptes dans un fichier.",
+    "opening": "Solde d’ouverture",
+    "closing": "Solde de clôture",
+    "debits": "Débits de la période",
+    "credits": "Crédits de la période",
+    "count": "{count, plural, =0 {Aucune ligne sur cette période} one {# ligne} other {# lignes}}",
+    "empty": "Aucune ligne de ce compte sur cette période.",
+    "date": "Date",
+    "entry": "Écriture",
+    "description": "Description",
+    "debit": "Débit",
+    "credit": "Crédit",
+    "balance": "Solde",
+    "reversed": "contre-passée",
+    "pagination": "Pagination du grand livre",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {page} sur {count}",
+    "code": "Compte",
+    "accountName": "Libellé",
+    "contact": "Contact",
+    "file": "grand-livre",
+    "allFile": "tous-les-comptes"
+  },
   "audit": {
     "title": "Piste d'audit",
     "intro": "Chaque création, modification ou suppression est inscrite ici par la base de données elle-même. Lecture seule : rien ne s'efface.",
@@ -679,7 +716,8 @@
       "factures": "Brouillons de factures",
       "avoirs": "Brouillons d’avoirs",
       "resultats": "État des résultats",
-      "bilan": "Bilan"
+      "bilan": "Bilan",
+      "grand-livre": "Grand livre"
     }
   },
   "updates": {
