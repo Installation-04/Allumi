@@ -92,7 +92,7 @@ describe("the income statement", () => {
   });
 
   it("refuses days that do not exist and a period that ends before it begins", async () => {
-    for (const period of [{ from: "2026-02-30", to: "2026-03-31" }, { from: "2026-03-01", to: "pas une date" }, { from: "2026-03-31", to: "2026-03-01" }, { from: "", to: "" }]) {
+    for (const period of [{ from: "2026-02-30", to: "2026-03-31" }, { from: "2026-13-01", to: "2026-12-31" }, { from: "2026-01-00", to: "2026-01-31" }, { from: "2026-01-01", to: "2026-01-32" }, { from: "2026-03-01", to: "pas une date" }, { from: "2026-03-31", to: "2026-03-01" }, { from: "", to: "" }]) {
       expect(await refusal(getIncomeStatement(actor, period))).toBe("reports.period");
     }
   });
@@ -139,6 +139,7 @@ describe("the balance sheet", () => {
     const empty = await getBalanceSheet(actor, "2025-06-30");
     expect(empty.sheet).toMatchObject({ totalAssetsCents: 0n, totalEquityCents: 0n, balanced: true });
     expect(await refusal(getBalanceSheet(actor, "2026-02-30"))).toBe("reports.period");
+    for (const impossible of ["2026-13-01", "2026-00-10", "2026-01-32"]) expect(await refusal(getBalanceSheet(actor, impossible)), impossible).toBe("reports.period");
     expect(await refusal(getBalanceSheet(actor, ""))).toBe("reports.period");
     expect(await refusal(getBalanceSheet(intruder, "2026-03-31"))).toBe("forbidden");
     expect((await getBalanceSheet(reader, "2026-03-31")).sheet.balanced).toBe(true);
@@ -250,7 +251,7 @@ describe("the ledger of an account", () => {
     expect((await getAccountLedger(otherOwner, { accountId: W.bankB, ...march })).closingCents).toBe(999_999n);
     expect(await refusal(getAccountLedger(actor, { accountId: randomUUID(), ...march }))).toBe("reports.account");
     expect(await refusal(getAccountLedger(actor, { accountId: "pas-un-id", ...march }))).toBe("reports.account");
-    for (const period of [{ from: "2026-02-30", to: "2026-03-31" }, { from: "2026-03-31", to: "2026-03-01" }, { from: "", to: "" }]) expect(await refusal(getAccountLedger(actor, { accountId: W.bank, ...period }))).toBe("reports.period");
+    for (const period of [{ from: "2026-02-30", to: "2026-03-31" }, { from: "2026-13-01", to: "2026-12-31" }, { from: "2026-01-01", to: "2026-00-10" }, { from: "2026-03-31", to: "2026-03-01" }, { from: "", to: "" }]) expect(await refusal(getAccountLedger(actor, { accountId: W.bank, ...period }))).toBe("reports.period");
   });
 
   it("exports one account whole, or every account that moved or holds a balance, by code", async () => {
@@ -283,6 +284,7 @@ describe("the ledger of an account", () => {
     expect(await refusal(getLedgerExport(otherOwner, { accountId: W.bank, ...march }))).toBe("reports.account");
     expect(await refusal(getLedgerExport(actor, { accountId: "pas-un-id", ...march }))).toBe("reports.account");
     expect(await refusal(getLedgerExport(actor, { accountId: null, from: "2026-03-31", to: "2026-03-01" }))).toBe("reports.period");
+    expect(await refusal(getLedgerExport(actor, { accountId: null, from: "2026-13-01", to: "2026-12-31" }))).toBe("reports.period");
     const foreign = await getLedgerExport(otherOwner, { accountId: null, ...march });
     expect(foreign.map((ledger) => ledger.account.code).sort()).toEqual(["1000", "4000"]); // B's own, never A's
   });

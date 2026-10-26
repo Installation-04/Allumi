@@ -1,6 +1,6 @@
 import "server-only";
 import { requireRole } from "@/modules/companies";
-import { formatNumber, naturalBalance, type AccountType } from "@/modules/ledger";
+import { formatNumber, isValidIsoDate, naturalBalance, type AccountType } from "@/modules/ledger";
 import { AppError } from "@/platform/errors";
 import { withCompany, type CompanyContext, type Tx } from "@/platform/tenant";
 import { runLedger, type LedgerAccountReport, type LedgerLine, type LedgerRow } from "../domain/ledger-report";
@@ -10,7 +10,6 @@ export const LEDGER_PAGE_SIZE = 100;
 export const MAX_EXPORT_LINES = 200_000;
 
 const iso = (date: Date): string => date.toISOString().slice(0, 10);
-const validDay = (value: string): boolean => /^\d{4}-\d{2}-\d{2}$/.test(value) && iso(new Date(`${value}T00:00:00Z`)) === value;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export type LedgerAccount = { id: string; code: string; nameFr: string; nameEn: string; type: AccountType };
@@ -52,7 +51,7 @@ const toLine = (row: LineRow, format: { prefix: string; padding: number }): Ledg
  * hundred; every figure is exact, and the balances run across pages. Every member who reads the ledger reads it.
  */
 export async function getAccountLedger(actor: CompanyContext, input: { accountId: string; from: string; to: string; page?: number }): Promise<AccountLedger> {
-  if (!validDay(input.from) || !validDay(input.to) || input.from > input.to) throw new AppError("reports.period");
+  if (!isValidIsoDate(input.from) || !isValidIsoDate(input.to) || input.from > input.to) throw new AppError("reports.period");
   if (!UUID.test(input.accountId)) throw new AppError("reports.account");
   return withCompany(actor, async (tx) => {
     await requireRole(tx, "ledger.read");
@@ -103,7 +102,7 @@ export type ExportedLedger = LedgerAccountReport & { account: LedgerAccount };
  * with its opening balance, its lines with the running balance, and its closing balance. Refused past 200 000 lines.
  */
 export async function getLedgerExport(actor: CompanyContext, input: { accountId: string | null; from: string; to: string }, options: { maxLines?: number } = {}): Promise<ExportedLedger[]> {
-  if (!validDay(input.from) || !validDay(input.to) || input.from > input.to) throw new AppError("reports.period");
+  if (!isValidIsoDate(input.from) || !isValidIsoDate(input.to) || input.from > input.to) throw new AppError("reports.period");
   if (input.accountId !== null && !UUID.test(input.accountId)) throw new AppError("reports.account");
   return withCompany(actor, async (tx) => {
     await requireRole(tx, "ledger.read");

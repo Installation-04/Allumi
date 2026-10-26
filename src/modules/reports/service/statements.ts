@@ -1,5 +1,6 @@
 import "server-only";
 import { requireRole } from "@/modules/companies";
+import { isValidIsoDate } from "@/modules/ledger";
 import { AppError } from "@/platform/errors";
 import { withCompany, type CompanyContext, type Tx } from "@/platform/tenant";
 import { buildBalanceSheet, buildIncomeStatement, type AccountTotals, type BalanceSheet, type IncomeStatement } from "../domain/statements";
@@ -39,14 +40,12 @@ async function totals(tx: Tx, companyId: string, from: string | null, to: string
   });
 }
 
-const validDay = (value: string): boolean => /^\d{4}-\d{2}-\d{2}$/.test(value) && iso(day(value)) === value;
-
 /**
  * The income statement of a period (both days included), from the revenue and expense lines of the ledger dated in
  * it. Every member who reads the ledger reads it. Accounts that net to zero are left out.
  */
 export async function getIncomeStatement(actor: CompanyContext, period: { from: string; to: string }): Promise<IncomeStatementReport> {
-  if (!validDay(period.from) || !validDay(period.to) || period.from > period.to) throw new AppError("reports.period");
+  if (!isValidIsoDate(period.from) || !isValidIsoDate(period.to) || period.from > period.to) throw new AppError("reports.period");
   return withCompany(actor, async (tx) => {
     await requireRole(tx, "ledger.read");
     const rows = await totals(tx, actor.companyId, period.from, period.to, ["REVENUE", "EXPENSE"]);
@@ -59,7 +58,7 @@ export async function getIncomeStatement(actor: CompanyContext, period: { from: 
  * day falls in are shown apart from those of the current one. Every member who reads the ledger reads it.
  */
 export async function getBalanceSheet(actor: CompanyContext, asOf: string): Promise<BalanceSheetReport> {
-  if (!validDay(asOf)) throw new AppError("reports.period");
+  if (!isValidIsoDate(asOf)) throw new AppError("reports.period");
   return withCompany(actor, async (tx) => {
     await requireRole(tx, "ledger.read");
     const rows = await totals(tx, actor.companyId, null, asOf);
