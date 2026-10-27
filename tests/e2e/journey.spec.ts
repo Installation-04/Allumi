@@ -771,6 +771,19 @@ async function postingJourney(page: Page) {
   await expect(page.getByText("Facture comptabilisée", { exact: true })).toBeVisible();
   await expectNoPageOverflow(page);
   await captureReference(page, "facture-validee");
+  const printSourceUrl = page.url();
+  await page.getByRole("link", { name: "Version imprimable", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Facture F-00001", exact: true })).toBeVisible();
+  await expect(page.locator(".invoice-paper")).toContainText("241,45");
+  await expectNoPageOverflow(page);
+  await page.emulateMedia({ media: "print" });
+  await expect(page.locator(".workspace-header")).toBeHidden();
+  await expect(page.locator(".print-controls")).toBeHidden();
+  await expect(page.locator(".invoice-paper")).toBeVisible();
+  await captureReference(page, "facture-imprimable");
+  await page.emulateMedia({ media: "screen" });
+  await page.goto(printSourceUrl);
+
   await page.getByRole("button", { name: "English", exact: true }).click();
   await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption("dark");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");

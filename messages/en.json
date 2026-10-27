@@ -224,7 +224,18 @@
         "email": "The email address is not valid."
       }
     },
-    "sales": {
+    "invoicePrint": {
+  "title": "Invoice",
+  "open": "Print view",
+  "print": "Print or save as PDF",
+  "back": "Back to invoice",
+  "hint": "In the print dialog, choose your printer or Save as PDF. Disable browser headers and footers to hide the server address.",
+  "description": "Description",
+  "quantity": "Quantity",
+  "unitPrice": "Unit price",
+  "amount": "Amount"
+},
+  "sales": {
       "invalid": "Check dates, lines and amounts. The total must be positive; at most 50 lines.",
       "reference": "Choose active customers, items, income accounts and tax codes belonging to this company.",
       "rate": "A tax rate is missing on this date, or calculations do not agree. Check tax settings.",
@@ -943,6 +954,17 @@
     "fiscalYearStart": "The fiscal year starts in {month}. It is set when the company is created.",
     "save": "Save"
   },
+  "invoicePrint": {
+  "title": "Invoice",
+  "open": "Print view",
+  "print": "Print or save as PDF",
+  "back": "Back to invoice",
+  "hint": "In the print dialog, choose your printer or Save as PDF. Disable browser headers and footers to hide the server address.",
+  "description": "Description",
+  "quantity": "Quantity",
+  "unitPrice": "Unit price",
+  "amount": "Amount"
+},
   "sales": {
     "title": "Invoice drafts",
     "draft": "Draft — not posted",

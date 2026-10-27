@@ -224,7 +224,18 @@
         "email": "Le courriel n'est pas valide."
       }
     },
-    "sales": {
+    "invoicePrint": {
+  "title": "Facture",
+  "open": "Version imprimable",
+  "print": "Imprimer ou enregistrer en PDF",
+  "back": "Retour à la facture",
+  "hint": "Dans la fenêtre d’impression, choisissez votre imprimante ou Enregistrer au format PDF. Désactivez les en-têtes et pieds de page du navigateur pour masquer l’adresse du serveur.",
+  "description": "Description",
+  "quantity": "Quantité",
+  "unitPrice": "Prix unitaire",
+  "amount": "Montant"
+},
+  "sales": {
       "invalid": "Vérifiez les dates, les lignes et les montants. Le total doit être positif; 50 lignes au maximum.",
       "reference": "Choisissez des clients, articles, comptes de revenus et codes fiscaux actifs de cette entreprise.",
       "rate": "Un taux fiscal manque à cette date, ou les calculs ne concordent pas. Vérifiez les taxes.",
@@ -943,6 +954,17 @@
     "fiscalYearStart": "L'exercice financier commence en {month}. Il se fixe à la création de l'entreprise.",
     "save": "Enregistrer"
   },
+  "invoicePrint": {
+  "title": "Facture",
+  "open": "Version imprimable",
+  "print": "Imprimer ou enregistrer en PDF",
+  "back": "Retour à la facture",
+  "hint": "Dans la fenêtre d’impression, choisissez votre imprimante ou Enregistrer au format PDF. Désactivez les en-têtes et pieds de page du navigateur pour masquer l’adresse du serveur.",
+  "description": "Description",
+  "quantity": "Quantité",
+  "unitPrice": "Prix unitaire",
+  "amount": "Montant"
+},
   "sales": {
     "title": "Brouillons de factures",
     "draft": "Brouillon — non comptabilisé",
