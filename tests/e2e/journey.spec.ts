@@ -227,6 +227,17 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await expect(page.getByRole("heading", { name: "À venir — non disponible" })).toBeVisible();
   await expectNoPageOverflow(page);
   await captureReference(page, "espace-ventes");
+  if ((page.viewportSize()?.width ?? 1280) >= 1024) {
+    const sidebar = page.getByRole("navigation", { name: "Navigation de l'entreprise", exact: true });
+    const tabs = page.getByRole("navigation", { name: "Sections comptables", exact: true });
+    await expect(sidebar.getByRole("link", { name: "Brouillons de factures", exact: true })).toHaveCount(0);
+    await expect(sidebar.getByRole("link", { name: "Ventes", exact: true })).toHaveAttribute("aria-current", "page");
+    await tabs.getByRole("link", { name: "Brouillons de factures", exact: true }).click();
+    await expect(tabs.getByRole("link", { name: "Brouillons de factures", exact: true })).toHaveAttribute("aria-current", "page");
+    await expect(sidebar.getByRole("link", { name: "Ventes", exact: true })).toHaveAttribute("aria-current", "page");
+    await captureReference(page, "navigation-contextuelle");
+    await sidebar.getByRole("link", { name: "Ventes", exact: true }).click();
+  } else await captureReference(page, "navigation-contextuelle");
   if ((page.viewportSize()?.width ?? 1280) < 1024) {
     const nav = page.getByRole("navigation", { name: "Navigation de l'entreprise", exact: true });
     await nav.getByRole("button", { name: "Menu", exact: true }).click();
@@ -276,7 +287,10 @@ const reportDays = (): [string, string] => {
 const openSection = async (page: Page, name: string) => {
   const nav = page.getByRole("navigation", { name: "Navigation de l'entreprise", exact: true });
   const link = nav.getByRole("link", { name, exact: true });
-  if (!(await link.isVisible())) await nav.getByRole("button", { name: "Menu", exact: true }).click();
+  if (!(await link.isVisible())) {
+    if ((page.viewportSize()?.width ?? 1280) < 1024) await nav.getByRole("button", { name: "Menu", exact: true }).click();
+    else await nav.getByRole("searchbox", { name: "Rechercher une section", exact: true }).fill(name);
+  }
   await link.click();
 };
 
@@ -1983,7 +1997,7 @@ async function membersJourney(page: Page, browser: Browser) {
   const member = page.getByRole("article").filter({ has: page.getByRole("heading", { name: "Collègue Exemple" }) });
   await guest.goto(`${company}/espace/banque`);
   await expect(guest.getByRole("link", { name: "Intégrations", exact: true })).toHaveCount(0);
-  await expect(guest.getByRole("link", { name: "Transactions bancaires", exact: true })).toBeVisible();
+  await expect(guest.locator(".workspace-content").getByRole("link", { name: "Transactions bancaires", exact: true })).toBeVisible();
   await member.getByText("Permissions par module", { exact: true }).click();
   for (const moduleKey of ["catalog", "sales", "accounting", "taxes", "audit"]) await member.locator(`select[name="${moduleKey}"]`).selectOption("none");
   const saveAccess = async () => {
@@ -2021,7 +2035,7 @@ async function membersJourney(page: Page, browser: Browser) {
   for (const moduleKey of ["catalog", "sales", "accounting", "taxes", "audit"]) await member.locator(`select[name="${moduleKey}"]`).selectOption("default");
   await saveAccess();
   await guest.goto(`${company}/espace/rapports`);
-  await expect(guest.getByRole("link", { name: "Âge des comptes clients", exact: true })).toBeVisible();
+  await expect(guest.locator(".workspace-content").getByRole("link", { name: "Âge des comptes clients", exact: true })).toBeVisible();
   await member.getByLabel("Rôle", { exact: true }).selectOption("READ_ONLY");
   await member.getByRole("button", { name: "Enregistrer les accès" }).click();
   await expect(member.getByRole("status")).toBeVisible();

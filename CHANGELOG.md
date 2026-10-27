@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Navigation par domaine : suppression du menu global dupliqué en haut, onglets contextuels Ventes/Banque/Comptabilité/Rapports et sélection du domaine sur les pages de détail. Recherche et accès mobiles conservés selon les permissions.
+
 ## [0.4.0-alpha.15] - 2026-10-26
 
 - Recherche des sections dans le menu ordinateur et mobile : accents et casse ignorés, compteur et état vide, effacement, français/anglais et respect des permissions.

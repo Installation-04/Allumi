@@ -1,3 +1,4 @@
+import { NAVIGATION_GROUPS } from "./navigation-groups";
 import { canAccessArea, canAccessRoute } from "./navigation-access";
 import { AREAS, type Area } from "./sections";
 import Link from "next/link";
@@ -31,6 +32,14 @@ export default async function CompanyLayout({ children, params }: { children: Re
   ];
   const visibleLinks = links.filter(link => canAccessRoute(company, link.href === base ? "" : link.href.slice(base.length + 1)));
   const areaLinks: NavLink[] = (Object.keys(AREAS) as Area[]).filter(area => canAccessArea(company, area)).map((area) => ({ href: area === "taxes" ? `${base}/taxes` : `${base}/espace/${area}`, label: ta(`${area}.title`), icon: AREAS[area].icon }));
+  const groups = Object.entries(NAVIGATION_GROUPS).filter(([area]) => canAccessArea(company, area as Area)).map(([area, routes]) => ({
+    href: `${base}/espace/${area}`,
+    links: routes.filter(route => canAccessRoute(company, route)).map(route => visibleLinks.find(link => link.href === `${base}/${route}`) ?? { href: `${base}/${route}`, label: ta(`links.${route}`), icon: AREAS[area as Area].icon }),
+  }));
+  const groupedHrefs = new Set(groups.flatMap(group => group.links.map(link => link.href)));
+  const desktopLinks = [visibleLinks[0]!, ...areaLinks, ...visibleLinks.slice(1).filter(link => !groupedHrefs.has(link.href))];
+  const allLinks = [...visibleLinks.slice(0, 3), ...areaLinks, ...visibleLinks.slice(3)];
+  for (const group of groups) for (const link of group.links) if (!allLinks.some(existing => existing.href === link.href)) allLinks.push(link);
   return (
     <div className="company-workspace grid min-w-0 lg:grid-cols-[208px_minmax(0,1fr)]">
       <aside className="workspace-sidebar contents min-w-0 text-white lg:bg-[#34373b] lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col lg:self-start">
@@ -40,12 +49,12 @@ export default async function CompanyLayout({ children, params }: { children: Re
           </Link>
           {can(company, "entry.post") ? <Link href={`${base}/journal/nouvelle`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-stone-400 px-4 text-sm font-semibold hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white lg:mt-5 lg:w-full"><Icon name="plus" />{td("create")}</Link> : null}
         </div>
-        <CompanyNav links={[...visibleLinks.slice(0, 3), ...areaLinks, ...visibleLinks.slice(3)]} label={t("label")} />
+        <CompanyNav links={allLinks} desktopLinks={desktopLinks} groups={groups} label={t("label")} />
         <Link href="/compte/securite" className="hidden min-h-11 items-center gap-2 border-t border-white/15 px-5 py-4 text-sm text-stone-200 hover:bg-black/20 focus-visible:outline-2 focus-visible:outline-white lg:mt-auto lg:flex"><Icon name="audit" />{td("security")}</Link>
       </aside>
       <div className="min-w-0">
         <Header companyName={company.name} />
-        <CompanyNav links={visibleLinks} label={t("sections")} tabs />
+        <CompanyNav links={allLinks} groups={groups} label={t("sections")} tabs />
         <div className="workspace-content min-w-0 px-4 py-6 sm:px-6 lg:px-7">{children}</div>
       </div>
     </div>

@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.15
+git checkout v0.4.0-alpha.16
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.15 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.16 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -238,3 +238,11 @@ Retrouve une section autorisée depuis le menu, sur ordinateur ou téléphone, s
 ![Recherche dans le menu](docs/images/navigation-recherche-desktop.png)
 
 ![Recherche mobile](docs/images/navigation-recherche-mobile.png)
+
+### Navigation par domaine
+
+Les domaines restent à gauche; les outils du domaine ouvert apparaissent dans des onglets contextuels, sans répéter le menu global. [Guide](docs/Interface-et-navigation.md#navigation-par-domaine).
+
+![Navigation contextuelle](docs/images/navigation-contextuelle-desktop.png)
+
+![Navigation mobile](docs/images/navigation-contextuelle-mobile.png)
