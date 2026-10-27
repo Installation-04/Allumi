@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.18] - 2026-10-27
+
 - Version imprimable des factures validées : coordonnées figées, lignes/taxes/totaux exacts, annulation visible et impression/enregistrement PDF via le navigateur, protégés par les droits de vente.
 
 ## [0.4.0-alpha.17] - 2026-10-27
