@@ -371,6 +371,10 @@
       "trial": "Balance",
       "audit": "Audit"
     },
+    "search": "Rechercher une section",
+    "clearSearch": "Effacer la recherche",
+    "searchCount": "{count, plural, one {# section trouvée} other {# sections trouvées}}",
+    "searchEmpty": "Aucune section trouvée.",
     "menu": "Menu",
     "closeMenu": "Fermer le menu",
     "catalog": "Produits et services",

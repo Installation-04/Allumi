@@ -38,3 +38,13 @@ La navigation tient compte des [[Utilisateurs-et-permissions]], y compris dans l
 
 ![Navigation avec accès limité aux contacts — ordinateur](images/navigation-restreinte-desktop.png)
 ![Navigation avec accès limité aux contacts — téléphone](images/navigation-restreinte-mobile.png)
+
+## Rechercher une section
+
+Le champ **Rechercher une section** filtre le menu latéral sur ordinateur. Sur téléphone, ouvre **Menu** pour retrouver le même champ. La recherche ignore les majuscules et les accents : « depenses » retrouve « Dépenses ». Plusieurs mots peuvent être saisis dans n’importe quel ordre.
+
+Seules les sections autorisées pour ton compte sont proposées. Cette recherche porte sur les noms des sections, pas sur les données des clients ni sur les factures. **Effacer la recherche** rétablit le menu; choisir un lien efface aussi la recherche. Le compteur annonce le nombre de résultats et un message indique quand aucune section ne correspond. Le champ et les résultats suivent la langue et le thème de l’interface.
+
+![Recherche du menu sur ordinateur](images/navigation-recherche-desktop.png)
+
+![Recherche du menu sur téléphone](images/navigation-recherche-mobile.png)

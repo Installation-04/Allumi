@@ -230,3 +230,11 @@ Les menus et raccourcis s’adaptent aux accès de chaque membre ([guide](docs/U
 
 ![Navigation d’un compte limité aux contacts](docs/images/navigation-restreinte-desktop.png)
 ![Menu mobile du même compte](docs/images/navigation-restreinte-mobile.png)
+
+### Recherche des sections
+
+Retrouve une section autorisée depuis le menu, sur ordinateur ou téléphone, sans tenir compte des accents. [Guide](docs/Interface-et-navigation.md#rechercher-une-section).
+
+![Recherche dans le menu](docs/images/navigation-recherche-desktop.png)
+
+![Recherche mobile](docs/images/navigation-recherche-mobile.png)

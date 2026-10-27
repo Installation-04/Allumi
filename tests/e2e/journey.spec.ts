@@ -1339,7 +1339,7 @@ async function bankImportJourney(page: Page) {
   // setting a line aside and bringing it back, and the filters
   await page.getByRole("button", { name: "Mettre de côté : ABONNEMENT LOGICIEL", exact: true }).click();
   await expect(page.locator("li").filter({ hasText: "ABONNEMENT LOGICIEL" })).toContainText("Mise de côté");
-  await page.getByLabel("Recherche").fill("abonnement");
+  await page.getByLabel("Recherche", { exact: true }).fill("abonnement");
   await page.getByRole("button", { name: "Filtrer", exact: true }).click();
   await expect(page.getByText("1 transaction", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Remettre à traiter : ABONNEMENT LOGICIEL", exact: true }).click();
@@ -1999,6 +1999,16 @@ async function membersJourney(page: Page, browser: Browser) {
   if (process.env.E2E_MOBILE === "1") await guest.getByRole("button", { name: "Menu", exact: true }).click();
   await expectNoPageOverflow(guest);
   await captureReference(guest, "navigation-restreinte");
+  const navigationSearch = guest.getByRole("searchbox", { name: "Rechercher une section" }).filter({ visible: true });
+  await navigationSearch.fill("DEPENSES");
+  await expect(guest.getByRole("navigation", { name: "Navigation de l'entreprise" }).getByRole("status").filter({ visible: true })).toHaveText("1 section trouvée");
+  await expect(guest.getByRole("link", { name: "Dépenses", exact: true })).toBeVisible();
+  await captureReference(guest, "navigation-recherche");
+  await navigationSearch.fill("rapports");
+  await expect(guest.getByRole("navigation", { name: "Navigation de l'entreprise" }).getByRole("status").filter({ visible: true })).toHaveText("Aucune section trouvée.");
+  await guest.getByRole("button", { name: "Effacer la recherche" }).filter({ visible: true }).click();
+  await expect(navigationSearch).toHaveValue("");
+
   for (const area of ["rapports", "ventes", "banque"]) expect((await guest.goto(`${company}/espace/${area}`))?.status()).toBe(404);
   await guest.goto(`${company}/espace/depenses`);
   await expect(guest.locator(`a[href="${company}/catalogue"]`)).toHaveCount(0);

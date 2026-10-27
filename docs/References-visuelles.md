@@ -267,3 +267,11 @@ Compte fictif limité à la lecture des contacts : les raccourcis financiers son
 
 ![Navigation restreinte — ordinateur](images/navigation-restreinte-desktop.png)
 ![Navigation restreinte — téléphone](images/navigation-restreinte-mobile.png)
+
+## Recherche dans la navigation
+
+Recherche sans accents d’une section autorisée, avec un compte aux permissions limitées.
+
+![Recherche sur ordinateur](images/navigation-recherche-desktop.png)
+
+![Recherche sur mobile](images/navigation-recherche-mobile.png)
