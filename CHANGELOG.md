@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Espace Paramètres et administration : profil et préférences fiscales, comptabilité, permissions, sécurité, intégrations, sauvegardes/serveur, apparence et mises à jour regroupés selon les droits du compte.
+
 ## [0.4.0-alpha.16] - 2026-10-27
 
 - Navigation par domaine : suppression du menu global dupliqué en haut, onglets contextuels Ventes/Banque/Comptabilité/Rapports et sélection du domaine sur les pages de détail. Recherche et accès mobiles conservés selon les permissions.

@@ -4,6 +4,7 @@ import { AREAS, type Area } from "./sections";
 /** Shared by tabs, the sidebar and activity shortcuts. Unknown destinations are not advertised. */
 export const ROUTE_ACCESS: Record<string, readonly Action[]> = {
   "": ["company.read"],
+  parametres: ["company.read"],
   contacts: ["contact.read"],
   journal: ["ledger.read"],
   factures: ["sales.read"],

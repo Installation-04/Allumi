@@ -94,7 +94,7 @@ export default async function CompanyProfilePage({ params }: { params: Promise<{
           </div>
         </fieldset>
 
-        <fieldset className="space-y-4">
+        <fieldset id="fiscal-settings" className="scroll-mt-6 space-y-4">
           <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-stone-600 dark:text-stone-400">{t("settings")}</legend>
           <div className="grid gap-4 sm:grid-cols-3">
             <SelectField name="defaultLocale" label={t("defaultLocale")} defaultValue={profile.defaultLocale} options={LOCALES.map((code) => ({ value: code, label: locales(code) }))} />
