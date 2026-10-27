@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.16
+git checkout v0.4.0-alpha.17
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.16 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.17 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -246,3 +246,11 @@ Les domaines restent à gauche; les outils du domaine ouvert apparaissent dans d
 ![Navigation contextuelle](docs/images/navigation-contextuelle-desktop.png)
 
 ![Navigation mobile](docs/images/navigation-contextuelle-mobile.png)
+
+### Paramètres et administration
+
+Les réglages de l’entreprise, des utilisateurs, de sécurité, du serveur et de l’apparence sont regroupés dans un espace adapté aux permissions. [Guide](docs/Parametres-et-administration.md).
+
+![Paramètres](docs/images/parametres-administration-desktop.png)
+
+![Paramètres mobile](docs/images/parametres-administration-mobile.png)

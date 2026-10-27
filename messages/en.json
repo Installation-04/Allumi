@@ -354,7 +354,55 @@
       "tooManyLines": "The period has too many entries for one file (200,000 lines at most): choose a shorter period or a single account."
     }
   },
+  "settingsPage": {
+  "title": "Settings and administration",
+  "intro": "Company, account and application settings, organized according to your permissions.",
+  "company": {
+    "title": "Company",
+    "description": "Legal identity, contact details, province, document language and tax preferences."
+  },
+  "accounting": {
+    "title": "Accounting and taxes",
+    "description": "Chart of accounts, fiscal years, period locks and tax configuration."
+  },
+  "access": {
+    "title": "Users and security",
+    "description": "Roles, modular access, audit trail, password, two-factor authentication and sessions."
+  },
+  "connections": {
+    "title": "Integrations",
+    "description": "Banking and payment connections: configure and revoke providers."
+  },
+  "server": {
+    "title": "Server administration",
+    "description": "Server health, backups, retention and operation logs. Restricted to server administrators."
+  },
+  "application": {
+    "title": "Application and support",
+    "description": "Installed version, updates and documentation."
+  },
+  "preferences": {
+    "title": "Appearance and language",
+    "description": "Choose a light, dark or system theme for this browser.",
+    "language": "Choose the interface language in the header. Set the default document language in Company."
+  },
+  "links": {
+    "identity": "Identity and contact details",
+    "taxSettings": "Tax and document preferences",
+    "accounts": "Chart of accounts",
+    "periods": "Fiscal years and locks",
+    "taxes": "Tax codes and rates",
+    "members": "Users and permissions",
+    "audit": "Audit trail",
+    "security": "My account security",
+    "integrations": "Manage integrations",
+    "serverAdmin": "Server, backups and logs",
+    "updates": "Versions and updates",
+    "help": "User guide"
+  }
+},
   "nav": {
+    "settings": "Settings and administration",
     "overview": "Dashboard",
     "accounts": "Chart of accounts",
     "journal": "Journal",

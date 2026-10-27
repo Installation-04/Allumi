@@ -265,6 +265,16 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await financialStatementsJourney(page);
   await generalLedgerJourney(page);
   await receivablesAgingJourney(page);
+  const settingsBase = new URL(page.url()).pathname.match(/^\/c\/[^/]+/)?.[0];
+  expect(settingsBase).toBeTruthy();
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await page.goto(`${settingsBase}/parametres`);
+  await expect(page.getByRole("heading", { name: "Paramètres et administration", exact: true })).toBeVisible();
+  const settings = page.locator(".workspace-content");
+  await expect(settings.getByRole("link", { name: "Utilisateurs et permissions", exact: true })).toBeVisible();
+  await expect(settings.getByRole("link", { name: "Serveur, sauvegardes et journaux", exact: true })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "parametres-administration");
   await membersJourney(page, browser);
   // Nothing in the whole journey (both locales, every form, the security pages, a second browser) was blocked.
   expect(cspViolations, "Content-Security-Policy violations").toEqual([]);
@@ -1989,6 +1999,11 @@ async function membersJourney(page: Page, browser: Browser) {
   await expect(guest.getByText("Ton rôle : Utilisateur")).toBeVisible();
   expect((await guest.goto(`${company}/utilisateurs`))?.status()).toBe(404);
   expect((await guest.goto("/administration/serveur"))?.status()).toBe(404);
+  await guest.goto(`${company}/parametres`);
+  const guestSettings = guest.locator(".workspace-content");
+  await expect(guestSettings.getByRole("heading", { name: "Paramètres et administration", exact: true })).toBeVisible();
+  for (const name of ["Utilisateurs et permissions", "Serveur, sauvegardes et journaux", "Gérer les intégrations"]) await expect(guestSettings.getByRole("link", { name, exact: true })).toHaveCount(0);
+  await expect(guestSettings.getByRole("link", { name: "Sécurité de mon compte", exact: true })).toBeVisible();
   await guest.goto(`${company}/contacts`);
   await expect(guest.getByRole("link", { name: "Nouveau contact", exact: true })).toHaveCount(0);
 

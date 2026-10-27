@@ -354,7 +354,55 @@
       "tooManyLines": "La période contient trop d’écritures pour un seul fichier (200 000 lignes au plus) : choisissez une période plus courte ou un seul compte."
     }
   },
+  "settingsPage": {
+  "title": "Paramètres et administration",
+  "intro": "Les réglages de votre entreprise, de votre compte et de votre application, regroupés selon vos permissions.",
+  "company": {
+    "title": "Entreprise",
+    "description": "Identité légale, coordonnées, province, langue des documents et préférences fiscales."
+  },
+  "accounting": {
+    "title": "Comptabilité et taxes",
+    "description": "Plan comptable, exercices, verrouillage des périodes et configuration des taxes."
+  },
+  "access": {
+    "title": "Utilisateurs et sécurité",
+    "description": "Rôles, accès modulaires, piste d’audit, mot de passe, double authentification et sessions."
+  },
+  "connections": {
+    "title": "Intégrations",
+    "description": "Connexions bancaires et paiements : configuration et révocation des fournisseurs."
+  },
+  "server": {
+    "title": "Administration du serveur",
+    "description": "État du serveur, sauvegardes, rétention et journal des opérations. Accès réservé aux administrateurs du serveur."
+  },
+  "application": {
+    "title": "Application et assistance",
+    "description": "Version installée, mises à jour et documentation."
+  },
+  "preferences": {
+    "title": "Apparence et langue",
+    "description": "Choisissez un thème clair, sombre ou celui du système pour ce navigateur.",
+    "language": "La langue de l’interface se choisit dans l’en-tête. La langue par défaut des documents se règle dans Entreprise."
+  },
+  "links": {
+    "identity": "Identité et coordonnées",
+    "taxSettings": "Préférences fiscales et documents",
+    "accounts": "Plan comptable",
+    "periods": "Exercices et verrouillage",
+    "taxes": "Codes et taux de taxes",
+    "members": "Utilisateurs et permissions",
+    "audit": "Piste d’audit",
+    "security": "Sécurité de mon compte",
+    "integrations": "Gérer les intégrations",
+    "serverAdmin": "Serveur, sauvegardes et journaux",
+    "updates": "Versions et mises à jour",
+    "help": "Guide utilisateur"
+  }
+},
   "nav": {
+    "settings": "Paramètres et administration",
     "overview": "Tableau de bord",
     "accounts": "Plan comptable",
     "journal": "Journal",
