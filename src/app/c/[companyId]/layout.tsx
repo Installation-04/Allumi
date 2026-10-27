@@ -1,9 +1,10 @@
+import { canAccessArea, canAccessRoute } from "./navigation-access";
 import { AREAS, type Area } from "./sections";
 import Link from "next/link";
 import { Header } from "@/app/_components/shell";
 import { Icon } from "@/app/_components/icon";
 import { getTranslations } from "next-intl/server";
-import { can, type Action } from "@/modules/companies";
+import { can } from "@/modules/companies";
 import { loadCompany } from "./_lib";
 import { CompanyNav, type NavLink } from "./nav";
 import { Logo } from "@/app/_components/logo";
@@ -28,9 +29,8 @@ export default async function CompanyLayout({ children, params }: { children: Re
     ...(can(company, "members.manage") ? [{ href: `${base}/utilisateurs`, label: t("members"), icon: "contacts" as const }] : []),
     ...(can(company, "audit.read") ? [{ href: `${base}/audit`, label: t("audit"), shortLabel: t("short.audit"), icon: "audit" as const }] : []),
   ];
-  const required: Record<string, Action> = { contacts: "contact.read", journal: "ledger.read", factures: "sales.read", avoirs: "sales.read", catalogue: "catalog.read", comptes: "ledger.read", balance: "ledger.read", exercices: "ledger.read", taxes: "taxes.read" };
-  const visibleLinks = links.filter(link => !required[link.href.split("/").at(-1) ?? ""] || can(company, required[link.href.split("/").at(-1) ?? ""]!));
-  const areaLinks: NavLink[] = (Object.keys(AREAS) as Area[]).map((area) => ({ href: area === "taxes" ? `${base}/taxes` : `${base}/espace/${area}`, label: ta(`${area}.title`), icon: AREAS[area].icon }));
+  const visibleLinks = links.filter(link => canAccessRoute(company, link.href === base ? "" : link.href.slice(base.length + 1)));
+  const areaLinks: NavLink[] = (Object.keys(AREAS) as Area[]).filter(area => canAccessArea(company, area)).map((area) => ({ href: area === "taxes" ? `${base}/taxes` : `${base}/espace/${area}`, label: ta(`${area}.title`), icon: AREAS[area].icon }));
   return (
     <div className="company-workspace grid min-w-0 lg:grid-cols-[208px_minmax(0,1fr)]">
       <aside className="workspace-sidebar contents min-w-0 text-white lg:bg-[#34373b] lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col lg:self-start">

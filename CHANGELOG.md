@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Navigation : menus, onglets et espaces filtrés selon les permissions modulaires; intégrations réservées aux admins, âge clients soumis aux ventes et à la comptabilité, accès direct aux espaces interdits refusé. Contrôles navigateur de révocation et de rétablissement des accès sur ordinateur et téléphone.
+
 ## [0.4.0-alpha.14] - 2026-10-26
 
 - Tests : vérifier les index valides du grand livre dans le catalogue PostgreSQL plutôt que le choix de plan sur un petit jeu de données; le test de durée des écritures reste inchangé.

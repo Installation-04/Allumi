@@ -1,5 +1,5 @@
 import { mkdirSync, readFileSync } from "node:fs";
-import { expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
+import { devices, expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
 import { Secret, TOTP } from "otpauth";
 import pg from "pg";
 import { e2eUrls } from "./db";
@@ -1960,7 +1960,7 @@ async function membersJourney(page: Page, browser: Browser) {
   await invite.getByRole("button", { name: "Inviter un utilisateur", exact: true }).click();
   const code = await page.getByTestId("invitation-code").textContent();
   expect(code).toMatch(/^[A-Za-z0-9_-]{43}$/);
-  const context = await newWatchedContext(browser);
+  const context = watchCsp(await browser.newContext({ ...devices[process.env.E2E_MOBILE === "1" ? "Pixel 7" : "Desktop Chrome"], locale: "fr-CA" }));
   const guest = await context.newPage();
   await guest.goto("/invitation");
   await guest.getByLabel("Code d’invitation").fill(code!);
@@ -1981,6 +1981,37 @@ async function membersJourney(page: Page, browser: Browser) {
   await page.reload(); // the invitation code is deliberately not retained on a refreshed page
   await expect(page.getByTestId("invitation-code")).toHaveCount(0);
   const member = page.getByRole("article").filter({ has: page.getByRole("heading", { name: "Collègue Exemple" }) });
+  await guest.goto(`${company}/espace/banque`);
+  await expect(guest.getByRole("link", { name: "Intégrations", exact: true })).toHaveCount(0);
+  await expect(guest.getByRole("link", { name: "Transactions bancaires", exact: true })).toBeVisible();
+  await member.getByText("Permissions par module", { exact: true }).click();
+  for (const moduleKey of ["catalog", "sales", "accounting", "taxes", "audit"]) await member.locator(`select[name="${moduleKey}"]`).selectOption("none");
+  const saveAccess = async () => {
+    await Promise.all([
+      page.waitForResponse(response => response.request().method() === "POST" && response.url().includes("/utilisateurs")),
+      member.getByRole("button", { name: "Enregistrer les accès" }).click(),
+    ]);
+    await page.reload();
+  };
+  await saveAccess();
+  await guest.goto(`${company}/contacts`);
+  for (const route of ["journal", "taxes", "espace/rapports", "espace/ventes", "espace/banque"]) await expect(guest.locator(`a[href="${company}/${route}"]`)).toHaveCount(0);
+  if (process.env.E2E_MOBILE === "1") await guest.getByRole("button", { name: "Menu", exact: true }).click();
+  await expectNoPageOverflow(guest);
+  await captureReference(guest, "navigation-restreinte");
+  for (const area of ["rapports", "ventes", "banque"]) expect((await guest.goto(`${company}/espace/${area}`))?.status()).toBe(404);
+  await guest.goto(`${company}/espace/depenses`);
+  await expect(guest.locator(`a[href="${company}/catalogue"]`)).toHaveCount(0);
+  await expect(guest.locator(`a[href="${company}/journal"]`)).toHaveCount(0);
+  await guest.getByRole("button", { name: "English", exact: true }).click();
+  await expect(guest.getByRole("heading", { name: "Expenses", exact: true })).toBeVisible();
+  await expect(guest.locator(`a[href="${company}/espace/rapports"]`)).toHaveCount(0);
+  await guest.getByRole("button", { name: "Français", exact: true }).click();
+  await member.getByText("Permissions par module", { exact: true }).click();
+  for (const moduleKey of ["catalog", "sales", "accounting", "taxes", "audit"]) await member.locator(`select[name="${moduleKey}"]`).selectOption("default");
+  await saveAccess();
+  await guest.goto(`${company}/espace/rapports`);
+  await expect(guest.getByRole("link", { name: "Âge des comptes clients", exact: true })).toBeVisible();
   await member.getByLabel("Rôle", { exact: true }).selectOption("READ_ONLY");
   await member.getByRole("button", { name: "Enregistrer les accès" }).click();
   await expect(member.getByRole("status")).toBeVisible();
