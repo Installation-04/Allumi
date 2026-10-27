@@ -10,6 +10,9 @@ export default defineConfig({
   workers: 1,
   retries: 0,
   reporter: [["list"]],
+  // Password hashing and server actions may exceed the default five seconds on shared test hosts.
+  // These assertions wait for completion; accounting performance has its own unchanged timing guard.
+  expect: { timeout: 15_000 },
   use: {
     baseURL: `http://127.0.0.1:${PORT}`,
     trace: "retain-on-failure",

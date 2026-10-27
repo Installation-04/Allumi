@@ -31,3 +31,20 @@ Le menu latéral regroupe aussi Ventes, Dépenses, Banque et transactions, Trés
 L’en-tête permet de choisir **Français** ou **English**, ainsi que **Thème clair**, **Thème sombre** ou **Thème du système**. Le dernier suit les changements de l’appareil automatiquement. Le choix explicite clair ou sombre prend priorité sur le système; il est conservé dans un cookie du navigateur pendant un an et appliqué au chargement de la page.
 
 Ces préférences sont propres au navigateur ou au client : le client Windows et l’app iOS peuvent avoir leur propre choix. Effacer les cookies rétablit le thème système. Les noms d’entreprises, contacts et notes saisis par les utilisateurs ne sont pas traduits. Guide anglais et captures : [[Appearance-and-language]].
+
+## Permissions et raccourcis
+
+La navigation tient compte des [[Utilisateurs-et-permissions]], y compris dans les espaces d’activité : aucune carte ne propose un outil interdit. Les espaces ventes, banque, trésorerie, rapports, taxes et comptabilité exigent leurs droits de lecture respectifs. Les boutons de création restent soumis aux droits de modification. Les menus sont actualisés au prochain chargement de page après une modification des accès.
+
+![Navigation avec accès limité aux contacts — ordinateur](images/navigation-restreinte-desktop.png)
+![Navigation avec accès limité aux contacts — téléphone](images/navigation-restreinte-mobile.png)
+
+## Rechercher une section
+
+Le champ **Rechercher une section** filtre le menu latéral sur ordinateur. Sur téléphone, ouvre **Menu** pour retrouver le même champ. La recherche ignore les majuscules et les accents : « depenses » retrouve « Dépenses ». Plusieurs mots peuvent être saisis dans n’importe quel ordre.
+
+Seules les sections autorisées pour ton compte sont proposées. Cette recherche porte sur les noms des sections, pas sur les données des clients ni sur les factures. **Effacer la recherche** rétablit le menu; choisir un lien efface aussi la recherche. Le compteur annonce le nombre de résultats et un message indique quand aucune section ne correspond. Le champ et les résultats suivent la langue et le thème de l’interface.
+
+![Recherche du menu sur ordinateur](images/navigation-recherche-desktop.png)
+
+![Recherche du menu sur téléphone](images/navigation-recherche-mobile.png)

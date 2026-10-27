@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.14
+git checkout v0.4.0-alpha.15
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.14 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.15 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -223,3 +223,18 @@ Le [grand livre](docs/Grand-livre.md) détaille les mouvements et soldes par com
 
 ![Grand livre](docs/images/rapport-grand-livre-desktop.png)
 ![Âge des comptes clients sur téléphone](docs/images/rapport-age-clients-mobile.png)
+
+### Navigation selon les permissions
+
+Les menus et raccourcis s’adaptent aux accès de chaque membre ([guide](docs/Utilisateurs-et-permissions.md#navigation-selon-les-droits)).
+
+![Navigation d’un compte limité aux contacts](docs/images/navigation-restreinte-desktop.png)
+![Menu mobile du même compte](docs/images/navigation-restreinte-mobile.png)
+
+### Recherche des sections
+
+Retrouve une section autorisée depuis le menu, sur ordinateur ou téléphone, sans tenir compte des accents. [Guide](docs/Interface-et-navigation.md#rechercher-une-section).
+
+![Recherche dans le menu](docs/images/navigation-recherche-desktop.png)
+
+![Recherche mobile](docs/images/navigation-recherche-mobile.png)

@@ -260,3 +260,18 @@ Voir [[Utilisateurs-et-permissions]] et [[Administration-serveur]] pour les capt
 
 ![Permissions](images/utilisateurs-permissions-desktop.png)
 ![Serveur mobile](images/serveur-mobile.png)
+
+## Navigation et permissions
+
+Compte fictif limité à la lecture des contacts : les raccourcis financiers sont retirés du menu et les espaces non autorisés sont refusés par leur URL.
+
+![Navigation restreinte — ordinateur](images/navigation-restreinte-desktop.png)
+![Navigation restreinte — téléphone](images/navigation-restreinte-mobile.png)
+
+## Recherche dans la navigation
+
+Recherche sans accents d’une section autorisée, avec un compte aux permissions limitées.
+
+![Recherche sur ordinateur](images/navigation-recherche-desktop.png)
+
+![Recherche sur mobile](images/navigation-recherche-mobile.png)

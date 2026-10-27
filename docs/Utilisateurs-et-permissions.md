@@ -47,3 +47,12 @@ Le super admin peut ouvrir **Accès global au serveur** dans la fiche d’un mem
 ![Permissions ordinateur](images/utilisateurs-permissions-desktop.png)
 ![Membres sur téléphone](images/utilisateurs-membres-mobile.png)
 ![Users and permissions](images/utilisateurs-en-desktop.png)
+
+## Navigation selon les droits
+
+Le menu latéral, les onglets et les raccourcis des espaces d’activité affichent uniquement les destinations autorisées. Par exemple, un comptable externe voit les transactions bancaires mais pas les intégrations réservées aux admins. L’âge des comptes clients exige les accès aux ventes et à la comptabilité.
+
+Après un changement de permissions, recharger la page actualise les menus. Un espace financier interdit est également refusé par son adresse directe. Les espaces de fonctionnalités prévues restent identifiés comme tels; leur présence n’accorde aucun droit comptable.
+
+![Navigation avec accès limité aux contacts — ordinateur](images/navigation-restreinte-desktop.png)
+![Navigation avec accès limité aux contacts — téléphone](images/navigation-restreinte-mobile.png)
