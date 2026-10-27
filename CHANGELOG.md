@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Version imprimable des factures validées : coordonnées figées, lignes/taxes/totaux exacts, annulation visible et impression/enregistrement PDF via le navigateur, protégés par les droits de vente.
+
 ## [0.4.0-alpha.17] - 2026-10-27
 
 - Espace Paramètres et administration : profil et préférences fiscales, comptabilité, permissions, sécurité, intégrations, sauvegardes/serveur, apparence et mises à jour regroupés selon les droits du compte.

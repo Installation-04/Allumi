@@ -70,3 +70,5 @@
 - [[Age-des-comptes]]
 
 - [[Parametres-et-administration]]
+
+- [[Impression-des-factures]]

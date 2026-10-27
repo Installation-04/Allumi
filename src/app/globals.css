@@ -107,3 +107,17 @@ main:has(> .company-workspace) { max-width: none; padding: 0; }
 @media (min-width: 1024px) {
   .company-workspace { @variant dark { background: linear-gradient(to right, #34373b 208px, var(--color-stone-950) 208px); } }
 }
+
+@media print {
+  body:has(.invoice-print) { background: white !important; color: black !important; padding: 0 !important; }
+  body:has(.invoice-print) .workspace-sidebar,
+  body:has(.invoice-print) .workspace-header,
+  body:has(.invoice-print) nav,
+  body:has(.invoice-print) footer,
+  .print-controls { display: none !important; }
+  body:has(.invoice-print) .company-workspace { display: block; background: white !important; }
+  body:has(.invoice-print) .workspace-content { padding: 0; }
+  .invoice-paper { max-width: none; padding: 0; border: 0; border-radius: 0; }
+  .invoice-paper thead { display: table-header-group; }
+  .invoice-paper tr, .invoice-totals { break-inside: avoid; }
+}
