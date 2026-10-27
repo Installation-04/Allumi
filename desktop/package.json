@@ -1,7 +1,7 @@
 {
   "name": "allumi-desktop",
   "productName": "Allumi",
-  "version": "0.4.0-alpha.15",
+  "version": "0.4.0-alpha.16",
   "private": true,
   "description": "Client Allumi pour serveur auto-hébergé",
   "author": "Allumi contributors",

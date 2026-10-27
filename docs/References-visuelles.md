@@ -275,3 +275,11 @@ Recherche sans accents d’une section autorisée, avec un compte aux permission
 ![Recherche sur ordinateur](images/navigation-recherche-desktop.png)
 
 ![Recherche sur mobile](images/navigation-recherche-mobile.png)
+
+## Navigation par domaine
+
+Le menu latéral affiche les domaines; les onglets montrent seulement les outils du domaine ouvert.
+
+![Onglets Ventes sans menu global répété](images/navigation-contextuelle-desktop.png)
+
+![Accès mobile aux domaines](images/navigation-contextuelle-mobile.png)

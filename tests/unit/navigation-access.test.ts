@@ -1,3 +1,4 @@
+import { NAVIGATION_GROUPS, matchesNavigationPath } from "@/app/c/[companyId]/navigation-groups";
 import { describe, expect, it } from "vitest";
 import { canAccessArea, canAccessRoute, ROUTE_ACCESS, visibleAreaRoutes } from "@/app/c/[companyId]/navigation-access";
 import { AREAS } from "@/app/c/[companyId]/sections";
@@ -34,5 +35,20 @@ describe("company navigation authorization", () => {
     for (const area of Object.values(AREAS)) for (const route of area.links) expect(Object.hasOwn(ROUTE_ACCESS, route), route).toBe(true);
     expect(canAccessRoute({ role: "OWNER" }, "future-unregistered-page")).toBe(false);
     expect(canAccessRoute({ role: "OWNER" }, "constructor")).toBe(false);
+  });
+});
+
+
+describe("contextual navigation", () => {
+  it("assigns each tool to only one parent and an explicit permission policy", () => {
+    const routes = Object.values(NAVIGATION_GROUPS).flat();
+    expect(new Set(routes).size).toBe(routes.length);
+    for (const route of routes) expect(Object.hasOwn(ROUTE_ACCESS, route)).toBe(true);
+  });
+  it("retains the active tab on child pages without matching a route prefix", () => {
+    expect(matchesNavigationPath("/c/acme/factures/validees/123", "/c/acme/factures")).toBe(true);
+    expect(matchesNavigationPath("/c/acme/factures", "/c/acme/factures")).toBe(true);
+    expect(matchesNavigationPath("/c/acme/factures-autres", "/c/acme/factures")).toBe(false);
+    expect(matchesNavigationPath("/c/other/factures", "/c/acme/factures")).toBe(false);
   });
 });

@@ -1,6 +1,6 @@
 # Interface et navigation
 
-Allumi propose un espace de travail comptable bilingue. Sur ordinateur, une barre latérale sombre occupe toute la hauteur, avec une action Créer et les modules comptables. Une barre supérieure compacte affiche l’entreprise et les contrôles de session; des onglets soulignent la section active. Sur téléphone et tablette, une barre de navigation fixe au bas de l’écran donne accès aux sections, tandis que les résumés et les écritures s’empilent. La section active est indiquée visuellement et aux lecteurs d’écran. Les liens conduisent uniquement à des fonctions disponibles.
+Allumi propose un espace de travail comptable bilingue. Sur ordinateur, une barre latérale sombre occupe toute la hauteur, avec une action Créer et les modules comptables. Une barre supérieure compacte affiche l’entreprise et les contrôles de session; des onglets contextuels montrent uniquement les outils du domaine ouvert. Le tableau de bord n’affiche pas de deuxième menu global. Sur téléphone et tablette, une barre de navigation fixe au bas de l’écran donne accès aux sections, tandis que les résumés et les écritures s’empilent. La section active est indiquée visuellement et aux lecteurs d’écran. Les liens conduisent uniquement à des fonctions disponibles.
 
 ## Tableau de bord
 
@@ -48,3 +48,15 @@ Seules les sections autorisées pour ton compte sont proposées. Cette recherche
 ![Recherche du menu sur ordinateur](images/navigation-recherche-desktop.png)
 
 ![Recherche du menu sur téléphone](images/navigation-recherche-mobile.png)
+
+## Navigation par domaine
+
+Sur ordinateur, le menu de gauche contient les domaines d’activité. **Ventes** ouvre les onglets Factures, Avoirs, Encaissements, Contacts et Catalogue; **Banque et transactions** regroupe les transactions, le rapprochement et les intégrations autorisées; **Comptabilité** regroupe les comptes, le journal, la balance et les exercices; **Rapports** regroupe les états financiers, le grand livre et l’âge clients. Le domaine reste sélectionné pendant la consultation ou la modification d’une pièce.
+
+Les pages de ces domaines ne sont plus répétées dans le menu latéral. La recherche retrouve toujours directement chaque outil autorisé. Un outil dont le domaine est interdit reste accessible directement s’il dispose de son propre droit de lecture, par exemple Contacts. Les réglages de l’entreprise restent à gauche. Les filtres et actions propres à une page restent dans son contenu.
+
+Sur téléphone, les raccourcis du bas et le panneau Menu donnent accès à ces mêmes outils sans ajouter une deuxième rangée d’onglets.
+
+![Navigation contextuelle sur ordinateur](images/navigation-contextuelle-desktop.png)
+
+![Navigation sur téléphone](images/navigation-contextuelle-mobile.png)
