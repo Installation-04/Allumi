@@ -283,3 +283,13 @@ Le menu latéral affiche les domaines; les onglets montrent seulement les outils
 ![Onglets Ventes sans menu global répété](images/navigation-contextuelle-desktop.png)
 
 ![Accès mobile aux domaines](images/navigation-contextuelle-mobile.png)
+
+## Factures fournisseurs
+
+Saisie et validation d’une facture de charges avec TPS/TVQ entièrement récupérables, données fictives. Voir [[Factures-fournisseurs]].
+
+![Saisie d’une facture fournisseur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/achat-formulaire-desktop.png)
+
+![Facture fournisseur validée](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/achat-valide-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/achat-valide-mobile.png" alt="Facture fournisseur — téléphone" width="412">

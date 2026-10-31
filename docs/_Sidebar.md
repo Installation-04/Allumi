@@ -72,3 +72,4 @@
 - [[Parametres-et-administration]]
 
 - [[Impression-des-factures]]
+- [[Factures-fournisseurs]]

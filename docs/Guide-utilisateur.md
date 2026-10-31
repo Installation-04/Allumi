@@ -66,3 +66,7 @@ Pour corriger entièrement une facture validée, voir [[Annulation-des-factures]
 - [[Brouillons-d-avoirs]]
 
 - [[Validation-des-avoirs]]
+
+## Saisir une facture fournisseur
+
+Ouvrir **Dépenses → Factures fournisseurs** pour préparer une facture à payer, la valider et consulter son écriture. Voir [[Factures-fournisseurs]] pour les droits, l’annulation et les limites de récupération des taxes.

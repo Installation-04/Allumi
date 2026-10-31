@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.18
+git checkout v0.4.0-alpha.19
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.18 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.19 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -262,3 +262,11 @@ Les factures validées proposent une [version imprimable](docs/Impression-des-fa
 ![Facture](docs/images/facture-imprimable-desktop.png)
 
 ![Facture mobile](docs/images/facture-imprimable-mobile.png)
+
+### Factures fournisseurs
+
+Le parcours [Dépenses → Factures fournisseurs](docs/Factures-fournisseurs.md) permet de saisir, valider et annuler une facture à payer. Ce premier lot couvre les charges avec taxes entièrement récupérables ou sans taxe; les paiements fournisseurs restent à venir.
+
+![Facture fournisseur validée](docs/images/achat-valide-desktop.png)
+
+![Facture fournisseur sur mobile](docs/images/achat-valide-mobile.png)
