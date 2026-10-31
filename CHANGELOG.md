@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Factures fournisseurs : brouillons, référence unique par fournisseur, validation vers comptes fournisseurs et taxes entièrement récupérables, annulation par contre-passation, permissions Comptabilité et parcours FR/EN sur ordinateur/mobile.
+
 ## [0.4.0-alpha.18] - 2026-10-27
 
 - Version imprimable des factures validées : coordonnées figées, lignes/taxes/totaux exacts, annulation visible et impression/enregistrement PDF via le navigateur, protégés par les droits de vente.

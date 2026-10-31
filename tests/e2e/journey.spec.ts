@@ -265,6 +265,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await financialStatementsJourney(page);
   await generalLedgerJourney(page);
   await receivablesAgingJourney(page);
+  await supplierBillsJourney(page);
   const settingsBase = new URL(page.url()).pathname.match(/^\/c\/[^/]+/)?.[0];
   expect(settingsBase).toBeTruthy();
   await page.getByRole("button", { name: "Français", exact: true }).click();
@@ -2099,4 +2100,43 @@ async function membersJourney(page: Page, browser: Browser) {
   await expect(member).toHaveCount(0);
   expect((await guest.goto(company))?.status()).toBe(404);
   await context.close();
+}
+
+async function supplierBillsJourney(page: Page) {
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await openSection(page, "Factures fournisseurs");
+  await page.getByRole("link", { name: "Nouveau brouillon", exact: true }).click();
+  await page.getByLabel("Fournisseur", { exact: true }).selectOption({ label: "Atelier Boréal" });
+  await page.getByLabel("Numéro de facture fournisseur", { exact: true }).fill("FOUR-2026-001");
+  await page.getByLabel("Date de facture", { exact: true }).fill("2026-07-15");
+  await page.getByLabel("Date d’échéance", { exact: true }).fill("2026-08-15");
+  const line = page.getByRole("group", { name: "Ligne 1", exact: true });
+  await line.getByLabel("Description").fill("Fournitures de bureau");
+  await line.getByLabel("Prix unitaire (CAD)").fill("100");
+  await line.getByLabel("Compte de charges").selectOption({ label: "6040 — Fournitures de bureau" });
+  await line.getByLabel("Code de taxe").selectOption({ label: "TPS+TVQ" });
+  await expectNoPageOverflow(page);
+  await captureReference(page, "achat-formulaire");
+  await page.getByRole("button", { name: "Enregistrer le brouillon" }).click();
+  await expect(page.getByRole("heading", { name: "FOUR-2026-001", exact: true })).toBeVisible();
+  await expect(page.getByText(/Total:.*114,98/)).toBeVisible();
+  await page.getByRole("link", { name: "Modifier le brouillon" }).click();
+  await page.getByLabel("Note", { exact: true }).fill("Facture fournisseur de référence");
+  await page.getByRole("button", { name: "Enregistrer le brouillon" }).click();
+  await page.locator("summary", { hasText: "Valider la facture" }).click();
+  await page.getByLabel("Je confirme les montants de la pièce et la récupération intégrale des taxes.").check();
+  await page.getByRole("button", { name: "Valider la facture", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "A-00001", exact: true })).toBeVisible();
+  await expect(page.getByText("Facture comptabilisée", { exact: true })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "achat-valide");
+  await page.getByRole("button", { name: "English", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Supplier", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await page.locator("summary", { hasText: "Annuler la facture" }).click();
+  await page.getByLabel("Date de contre-passation", { exact: true }).fill("2026-07-16");
+  await page.getByLabel("Motif", { exact: true }).fill("Correction de la pièce de test");
+  await page.getByLabel("Je confirme l’annulation définitive de cette facture.").check();
+  await page.getByRole("button", { name: "Annuler la facture", exact: true }).click();
+  await expect(page.getByText("Facture annulée", { exact: true })).toBeVisible();
 }
