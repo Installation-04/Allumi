@@ -2130,6 +2130,23 @@ async function supplierBillsJourney(page: Page) {
   await expect(page.getByText("Facture comptabilisée", { exact: true })).toBeVisible();
   await expectNoPageOverflow(page);
   await captureReference(page, "achat-valide");
+  const supplierBillUrl = page.url();
+  await page.locator("summary", { hasText: "Enregistrer un décaissement" }).click();
+  await page.getByLabel("Montant envoyé", { exact: true }).fill("50,00");
+  await page.getByLabel("Date de paiement", { exact: true }).fill("2026-07-15");
+  await page.getByRole("button", { name: "Enregistrer le décaissement", exact: true }).click();
+  await expect(page).toHaveURL(/decaissements\//);
+  await expectNoPageOverflow(page);
+  await captureReference(page, "paiement-fournisseur");
+  await page.locator("summary", { hasText: "Annuler ce décaissement" }).click();
+  await page.getByLabel("Date d’annulation", { exact: true }).fill("2026-07-16");
+  await page.getByLabel("Motif (obligatoire, 500 caractères au plus)").fill("Correction du règlement de test");
+  await page.getByLabel("Je confirme l’annulation définitive de ce décaissement.").check();
+  await page.getByRole("button", { name: "Annuler le décaissement", exact: true }).click();
+  await expect(page.getByText("Motif : Correction du règlement de test", { exact: true })).toBeVisible();
+  await page.goto(supplierBillUrl);
+  await expect(page.getByText(/Solde à payer:.*114,98/)).toBeVisible();
+
   await page.getByRole("button", { name: "English", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Supplier", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Français", exact: true }).click();

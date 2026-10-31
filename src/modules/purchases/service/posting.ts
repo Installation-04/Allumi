@@ -65,3 +65,11 @@ export async function getBill(actor: CompanyContext, id: string) {
     return tx.purchaseDocument.findFirst({ where: { companyId: actor.companyId, id, kind: "BILL", status: { in: ["POSTED", "VOID"] } }, include: { voidEntry: { select: { entryDate: true } }, lines: { orderBy: { position: "asc" } }, taxes: { include: { tax: { select: { code: true } } } } } });
   });
 }
+
+export async function getBillOpenCents(actor: CompanyContext, id: string) {
+  return withCompany(actor, async tx => {
+    await requireRole(tx, "ledger.read");
+    const rows = await tx.$queryRaw<{ cents: bigint | null }[]>`SELECT purchase_document_open_cents(${actor.companyId}::uuid, ${id}::uuid) AS cents`;
+    return rows[0]?.cents ?? null;
+  });
+}

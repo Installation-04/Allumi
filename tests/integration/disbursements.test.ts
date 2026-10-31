@@ -1,0 +1,38 @@
+import { afterAll, beforeAll, expect, it } from "vitest";
+import type pg from "pg";
+import { getDisbursement, recordDisbursement, voidDisbursement } from "@/modules/payments";
+import { saveDraft, getDraft, postBill, getBillOpenCents, voidBill } from "@/modules/purchases";
+import { owner } from "./helpers";
+import { seedWorld, W } from "./world";
+const actor = { userId: W.userOwnerA, companyId: W.companyA };
+let db: pg.Client;
+beforeAll(async () => {
+ db = await owner(); await seedWorld(db);
+ await db.query("INSERT INTO number_sequence(company_id,key,next_value,prefix,padding) VALUES ($1,'JOURNAL_ENTRY',1,'J-',5),($1,'PURCHASE_DOCUMENT',1,'A-',5),($1,'PAYMENT_SENT',1,'D-',5)",[W.companyA]);
+});
+afterAll(async () => { await db?.end(); });
+it("pays partially once under concurrent submissions, preserves tenant boundaries, reverses exactly", async () => {
+ const id = await saveDraft(actor,{contactId:W.supplier,documentDate:"2026-06-01",dueDate:"2026-07-01",lines:[{description:"Supplies",quantity:"1",unitPrice:"100",accountId:W.expenses,taxCodeId:W.taxCodeStandard}]});
+ await postBill(actor,id,(await getDraft(actor,id))!.revision,"2026-06-01");
+ const input={billId:id,amountCents:"5000",expectedOpenCents:"11498",date:"2026-06-02",accountId:W.bank,method:"EFT"};
+ const now={now:new Date("2026-12-31")};
+ await expect(recordDisbursement({...actor,userId:W.userReader},input,now)).rejects.toThrow();
+ await expect(recordDisbursement({userId:W.userOwnerB,companyId:W.companyB},input,now)).rejects.toThrow();
+ await expect(recordDisbursement(actor,{...input,amountCents:"11499"},now)).rejects.toThrow();
+ const attempts=await Promise.allSettled([recordDisbursement(actor,input,now),recordDisbursement(actor,input,now)]);
+ expect(attempts.filter(r=>r.status==="fulfilled")).toHaveLength(1);
+ const result=attempts.find(r=>r.status==="fulfilled")!;
+ if(result.status!=="fulfilled") throw new Error("Missing payment");
+ expect(await getBillOpenCents(actor,id)).toBe(6498n);
+ const payment=(await getDisbursement(actor,result.value.id))!;
+ const lines=(await db.query("SELECT account_id,debit_cents::text AS debit,credit_cents::text AS credit FROM journal_line WHERE entry_id=$1 ORDER BY line_no",[payment.journalEntryId])).rows;
+ expect(lines).toEqual([{account_id:W.bank,debit:"0",credit:"5000"},{account_id:W.payable,debit:"5000",credit:"0"}]);
+ await expect(voidBill(actor,id,"2026-06-03","Correction")).rejects.toThrow();
+ await voidDisbursement(actor,payment.id,{date:"2026-06-03",reason:"Incorrect payment"});
+ expect(await getBillOpenCents(actor,id)).toBe(11498n);
+ const voided=(await getDisbursement(actor,payment.id))!;
+ expect(voided.status).toBe("VOID");
+ const sums=(await db.query("SELECT account_id,sum(debit_cents-credit_cents)::text AS net FROM journal_line WHERE entry_id=ANY($1::uuid[]) GROUP BY account_id",[[payment.journalEntryId,voided.voidEntryId]])).rows;
+ expect(sums.every(r=>r.net==="0")).toBe(true);
+ await expect(voidDisbursement(actor,payment.id,{date:"2026-06-03",reason:"Retry"})).resolves.toBe(payment.id);
+});

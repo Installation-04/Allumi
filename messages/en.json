@@ -1,8 +1,77 @@
 {
+  "disbursements": {
+    "title": "Payments sent",
+    "intro": "Payments to suppliers, applied to posted bills.",
+    "back": "Back to payments",
+    "empty": "No payments yet",
+    "emptyHint": "Open a posted bill to record a payment sent.",
+    "number": "Number",
+    "date": "Date",
+    "supplier": "Supplier",
+    "amount": "Amount",
+    "status": "Status",
+    "bills": "Bills",
+    "method": "Payment method",
+    "reference": "Reference",
+    "memo": "Note",
+    "account": "Paid from",
+    "statuses": {
+      "POSTED": "Posted",
+      "VOID": "Voided"
+    },
+    "methods": {
+      "CASH": "Cash",
+      "CHEQUE": "Cheque",
+      "EFT": "Bank transfer",
+      "INTERAC": "Interac",
+      "CREDIT_CARD": "Credit card",
+      "DEBIT_CARD": "Debit card",
+      "OTHER": "Other"
+    },
+    "pagination": "Payments pagination",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {count}",
+    "count": "{count, plural, =0 {No payments} one {# payment} other {# payments}}",
+    "billTitle": "Payments on this bill",
+    "balance": "Remaining balance",
+    "settlement": {
+      "UNPAID": "Unpaid",
+      "PARTIAL": "Partially paid",
+      "PAID": "Paid"
+    },
+    "none": "No payment is applied to this bill.",
+    "paidInFull": "This bill is paid in full.",
+    "record": "Record a payment",
+    "recordHint": "The payment reduces the selected account and accounts payable. The amount cannot exceed the open balance.",
+    "amountField": "Amount sent",
+    "amountHint": "Up to the remaining balance, with at most two decimals.",
+    "dateField": "Payment date",
+    "accountField": "Payment account",
+    "accountHint": "An active bank, cash or credit card account.",
+    "methodField": "Payment method",
+    "referenceField": "Reference (cheque or transaction number…)",
+    "memoField": "Note",
+    "submit": "Record payment",
+    "detail": "Payment {number}",
+    "journalEntry": "Journal entry",
+    "allocations": "Applications",
+    "allocationLine": "{amount} applied to bill {number}",
+    "released": "released on {date}",
+    "voidTitle": "Void this payment",
+    "voidWarning": "Voiding keeps the payment and adds a reversing entry; the bill's balance is restored. The date cannot precede the payment or its applications.",
+    "voidDate": "Void date",
+    "voidReason": "Reason (required, up to 500 characters)",
+    "confirmVoid": "I confirm permanently voiding this payment.",
+    "voidSubmit": "Void payment",
+    "voidedOn": "Voided on {date}",
+    "voidedReason": "Reason: {reason}"
+  },
   "purchases": {
+    "openBalance": "Balance due",
     "title": "Supplier bill drafts",
     "draft": "Draft — not posted",
-    "intro": "Enter an unpaid supplier bill. This first version supports expenses with fully recoverable taxes or no tax; payments, credits and partial tax recovery are not yet available.",
+    "intro": "Enter an unpaid supplier bill. This first version supports expenses with fully recoverable taxes or no tax; credits and partial tax recovery are not yet available.",
     "new": "New draft",
     "edit": "Edit draft",
     "back": "Back to drafts",
@@ -46,7 +115,7 @@
     "journal": "View journal entry",
     "issuer": "Issuer",
     "billedTo": "Bill to",
-    "postedHint": "Supplier details are frozen at posting. Supplier payments are not yet available.",
+    "postedHint": "Supplier details are frozen at posting.",
     "void": "Void invoice",
     "voided": "Voided invoice",
     "voidDate": "Reversal date",
@@ -192,6 +261,19 @@
     "create": "Create"
   },
   "errors": {
+    "disbursements": {
+      "invalid": "Check the amount (positive, at most two decimals), the date, the account and the payment method.",
+      "billNotFound": "Bill not found.",
+      "billNotOpen": "Only a posted, non-voided bill can receive a payment.",
+      "stale": "The balance of this bill changed after the form was shown. Reload the page and check the balance.",
+      "exceeds": "The amount is more than the bill's remaining balance.",
+      "dateBeforeBill": "The date received cannot precede the bill's accounting date.",
+      "futureDate": "The date received cannot be in the future.",
+      "account": "Choose an active bank account, cash account or \"Undeposited funds\".",
+      "notFound": "Payment not found.",
+      "invalidVoid": "Give a reason of 1 to 500 characters and a date on or after the payment and its applications.",
+      "confirmVoid": "Confirm the permanent voiding of the payment."
+    },
     "purchases": {
       "invalid": "Check dates, lines and amounts. The total must be positive; at most 50 lines.",
       "reference": "Choose active customers, items, income accounts and tax codes belonging to this company.",
@@ -839,7 +921,7 @@
     "depenses": {
       "title": "Expenses",
       "description": "Find suppliers and consult the journal.",
-      "planned": "Supplier payments and credits, immediately paid expenses, partial tax recovery and attachments are still planned."
+      "planned": "Supplier credits, immediately paid expenses, partial tax recovery and attachments are still planned."
     },
     "banque": {
       "title": "Banking and transactions",
@@ -889,6 +971,7 @@
     "planned": "Planned — not available",
     "progress": "Features and limitations",
     "links": {
+      "decaissements": "Supplier payments",
       "achats": "Supplier bills",
       "contacts": "Contacts",
       "journal": "Journal",
