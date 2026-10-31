@@ -1,8 +1,77 @@
 {
+  "disbursements": {
+    "title": "Décaissements",
+    "intro": "Les paiements à vos fournisseurs, appliqués aux factures validées.",
+    "back": "Retour aux décaissements",
+    "empty": "Aucun décaissement pour le moment",
+    "emptyHint": "Ouvrez une facture validée pour enregistrer un paiement envoyé.",
+    "number": "Numéro",
+    "date": "Date",
+    "supplier": "Fournisseur",
+    "amount": "Montant",
+    "status": "État",
+    "bills": "Factures",
+    "method": "Mode de paiement",
+    "reference": "Référence",
+    "memo": "Note",
+    "account": "Payé depuis",
+    "statuses": {
+      "POSTED": "Comptabilisé",
+      "VOID": "Annulé"
+    },
+    "methods": {
+      "CASH": "Comptant",
+      "CHEQUE": "Chèque",
+      "EFT": "Virement",
+      "INTERAC": "Interac",
+      "CREDIT_CARD": "Carte de crédit",
+      "DEBIT_CARD": "Carte de débit",
+      "OTHER": "Autre"
+    },
+    "pagination": "Pagination des décaissements",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {page} sur {count}",
+    "count": "{count, plural, =0 {Aucun décaissement} one {# décaissement} other {# décaissements}}",
+    "billTitle": "Décaissements de cette facture",
+    "balance": "Solde restant",
+    "settlement": {
+      "UNPAID": "Non payée",
+      "PARTIAL": "Partiellement payée",
+      "PAID": "Payée"
+    },
+    "none": "Aucun décaissement appliqué à cette facture.",
+    "paidInFull": "Cette facture est payée en entier.",
+    "record": "Enregistrer un décaissement",
+    "recordHint": "Le paiement diminue le compte choisi et les comptes fournisseurs. Le montant ne peut dépasser le solde restant.",
+    "amountField": "Montant envoyé",
+    "amountHint": "Jusqu’au solde restant, avec deux décimales au plus.",
+    "dateField": "Date de paiement",
+    "accountField": "Compte de paiement",
+    "accountHint": "Banque, encaisse ou carte de crédit active.",
+    "methodField": "Mode de paiement",
+    "referenceField": "Référence (numéro de chèque, de transaction…)",
+    "memoField": "Note",
+    "submit": "Enregistrer le décaissement",
+    "detail": "Décaissement {number}",
+    "journalEntry": "Écriture au journal",
+    "allocations": "Affectations",
+    "allocationLine": "{amount} appliqués à la facture {number}",
+    "released": "retiré le {date}",
+    "voidTitle": "Annuler ce décaissement",
+    "voidWarning": "L’annulation conserve le décaissement et ajoute une écriture inverse; le solde de la facture est rétabli. La date ne peut précéder le décaissement ni ses affectations.",
+    "voidDate": "Date d’annulation",
+    "voidReason": "Motif (obligatoire, 500 caractères au plus)",
+    "confirmVoid": "Je confirme l’annulation définitive de ce décaissement.",
+    "voidSubmit": "Annuler le décaissement",
+    "voidedOn": "Annulé le {date}",
+    "voidedReason": "Motif : {reason}"
+  },
   "purchases": {
+    "openBalance": "Solde à payer",
     "title": "Brouillons de factures fournisseurs",
     "draft": "Brouillon — non comptabilisé",
-    "intro": "Saisissez une facture fournisseur à payer. Cette première version prend en charge les charges avec taxes entièrement récupérables ou sans taxe; paiements, crédits et récupération partielle ne sont pas encore disponibles.",
+    "intro": "Saisissez une facture fournisseur à payer. Cette première version prend en charge les charges avec taxes entièrement récupérables ou sans taxe; crédits et récupération partielle ne sont pas encore disponibles.",
     "new": "Nouveau brouillon",
     "edit": "Modifier le brouillon",
     "back": "Retour aux brouillons",
@@ -46,7 +115,7 @@
     "journal": "Voir l’écriture comptable",
     "issuer": "Émetteur",
     "billedTo": "Facturé à",
-    "postedHint": "Les coordonnées du fournisseur sont figées à la validation. Le paiement fournisseur n’est pas encore disponible.",
+    "postedHint": "Les coordonnées du fournisseur sont figées à la validation.",
     "void": "Annuler la facture",
     "voided": "Facture annulée",
     "voidDate": "Date de contre-passation",
@@ -192,6 +261,19 @@
     "create": "Créer"
   },
   "errors": {
+    "disbursements": {
+      "invalid": "Vérifiez le montant (positif, deux décimales au plus), la date, le compte et le mode de paiement.",
+      "billNotFound": "Facture introuvable.",
+      "billNotOpen": "Seule une facture validée et non annulée peut recevoir un paiement.",
+      "stale": "Le solde de cette facture a changé depuis l’affichage du formulaire. Rechargez la page et vérifiez le solde.",
+      "exceeds": "Le montant dépasse le solde restant de la facture.",
+      "dateBeforeBill": "La date de réception ne peut précéder la date comptable de la facture.",
+      "futureDate": "La date de réception ne peut pas être dans le futur.",
+      "account": "Choisissez un compte bancaire, la caisse ou « Fonds non déposés » actif.",
+      "notFound": "Encaissement introuvable.",
+      "invalidVoid": "Indiquez un motif de 1 à 500 caractères et une date égale ou postérieure à l’décaissement et à ses affectations.",
+      "confirmVoid": "Confirmez l’annulation définitive de l’décaissement."
+    },
     "purchases": {
       "invalid": "Vérifiez les dates, les lignes et les montants. Le total doit être positif; 50 lignes au maximum.",
       "reference": "Choisissez des clients, articles, comptes de revenus et codes fiscaux actifs de cette entreprise.",
@@ -839,7 +921,7 @@
     "depenses": {
       "title": "Dépenses",
       "description": "Retrouvez vos fournisseurs et consultez le journal.",
-      "planned": "Paiements et crédits fournisseurs, dépenses payées immédiatement, récupération partielle des taxes et pièces jointes restent à venir."
+      "planned": "Crédits fournisseurs, dépenses payées immédiatement, récupération partielle des taxes et pièces jointes restent à venir."
     },
     "banque": {
       "title": "Banque et transactions",
@@ -889,6 +971,7 @@
     "planned": "À venir — non disponible",
     "progress": "Fonctionnalités et limites",
     "links": {
+      "decaissements": "Paiements fournisseurs",
       "achats": "Factures fournisseurs",
       "contacts": "Contacts",
       "journal": "Journal",

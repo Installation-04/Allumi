@@ -7,6 +7,7 @@ export const ROUTE_ACCESS: Record<string, readonly Action[]> = {
   parametres: ["company.read"],
   contacts: ["contact.read"],
   journal: ["ledger.read"],
+  decaissements: ["ledger.read"],
   achats: ["ledger.read"],
   factures: ["sales.read"],
   avoirs: ["sales.read"],

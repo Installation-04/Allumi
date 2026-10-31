@@ -4,6 +4,10 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.20] - 2026-10-31
+
+- Paiements fournisseurs partiels ou complets, solde à payer sur les factures, historique et annulation par contre-passation, permissions Comptabilité.
+
 ## [0.4.0-alpha.19] - 2026-10-31
 
 - Factures fournisseurs : brouillons, référence unique par fournisseur, validation vers comptes fournisseurs et taxes entièrement récupérables, annulation par contre-passation, permissions Comptabilité et parcours FR/EN sur ordinateur/mobile.

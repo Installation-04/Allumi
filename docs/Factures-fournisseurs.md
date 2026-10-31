@@ -28,6 +28,14 @@ La validation attribue un numéro interne `A-…`, fige les coordonnées du four
 
 **Annuler la facture** demande un motif et une date dans une période ouverte, au moins égale à la date comptable originale. La facture et sa piste d’audit restent présentes; une écriture inverse annule son effet comptable. Des paiements ou crédits liés empêchent l’annulation tant qu’ils ne sont pas résolus.
 
-Le règlement des fournisseurs, les crédits fournisseurs, les dépenses immédiatement payées, les immobilisations et stocks, les pièces jointes et l’âge des comptes fournisseurs restent à venir. Les listes affichent au maximum 100 pièces; la liste des brouillons propose une recherche. Les sélecteurs de fournisseurs et d’articles sont limités à 500 entrées actives.
+Les crédits fournisseurs, les dépenses immédiatement payées, les immobilisations et stocks, les pièces jointes et l’âge des comptes fournisseurs restent à venir. Les listes affichent au maximum 100 pièces; la liste des brouillons propose une recherche. Les sélecteurs de fournisseurs et d’articles sont limités à 500 entrées actives.
 
 Voir aussi [[Taxes-et-catalogue]], [[Utilisateurs-et-permissions]] et [[Fonctionnalites-et-limites]].
+
+## Paiements fournisseurs
+
+Depuis une facture validée, le panneau Paiements permet de saisir un règlement partiel ou complet et affiche le solde à payer. Choisissez une banque, une encaisse ou une carte de crédit active. La date doit suivre la date comptable de la facture et ne pas être future. Un solde modifié par une autre opération impose de recharger la fiche. Le paiement débite les comptes fournisseurs et crédite le compte choisi. Sa fiche permet une annulation motivée dans une période ouverte; le solde de la facture est rétabli par contre-passation. Voir aussi Dépenses → Paiements fournisseurs pour l’historique paginé. Ces opérations enregistrent les paiements dans la comptabilité; elles n’émettent aucun virement bancaire.
+
+![Paiement fournisseur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/paiement-fournisseur-desktop.png)
+
+![Paiement sur téléphone](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/paiement-fournisseur-mobile.png)
