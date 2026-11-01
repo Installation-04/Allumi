@@ -28,6 +28,8 @@ Un second essai de la même validation retourne la dépense existante sans numé
 
 **Annuler la dépense** demande un motif et une date dans une période ouverte, au moins égale à sa validation. La contre-passation inverse chaque ligne; la dépense, son numéro, son écriture d’origine et l’audit restent conservés.
 
-Ce premier parcours exige un fournisseur actif et un compte actif banque, encaisse ou carte de crédit. Il couvre les charges avec taxes entièrement récupérables ou sans taxe. Ne validez pas si les montants calculés ne correspondent pas au reçu. Les dépenses sans contact, immobilisations/stocks, récupération partielle, ajustements manuels de taxes et pièces jointes ne sont pas disponibles dans ce parcours. Les listes affichent les 100 pièces les plus récentes; les brouillons proposent une recherche.
+Ce premier parcours exige un fournisseur actif et un compte actif banque, encaisse ou carte de crédit. Il couvre les charges avec taxes entièrement récupérables ou sans taxe. Ne validez pas si les montants calculés ne correspondent pas au reçu. Les dépenses sans contact, immobilisations/stocks, récupération partielle, ajustements manuels de taxes ne sont pas disponibles dans ce parcours. Les listes affichent les 100 pièces les plus récentes; les brouillons proposent une recherche.
 
 Voir [[Factures-fournisseurs]], [[Taxes-et-catalogue]] et [[Utilisateurs-et-permissions]].
+
+Les [[Justificatifs]] permettent d’ajouter les reçus et preuves de paiement à la dépense.

@@ -64,3 +64,7 @@ Au démarrage, une variable manquante ou invalide arrête l'application avec un 
 ## Administration du serveur
 
 `ALLUMI_SERVER_ADMIN_ENABLED` vaut `0` par défaut. L’activation se fait avec `scripts/enable-server-admin.sh` sur un hôte systemd. Voir [[Administration-serveur]] pour les sauvegardes, la rétention et le journal d’opérations. Aucun secret de `.env` n’est modifiable ou visible depuis cette page.
+
+## Stockage des justificatifs
+
+Docker fixe `ATTACHMENTS_DIR=/app/storage/attachments`, dans le volume sauvegardé `app_storage`. Hors Docker, choisir un répertoire privé accessible au processus, en dehors de tout répertoire public, et sauvegarder ce stockage avec la base. Voir [[Justificatifs]].

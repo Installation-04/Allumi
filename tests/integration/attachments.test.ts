@@ -1,0 +1,46 @@
+import { afterAll,beforeAll,expect,it } from "vitest";
+import { mkdtemp,rm,writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import type pg from "pg";
+import { uploadPurchaseAttachment, downloadPurchaseAttachment, listPurchaseAttachments, detachPurchaseAttachment } from "@/modules/attachments";
+import { saveDraft,getDraft,postBill,deleteDraft } from "@/modules/purchases";
+import { owner } from "./helpers";
+import { seedWorld,W } from "./world";
+const actor={userId:W.userOwnerA,companyId:W.companyA}, reader={...actor,userId:W.userReader},other={userId:W.userOwnerB,companyId:W.companyB};
+const png=Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jC1sAAAAASUVORK5CYII=","base64");
+let db:pg.Client,dir:string;
+beforeAll(async()=>{db=await owner();await seedWorld(db);dir=await mkdtemp("/tmp/allumi-attachment-test-");process.env.ATTACHMENTS_DIR=dir;await db.query("INSERT INTO number_sequence(company_id,key,next_value,prefix,padding) VALUES ($1,'JOURNAL_ENTRY',1,'J-',5),($1,'PURCHASE_DOCUMENT',1,'A-',5)",[W.companyA]);});
+afterAll(async()=>{await db?.end();await rm(dir,{recursive:true,force:true});delete process.env.ATTACHMENTS_DIR;});
+const draft=()=>saveDraft(actor,{contactId:W.supplier,documentDate:"2026-06-01",dueDate:"2026-07-01",lines:[{description:"Service",quantity:"1",unitPrice:"100",accountId:W.expenses,taxCodeId:W.taxCodeStandard}]});
+it("stores private immutable bytes, authorizes every access and retains posted evidence",async()=>{
+ const doc=await draft();const id=await uploadPurchaseAttachment(actor,doc,"reçu.png",png);
+ expect((await downloadPurchaseAttachment(reader,doc,id)).data).toEqual(png);
+ expect((await listPurchaseAttachments(reader,doc)).files.map(f=>f.id)).toEqual([id]);
+ await expect(uploadPurchaseAttachment(reader,doc,"reçu.png",png)).rejects.toThrow();
+ await expect(downloadPurchaseAttachment(other,doc,id)).rejects.toThrow();
+ await expect(uploadPurchaseAttachment(other,doc,"reçu.png",png)).rejects.toThrow();
+ const otherDoc=await draft();await expect(downloadPurchaseAttachment(actor,otherDoc,id)).rejects.toThrow();
+ await postBill(actor,doc,(await getDraft(actor,doc))!.revision,"2026-06-01");
+ await expect(detachPurchaseAttachment(actor,doc,id)).rejects.toMatchObject({key:"attachments.retained"});
+ expect((await downloadPurchaseAttachment(reader,doc,id)).data).toEqual(png);
+ expect((await db.query("SELECT count(*)::int AS n FROM audit_log WHERE entity_id=$1 AND action='row.insert'",[id])).rows[0].n).toBe(1);
+});
+it("retires draft links and permits deleting the draft, without exposing retained bytes",async()=>{
+ const doc=await draft();const id=await uploadPurchaseAttachment(actor,doc,"file.png",png);
+ await detachPurchaseAttachment(actor,doc,id);
+ expect((await listPurchaseAttachments(actor,doc)).files).toHaveLength(0);
+ await expect(downloadPurchaseAttachment(actor,doc,id)).rejects.toThrow();
+ expect((await db.query("SELECT deleted_at FROM attachment WHERE id=$1",[id])).rows[0].deleted_at).not.toBeNull();
+ await deleteDraft(actor,doc,(await getDraft(actor,doc))!.revision);
+});
+it("refuses corrupt stored bytes, disguised files and concurrent uploads beyond the limit",async()=>{
+ const doc=await draft();const id=await uploadPurchaseAttachment(actor,doc,"file.png",png);
+ const key=(await db.query("SELECT storage_key FROM attachment WHERE id=$1",[id])).rows[0].storage_key;
+ await writeFile(join(dir,key),Buffer.from("corrupt"));
+ await expect(downloadPurchaseAttachment(actor,doc,id)).rejects.toMatchObject({key:"attachments.unavailable"});
+ await expect(uploadPurchaseAttachment(actor,doc,"fake.pdf",Buffer.from("<html>"))).rejects.toThrow();
+ for(let i=0;i<18;i++) await uploadPurchaseAttachment(actor,doc,`file-${i}.png`,png);
+ const results=await Promise.allSettled([1,2].map(i=>uploadPurchaseAttachment(actor,doc,`last-${i}.png`,png)));
+ expect(results.filter(r=>r.status==="fulfilled")).toHaveLength(1);
+ expect((await listPurchaseAttachments(actor,doc)).files).toHaveLength(20);
+});

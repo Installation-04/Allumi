@@ -2206,6 +2206,14 @@ async function paidExpensesJourney(page: Page) {
   await expect(page.getByText(/Total:.*114,98/)).toBeVisible();
   await expectNoPageOverflow(page);
   await captureReference(page, "depense-payee-brouillon");
+  const evidence = page.getByRole("region", { name: "Justificatifs", exact: true });
+  await evidence.getByLabel("Fichier justificatif", { exact: true }).setInputFiles({ name: "faux.pdf", mimeType: "application/pdf", buffer: Buffer.from("<html>not a PDF</html>") });
+  await evidence.getByRole("button", { name: "Ajouter le justificatif", exact: true }).click();
+  await expect(evidence.getByRole("alert")).toContainText("Choisissez un PDF");
+  await evidence.getByLabel("Fichier justificatif", { exact: true }).setInputFiles({ name: "recu-test.png", mimeType: "image/png", buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jC1sAAAAASUVORK5CYII=", "base64") });
+  await evidence.getByRole("button", { name: "Ajouter le justificatif", exact: true }).click();
+  await expect(evidence.getByRole("link", { name: "recu-test.png", exact: true })).toBeVisible();
+
   await page.locator("summary", { hasText: "Valider la dépense" }).click();
   await page.getByLabel("Je confirme les montants de la pièce et la récupération intégrale des taxes.").check();
   await page.getByRole("button", { name: "Valider la dépense", exact: true }).click();
@@ -2213,6 +2221,19 @@ async function paidExpensesJourney(page: Page) {
   await expect(page.getByText("Dépense comptabilisée", { exact: true })).toBeVisible();
   await expectNoPageOverflow(page);
   await captureReference(page, "depense-payee-validee");
+  await expect(evidence.getByRole("button", { name: "Retirer du brouillon", exact: true })).toHaveCount(0);
+  const attachmentUrl=await evidence.getByRole("link", { name: "recu-test.png", exact: true }).getAttribute("href");
+  const response=await page.request.get(attachmentUrl!);
+  expect(response.headers()["cache-control"]).toContain("no-store");
+  expect(response.headers()["content-disposition"]).toContain("attachment;");
+  expect(response.headers()["x-content-type-options"]).toBe("nosniff");
+  expect((await response.body()).length).toBe(68);
+  const downloadEvent=page.waitForEvent("download");
+  await evidence.getByRole("link", { name: "recu-test.png", exact: true }).click();
+  expect((await downloadEvent).suggestedFilename()).toBe("recu-test.png");
+  await expectNoPageOverflow(page);
+  await captureReference(page, "justificatif-depense", "Justificatifs");
+
   await page.locator("summary", { hasText: "Annuler la dépense" }).click();
   await page.getByLabel("Date de contre-passation", { exact: true }).fill("2026-07-21");
   await page.getByLabel("Motif", { exact: true }).fill("Correction de la dépense de test");

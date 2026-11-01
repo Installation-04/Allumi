@@ -1,4 +1,14 @@
 {
+  "attachments": {
+    "remove": "Remove from draft",
+    "confirm": "I confirm removing this document.",
+    "title": "Supporting documents",
+    "hint": "PDF, PNG or JPEG, up to 4 MB per file and 20 files per record. Private downloads; uploaded documents are retained.",
+    "empty": "No supporting documents.",
+    "bytes": "bytes",
+    "upload": "Upload supporting document",
+    "file": "Supporting file"
+  },
   "expenses": {
     "openBalance": "Balance due",
     "title": "Paid expense drafts",
@@ -369,6 +379,13 @@
     "create": "Create"
   },
   "errors": {
+    "attachments": {
+      "retained": "Documents on posted or voided records are retained.",
+      "confirm": "Confirm removing the document.",
+      "invalid": "Choose a nonempty PDF, PNG or JPEG up to 4 MB, with an extension matching its detected format.",
+      "limit": "This record has reached the limit of 20 files.",
+      "unavailable": "This document is unavailable or its integrity cannot be verified."
+    },
     "disbursements": {
       "invalid": "Check the amount (positive, at most two decimals), the date, the account and the payment method.",
       "billNotFound": "Bill not found.",

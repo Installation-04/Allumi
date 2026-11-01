@@ -1,4 +1,14 @@
 {
+  "attachments": {
+    "remove": "Retirer du brouillon",
+    "confirm": "Je confirme le retrait de ce justificatif.",
+    "title": "Justificatifs",
+    "hint": "PDF, PNG ou JPEG, 4 Mo maximum par fichier et 20 fichiers par pièce. Téléchargement privé; les documents déposés sont conservés.",
+    "empty": "Aucun justificatif.",
+    "bytes": "octets",
+    "upload": "Ajouter le justificatif",
+    "file": "Fichier justificatif"
+  },
   "expenses": {
     "openBalance": "Solde à payer",
     "title": "Brouillons de dépenses payées",
@@ -369,6 +379,13 @@
     "create": "Créer"
   },
   "errors": {
+    "attachments": {
+      "retained": "Les justificatifs des pièces comptabilisées ou annulées sont conservés.",
+      "confirm": "Confirmez le retrait du justificatif.",
+      "invalid": "Choisissez un PDF, PNG ou JPEG non vide de 4 Mo maximum, avec une extension correspondant au format détecté.",
+      "limit": "La limite de 20 justificatifs par pièce est atteinte.",
+      "unavailable": "Ce justificatif est indisponible ou son intégrité ne peut être vérifiée."
+    },
     "disbursements": {
       "invalid": "Vérifiez le montant (positif, deux décimales au plus), la date, le compte et le mode de paiement.",
       "billNotFound": "Facture introuvable.",

@@ -41,7 +41,7 @@ ENV APP_VERSION=${APP_VERSION} \
     HOSTNAME=0.0.0.0
 RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates tini \
     && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p /app/storage /app/.next/cache \
+    && mkdir -p /app/storage/attachments /app/.next/cache \
     && chown -R node:node /app
 
 COPY --from=builder --chown=node:node /app/public ./public
