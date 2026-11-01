@@ -4,8 +4,6 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
-## [0.4.0-alpha.27] - 2026-11-01
-
 - Envoi manuel des factures validées par SMTP en français/anglais : coordonnées figées, destinataire confirmé, historique protégé par les permissions Ventes, soumissions idempotentes, limites et résultats incertains sans renvoi automatique. Configuration TLS explicite.
 
 ## [0.4.0-alpha.26] - 2026-11-01

@@ -1,7 +1,7 @@
 BEGIN;
 CREATE TABLE invoice_email (
  id uuid PRIMARY KEY,
- company_id uuid NOT NULL REFERENCES company(id) ON DELETE RESTRICT,
+ company_id uuid NOT NULL REFERENCES company(id) ON DELETE RESTRICT ON UPDATE CASCADE,
  document_id uuid NOT NULL,
  recipient text NOT NULL CHECK (length(recipient) BETWEEN 3 AND 254 AND recipient !~ '[[:cntrl:],;<>]'),
  locale text NOT NULL CHECK (locale IN ('fr-CA','en')),
@@ -9,7 +9,7 @@ CREATE TABLE invoice_email (
  created_by_id uuid NOT NULL,
  created_at timestamptz NOT NULL DEFAULT now(),
  completed_at timestamptz,
- FOREIGN KEY (company_id,document_id) REFERENCES sales_document(company_id,id) ON DELETE RESTRICT,
+ FOREIGN KEY (company_id,document_id) REFERENCES sales_document(company_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
  CHECK ((status='PENDING') = (completed_at IS NULL))
 );
 CREATE INDEX invoice_email_company_id_document_id_created_at_idx ON invoice_email(company_id,document_id,created_at);
