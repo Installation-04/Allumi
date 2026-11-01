@@ -2216,6 +2216,7 @@ async function supplierBillsJourney(page: Page) {
   const apEn=await page.request.get((await page.getByRole("link",{name:"Export as CSV",exact:true}).getAttribute("href"))!);
   expect(apEn.headers()["content-disposition"]).toContain("payables-aging_2026-07-15.csv");expect(await apEn.text()).toContain(",Supplier bill,A-00001,");
   await page.getByRole("button",{name:"Français",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Âge des comptes fournisseurs",exact:true})).toBeVisible();
   await page.goto(supplierCreditUrl);
   await page.locator("summary", { hasText: "Annuler l’avoir" }).click();
   await page.getByLabel("Date de contre-passation", { exact: true }).fill("2026-07-18");
