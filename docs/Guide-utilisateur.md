@@ -84,3 +84,7 @@ Ouvre une facture validée puis **Envoi par courriel**. Vérifie le destinataire
 ## Vérifier les comptes fournisseurs
 
 Dans **Rapports → Âge des comptes fournisseurs**, choisis une date pour retrouver les factures ouvertes, les montants non affectés et leur concordance avec le grand livre. Le détail et le CSV suivent cette même date. Voir [[Age-des-comptes-fournisseurs]].
+
+## Consulter le sommaire des taxes
+
+Dans **Rapports → Sommaire TPS/TVQ**, sélectionne une période pour consulter les taxes comptabilisées et leur contrôle au grand livre. Les versements restent distincts du net de période. Voir [[Sommaire-des-taxes]] pour les signes, limites et exports.

@@ -37,3 +37,7 @@ Données fictives issues du parcours de test.
 ![Catalogue anglais sombre](images/catalogue-en-dark-desktop.png)
 
 Voir aussi [[Contacts]], [[Plan-comptable]] et [[Appearance-and-language]].
+
+## Montants comptabilisés
+
+Le [[Sommaire-des-taxes]] présente les taxes des écritures validées sur une période, indépendamment des taux actuels, avec contrôle et détail. Ce rapport ne dépose pas de déclaration.

@@ -1079,7 +1079,7 @@
     "rapports": {
       "title": "Reports",
       "description": "Consult the reports available for your company.",
-      "planned": "GST/QST summary, period comparisons and PDF exports: phase 6."
+      "planned": "Period comparisons, tax return forms and PDF exports: phase 6."
     },
     "taxes": {
       "title": "Taxes",
@@ -1135,7 +1135,8 @@
       "bilan": "Balance sheet",
       "grand-livre": "General ledger",
       "age-clients": "Receivables aging",
-      "age-fournisseurs": "Payables aging"
+      "age-fournisseurs": "Payables aging",
+      "sommaire-taxes": "Tax summary"
     }
   },
   "updates": {
@@ -2024,5 +2025,51 @@
     "agrees": "The total agrees with the accounts payable ledger balance.",
     "differs": "The total differs from the ledger by {amount}: review entries posted to accounts payable.",
     "file": "payables-aging"
+  },
+  "taxSummary": {
+    "title": "GST/QST and other taxes summary",
+    "intro": "Tax amounts posted during the period, with journal detail and a ledger control.",
+    "from": "From",
+    "to": "To",
+    "apply": "Show",
+    "export": "Export as CSV",
+    "period": "Entries from {from} to {to}.",
+    "scope": "Summary of posted entries, before carrying forward earlier balances. This is not a tax return. Settlements are shown separately; nothing is filed or paid.",
+    "tax": "Tax",
+    "collected": "Collected",
+    "recoverable": "Recoverable",
+    "adjustment": "Adjustments",
+    "net": "Net before settlements",
+    "settlement": "Payments / refunds",
+    "movement": "Net movement",
+    "total": "Total",
+    "control": "Ledger movement — tax accounts",
+    "difference": "Difference",
+    "anomalies": "Lines to review",
+    "detail": "Tax journal detail",
+    "date": "Date",
+    "entry": "Entry",
+    "account": "Account",
+    "memo": "Description",
+    "box": "Category",
+    "debit": "Debit",
+    "credit": "Credit",
+    "agrees": "The movements agree with the tax accounts in the ledger.",
+    "warning": "Review the flagged lines or difference before using this summary.",
+    "reviewLedger": "Review general ledger",
+    "empty": "No tax to display in the summary.",
+    "count": "{count} posted lines.",
+    "pagination": "Tax journal pagination",
+    "page": "Page {page} of {pages}",
+    "previous": "Previous",
+    "next": "Next",
+    "tooManyLines": "The export exceeds 200,000 lines. Shorten the period; no partial file is produced.",
+    "file": "tax-summary",
+    "boxes": {
+      "COLLECTED": "Collected tax",
+      "RECOVERABLE": "Recoverable tax",
+      "ADJUSTMENT": "Adjustment",
+      "SETTLEMENT": "Settlement / refund"
+    }
   }
 }

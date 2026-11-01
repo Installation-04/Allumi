@@ -272,6 +272,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await receivablesAgingJourney(page);
   await supplierBillsJourney(page);
   await paidExpensesJourney(page);
+  await taxSummaryJourney(page);
   const settingsBase = new URL(page.url()).pathname.match(/^\/c\/[^/]+/)?.[0];
   expect(settingsBase).toBeTruthy();
   await page.getByRole("button", { name: "Français", exact: true }).click();
@@ -2292,4 +2293,28 @@ async function paidExpensesJourney(page: Page) {
   await page.getByLabel("Je confirme l’annulation définitive de cette dépense.").check();
   await page.getByRole("button", { name: "Annuler la dépense", exact: true }).click();
   await expect(page.getByText("Dépense annulée", { exact: true })).toBeVisible();
+}
+
+async function taxSummaryJourney(page:Page){
+ const company=new URL(page.url()).pathname.match(/^\/c\/[^/]+/)![0];
+ await page.goto(`${company}/sommaire-taxes?du=2026-07-15&au=2026-07-15`);
+ await expect(page.getByRole("heading",{name:"Sommaire TPS/TVQ et autres taxes",exact:true})).toBeVisible();
+ await expect(page.getByText("Les mouvements concordent avec les comptes de taxes du grand livre.",{exact:true})).toBeVisible();
+ const summary=page.locator("table").first();
+ const gst=summary.locator("tbody tr").filter({has:page.getByText("TPS",{exact:true})}).first();
+ const qst=summary.locator("tbody tr").filter({has:page.getByText("TVQ",{exact:true})}).first();
+ await expect(gst.getByRole("cell").nth(1)).toContainText(/5,00\s*\$/);await expect(qst.getByRole("cell").nth(1)).toContainText(/9,98\s*\$/);
+ await expect(gst.getByRole("cell").nth(3)).toContainText(/-5,00\s*\$/);
+ await expect(page.getByText("2 lignes comptabilisées.",{exact:true})).toBeVisible();
+ await expectNoPageOverflow(page);await captureReference(page,"sommaire-taxes","Sommaire TPS/TVQ et autres taxes");
+ const file=await page.request.get((await page.getByRole("link",{name:"Exporter en CSV",exact:true}).getAttribute("href"))!);
+ expect(file.status()).toBe(200);expect(file.headers()["content-disposition"]).toContain("sommaire-taxes_2026-07-15_2026-07-15.csv");expect(file.headers()["cache-control"]).toContain("no-store");
+ const csv=await file.text();expect(csv.charCodeAt(0)).toBe(0xfeff);expect(csv).toContain("TPS;0,00;5,00;0,00;-5,00;0,00;-5,00");expect(csv).toContain("Taxe récupérable");
+ await page.getByRole("button",{name:"English",exact:true}).click();await expect(page.getByRole("heading",{name:"GST/QST and other taxes summary",exact:true})).toBeVisible();
+ const english=await page.request.get((await page.getByRole("link",{name:"Export as CSV",exact:true}).getAttribute("href"))!);expect(await english.text()).toContain("TPS,0.00,5.00,0.00,-5.00,0.00,-5.00");
+ await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.getByRole("heading",{name:"Sommaire TPS/TVQ et autres taxes",exact:true})).toBeVisible();
+ await page.getByLabel("Au",{exact:true}).fill("2026-07-19");await page.getByRole("button",{name:"Afficher",exact:true}).click();await expect(page.getByText("Écritures du 2026-07-15 au 2026-07-19.",{exact:true})).toBeVisible();
+ await expect(page.locator("table").first().locator("tfoot td").nth(3)).toContainText(/0,00\s*\$/);
+ await expect(page.getByText("8 lignes comptabilisées.",{exact:true})).toBeVisible();
+ const entry=page.locator("table").nth(1).getByRole("link").first();await entry.click();await expect(page).toHaveURL(/\/journal\//);
 }

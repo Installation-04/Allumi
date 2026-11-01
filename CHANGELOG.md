@@ -4,6 +4,10 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.32] - 2026-11-01
+
+- Sommaire TPS/TVQ et autres taxes par période : montants comptabilisés perçus/récupérables, ajustements et versements séparés, contrôle cohérent du grand livre, anomalies signalées, détail paginé et CSV FR/EN intégral sous droits Comptabilité et Taxes. Aucune déclaration ni écriture créée.
+
 ## [0.4.0-alpha.31] - 2026-11-01
 
 - Âge des comptes fournisseurs à une date donnée : factures par tranche, crédits/paiements non affectés, annulations historiques, contrôle du grand livre dans un même instantané, consultation FR/EN et export CSV sous permissions Comptabilité.

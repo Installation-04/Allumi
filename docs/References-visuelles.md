@@ -309,3 +309,11 @@ Rapport historique d’une entreprise fictive, concordant avec le grand livre ap
 ![Âge fournisseurs — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/rapport-age-fournisseurs-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/rapport-age-fournisseurs-mobile.png" alt="Âge fournisseurs — téléphone" width="412">
+
+## Sommaire des taxes
+
+Montants comptabilisés d’une entreprise fictive et contrôle du grand livre. Voir [[Sommaire-des-taxes]].
+
+![Sommaire des taxes — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/sommaire-taxes-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/sommaire-taxes-mobile.png" alt="Sommaire des taxes — téléphone" width="412">
