@@ -15,6 +15,7 @@ export async function generateMetadata() { return { title: (await getTranslation
 export default async function IncomeStatementPage({ params, searchParams }: { params: Promise<{ companyId: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { company, actor, locale } = await loadCompany(params, "ledger.read");
   const t = await getTranslations("statements");
+  const c = await getTranslations("incomeComparison");
   const years = await listFiscalYears(actor);
   const query = await searchParams;
   const { from, to } = statementPeriod(query, years, todayIso());
@@ -29,6 +30,7 @@ export default async function IncomeStatementPage({ params, searchParams }: { pa
         <h1 className="text-2xl font-semibold">{t("incomeTitle")}</h1>
         <p className="text-sm text-stone-600 dark:text-stone-400">{t("incomeIntro")}</p>
       </div>
+      <Link className={`inline-flex min-h-11 items-center underline ${FOCUS}`} href={`/c/${company.id}/resultats/comparer?${new URLSearchParams({du:from,au:to})}`}>{c("open")}</Link>
       <form key={`${from}|${to}`} method="get" className="flex flex-wrap items-end gap-3">
         <label className="text-sm"><span className="mb-1 block font-medium">{t("from")}</span><input type="date" name="du" defaultValue={from} required className={control} /></label>
         <label className="text-sm"><span className="mb-1 block font-medium">{t("to")}</span><input type="date" name="au" defaultValue={to} required className={control} /></label>

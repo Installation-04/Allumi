@@ -1735,6 +1735,19 @@ async function financialStatementsJourney(page: Page) {
   expect(csv).toContain("\r\n4000;Revenus de services;1000,00\r\n");
   expect(csv).toContain(";Résultat net;580,00\r\n");
 
+  await page.getByRole("link",{name:"Comparer des périodes",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Comparaison de l’état des résultats",exact:true})).toBeVisible();
+  await page.getByLabel("Début de la référence",{exact:true}).fill(from);await page.getByLabel("Fin de la référence",{exact:true}).fill(from);
+  await page.getByRole("button",{name:"Comparer",exact:true}).click();
+  const comparedNet=page.getByRole("row").filter({hasText:/^Résultat net/});
+  await expect(comparedNet.getByRole("cell").nth(0)).toContainText(amount("580,00 $"));await expect(comparedNet.getByRole("cell").nth(1)).toContainText(amount("975,00 $"));await expect(comparedNet.getByRole("cell").nth(2)).toContainText(amount("-395,00 $"));await expect(comparedNet.getByRole("cell").nth(3)).toContainText("-40,51 %");
+  await expectNoPageOverflow(page);await captureReference(page,"resultats-comparatifs","Montants comparés");
+  const comparisonFile=await page.request.get((await page.getByRole("link",{name:"Exporter en CSV",exact:true}).getAttribute("href"))!);expect(comparisonFile.status()).toBe(200);expect(comparisonFile.headers()["cache-control"]).toContain("no-store");
+  const comparisonCsv=await comparisonFile.text();expect(comparisonCsv.charCodeAt(0)).toBe(0xfeff);expect(comparisonCsv).toContain(";Résultat net;580,00;975,00;-395,00;-40,51");
+  await page.getByRole("button",{name:"English",exact:true}).click();await expect(page.getByRole("heading",{name:"Income statement comparison",exact:true})).toBeVisible();
+  const comparisonEn=await page.request.get((await page.getByRole("link",{name:"Export as CSV",exact:true}).getAttribute("href"))!);expect(await comparisonEn.text()).toContain(",Net income,580.00,975.00,-395.00,-40.51");
+  await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.getByRole("heading",{name:"Comparaison de l’état des résultats",exact:true})).toBeVisible();
+
   // the balance sheet at the end of those days: it balances whatever the other journeys wrote
   await page.goto(`${company}/bilan?au=${to}`);
   await expect(page.getByRole("heading", { name: "Bilan", exact: true })).toBeVisible();

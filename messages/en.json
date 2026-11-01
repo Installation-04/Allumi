@@ -1079,7 +1079,7 @@
     "rapports": {
       "title": "Reports",
       "description": "Consult the reports available for your company.",
-      "planned": "Period comparisons, tax return forms and PDF exports: phase 6."
+      "planned": "Balance sheet comparison, tax return forms and PDF exports: phase 6."
     },
     "taxes": {
       "title": "Taxes",
@@ -2071,5 +2071,26 @@
       "ADJUSTMENT": "Adjustment",
       "SETTLEMENT": "Settlement / refund"
     }
+  },
+  "incomeComparison": {
+    "figures": "Compared amounts",
+    "title": "Income statement comparison",
+    "open": "Compare periods",
+    "back": "Income statement",
+    "intro": "Compare posted amounts for two periods, account by account.",
+    "current": "Selected period",
+    "reference": "Reference period",
+    "currentFrom": "Selected period start",
+    "currentTo": "Selected period end",
+    "referenceFrom": "Reference start",
+    "referenceTo": "Reference end",
+    "apply": "Compare",
+    "export": "Export as CSV",
+    "difference": "Difference",
+    "percent": "Change (%)",
+    "noPercent": "Percentage not calculated: zero or negative reference.",
+    "rules": "Difference = selected period − reference. Percentages are calculated only for a positive reference, rounded to two decimals. Period lengths are not normalized; a positive difference is not necessarily favorable.",
+    "periods": "Selected: {from} to {to}. Reference: {referenceFrom} to {referenceTo}.",
+    "file": "income-comparison"
   }
 }

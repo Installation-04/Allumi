@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.32
+git checkout v0.4.0-alpha.33
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.32 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.33 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -342,3 +342,11 @@ Consultez les montants comptabilisés par période, les ajustements et versement
 ![Sommaire des taxes](docs/images/sommaire-taxes-desktop.png)
 
 ![Sommaire des taxes mobile](docs/images/sommaire-taxes-mobile.png)
+
+### Comparaison de l’état des résultats
+
+Comparez deux périodes depuis l’état des résultats : montants par compte, écarts exacts, pourcentages et export CSV bilingue ([guide](docs/Comparaison-des-resultats.md)).
+
+![Résultats comparatifs](docs/images/resultats-comparatifs-desktop.png)
+
+![Résultats comparatifs mobile](docs/images/resultats-comparatifs-mobile.png)
