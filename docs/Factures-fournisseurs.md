@@ -28,7 +28,7 @@ La validation attribue un numéro interne `A-…`, fige les coordonnées du four
 
 **Annuler la facture** demande un motif et une date dans une période ouverte, au moins égale à la date comptable originale. La facture et sa piste d’audit restent présentes; une écriture inverse annule son effet comptable. Des paiements ou crédits liés empêchent l’annulation tant qu’ils ne sont pas résolus.
 
-Les immobilisations et stocks, l’âge des comptes fournisseurs restent à venir. Les listes affichent au maximum 100 pièces; la liste des brouillons propose une recherche. Les sélecteurs de fournisseurs et d’articles sont limités à 500 entrées actives.
+Les immobilisations et stocks restent à venir. L’[[Age-des-comptes-fournisseurs]] est disponible dans Rapports. Les listes affichent au maximum 100 pièces; la liste des brouillons propose une recherche. Les sélecteurs de fournisseurs et d’articles sont limités à 500 entrées actives.
 
 Voir aussi [[Taxes-et-catalogue]], [[Utilisateurs-et-permissions]] et [[Fonctionnalites-et-limites]].
 
