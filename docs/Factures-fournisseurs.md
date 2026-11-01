@@ -28,7 +28,7 @@ La validation attribue un numéro interne `A-…`, fige les coordonnées du four
 
 **Annuler la facture** demande un motif et une date dans une période ouverte, au moins égale à la date comptable originale. La facture et sa piste d’audit restent présentes; une écriture inverse annule son effet comptable. Des paiements ou crédits liés empêchent l’annulation tant qu’ils ne sont pas résolus.
 
-Les crédits fournisseurs, les dépenses immédiatement payées, les immobilisations et stocks, les pièces jointes et l’âge des comptes fournisseurs restent à venir. Les listes affichent au maximum 100 pièces; la liste des brouillons propose une recherche. Les sélecteurs de fournisseurs et d’articles sont limités à 500 entrées actives.
+Les dépenses immédiatement payées, les immobilisations et stocks, les pièces jointes et l’âge des comptes fournisseurs restent à venir. Les listes affichent au maximum 100 pièces; la liste des brouillons propose une recherche. Les sélecteurs de fournisseurs et d’articles sont limités à 500 entrées actives.
 
 Voir aussi [[Taxes-et-catalogue]], [[Utilisateurs-et-permissions]] et [[Fonctionnalites-et-limites]].
 
@@ -46,8 +46,26 @@ Depuis une facture validée, **Nouveau crédit fournisseur** permet de saisir un
 
 Le brouillon se consulte dans **Dépenses → Crédits fournisseurs**. Les droits Comptabilité autorisent la consultation ou l’écriture. Il peut être modifié ou supprimé; une modification concurrente exige de recharger la fiche. Si la facture d’origine est annulée, le brouillon reste consultable et supprimable.
 
-**Ce lot prépare uniquement les brouillons : aucune écriture, aucun numéro définitif, aucune réservation de montant et aucune réduction du solde fournisseur.** La validation, l’affectation et l’annulation comptable des crédits seront ajoutées dans un prochain lot. Plusieurs brouillons peuvent donc corriger les mêmes montants; ils ne représentent pas des crédits validés.
+**Un brouillon ne crée aucune écriture, aucun numéro définitif, aucune réservation de montant et aucune réduction du solde fournisseur.** La validation et l’annulation sont maintenant disponibles depuis la fiche du crédit. Plusieurs brouillons peuvent donc corriger les mêmes montants; ils ne représentent pas des crédits validés.
 
 ![Brouillon de crédit fournisseur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/credit-fournisseur-brouillon-desktop.png)
 
 ![Brouillon sur téléphone](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/credit-fournisseur-brouillon-mobile.png)
+
+## Valider et appliquer un crédit fournisseur
+
+Ouvrez **Valider et affecter l’avoir**, choisissez une date comptable au moins égale à sa date de document et dans une période ouverte, puis confirmez. La validation attribue un numéro de la séquence d’achats `A-…`, débite les comptes fournisseurs et crédite les charges et taxes récupérables correspondantes. Les coordonnées du fournisseur proviennent de la facture figée. Le crédit est appliqué intégralement à sa facture d’origine dans la même transaction.
+
+Les contrôles de l’application et de la base limitent les crédits validés cumulés aux montants originaux de chaque ligne, de chaque taxe et de la facture. Le solde encore à payer doit couvrir le crédit : un paiement ou un autre crédit concurrent peut empêcher la validation. Un nouvel essai d’une validation déjà réussie retourne le crédit existant sans écriture ni numéro supplémentaire.
+
+Depuis la facture, consultez son nouveau solde et ses crédits. **Crédits fournisseurs → Avoirs validés** donne accès aux pièces et à l’historique daté des affectations.
+
+![Crédit fournisseur validé](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/credit-fournisseur-valide-desktop.png)
+
+![Crédit validé sur téléphone](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/credit-fournisseur-valide-mobile.png)
+
+## Annuler un crédit validé
+
+**Annuler l’avoir** demande un motif et une date dans une période ouverte, au moins égale à sa validation et à tous les événements d’affectation/retrait. L’application à la facture est retirée à cette date et une écriture inverse rétablit son solde. Le crédit original, son numéro et l’historique sont conservés. Un remboursement actif ou une affectation active à une autre facture bloque cette annulation. Les remboursements et la gestion manuelle d’affectations à d’autres factures ne sont pas proposés par cette interface.
+
+Les crédits restent limités aux factures avec taxes entièrement récupérables ou sans taxe. La récupération partielle et les ajustements manuels de taxes restent indisponibles.

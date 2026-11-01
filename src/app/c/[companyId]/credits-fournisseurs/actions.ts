@@ -26,3 +26,26 @@ export async function deleteCreditAction(companyId: string, id: string, revision
     redirect(`/c/${companyId}/credits-fournisseurs`);
   });
 }
+export async function postCreditAction(companyId: string, id: string, revision: string, _previous: FormState, form: FormData): Promise<FormState> {
+  const values=textValues(form,["postingDate"]);
+  return safeAction(async()=>{
+    if(form.get("confirm")!=="yes") throw new AppError("purchases.confirmCreditPost");
+    const session=await requireSession();
+    const {postCreditNote}=await import("@/modules/purchases");
+    await postCreditNote({userId:session.userId,companyId},id,revision,values.postingDate??"");
+    revalidatePath(`/c/${companyId}`,"layout");
+    redirect(`/c/${companyId}/credits-fournisseurs/valides/${id}`);
+  },values);
+}
+
+export async function voidCreditAction(companyId: string, id: string, _previous: FormState, form: FormData): Promise<FormState> {
+  const values = textValues(form, ["voidDate", "reason"]);
+  return safeAction(async () => {
+    if (form.get("confirm") !== "yes") throw new AppError("purchases.confirmCreditVoid");
+    const session = await requireSession();
+    const { voidCreditNote } = await import("@/modules/purchases");
+    await voidCreditNote({ userId: session.userId, companyId }, id, values.voidDate ?? "", values.reason ?? "");
+    revalidatePath(`/c/${companyId}`, "layout");
+    redirect(`/c/${companyId}/credits-fournisseurs/valides/${id}`);
+  }, values);
+}

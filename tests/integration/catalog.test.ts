@@ -179,3 +179,9 @@ describe("modular access and server delegation catalog", () => {
     expect(business.filter(t=>!rows.some(r=>r.tablename===t.table_name))).toEqual([]);
   });
 });
+
+it("guards supplier credit limits, source taxes and exact deferred postings", async () => {
+ expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='supplier_credit_limits' AND NOT tgisinternal")).toHaveLength(1);
+ expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='supplier_credit_posting_exact' AND tgdeferrable AND tginitdeferred AND NOT tgisinternal")).toHaveLength(1);
+ expect((await q<{ok:boolean}>("SELECT has_function_privilege('allumi_app','purchase_document_taxes_are_exact(purchase_document)','EXECUTE') AS ok"))[0]?.ok).toBe(true);
+});

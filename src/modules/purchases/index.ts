@@ -3,3 +3,6 @@ export { postBill, listBills, getBill, getBillOpenCents } from "./service/postin
 export { voidBill } from "./service/voiding";
 
 export { listCreditDrafts, getCreditDraft, saveCreditDraft, deleteCreditDraft, creditAmount } from "./service/credit-drafts";
+
+export { postCreditNote, getPostedCredit, listPostedCredits } from "./service/credit-posting";
+export { voidCreditNote } from "./service/credit-voiding";

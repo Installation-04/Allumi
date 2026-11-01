@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Crédits fournisseurs : validation et application intégrale à la facture d’origine, contrôles cumulés par ligne/taxe en base, écriture exacte, annulation par contre-passation et historique des affectations.
+
 ## [0.4.0-alpha.21] - 2026-10-31
 
 - Brouillons de crédits fournisseurs liés aux factures : montants par ligne, taux d’origine, modification et suppression avec contrôle de version, permissions Comptabilité. Sans comptabilisation ni réduction du solde à ce stade.

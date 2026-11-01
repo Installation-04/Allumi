@@ -45,7 +45,7 @@ Les propriétaires et comptables accèdent à **Piste d’audit** pour examiner 
 
 ## 8. Exploiter au quotidien
 
-L’administrateur doit tester les [[Sauvegardes]], suivre les [[Mise-a-jour]] et vérifier la [[Configuration]]. La pré-alpha ne remplace pas encore un logiciel de production : les ventes, achats, paiements, imports et exports restent planifiés. Pour un problème, consulter [[Depannage]] et [[FAQ]].
+L’administrateur doit tester les [[Sauvegardes]], suivre les [[Mise-a-jour]] et vérifier la [[Configuration]]. Le produit reste une préversion; consultez [[Fonctionnalites-et-limites]] pour le périmètre disponible et les limites avant un usage en production. Pour un problème, consulter [[Depannage]] et [[FAQ]].
 
 Le répertoire clients et fournisseurs (lot 4.1 livré) est décrit dans [[Contacts]].
 
@@ -71,4 +71,4 @@ Pour corriger entièrement une facture validée, voir [[Annulation-des-factures]
 
 Ouvrir **Dépenses → Factures fournisseurs** pour préparer une facture à payer, la valider et consulter son écriture. Voir [[Factures-fournisseurs]] pour les droits, l’annulation et les limites de récupération des taxes.
 
-Depuis une facture fournisseur validée, **Nouveau crédit fournisseur** prépare un brouillon de correction aux taux d’origine. Il ne réduit pas le solde à payer; la validation comptable reste à venir. Voir [[Factures-fournisseurs]].
+Depuis une facture fournisseur validée, **Nouveau crédit fournisseur** prépare un brouillon de correction aux taux d’origine. Le brouillon ne réduit pas le solde à payer; sa validation le comptabilise et l’applique intégralement à la facture d’origine. Voir [[Factures-fournisseurs]].

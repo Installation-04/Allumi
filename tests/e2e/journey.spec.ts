@@ -2152,9 +2152,26 @@ async function supplierBillsJourney(page: Page) {
   await page.getByLabel("Fournitures de bureau", { exact: true }).fill("25,00");
   await page.getByRole("button", { name: "Enregistrer le brouillon d’avoir", exact: true }).click();
   await expect(page.getByText(/Total:.*28,74/)).toBeVisible();
-  await expect(page.getByRole("button", { name: "Valider et affecter l’avoir", exact: true })).toHaveCount(0);
   await expectNoPageOverflow(page);
   await captureReference(page, "credit-fournisseur-brouillon");
+  await page.locator("summary", { hasText: "Valider et affecter l’avoir" }).click();
+  await page.getByLabel("Date comptable", { exact: true }).fill("2026-07-17");
+  await page.getByLabel("Je confirme la validation et l’affectation intégrale de cet avoir.").check();
+  await page.getByRole("button", { name: "Valider et affecter l’avoir", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "A-00002", exact: true })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "credit-fournisseur-valide");
+  const supplierCreditUrl = page.url();
+  await page.goto(supplierBillUrl);
+  await expect(page.getByText(/Solde à payer:.*86,24/)).toBeVisible();
+  await page.goto(supplierCreditUrl);
+  await page.locator("summary", { hasText: "Annuler l’avoir" }).click();
+  await page.getByLabel("Date de contre-passation", { exact: true }).fill("2026-07-18");
+  await page.getByLabel("Motif", { exact: true }).fill("Correction du crédit de test");
+  await page.getByLabel("Je confirme l’annulation définitive de cet avoir.").check();
+  await page.getByRole("button", { name: "Annuler l’avoir", exact: true }).click();
+  await expect(page.getByText("Avoir annulé", { exact: true })).toBeVisible();
+
   await page.goto(supplierBillUrl);
   await expect(page.getByText(/Solde à payer:.*114,98/)).toBeVisible();
 
@@ -2163,7 +2180,7 @@ async function supplierBillsJourney(page: Page) {
   await expect(page.getByRole("heading", { name: "Supplier", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Français", exact: true }).click();
   await page.locator("summary", { hasText: "Annuler la facture" }).click();
-  await page.getByLabel("Date de contre-passation", { exact: true }).fill("2026-07-16");
+  await page.getByLabel("Date de contre-passation", { exact: true }).fill("2026-07-19");
   await page.getByLabel("Motif", { exact: true }).fill("Correction de la pièce de test");
   await page.getByLabel("Je confirme l’annulation définitive de cette facture.").check();
   await page.getByRole("button", { name: "Annuler la facture", exact: true }).click();
