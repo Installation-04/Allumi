@@ -5,7 +5,7 @@
     "new": "Nouveau crédit fournisseur",
     "edit": "Modifier l’avoir",
     "save": "Enregistrer le brouillon d’avoir",
-    "intro": "Préparez un crédit lié à une facture fournisseur. Ce brouillon ne réduit pas le solde à payer. La validation comptable et l’affectation seront disponibles dans un prochain lot.",
+    "intro": "Préparez un crédit fournisseur, puis validez-le pour le comptabiliser et l’appliquer intégralement à sa facture d’origine. Un brouillon ne réduit pas le solde à payer.",
     "amountHint": "Indiquez le montant hors taxes à créditer pour chaque ligne, avec au plus deux décimales. Laissez 0 pour exclure une ligne. Les taux et le mode d’arrondi proviennent de la facture d’origine. Les brouillons ne réservent aucun montant.",
     "reason": "Motif de l’avoir",
     "maximum": "Montant original hors taxes : {amount}",

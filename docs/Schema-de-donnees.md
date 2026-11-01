@@ -4428,3 +4428,9 @@ Le service valide et affecte intégralement l’avoir à sa facture d’origine 
 La migration `20261027000000_user_management` ajoute le rôle `USER` et `module_access` (JSON validé) aux adhésions et invitations. Les politiques restrictives complètent l’isolation existante. `app_accept_invitation` consomme un code haché sous verrou, sans changer les identifiants d’un compte existant. Les invitations sont réservées aux admins.
 
 La migration `20261028000000_server_access` ajoute `app_user.can_manage_server`, hors des colonnes de profil modifiables. Seul `app_set_server_access` (super admin vérifié en base) délègue ce droit global; aucun rôle d’entreprise ne le donne automatiquement.
+
+## Validation des crédits fournisseurs
+
+La migration `20261101000000_supplier_credit_posting` ajoute `supplier_credit_limits` sur les transitions DRAFT → POSTED de `purchase_document` : verrou de la facture d’origine, concordance des comptes/codes/positions et limites cumulées sur les lignes, taxes et total. `purchase_document_taxes_are_exact(purchase_document)` recalcule les taxes du crédit aux taux stockés de sa facture, selon son arrondi, et exige une récupération intégrale.
+
+Le trigger différé `supplier_credit_posting_exact` vérifie l’égalité exacte des comptes, contacts et cases fiscales de l’écriture du crédit : débit des comptes fournisseurs, crédit des charges et des taxes récupérables. Les applications restent dans `purchase_credit_application`; leur retrait daté et la contre-passation conservent l’historique. Le numéro utilise la séquence PURCHASE_DOCUMENT existante. Aucun nouveau champ Prisma.

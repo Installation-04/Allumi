@@ -5,7 +5,7 @@
     "new": "New supplier credit",
     "edit": "Edit credit note",
     "save": "Save credit note draft",
-    "intro": "Prepare a credit linked to a supplier bill. This draft does not reduce the balance due. Posting and application will be available in a future update.",
+    "intro": "Prepare a supplier credit, then post and fully apply it to its source bill. A draft does not reduce the balance due.",
     "amountHint": "Enter the amount before tax to credit for each line, with up to two decimal places. Leave 0 to exclude a line. Tax rates and rounding come from the original invoice. Drafts do not reserve any amount.",
     "reason": "Credit note reason",
     "maximum": "Original amount before tax: {amount}",
