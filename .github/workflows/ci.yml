@@ -52,7 +52,8 @@ jobs:
         run: |
           npm run lint
           npm run typecheck
-          npm test
+          # Keep the timed database guard isolated from other test workers.
+          npm test -- --maxWorkers=1
           npm audit --omit=dev --audit-level=high
 
   e2e:
