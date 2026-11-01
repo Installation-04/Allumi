@@ -443,6 +443,7 @@ model Company {
   taxes                  Tax[]
   taxCodes               TaxCode[]
   salesDocuments         SalesDocument[]
+  invoiceEmails          InvoiceEmail[]
   purchaseDocuments      PurchaseDocument[]
   payments               Payment[]
   bankDeposits           BankDeposit[]
@@ -891,6 +892,7 @@ model SalesDocument {
   creditsReceived SalesCreditApplication[] @relation("InvoiceCredited")
   attachmentLinks AttachmentLink[]
 
+  emails InvoiceEmail[]
   @@unique([companyId, id])
   @@unique([companyId, kind, number])
   @@unique([companyId, journalEntryId])
@@ -898,6 +900,24 @@ model SalesDocument {
   @@index([companyId, contactId])
   @@index([companyId, status, issueDate])
   @@map("sales_document")
+}
+
+/// Tentative SMTP : acceptation du relais, jamais une preuve de livraison.
+model InvoiceEmail {
+  id           String @id @db.Uuid
+  companyId    String @map("company_id") @db.Uuid
+  documentId   String @map("document_id") @db.Uuid
+  recipient    String
+  locale       String
+  status       String @default("PENDING")
+  createdById  String @map("created_by_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  completedAt  DateTime? @map("completed_at") @db.Timestamptz(6)
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  document SalesDocument @relation(fields: [companyId, documentId], references: [companyId, id], onDelete: Restrict)
+  @@index([companyId, documentId, createdAt])
+  @@map("invoice_email")
 }
 
 model SalesDocumentLine {

@@ -379,6 +379,15 @@
     "create": "Créer"
   },
   "errors": {
+    "invoiceEmail": {
+      "config": "Configuration SMTP absente ou invalide. Contactez l’administrateur du serveur.",
+      "invalid": "Vérifiez le destinataire et la langue du courriel.",
+      "unavailable": "Seules les factures validées et non annulées peuvent être envoyées.",
+      "confirm": "Confirmez le destinataire et l’envoi.",
+      "confirmResend": "Confirmez le nouvel envoi; une tentative existe déjà.",
+      "rate": "Patientez au moins une minute entre les envois (cinq minutes si un envoi est en cours). Maximum : 20 tentatives par facture sur 24 heures.",
+      "uncertain": "Le résultat n’a pas pu être enregistré. Le message peut avoir été envoyé : vérifiez auprès du destinataire avant de réessayer."
+    },
     "attachments": {
       "retained": "Les justificatifs des pièces comptabilisées ou annulées sont conservés.",
       "confirm": "Confirmez le retrait du justificatif.",
@@ -1261,7 +1270,7 @@
   "sales": {
     "title": "Brouillons de factures",
     "draft": "Brouillon — non comptabilisé",
-    "intro": "Préparez des factures puis validez-les pour les comptabiliser. Un brouillon ne modifie pas le grand livre. L’envoi par courriel reste à venir.",
+    "intro": "Préparez des factures puis validez-les pour les comptabiliser. Un brouillon ne modifie pas le grand livre.",
     "new": "Nouveau brouillon",
     "edit": "Modifier le brouillon",
     "back": "Retour aux brouillons",
@@ -1954,5 +1963,29 @@
     "agrees": "Le total concorde avec le solde des comptes clients du grand livre.",
     "differs": "Le total ne concorde pas avec le grand livre (écart de {amount}) : les écritures des comptes clients doivent être vérifiées.",
     "file": "age-des-comptes-clients"
+  },
+  "invoiceEmail": {
+    "title": "Envoi par courriel",
+    "intro": "Envoyez cette facture au destinataire de votre choix et consultez les tentatives d’envoi. L’acceptation par le relais SMTP ne garantit pas la livraison.",
+    "notConfigured": "Le courriel n’est pas configuré. Demandez à l’administrateur du serveur de définir les variables SMTP et de redémarrer l’application.",
+    "empty": "Aucune tentative d’envoi.",
+    "limit": "Les 20 dernières tentatives sont affichées.",
+    "send": "Envoyer la facture",
+    "resend": "Envoyer de nouveau",
+    "submit": "Confirmer et envoyer",
+    "recipient": "Adresse du destinataire",
+    "language": "Langue du courriel",
+    "french": "Français (Canada)",
+    "english": "Anglais",
+    "contentHint": "La facture complète est incluse dans le corps du courriel, avec les coordonnées figées à la validation. Aucun PDF, justificatif privé ou lien de paiement n’est joint.",
+    "confirm": "J’ai vérifié le destinataire et je confirme cet envoi.",
+    "confirmResend": "Une tentative existe déjà. Je confirme un nouvel envoi, qui peut créer un doublon.",
+    "uncertainHint": "Vérifiez auprès du destinataire avant tout nouvel envoi. Aucun renvoi automatique.",
+    "statuses": {
+      "PENDING": "Tentative enregistrée — résultat non confirmé",
+      "ACCEPTED": "Accepté par le serveur SMTP — livraison non confirmée",
+      "FAILED": "Refusé par le serveur SMTP",
+      "UNKNOWN": "Résultat incertain — le message peut avoir été accepté"
+    }
   }
 }

@@ -379,6 +379,15 @@
     "create": "Create"
   },
   "errors": {
+    "invoiceEmail": {
+      "config": "SMTP configuration is missing or invalid. Contact the server administrator.",
+      "invalid": "Check the recipient and email language.",
+      "unavailable": "Only posted invoices that have not been voided can be sent.",
+      "confirm": "Confirm the recipient and send.",
+      "confirmResend": "Confirm the new send; a previous attempt already exists.",
+      "rate": "Wait at least one minute between sends (five minutes if a send is pending). Limit: 20 attempts per invoice in 24 hours.",
+      "uncertain": "The result could not be recorded. The message may have been sent: check with the recipient before trying again."
+    },
     "attachments": {
       "retained": "Documents on posted or voided records are retained.",
       "confirm": "Confirm removing the document.",
@@ -1261,7 +1270,7 @@
   "sales": {
     "title": "Invoice drafts",
     "draft": "Draft — not posted",
-    "intro": "Prepare invoices, then post them to record them in the ledger. Drafts do not affect accounting. Email delivery is still planned.",
+    "intro": "Prepare invoices and post them to the ledger. Drafts do not affect the ledger.",
     "new": "New draft",
     "edit": "Edit draft",
     "back": "Back to drafts",
@@ -1954,5 +1963,29 @@
     "agrees": "The total agrees with the balance of the receivable accounts in the general ledger.",
     "differs": "The total does not agree with the general ledger (difference of {amount}): the entries on the receivable accounts need to be checked.",
     "file": "receivables-aging"
+  },
+  "invoiceEmail": {
+    "title": "Email invoice",
+    "intro": "Send this invoice to a confirmed recipient and review send attempts. SMTP acceptance does not guarantee delivery.",
+    "notConfigured": "Email is not configured. Ask the server administrator to set the SMTP variables and restart the application.",
+    "empty": "No send attempts yet.",
+    "limit": "Showing the latest 20 attempts.",
+    "send": "Send invoice",
+    "resend": "Send again",
+    "submit": "Confirm and send",
+    "recipient": "Recipient email address",
+    "language": "Email language",
+    "french": "French (Canada)",
+    "english": "English",
+    "contentHint": "The full invoice is included in the email body using the details frozen at posting. No PDF, private evidence or payment link is attached.",
+    "confirm": "I have checked the recipient and confirm this send.",
+    "confirmResend": "A previous attempt exists. I confirm a new send, which may create a duplicate.",
+    "uncertainHint": "Check with the recipient before sending again. No automatic retry.",
+    "statuses": {
+      "PENDING": "Attempt recorded — result unconfirmed",
+      "ACCEPTED": "Accepted by SMTP server — delivery unconfirmed",
+      "FAILED": "Rejected by SMTP server",
+      "UNKNOWN": "Uncertain result — the message may have been accepted"
+    }
   }
 }

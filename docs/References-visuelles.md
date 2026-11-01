@@ -293,3 +293,11 @@ Saisie et validation d’une facture de charges avec TPS/TVQ entièrement récup
 ![Facture fournisseur validée](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/achat-valide-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/achat-valide-mobile.png" alt="Facture fournisseur — téléphone" width="412">
+
+## Envoi des factures par courriel
+
+Facture fictive acceptée par le relais SMTP local des tests. Le statut ne constitue pas une preuve de livraison. Voir [[Envoi-des-factures]].
+
+![Courriel de facture — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/courriel-facture-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/courriel-facture-mobile.png" alt="Courriel de facture — téléphone" width="412">

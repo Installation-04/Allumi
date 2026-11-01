@@ -42,7 +42,7 @@ Le rapport indique le système (distribution, WSL), le processeur (`x86_64` ou `
 | Windows (Git Bash) | arrêt : le serveur tourne sous Linux (VM ou WSL 2); le client Windows s’y connecte |
 | Processeur autre qu’AMD64 ou ARM64 | arrêt (ex. ARM 32 bits) |
 
-Options : `--version v0.4.0-alpha.26` (sinon la plus récente, préversions comprises), `--branch main` (essais), `--dir`, `--docker-only` (Docker déjà installé : ni pare-feu ni tâche planifiée), `--yes` (sans confirmation), `--force`. Ce qui suit `--` va à l’installateur : `-- --app-url http://192.168.1.20:28080 --prepare-only`.
+Options : `--version v0.4.0-alpha.27` (sinon la plus récente, préversions comprises), `--branch main` (essais), `--dir`, `--docker-only` (Docker déjà installé : ni pare-feu ni tâche planifiée), `--yes` (sans confirmation), `--force`. Ce qui suit `--` va à l’installateur : `-- --app-url http://192.168.1.20:28080 --prepare-only`.
 
 Avant d’agir, le script résume l’installateur retenu et demande confirmation sur le terminal; sans terminal, il exige `--yes`. Le dépôt est cloné dans `/opt/allumi` (ou `~/allumi` sans droits), sur l’étiquette de version. Un dépôt existant n’est mis à jour que s’il est sans modification locale, et une installation existante garde ses secrets, ses volumes et son `APP_URL`.
 
@@ -55,7 +55,7 @@ Prérequis : Docker Engine, Compose v2, Bash, OpenSSL et Git; un compte autoris�
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.26
+git checkout v0.4.0-alpha.27
 ./scripts/install-docker.sh
 ```
 
@@ -104,7 +104,7 @@ Sauvegarder la base et `.env` avant de changer de version. Depuis le dossier exi
 ```bash
 ./scripts/backup.sh
 git fetch --tags origin
-git checkout v0.4.0-alpha.26
+git checkout v0.4.0-alpha.27
 ./scripts/install-docker.sh --app-url http://192.168.1.20:28080 --http-port 28080
 ```
 

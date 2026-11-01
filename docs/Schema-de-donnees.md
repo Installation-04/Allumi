@@ -15,7 +15,7 @@ Voir aussi [[Architecture]], [[Regles-comptables]], [[Plan-de-tests]].
 - Les `CHECK` qui comparent une colonne d'enum à un littéral s'écrivent sur `::text` (voir [la recette de changement d'enum](#changer-un-enum)).
 
 ## Vue d'ensemble
-49 tables : 7 sans `company_id` (`instance` et `rate_limit` sans RLS; les 5 tables d'identité sous RLS par utilisateur) et 42 par entreprise (RLS par entreprise).
+50 tables : 7 sans `company_id` (`instance` et `rate_limit` sans RLS; les 5 tables d'identité sous RLS par utilisateur) et 43 par entreprise (RLS par entreprise).
 
 | Domaine | Tables |
 |---|---|
@@ -25,7 +25,7 @@ Voir aussi [[Architecture]], [[Regles-comptables]], [[Plan-de-tests]].
 | Grand livre | `account`, `journal_entry`, `journal_line` |
 | Contacts | `contact`, `item` |
 | Taxes | `tax`, `tax_rate`, `tax_code`, `tax_code_component`, `tax_return` |
-| Ventes | `sales_document`, `sales_document_line`, `sales_document_tax`, `sales_credit_application` |
+| Ventes | `sales_document`, `sales_document_line`, `sales_document_tax`, `sales_credit_application`, `invoice_email` |
 | Achats | `purchase_document`, `purchase_document_line`, `purchase_document_tax`, `purchase_credit_application` |
 | Paiements | `payment`, `payment_allocation`, `payment_offset`, `bank_deposit`, `bank_deposit_item` |
 | Banque | `bank_account_profile`, `bank_import`, `bank_transaction`, `bank_match`, `bank_reconciliation`, `reconciled_line` |
@@ -164,6 +164,10 @@ Ajouter une valeur à la fin d'un enum n'a pas ces effets.
 - La revue adversariale (4 angles, ~30 constats) a produit les correctifs ci-dessus; les constats de sécurité et de comptabilité confirmés par reproduction sont tous intégrés.
 
 
+## Historique SMTP des factures
+
+`invoice_email` référence une facture par clé composite entreprise/document. L’identifiant UUID fourni par la soumission assure l’idempotence. Destinataire, langue, auteur et création sont immuables; seul le résultat passe de PENDING à ACCEPTED, FAILED ou UNKNOWN avec date de fin. Aucune suppression accordée à l’application. La RLS exige Ventes en lecture/écriture selon l’opération. Le trigger impose une facture INVOICE/POSTED, l’auteur courant et l’heure de la base; il sérialise les insertions par facture et impose les limites de fréquence. Les changements sont audités. SMTP s’exécute hors transaction; interruption ou révocation peut laisser PENDING. Aucun renvoi automatique ni preuve de livraison. Voir [[Envoi-des-factures]].
+
 ## Schéma Prisma
 ```prisma
 // Allumi — schéma de données (conception, phase 1).
@@ -212,6 +216,7 @@ enum MemberRole {
   OWNER
   ACCOUNTANT
   READ_ONLY
+  USER
 
   @@map("member_role")
 }
@@ -476,6 +481,7 @@ model User {
   /// Administrateur de l'instance : crée des entreprises, désactive des comptes, réinitialise la 2FA.
   /// Le propriétaire créé par /setup l'est; il en reste toujours au moins un actif (trigger).
   isInstanceAdmin Boolean   @default(false) @map("is_instance_admin")
+  canManageServer Boolean   @default(false) @map("can_manage_server")
   /// Un utilisateur n'est jamais supprimé : il est désactivé.
   disabledAt      DateTime? @map("disabled_at") @db.Timestamptz(6)
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -609,6 +615,7 @@ model Company {
   taxes                  Tax[]
   taxCodes               TaxCode[]
   salesDocuments         SalesDocument[]
+  invoiceEmails          InvoiceEmail[]
   purchaseDocuments      PurchaseDocument[]
   payments               Payment[]
   bankDeposits           BankDeposit[]
@@ -627,6 +634,7 @@ model Membership {
   companyId String     @map("company_id") @db.Uuid
   userId    String     @map("user_id") @db.Uuid
   role      MemberRole
+  moduleAccess Json @default("{}") @map("module_access")
   createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -643,6 +651,7 @@ model Invitation {
   companyId   String     @map("company_id") @db.Uuid
   email       String
   role        MemberRole
+  moduleAccess Json @default("{}") @map("module_access")
   /// SHA-256 (hex) du jeton envoyé par courriel.
   tokenHash   String     @unique @map("token_hash") @db.Char(64)
   expiresAt   DateTime   @map("expires_at") @db.Timestamptz(6)
@@ -1055,6 +1064,7 @@ model SalesDocument {
   creditsReceived SalesCreditApplication[] @relation("InvoiceCredited")
   attachmentLinks AttachmentLink[]
 
+  emails InvoiceEmail[]
   @@unique([companyId, id])
   @@unique([companyId, kind, number])
   @@unique([companyId, journalEntryId])
@@ -1062,6 +1072,24 @@ model SalesDocument {
   @@index([companyId, contactId])
   @@index([companyId, status, issueDate])
   @@map("sales_document")
+}
+
+/// Tentative SMTP : acceptation du relais, jamais une preuve de livraison.
+model InvoiceEmail {
+  id           String @id @db.Uuid
+  companyId    String @map("company_id") @db.Uuid
+  documentId   String @map("document_id") @db.Uuid
+  recipient    String
+  locale       String
+  status       String @default("PENDING")
+  createdById  String @map("created_by_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  completedAt  DateTime? @map("completed_at") @db.Timestamptz(6)
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  document SalesDocument @relation(fields: [companyId, documentId], references: [companyId, id], onDelete: Restrict)
+  @@index([companyId, documentId, createdAt])
+  @@map("invoice_email")
 }
 
 model SalesDocumentLine {
@@ -1708,6 +1736,7 @@ model ReconciledLine {
 
 /// Fichier dans /app/storage derrière une interface de stockage abstraite. storage_key = <company_id>/<aaaa>/<mm>/<uuid> (jamais le nom fourni).
 model Attachment {
+  scope        String    @default("accounting")
   id           String    @id @default(uuid(7)) @db.Uuid
   companyId    String    @map("company_id") @db.Uuid
   storageKey   String    @unique @map("storage_key")

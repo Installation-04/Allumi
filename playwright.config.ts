@@ -53,6 +53,12 @@ export default defineConfig({
       DEFAULT_LOCALE: "fr-CA",
       APP_VERSION: "",
       TRUSTED_PROXY_HOPS: "1",
+      SMTP_HOST: "127.0.0.1",
+      SMTP_PORT: String(PORT + 1),
+      SMTP_SECURITY: "plain",
+      SMTP_FROM: "Allumi test <sender@example.test>",
+      SMTP_USER: "",
+      SMTP_PASSWORD: "",
     },
   },
 });
