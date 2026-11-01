@@ -4440,3 +4440,9 @@ Le trigger différé `supplier_credit_posting_exact` vérifie l’égalité exac
 Le parcours utilise `purchase_document.kind = EXPENSE`, `payment_account_id` et `payment_method` existants. L’échéance reste nulle. La validation affecte un numéro PURCHASE_DOCUMENT et crée une écriture PURCHASE_DOCUMENT : débit des charges et taxes récupérables, crédit du compte de paiement. Aucun compte fournisseur ni enregistrement de paiement séparé n’est créé.
 
 La migration `20261102000000_paid_expenses` ajoute le trigger différé `paid_expense_posting_exact`, qui vérifie les comptes/montants/cases fiscales et exige une récupération intégrale ainsi qu’un compte actif banque/encaisse/carte. Le mode de paiement est obligatoire dans l’interface; le champ existant en base reste facultatif. Annulation par contre-passation et immutabilité utilisent les protections d’achats existantes. Aucun champ Prisma ajouté.
+
+## Stockage des justificatifs
+
+Le module utilise `attachment` et `attachment_link` existants : clé aléatoire `company_id/AAAA/MM/UUID`, nom original assaini, type détecté, taille et SHA256. Chaque lien du premier parcours vise un `purchase_document`. Le stockage se trouve dans `/app/storage/attachments`, dans le volume sauvegardé. Aucune migration.
+
+Le dépôt verrouille la pièce pour limiter à 20 liens concurrents. Le retrait est transactionnel et réservé aux brouillons; la suppression logique des métadonnées intervient seulement après retrait du dernier lien. Les fichiers physiques retirés sont conservés, sans accès depuis l’application. Les triggers existants empêchent de détacher les justificatifs des pièces comptabilisées. Un échec de commit incertain peut laisser un fichier privé sans métadonnée; il est conservé pour éviter une perte de justificatif.

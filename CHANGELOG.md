@@ -4,6 +4,10 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.24] - 2026-11-01
+
+- Justificatifs privés sur les factures fournisseurs, crédits et dépenses : PDF/PNG/JPEG jusqu’à 4 Mo, permissions Comptabilité, téléchargement contrôlé avec vérification SHA256, retrait limité aux brouillons et conservation sur les pièces comptabilisées.
+
 ## [0.4.0-alpha.23] - 2026-10-31
 
 - Dépenses immédiatement payées : brouillons, choix banque/encaisse/carte et mode de paiement, validation directe des charges/taxes contre le compte choisi, annulation et contrôle exact des écritures en base.

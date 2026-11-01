@@ -38,6 +38,7 @@ export default defineConfig({
     reuseExistingServer: false,
     timeout: 60_000,
     env: {
+      ATTACHMENTS_DIR: "/tmp/allumi-e2e-attachments",
       HOSTNAME: "127.0.0.1",
       PORT: String(PORT),
       NODE_ENV: "production",

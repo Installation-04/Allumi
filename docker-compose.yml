@@ -46,6 +46,7 @@ services:
     restart: unless-stopped
     # Liste explicite (pas de env_file) : ni DATABASE_URL ni POSTGRES_PASSWORD (propriétaire) ici.
     environment:
+      ATTACHMENTS_DIR: /app/storage/attachments
       NODE_ENV: production
       APP_URL: ${APP_URL:?APP_URL manquant dans .env}
       APP_DATABASE_URL: ${APP_DATABASE_URL:?APP_DATABASE_URL manquant dans .env}
