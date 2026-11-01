@@ -15,6 +15,7 @@ APP_DB_PASSWORD=allumi_app_dev_only
 APP_DATABASE_URL=postgresql://allumi_app:allumi_app_dev_only@localhost:5432/allumi
 SMTP_HOST=localhost
 SMTP_PORT=1025
+SMTP_SECURITY=plain
 APP_URL=http://localhost:3000
 NODE_ENV=development
 AUTH_SECRET=<openssl rand -base64 48>

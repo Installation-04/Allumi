@@ -1,6 +1,6 @@
 {
   "name": "allumi",
-  "version": "0.4.0-alpha.26",
+  "version": "0.4.0-alpha.28",
   "private": true,
   "description": "Logiciel de comptabilité open source et auto-hébergeable pour le Québec et le Canada",
   "license": "MIT",
@@ -29,6 +29,7 @@
     "@prisma/client": "7.10.0",
     "next": "16.4.1",
     "next-intl": "4.14.9",
+    "nodemailer": "10.3.1",
     "otpauth": "9.5.2",
     "pg": "8.23.1",
     "pino": "10.4.0",
@@ -43,6 +44,7 @@
     "@playwright/test": "1.64.1",
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "22.20.5",
+    "@types/nodemailer": "8.0.2",
     "@types/pg": "8.23.1",
     "@types/qrcode": "1.5.6",
     "@types/react": "19.3.0",

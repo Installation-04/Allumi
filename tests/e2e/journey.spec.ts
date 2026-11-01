@@ -1,8 +1,13 @@
+import { smtpReceiver } from "../support/smtp";
 import { mkdirSync, readFileSync } from "node:fs";
 import { devices, expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
 import { Secret, TOTP } from "otpauth";
 import pg from "pg";
 import { e2eUrls } from "./db";
+
+const relay=smtpReceiver();
+test.beforeAll(async()=>{await relay.listen(Number(process.env.E2E_PORT??3100)+1);});
+test.afterAll(async()=>{await relay.close();});
 
 const VERSION = (JSON.parse(readFileSync("package.json", "utf8")) as { version: string }).version;
 
@@ -773,6 +778,19 @@ async function postingJourney(page: Page) {
   await expect(page.getByText("Facture comptabilisée", { exact: true })).toBeVisible();
   await expectNoPageOverflow(page);
   await captureReference(page, "facture-validee");
+
+  const invoiceEmail=page.getByRole("region",{name:"Envoi par courriel",exact:true});
+  await expect(invoiceEmail.getByText("Aucune tentative d’envoi.", {exact:true})).toBeVisible();
+  await invoiceEmail.locator("summary").click();
+  await invoiceEmail.getByLabel("Adresse du destinataire",{exact:true}).fill("client@example.test");
+  await invoiceEmail.getByLabel("J’ai vérifié le destinataire et je confirme cet envoi.",{exact:true}).check();
+  await invoiceEmail.getByRole("button",{name:"Confirmer et envoyer",exact:true}).click();
+  await expect(invoiceEmail.getByText("Accepté par le serveur SMTP — livraison non confirmée",{exact:true})).toBeVisible();
+  expect(relay.messages).toHaveLength(1);
+  expect(relay.messages[0]).toContain("client@example.test");
+  expect(relay.messages[0]).toContain("multipart/alternative");
+  await expectNoPageOverflow(page);
+  await captureReference(page,"courriel-facture","Envoi par courriel");
 
   const salesEvidence=page.getByRole("region", { name:"Justificatifs", exact:true });
   await salesEvidence.getByLabel("Fichier justificatif", { exact:true }).setInputFiles({name:"bon-client.png",mimeType:"image/png",buffer:Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jC1sAAAAASUVORK5CYII=","base64")});

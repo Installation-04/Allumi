@@ -4,3 +4,4 @@ export { voidInvoice } from "./service/voiding";
 export { listCreditDrafts, getCreditDraft, saveCreditDraft, deleteCreditDraft, creditAmount } from "./service/credit-drafts";
 export { postCreditNote, getPostedCredit, listPostedCredits, getInvoiceOpenCents } from "./service/credit-posting";
 export { voidCreditNote } from "./service/credit-voiding";
+export { getInvoiceEmails, sendInvoiceEmail } from "./service/email";

@@ -25,7 +25,8 @@ const schema = z
     // When set, /setup asks for it: nobody who merely reaches the URL first can claim the instance.
     SETUP_TOKEN: z.string().min(16, "must be at least 16 characters").optional(),
     SMTP_HOST: z.string().optional(),
-    SMTP_PORT: z.coerce.number().int().positive().default(587),
+    SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(587),
+    SMTP_SECURITY: z.enum(["starttls", "tls", "plain"]).default("starttls"),
     SMTP_USER: z.string().optional(),
     SMTP_PASSWORD: z.string().optional(),
     SMTP_FROM: z.string().optional(),

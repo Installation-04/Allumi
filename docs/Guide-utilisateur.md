@@ -76,3 +76,7 @@ Depuis une facture fournisseur validée, **Nouveau crédit fournisseur** prépar
 Pour une dépense déjà réglée et non encore saisie, ouvrir **Dépenses → Dépenses payées**. Voir [[Depenses-payees]]. Une facture fournisseur déjà enregistrée se règle depuis sa fiche, sans créer une nouvelle dépense.
 
 Les factures et avoirs clients disposent de [[Justificatifs]] privés sous permissions Ventes; les achats utilisent les permissions Comptabilité.
+
+## Envoyer une facture
+
+Ouvre une facture validée puis **Envoi par courriel**. Vérifie le destinataire, choisis la langue et confirme. L’historique distingue l’acceptation SMTP d’un résultat incertain; aucun renvoi automatique. Voir [[Envoi-des-factures]].

@@ -42,7 +42,7 @@ PostgreSQL n'est **pas** exposé hors du réseau Docker en production. Pourquoi 
 | `TRUSTED_PROXY_HOPS` | De 0 à 5, défaut 0 : accès direct, en-têtes transférés ignorés et budget IP partagé. Avec un proxy externe, renseigner le nombre de proxys de confiance et empêcher tout accès direct contournant ces proxys. |
 
 ## Courriel (SMTP)
-`SMTP_HOST`, `SMTP_PORT` (587 par défaut), `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`. Utilise un service transactionnel avec SPF, DKIM et DMARC configurés sur ton domaine, sinon les factures risquent d'aboutir dans les pourriels.
+`SMTP_HOST`, `SMTP_PORT` (587 par défaut), `SMTP_SECURITY` (`starttls` par défaut, `tls` pour 465; `plain` pour un relais de test), `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`. Voir [[Envoi-des-factures]] pour le parcours et les résultats. Utilise un service transactionnel avec SPF, DKIM et DMARC configurés sur ton domaine, sinon les factures risquent d'aboutir dans les pourriels.
 
 ## Sauvegardes
 | Variable | Description |

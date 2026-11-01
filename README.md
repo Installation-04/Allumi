@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.26
+git checkout v0.4.0-alpha.28
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.26 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.28 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -318,3 +318,11 @@ Les factures et avoirs clients acceptent les justificatifs privés sous permissi
 ![Justificatif client](docs/images/justificatif-client-desktop.png)
 
 ![Justificatif client mobile](docs/images/justificatif-client-mobile.png)
+
+### Envoi manuel des factures par courriel
+
+Envoyez une facture validée en français ou anglais via votre relais SMTP. Destinataire confirmé, historique et permissions Ventes; les résultats incertains ne déclenchent pas de renvoi automatique ([guide](docs/Envoi-des-factures.md)).
+
+![Envoi par courriel](docs/images/courriel-facture-desktop.png)
+
+![Envoi par courriel mobile](docs/images/courriel-facture-mobile.png)

@@ -196,3 +196,11 @@ it("separates immutable attachment scopes and checks target scope in the databas
  const rows=await q<{qual:string}>("SELECT qual FROM pg_policies WHERE tablename='attachment' AND policyname='module_read'");
  expect(rows[0]?.qual).toContain("scope");
 });
+
+it("preserves invoice email attempts and grants only outcome transitions",async()=>{
+ const [grants]=await q<{del:boolean;trunc:boolean}>("SELECT has_table_privilege('allumi_app','invoice_email','DELETE') AS del, has_table_privilege('allumi_app','invoice_email','TRUNCATE') AS trunc");
+ expect(grants).toEqual({del:false,trunc:false});
+ const columns=await q<{column_name:string}>("SELECT column_name FROM information_schema.column_privileges WHERE grantee='allumi_app' AND table_name='invoice_email' AND privilege_type='UPDATE' ORDER BY column_name");
+ expect(columns.map(c=>c.column_name)).toEqual(["completed_at","status"]);
+ expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='invoice_email_guard' AND NOT tgisinternal")).toHaveLength(1);
+});
