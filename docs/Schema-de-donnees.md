@@ -4434,3 +4434,9 @@ La migration `20261028000000_server_access` ajoute `app_user.can_manage_server`,
 La migration `20261101000000_supplier_credit_posting` ajoute `supplier_credit_limits` sur les transitions DRAFT → POSTED de `purchase_document` : verrou de la facture d’origine, concordance des comptes/codes/positions et limites cumulées sur les lignes, taxes et total. `purchase_document_taxes_are_exact(purchase_document)` recalcule les taxes du crédit aux taux stockés de sa facture, selon son arrondi, et exige une récupération intégrale.
 
 Le trigger différé `supplier_credit_posting_exact` vérifie l’égalité exacte des comptes, contacts et cases fiscales de l’écriture du crédit : débit des comptes fournisseurs, crédit des charges et des taxes récupérables. Les applications restent dans `purchase_credit_application`; leur retrait daté et la contre-passation conservent l’historique. Le numéro utilise la séquence PURCHASE_DOCUMENT existante. Aucun nouveau champ Prisma.
+
+## Dépenses immédiatement payées
+
+Le parcours utilise `purchase_document.kind = EXPENSE`, `payment_account_id` et `payment_method` existants. L’échéance reste nulle. La validation affecte un numéro PURCHASE_DOCUMENT et crée une écriture PURCHASE_DOCUMENT : débit des charges et taxes récupérables, crédit du compte de paiement. Aucun compte fournisseur ni enregistrement de paiement séparé n’est créé.
+
+La migration `20261102000000_paid_expenses` ajoute le trigger différé `paid_expense_posting_exact`, qui vérifie les comptes/montants/cases fiscales et exige une récupération intégrale ainsi qu’un compte actif banque/encaisse/carte. Le mode de paiement est obligatoire dans l’interface; le champ existant en base reste facultatif. Annulation par contre-passation et immutabilité utilisent les protections d’achats existantes. Aucun champ Prisma ajouté.

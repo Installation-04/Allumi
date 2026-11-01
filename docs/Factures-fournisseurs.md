@@ -28,7 +28,7 @@ La validation attribue un numéro interne `A-…`, fige les coordonnées du four
 
 **Annuler la facture** demande un motif et une date dans une période ouverte, au moins égale à la date comptable originale. La facture et sa piste d’audit restent présentes; une écriture inverse annule son effet comptable. Des paiements ou crédits liés empêchent l’annulation tant qu’ils ne sont pas résolus.
 
-Les dépenses immédiatement payées, les immobilisations et stocks, les pièces jointes et l’âge des comptes fournisseurs restent à venir. Les listes affichent au maximum 100 pièces; la liste des brouillons propose une recherche. Les sélecteurs de fournisseurs et d’articles sont limités à 500 entrées actives.
+Les immobilisations et stocks, les pièces jointes et l’âge des comptes fournisseurs restent à venir. Les listes affichent au maximum 100 pièces; la liste des brouillons propose une recherche. Les sélecteurs de fournisseurs et d’articles sont limités à 500 entrées actives.
 
 Voir aussi [[Taxes-et-catalogue]], [[Utilisateurs-et-permissions]] et [[Fonctionnalites-et-limites]].
 
@@ -69,3 +69,5 @@ Depuis la facture, consultez son nouveau solde et ses crédits. **Crédits fourn
 **Annuler l’avoir** demande un motif et une date dans une période ouverte, au moins égale à sa validation et à tous les événements d’affectation/retrait. L’application à la facture est retirée à cette date et une écriture inverse rétablit son solde. Le crédit original, son numéro et l’historique sont conservés. Un remboursement actif ou une affectation active à une autre facture bloque cette annulation. Les remboursements et la gestion manuelle d’affectations à d’autres factures ne sont pas proposés par cette interface.
 
 Les crédits restent limités aux factures avec taxes entièrement récupérables ou sans taxe. La récupération partielle et les ajustements manuels de taxes restent indisponibles.
+
+Pour les dépenses déjà réglées sans facture préalablement saisie, voir [[Depenses-payees]].
