@@ -1,3 +1,4 @@
+import { SalesAttachments } from "../../../_attachments/sales-panel";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -46,5 +47,5 @@ export default async function Page({ params }: { params: Promise<{ companyId: st
         <label className="inline-flex min-h-11 items-center gap-3"><input type="checkbox" name="confirm" value="yes" required />{t("confirmVoid")}</label>
       </ActionForm>
     </details>}
-  </section>;
+  <SalesAttachments actor={actor} access={company} documentId={creditId} /></section>;
 }

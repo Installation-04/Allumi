@@ -28,4 +28,4 @@ Création, modification, consultation et suppression sont disponibles : [[Brouil
 
 Annulation des factures validées disponible avec contre-passation et historique conservé : [[Annulation-des-factures]].
 
-Les [[Justificatifs]] sont disponibles sur les documents d’achats : PDF/PNG/JPEG privés, 4 Mo, 20 fichiers par pièce; retrait sur les brouillons, conservation après comptabilisation. Les autres cibles, la purge physique et l’analyse antivirus ne sont pas proposées dans ce lot.
+Les [[Justificatifs]] sont disponibles sur les documents de ventes et d’achats, selon les droits du module : PDF/PNG/JPEG privés, 4 Mo, 20 fichiers par pièce; retrait sur les brouillons, conservation après comptabilisation. Les autres cibles, la purge physique et l’analyse antivirus ne sont pas proposées dans ce lot.

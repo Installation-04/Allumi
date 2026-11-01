@@ -1544,6 +1544,7 @@ model ReconciledLine {
 
 /// Fichier dans /app/storage derrière une interface de stockage abstraite. storage_key = <company_id>/<aaaa>/<mm>/<uuid> (jamais le nom fourni).
 model Attachment {
+  scope        String    @default("accounting")
   id           String    @id @default(uuid(7)) @db.Uuid
   companyId    String    @map("company_id") @db.Uuid
   storageKey   String    @unique @map("storage_key")

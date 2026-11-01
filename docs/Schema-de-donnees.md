@@ -4446,3 +4446,9 @@ La migration `20261102000000_paid_expenses` ajoute le trigger différé `paid_ex
 Le module utilise `attachment` et `attachment_link` existants : clé aléatoire `company_id/AAAA/MM/UUID`, nom original assaini, type détecté, taille et SHA256. Chaque lien du premier parcours vise un `purchase_document`. Le stockage se trouve dans `/app/storage/attachments`, dans le volume sauvegardé. Aucune migration.
 
 Le dépôt verrouille la pièce pour limiter à 20 liens concurrents. Le retrait est transactionnel et réservé aux brouillons; la suppression logique des métadonnées intervient seulement après retrait du dernier lien. Les fichiers physiques retirés sont conservés, sans accès depuis l’application. Les triggers existants empêchent de détacher les justificatifs des pièces comptabilisées. Un échec de commit incertain peut laisser un fichier privé sans métadonnée; il est conservé pour éviter une perte de justificatif.
+
+## Portée des justificatifs
+
+La migration transactionnelle `20261103000000_sales_attachments` ajoute `attachment.scope`, texte obligatoire parmi `sales` et `accounting`, par défaut `accounting`. Les politiques restrictives de métadonnées utilisent cette portée; celles des liens utilisent leur cible Ventes ou Comptabilité, en plus de l’isolation par entreprise déjà présente.
+
+Le trigger `attachment_scope_guard` exige qu’un fichier actif corresponde à la portée de son lien. L’immutabilité existante des métadonnées protège la portée. Les anciens fichiers liés uniquement aux ventes sont classés `sales`; les liens mixtes ou inconnus restent dans leur portée Comptabilité d’origine. Le stockage et les clés de fichiers restent identiques.

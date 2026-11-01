@@ -1,12 +1,12 @@
 # Justificatifs et pièces jointes
 
-Les fiches de factures fournisseurs, crédits fournisseurs et dépenses payées proposent un bloc **Justificatifs**, sur les brouillons comme sur les pièces validées ou annulées. Ce premier lot couvre les documents d’achats; les factures clients et autres cibles seront ajoutées ultérieurement.
+Les fiches de factures et avoirs clients, factures et crédits fournisseurs et dépenses payées proposent un bloc **Justificatifs**, sur les brouillons comme sur les pièces validées ou annulées. Les cibles disponibles couvrent les documents de ventes et d’achats. Les contacts, écritures et paiements séparés restent hors de ce parcours.
 
 ## Ajouter et consulter
 
 Choisissez un PDF, PNG ou JPEG puis **Ajouter le justificatif**. Chaque fichier doit être non vide, mesurer au plus 4 Mo et avoir une extension correspondant à la signature détectée. La limite est de 20 fichiers par pièce. Un HTML ou SVG déguisé est refusé; le type déclaré par le navigateur ne suffit pas à autoriser le dépôt.
 
-Les membres disposant du droit d’écriture **Comptabilité** peuvent ajouter des fichiers. Le droit de lecture permet de consulter la liste et de télécharger. Chaque téléchargement revérifie l’entreprise, les permissions et le lien à la pièce; il n’existe pas de lien public ni de partage anonyme.
+Les droits **Ventes** contrôlent les justificatifs des factures et avoirs clients. Les droits **Comptabilité** contrôlent ceux des factures fournisseurs, crédits et dépenses. Dans le module concerné, le droit d’écriture autorise le dépôt et le retrait sur brouillon; le droit de lecture autorise la consultation et le téléchargement. Un utilisateur Ventes sans accès Comptabilité peut gérer les fichiers clients et ne peut pas lire ceux des achats. Chaque téléchargement revérifie l’entreprise, les permissions et le lien à la pièce; il n’existe pas de lien public ni de partage anonyme.
 
 Le téléchargement se fait comme fichier joint, avec cache désactivé et protection contre l’interprétation d’un autre type de contenu. La taille et l’empreinte SHA256 sont vérifiées; un fichier absent ou altéré n’est pas envoyé. Les justificatifs ne changent ni les montants ni l’écriture comptable.
 
@@ -31,3 +31,11 @@ En développement hors Docker, `ATTACHMENTS_DIR` permet un répertoire privé ac
 La vérification du format et de l’intégrité n’est pas un antivirus. N’ouvrez que des documents provenant de sources de confiance. Les métadonnées et le disque ne forment pas une transaction unique : après un résultat de commit incertain, un fichier privé orphelin peut être conservé pour éviter une perte. Une purge administrative automatique reste à venir.
 
 Voir [[Factures-fournisseurs]], [[Depenses-payees]] et [[Utilisateurs-et-permissions]].
+
+## Justificatifs des factures clients
+
+Le bloc Justificatifs se trouve sur la fiche de la facture ou de l’avoir, y compris après validation ou annulation. Le téléchargement reste réservé aux membres autorisés de l’entreprise : la présence d’un justificatif ne crée pas de portail client ni d’envoi par courriel. La portée Ventes/Comptabilité est immuable et vérifiée en base lors de chaque rattachement. Les limites de 4 Mo et 20 fichiers, la conservation et les sauvegardes sont identiques.
+
+![Justificatif client](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/justificatif-client-desktop.png)
+
+![Justificatif client sur téléphone](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/justificatif-client-mobile.png)

@@ -1261,7 +1261,7 @@
   "sales": {
     "title": "Invoice drafts",
     "draft": "Draft — not posted",
-    "intro": "Prepare invoices, then post them to the ledger. A draft does not change the ledger. Sending and payments are not yet available.",
+    "intro": "Prepare invoices, then post them to record them in the ledger. Drafts do not affect accounting. Email delivery is still planned.",
     "new": "New draft",
     "edit": "Edit draft",
     "back": "Back to drafts",
@@ -1305,7 +1305,7 @@
     "journal": "View journal entry",
     "issuer": "Issuer",
     "billedTo": "Bill to",
-    "postedHint": "The details below were frozen when posted. Sending and payments are not yet available.",
+    "postedHint": "The details below are frozen at posting.",
     "void": "Void invoice",
     "voided": "Voided invoice",
     "voidDate": "Reversal date",

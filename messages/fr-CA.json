@@ -1261,7 +1261,7 @@
   "sales": {
     "title": "Brouillons de factures",
     "draft": "Brouillon — non comptabilisé",
-    "intro": "Préparez des factures puis validez-les pour les comptabiliser. Un brouillon ne modifie pas le grand livre. Envoi et paiements ne sont pas encore disponibles.",
+    "intro": "Préparez des factures puis validez-les pour les comptabiliser. Un brouillon ne modifie pas le grand livre. L’envoi par courriel reste à venir.",
     "new": "Nouveau brouillon",
     "edit": "Modifier le brouillon",
     "back": "Retour aux brouillons",
@@ -1305,7 +1305,7 @@
     "journal": "Voir l’écriture comptable",
     "issuer": "Émetteur",
     "billedTo": "Facturé à",
-    "postedHint": "Les coordonnées ci-dessous sont figées à la validation. Envoi et paiements ne sont pas encore disponibles.",
+    "postedHint": "Les coordonnées ci-dessous sont figées à la validation.",
     "void": "Annuler la facture",
     "voided": "Facture annulée",
     "voidDate": "Date de contre-passation",

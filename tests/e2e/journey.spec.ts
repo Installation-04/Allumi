@@ -773,6 +773,20 @@ async function postingJourney(page: Page) {
   await expect(page.getByText("Facture comptabilisée", { exact: true })).toBeVisible();
   await expectNoPageOverflow(page);
   await captureReference(page, "facture-validee");
+
+  const salesEvidence=page.getByRole("region", { name:"Justificatifs", exact:true });
+  await salesEvidence.getByLabel("Fichier justificatif", { exact:true }).setInputFiles({name:"bon-client.png",mimeType:"image/png",buffer:Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jC1sAAAAASUVORK5CYII=","base64")});
+  await salesEvidence.getByRole("button", { name:"Ajouter le justificatif",exact:true }).click();
+  const salesLink=salesEvidence.getByRole("link", { name:"bon-client.png",exact:true });
+  await expect(salesLink).toBeVisible();
+  expect(await salesLink.getAttribute("href")).toContain("/justificatifs-ventes/");
+  const salesDownload=await page.request.get((await salesLink.getAttribute("href"))!);
+  expect(salesDownload.status()).toBe(200);
+  expect(salesDownload.headers()["content-disposition"]).toContain("attachment;");
+  expect(salesDownload.headers()["cache-control"]).toContain("no-store");
+  expect((await salesDownload.body()).length).toBe(68);
+  await expectNoPageOverflow(page);
+  await captureReference(page,"justificatif-client","Justificatifs");
   const printSourceUrl = page.url();
   await page.getByRole("link", { name: "Version imprimable", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Facture F-00001", exact: true })).toBeVisible();
