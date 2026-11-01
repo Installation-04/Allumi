@@ -185,3 +185,7 @@ it("guards supplier credit limits, source taxes and exact deferred postings", as
  expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='supplier_credit_posting_exact' AND tgdeferrable AND tginitdeferred AND NOT tgisinternal")).toHaveLength(1);
  expect((await q<{ok:boolean}>("SELECT has_function_privilege('allumi_app','purchase_document_taxes_are_exact(purchase_document)','EXECUTE') AS ok"))[0]?.ok).toBe(true);
 });
+
+it("checks paid expense postings exactly at transaction completion", async () => {
+ expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='paid_expense_posting_exact' AND tgdeferrable AND tginitdeferred AND NOT tgisinternal")).toHaveLength(1);
+});

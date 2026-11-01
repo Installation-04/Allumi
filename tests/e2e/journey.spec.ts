@@ -266,6 +266,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await generalLedgerJourney(page);
   await receivablesAgingJourney(page);
   await supplierBillsJourney(page);
+  await paidExpensesJourney(page);
   const settingsBase = new URL(page.url()).pathname.match(/^\/c\/[^/]+/)?.[0];
   expect(settingsBase).toBeTruthy();
   await page.getByRole("button", { name: "Français", exact: true }).click();
@@ -2185,4 +2186,37 @@ async function supplierBillsJourney(page: Page) {
   await page.getByLabel("Je confirme l’annulation définitive de cette facture.").check();
   await page.getByRole("button", { name: "Annuler la facture", exact: true }).click();
   await expect(page.getByText("Facture annulée", { exact: true })).toBeVisible();
+}
+
+async function paidExpensesJourney(page: Page) {
+  await openSection(page, "Dépenses payées");
+  await page.getByRole("link", { name: "Nouvelle dépense payée", exact: true }).click();
+  await page.getByLabel("Fournisseur", { exact: true }).selectOption({ label: "Atelier Boréal" });
+  await page.getByLabel("Numéro de facture fournisseur", { exact: true }).fill("DEP-2026-001");
+  await page.getByLabel("Date de dépense", { exact: true }).fill("2026-07-20");
+  await page.getByLabel("Compte de paiement", { exact: true }).selectOption({ label: "1000 — Banque – compte courant" });
+  await page.getByLabel("Mode de paiement", { exact: true }).selectOption("EFT");
+  const line = page.getByRole("group", { name: "Ligne 1", exact: true });
+  await line.getByLabel("Description", { exact: true }).fill("Fournitures déjà payées");
+  await line.getByLabel("Prix unitaire (CAD)").fill("100");
+  await line.getByLabel("Compte de charges").selectOption({ label: "6040 — Fournitures de bureau" });
+  await line.getByLabel("Code de taxe").selectOption({ label: "TPS+TVQ" });
+  await page.getByRole("button", { name: "Enregistrer le brouillon", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "DEP-2026-001", exact: true })).toBeVisible();
+  await expect(page.getByText(/Total:.*114,98/)).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "depense-payee-brouillon");
+  await page.locator("summary", { hasText: "Valider la dépense" }).click();
+  await page.getByLabel("Je confirme les montants de la pièce et la récupération intégrale des taxes.").check();
+  await page.getByRole("button", { name: "Valider la dépense", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "A-00003", exact: true })).toBeVisible();
+  await expect(page.getByText("Dépense comptabilisée", { exact: true })).toBeVisible();
+  await expectNoPageOverflow(page);
+  await captureReference(page, "depense-payee-validee");
+  await page.locator("summary", { hasText: "Annuler la dépense" }).click();
+  await page.getByLabel("Date de contre-passation", { exact: true }).fill("2026-07-21");
+  await page.getByLabel("Motif", { exact: true }).fill("Correction de la dépense de test");
+  await page.getByLabel("Je confirme l’annulation définitive de cette dépense.").check();
+  await page.getByRole("button", { name: "Annuler la dépense", exact: true }).click();
+  await expect(page.getByText("Dépense annulée", { exact: true })).toBeVisible();
 }

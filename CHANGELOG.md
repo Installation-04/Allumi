@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Dépenses immédiatement payées : brouillons, choix banque/encaisse/carte et mode de paiement, validation directe des charges/taxes contre le compte choisi, annulation et contrôle exact des écritures en base.
+
 ## [0.4.0-alpha.22] - 2026-10-31
 
 - Crédits fournisseurs : validation et application intégrale à la facture d’origine, contrôles cumulés par ligne/taxe en base, écriture exacte, annulation par contre-passation et historique des affectations.

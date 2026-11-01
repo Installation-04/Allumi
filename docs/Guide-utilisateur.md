@@ -72,3 +72,5 @@ Pour corriger entièrement une facture validée, voir [[Annulation-des-factures]
 Ouvrir **Dépenses → Factures fournisseurs** pour préparer une facture à payer, la valider et consulter son écriture. Voir [[Factures-fournisseurs]] pour les droits, l’annulation et les limites de récupération des taxes.
 
 Depuis une facture fournisseur validée, **Nouveau crédit fournisseur** prépare un brouillon de correction aux taux d’origine. Le brouillon ne réduit pas le solde à payer; sa validation le comptabilise et l’applique intégralement à la facture d’origine. Voir [[Factures-fournisseurs]].
+
+Pour une dépense déjà réglée et non encore saisie, ouvrir **Dépenses → Dépenses payées**. Voir [[Depenses-payees]]. Une facture fournisseur déjà enregistrée se règle depuis sa fiche, sans créer une nouvelle dépense.

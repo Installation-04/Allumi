@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.22
+git checkout v0.4.0-alpha.23
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.22 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.23 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -294,3 +294,11 @@ Les crédits peuvent être comptabilisés et appliqués intégralement à la fac
 ![Crédit fournisseur validé](docs/images/credit-fournisseur-valide-desktop.png)
 
 ![Crédit sur mobile](docs/images/credit-fournisseur-valide-mobile.png)
+
+### Dépenses immédiatement payées
+
+Saisissez une dépense déjà réglée avec son fournisseur, ses lignes et son compte banque/encaisse/carte. La validation comptabilise directement charges et taxes contre ce compte; l’annulation conserve l’historique ([guide](docs/Depenses-payees.md)).
+
+![Dépense payée validée](docs/images/depense-payee-validee-desktop.png)
+
+![Dépense sur mobile](docs/images/depense-payee-validee-mobile.png)
