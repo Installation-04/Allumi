@@ -26,6 +26,8 @@ describe("company navigation authorization", () => {
   it("requires both sales and accounting for receivables aging", () => {
     const member: AccessContext = { role: "READ_ONLY", moduleAccess: { sales: "none" } };
     expect(visibleAreaRoutes(member, "rapports")).toContain("bilan");
+    expect(canAccessRoute(member,"age-fournisseurs")).toBe(true);
+    expect(canAccessRoute({...member,moduleAccess:{accounting:"none"}},"age-fournisseurs")).toBe(false);
     expect(visibleAreaRoutes(member, "rapports")).not.toContain("age-clients");
     expect(canAccessRoute({ ...member, moduleAccess: { accounting: "none" } }, "age-clients")).toBe(false);
     expect(canAccessRoute({ role: "READ_ONLY" }, "age-clients")).toBe(true);

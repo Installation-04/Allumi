@@ -1134,7 +1134,8 @@
       "resultats": "État des résultats",
       "bilan": "Bilan",
       "grand-livre": "Grand livre",
-      "age-clients": "Âge des comptes clients"
+      "age-clients": "Âge des comptes clients",
+      "age-fournisseurs": "Âge des comptes fournisseurs"
     }
   },
   "updates": {
@@ -1987,5 +1988,41 @@
       "FAILED": "Refusé par le serveur SMTP",
       "UNKNOWN": "Résultat incertain — le message peut avoir été accepté"
     }
+  },
+  "payablesAging": {
+    "title": "Âge des comptes fournisseurs",
+    "intro": "Les sommes dues aux fournisseurs à une date donnée, classées selon les jours de retard. Les crédits et paiements non affectés sont présentés séparément.",
+    "asOf": "Au",
+    "apply": "Afficher",
+    "export": "Exporter en CSV",
+    "status": "Soldes au {date}.",
+    "empty": "Aucun montant ouvert à cette date.",
+    "customer": "Fournisseur",
+    "current": "Courant",
+    "d1_30": "1–30 jours",
+    "d31_60": "31–60 jours",
+    "d61_90": "61–90 jours",
+    "d91_plus": "91 jours et plus",
+    "unapplied": "Non appliqué",
+    "total": "Total",
+    "detail": "Détail par fournisseur",
+    "document": "Pièce",
+    "number": "Numéro",
+    "date": "Date",
+    "dueDate": "Échéance",
+    "daysPastDue": "Jours de retard",
+    "notDue": "Non échue",
+    "amount": "Montant",
+    "kinds": {
+      "INVOICE": "Facture fournisseur",
+      "CREDIT_NOTE": "Crédit fournisseur non affecté",
+      "PAYMENT": "Paiement non affecté",
+      "REFUND": "Remboursement non affecté"
+    },
+    "ledgerBalance": "Solde du grand livre — comptes fournisseurs",
+    "difference": "Écart",
+    "agrees": "Le total concorde avec le solde des comptes fournisseurs du grand livre.",
+    "differs": "Le total ne concorde pas avec le grand livre (écart de {amount}) : les écritures des comptes fournisseurs doivent être vérifiées.",
+    "file": "age-des-comptes-fournisseurs"
   }
 }

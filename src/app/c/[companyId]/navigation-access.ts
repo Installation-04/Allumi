@@ -28,6 +28,7 @@ export const ROUTE_ACCESS: Record<string, readonly Action[]> = {
   resultats: ["ledger.read"],
   bilan: ["ledger.read"],
   "grand-livre": ["ledger.read"],
+  "age-fournisseurs": ["ledger.read"],
   "age-clients": ["ledger.read", "sales.read"],
 };
 

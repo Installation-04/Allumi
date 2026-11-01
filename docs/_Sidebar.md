@@ -30,6 +30,7 @@
 - [[Envoi-des-factures]]
 - [[Plan-comptable]]
 - [[Journal-et-ecritures]]
+- [[Age-des-comptes-fournisseurs]]
 - [[Exercices-et-periodes]]
 - [[Piste-d-audit]]
 
