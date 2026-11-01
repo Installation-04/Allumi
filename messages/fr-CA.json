@@ -1079,7 +1079,7 @@
     "rapports": {
       "title": "Rapports",
       "description": "Consultez les rapports disponibles pour votre entreprise.",
-      "planned": "Sommaire TPS/TVQ, comparaisons de périodes et exports PDF : phase 6."
+      "planned": "Comparaisons de périodes, formulaires de déclaration et exports PDF : phase 6."
     },
     "taxes": {
       "title": "Taxes",
@@ -1135,7 +1135,8 @@
       "bilan": "Bilan",
       "grand-livre": "Grand livre",
       "age-clients": "Âge des comptes clients",
-      "age-fournisseurs": "Âge des comptes fournisseurs"
+      "age-fournisseurs": "Âge des comptes fournisseurs",
+      "sommaire-taxes": "Sommaire TPS/TVQ"
     }
   },
   "updates": {
@@ -2024,5 +2025,51 @@
     "agrees": "Le total concorde avec le solde des comptes fournisseurs du grand livre.",
     "differs": "Le total ne concorde pas avec le grand livre (écart de {amount}) : les écritures des comptes fournisseurs doivent être vérifiées.",
     "file": "age-des-comptes-fournisseurs"
+  },
+  "taxSummary": {
+    "title": "Sommaire TPS/TVQ et autres taxes",
+    "intro": "Montants de taxes comptabilisés pendant la période, avec détail des écritures et contrôle du grand livre.",
+    "from": "Du",
+    "to": "Au",
+    "apply": "Afficher",
+    "export": "Exporter en CSV",
+    "period": "Écritures du {from} au {to}.",
+    "scope": "Sommaire selon les écritures comptabilisées, avant report des soldes antérieurs. Il ne constitue pas une déclaration fiscale. Les versements sont présentés séparément; aucun dépôt ni paiement n’est effectué.",
+    "tax": "Taxe",
+    "collected": "Perçue",
+    "recoverable": "Récupérable",
+    "adjustment": "Ajustements",
+    "net": "Net avant versements",
+    "settlement": "Versements / remboursements",
+    "movement": "Mouvement net",
+    "total": "Total",
+    "control": "Mouvement du grand livre — comptes de taxes",
+    "difference": "Écart",
+    "anomalies": "Lignes à vérifier",
+    "detail": "Détail des écritures de taxes",
+    "date": "Date",
+    "entry": "Écriture",
+    "account": "Compte",
+    "memo": "Description",
+    "box": "Catégorie",
+    "debit": "Débit",
+    "credit": "Crédit",
+    "agrees": "Les mouvements concordent avec les comptes de taxes du grand livre.",
+    "warning": "Des lignes ou un écart nécessitent une vérification avant utilisation de ce sommaire.",
+    "reviewLedger": "Vérifier le grand livre",
+    "empty": "Aucune taxe à présenter dans le sommaire.",
+    "count": "{count} lignes comptabilisées.",
+    "pagination": "Pagination des écritures de taxes",
+    "page": "Page {page} sur {pages}",
+    "previous": "Précédente",
+    "next": "Suivante",
+    "tooManyLines": "L’export dépasse 200 000 lignes. Réduisez la période; aucun fichier partiel n’est produit.",
+    "file": "sommaire-taxes",
+    "boxes": {
+      "COLLECTED": "Taxe perçue",
+      "RECOVERABLE": "Taxe récupérable",
+      "ADJUSTMENT": "Ajustement",
+      "SETTLEMENT": "Versement / remboursement"
+    }
   }
 }

@@ -31,6 +31,7 @@
 - [[Plan-comptable]]
 - [[Journal-et-ecritures]]
 - [[Age-des-comptes-fournisseurs]]
+- [[Sommaire-des-taxes]]
 - [[Exercices-et-periodes]]
 - [[Piste-d-audit]]
 

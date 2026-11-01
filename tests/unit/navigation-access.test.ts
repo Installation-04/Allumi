@@ -33,6 +33,11 @@ describe("company navigation authorization", () => {
     expect(canAccessRoute({ role: "READ_ONLY" }, "age-clients")).toBe(true);
   });
 
+  it("requires accounting and tax access for the tax summary",()=>{
+    expect(canAccessRoute({role:"READ_ONLY"},"sommaire-taxes")).toBe(true);
+    for(const moduleAccess of [{accounting:"none",taxes:"read"},{accounting:"read",taxes:"none"}])expect(canAccessRoute({role:"READ_ONLY",moduleAccess},"sommaire-taxes")).toBe(false);
+  });
+
   it("requires an explicit policy for each current shortcut and rejects unknown routes", () => {
     for (const area of Object.values(AREAS)) for (const route of area.links) expect(Object.hasOwn(ROUTE_ACCESS, route), route).toBe(true);
     expect(canAccessRoute({ role: "OWNER" }, "future-unregistered-page")).toBe(false);

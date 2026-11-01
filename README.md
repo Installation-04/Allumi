@@ -334,3 +334,11 @@ Consultez les factures encore dues à une date donnée, réparties par retard, a
 ![Âge fournisseurs](docs/images/rapport-age-fournisseurs-desktop.png)
 
 ![Âge fournisseurs mobile](docs/images/rapport-age-fournisseurs-mobile.png)
+
+### Sommaire TPS/TVQ et autres taxes
+
+Consultez les montants comptabilisés par période, les ajustements et versements, avec détail et contrôle du grand livre. Export CSV bilingue; aucune déclaration ni écriture créée ([guide](docs/Sommaire-des-taxes.md)).
+
+![Sommaire des taxes](docs/images/sommaire-taxes-desktop.png)
+
+![Sommaire des taxes mobile](docs/images/sommaire-taxes-mobile.png)

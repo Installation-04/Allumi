@@ -8,3 +8,5 @@ export { getBalanceSheet, getIncomeStatement, type BalanceSheetReport, type Inco
 export { getAccountLedger, getLedgerExport, LEDGER_PAGE_SIZE, MAX_EXPORT_LINES, type AccountLedger, type ExportedLedger, type LedgerAccount } from "./service/ledger-report";
 export { getReceivablesAging, type ReceivablesAging } from "./service/aging";
 export { getPayablesAging, type PayablesAging } from "./service/payables-aging";
+export * from "./domain/tax-summary";
+export { getTaxSummary, TAX_DETAIL_PAGE_SIZE, TAX_EXPORT_MAX_LINES } from "./service/tax-summary";
