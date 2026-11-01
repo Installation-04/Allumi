@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Brouillons de crédits fournisseurs liés aux factures : montants par ligne, taux d’origine, modification et suppression avec contrôle de version, permissions Comptabilité. Sans comptabilisation ni réduction du solde à ce stade.
+
 ## [0.4.0-alpha.20] - 2026-10-31
 
 - Paiements fournisseurs partiels ou complets, solde à payer sur les factures, historique et annulation par contre-passation, permissions Comptabilité.

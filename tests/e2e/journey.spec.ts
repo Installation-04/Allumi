@@ -2146,6 +2146,18 @@ async function supplierBillsJourney(page: Page) {
   await expect(page.getByText("Motif : Correction du règlement de test", { exact: true })).toBeVisible();
   await page.goto(supplierBillUrl);
   await expect(page.getByText(/Solde à payer:.*114,98/)).toBeVisible();
+  await page.getByRole("link", { name: "Nouveau crédit fournisseur", exact: true }).click();
+  await page.getByLabel("Date de l’avoir", { exact: true }).fill("2026-07-17");
+  await page.getByLabel("Motif de l’avoir", { exact: true }).fill("Retour partiel de fournitures");
+  await page.getByLabel("Fournitures de bureau", { exact: true }).fill("25,00");
+  await page.getByRole("button", { name: "Enregistrer le brouillon d’avoir", exact: true }).click();
+  await expect(page.getByText(/Total:.*28,74/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Valider et affecter l’avoir", exact: true })).toHaveCount(0);
+  await expectNoPageOverflow(page);
+  await captureReference(page, "credit-fournisseur-brouillon");
+  await page.goto(supplierBillUrl);
+  await expect(page.getByText(/Solde à payer:.*114,98/)).toBeVisible();
+
 
   await page.getByRole("button", { name: "English", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Supplier", exact: true })).toBeVisible();

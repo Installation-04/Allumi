@@ -70,3 +70,5 @@ Pour corriger entièrement une facture validée, voir [[Annulation-des-factures]
 ## Saisir une facture fournisseur
 
 Ouvrir **Dépenses → Factures fournisseurs** pour préparer une facture à payer, la valider et consulter son écriture. Voir [[Factures-fournisseurs]] pour les droits, l’annulation et les limites de récupération des taxes.
+
+Depuis une facture fournisseur validée, **Nouveau crédit fournisseur** prépare un brouillon de correction aux taux d’origine. Il ne réduit pas le solde à payer; la validation comptable reste à venir. Voir [[Factures-fournisseurs]].
