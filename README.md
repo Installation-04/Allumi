@@ -342,3 +342,11 @@ Consultez les montants comptabilisés par période, les ajustements et versement
 ![Sommaire des taxes](docs/images/sommaire-taxes-desktop.png)
 
 ![Sommaire des taxes mobile](docs/images/sommaire-taxes-mobile.png)
+
+### Comparaison de l’état des résultats
+
+Comparez deux périodes depuis l’état des résultats : montants par compte, écarts exacts, pourcentages et export CSV bilingue ([guide](docs/Comparaison-des-resultats.md)).
+
+![Résultats comparatifs](docs/images/resultats-comparatifs-desktop.png)
+
+![Résultats comparatifs mobile](docs/images/resultats-comparatifs-mobile.png)

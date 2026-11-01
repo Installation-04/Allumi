@@ -317,3 +317,11 @@ Montants comptabilisés d’une entreprise fictive et contrôle du grand livre. 
 ![Sommaire des taxes — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/sommaire-taxes-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/sommaire-taxes-mobile.png" alt="Sommaire des taxes — téléphone" width="412">
+
+## Résultats comparatifs
+
+Deux périodes d’une entreprise fictive, avec un écart de résultat net de −395,00 $. Voir [[Comparaison-des-resultats]].
+
+![Résultats comparatifs — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/resultats-comparatifs-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/resultats-comparatifs-mobile.png" alt="Résultats comparatifs — téléphone" width="412">

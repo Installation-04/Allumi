@@ -10,3 +10,5 @@ export { getReceivablesAging, type ReceivablesAging } from "./service/aging";
 export { getPayablesAging, type PayablesAging } from "./service/payables-aging";
 export * from "./domain/tax-summary";
 export { getTaxSummary, TAX_DETAIL_PAGE_SIZE, TAX_EXPORT_MAX_LINES } from "./service/tax-summary";
+export * from "./domain/income-comparison";
+export { getIncomeComparison } from "./service/income-comparison";

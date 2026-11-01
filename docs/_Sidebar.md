@@ -32,6 +32,7 @@
 - [[Journal-et-ecritures]]
 - [[Age-des-comptes-fournisseurs]]
 - [[Sommaire-des-taxes]]
+- [[Comparaison-des-resultats]]
 - [[Exercices-et-periodes]]
 - [[Piste-d-audit]]
 

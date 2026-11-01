@@ -1079,7 +1079,7 @@
     "rapports": {
       "title": "Rapports",
       "description": "Consultez les rapports disponibles pour votre entreprise.",
-      "planned": "Comparaisons de périodes, formulaires de déclaration et exports PDF : phase 6."
+      "planned": "Comparatif du bilan, formulaires de déclaration et exports PDF : phase 6."
     },
     "taxes": {
       "title": "Taxes",
@@ -2071,5 +2071,26 @@
       "ADJUSTMENT": "Ajustement",
       "SETTLEMENT": "Versement / remboursement"
     }
+  },
+  "incomeComparison": {
+    "figures": "Montants comparés",
+    "title": "Comparaison de l’état des résultats",
+    "open": "Comparer des périodes",
+    "back": "État des résultats",
+    "intro": "Comparez les montants comptabilisés de deux périodes, compte par compte.",
+    "current": "Période étudiée",
+    "reference": "Période de référence",
+    "currentFrom": "Début de la période étudiée",
+    "currentTo": "Fin de la période étudiée",
+    "referenceFrom": "Début de la référence",
+    "referenceTo": "Fin de la référence",
+    "apply": "Comparer",
+    "export": "Exporter en CSV",
+    "difference": "Écart",
+    "percent": "Variation (%)",
+    "noPercent": "Pourcentage non calculé : référence nulle ou négative.",
+    "rules": "Écart = période étudiée − référence. Le pourcentage est calculé uniquement pour une référence positive, arrondi à deux décimales. Les durées ne sont pas normalisées; un écart positif n’est pas nécessairement favorable.",
+    "periods": "Étudiée : {from} au {to}. Référence : {referenceFrom} au {referenceTo}.",
+    "file": "resultats-comparatifs"
   }
 }

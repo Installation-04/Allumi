@@ -88,3 +88,7 @@ Dans **Rapports → Âge des comptes fournisseurs**, choisis une date pour retro
 ## Consulter le sommaire des taxes
 
 Dans **Rapports → Sommaire TPS/TVQ**, sélectionne une période pour consulter les taxes comptabilisées et leur contrôle au grand livre. Les versements restent distincts du net de période. Voir [[Sommaire-des-taxes]] pour les signes, limites et exports.
+
+## Comparer les résultats
+
+Dans l’état des résultats, ouvre **Comparer des périodes**, choisis les deux plages et consulte les montants et écarts par compte. Voir [[Comparaison-des-resultats]].
