@@ -189,3 +189,10 @@ it("guards supplier credit limits, source taxes and exact deferred postings", as
 it("checks paid expense postings exactly at transaction completion", async () => {
  expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='paid_expense_posting_exact' AND tgdeferrable AND tginitdeferred AND NOT tgisinternal")).toHaveLength(1);
 });
+
+it("separates immutable attachment scopes and checks target scope in the database", async()=>{
+ expect(await q("SELECT conname FROM pg_constraint WHERE conname='attachment_scope'")).toHaveLength(1);
+ expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='attachment_scope_guard' AND NOT tgisinternal")).toHaveLength(1);
+ const rows=await q<{qual:string}>("SELECT qual FROM pg_policies WHERE tablename='attachment' AND policyname='module_read'");
+ expect(rows[0]?.qual).toContain("scope");
+});

@@ -1,0 +1,47 @@
+import { afterAll,beforeAll,expect,it } from "vitest";
+import { mkdtemp,rm } from "node:fs/promises";
+import type pg from "pg";
+import { uploadSalesAttachment,downloadSalesAttachment,detachSalesAttachment,listSalesAttachments,uploadPurchaseAttachment,downloadPurchaseAttachment } from "@/modules/attachments";
+import { saveDraft,getDraft,postInvoice } from "@/modules/sales";
+import { saveDraft as saveBill } from "@/modules/purchases";
+import { withCompany } from "@/platform/tenant";
+import { owner } from "./helpers";
+import { seedWorld,W } from "./world";
+const actor={userId:W.userOwnerA,companyId:W.companyA},seller={...actor,userId:W.userAccountant};
+const png=Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jC1sAAAAASUVORK5CYII=","base64");
+let db:pg.Client,dir:string,invoiceId:string,billId:string;
+beforeAll(async()=>{
+ db=await owner();await seedWorld(db);dir=await mkdtemp("/tmp/allumi-sales-attachments-");process.env.ATTACHMENTS_DIR=dir;
+ await db.query("INSERT INTO number_sequence(company_id,key,next_value,prefix,padding) VALUES ($1,'JOURNAL_ENTRY',1,'J-',5),($1,'INVOICE',1,'F-',5)",[W.companyA]);
+ invoiceId=await saveDraft(actor,{contactId:W.customer,issueDate:"2026-06-01",dueDate:"2026-07-01",lines:[{description:"Service",quantity:"1",unitPrice:"100",accountId:W.sales,taxCodeId:W.taxCodeStandard}]});
+ billId=await saveBill(actor,{contactId:W.supplier,documentDate:"2026-06-01",dueDate:"2026-07-01",lines:[{description:"Supply",quantity:"1",unitPrice:"100",accountId:W.expenses,taxCodeId:W.taxCodeStandard}]});
+ await db.query("UPDATE membership SET module_access=$3::jsonb WHERE company_id=$1 AND user_id=$2",[W.companyA,W.userAccountant,JSON.stringify({sales:"write",accounting:"none"})]);
+});
+afterAll(async()=>{await db?.end();await rm(dir,{recursive:true,force:true});delete process.env.ATTACHMENTS_DIR;});
+it("lets a sales-only writer upload and read sales evidence but refuses purchases and scope forgery",async()=>{
+ const id=await uploadSalesAttachment(seller,invoiceId,"preuve.png",png);
+ expect((await listSalesAttachments(seller,invoiceId)).files.map(f=>f.id)).toEqual([id]);
+ expect((await downloadSalesAttachment(seller,invoiceId,id)).data).toEqual(png);
+ const purchaseId=await uploadPurchaseAttachment(actor,billId,"recu.png",png);
+ await expect(downloadPurchaseAttachment(seller,billId,purchaseId)).rejects.toThrow();
+ await expect(downloadSalesAttachment(seller,billId,purchaseId)).rejects.toThrow();
+ await expect(withCompany(actor,tx=>tx.attachmentLink.create({data:{companyId:actor.companyId,attachmentId:id,purchaseDocumentId:billId}}))).rejects.toThrow();
+ const visible=await withCompany(seller,tx=>tx.attachment.findMany({where:{companyId:actor.companyId}}));
+ expect(visible.map(f=>f.id)).toEqual([id]);
+ await detachSalesAttachment(seller,invoiceId,id);
+ await expect(downloadSalesAttachment(seller,invoiceId,id)).rejects.toThrow();
+});
+it("applies revocation immediately and retains sales evidence after posting",async()=>{
+ const id=await uploadSalesAttachment(seller,invoiceId,"posted.png",png);
+ await postInvoice(actor,invoiceId,(await getDraft(actor,invoiceId))!.revision,"2026-06-01");
+ const readSales={...actor,userId:W.userReader};
+ await db.query("UPDATE membership SET module_access=$3::jsonb WHERE company_id=$1 AND user_id=$2",[W.companyA,W.userReader,JSON.stringify({sales:"read",accounting:"none"})]);
+ expect((await downloadSalesAttachment(readSales,invoiceId,id)).data).toEqual(png);
+ await expect(uploadSalesAttachment(readSales,invoiceId,"denied.png",png)).rejects.toThrow();
+ await expect(db.query("UPDATE attachment SET scope='accounting' WHERE id=$1",[id])).rejects.toMatchObject({code:"AL004"});
+ await expect(detachSalesAttachment(seller,invoiceId,id)).rejects.toMatchObject({key:"attachments.retained"});
+ await db.query("UPDATE membership SET module_access=$3::jsonb WHERE company_id=$1 AND user_id=$2",[W.companyA,W.userAccountant,JSON.stringify({sales:"none",accounting:"write"})]);
+ await expect(downloadSalesAttachment(seller,invoiceId,id)).rejects.toThrow();
+ expect((await withCompany(seller,tx=>tx.attachment.findMany({where:{companyId:actor.companyId,scope:"sales"}})))).toHaveLength(0);
+ await expect(downloadSalesAttachment({userId:W.userOwnerB,companyId:W.companyB},invoiceId,id)).rejects.toThrow();
+});

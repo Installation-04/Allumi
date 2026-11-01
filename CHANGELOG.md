@@ -4,6 +4,12 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.26] - 2026-11-01
+
+- Justificatifs des factures et avoirs clients : dépôt/téléchargement sous permissions Ventes, retrait sur brouillons, conservation après validation et portée immuable en base pour isoler ventes et comptabilité.
+
+- CI : un seul worker pour la suite de tests, afin d’isoler le garde chronométré des écritures de la concurrence entre bases de tests; seuil et assertions inchangés.
+
 ## [0.4.0-alpha.24] - 2026-11-01
 
 - Justificatifs privés sur les factures fournisseurs, crédits et dépenses : PDF/PNG/JPEG jusqu’à 4 Mo, permissions Comptabilité, téléchargement contrôlé avec vérification SHA256, retrait limité aux brouillons et conservation sur les pièces comptabilisées.

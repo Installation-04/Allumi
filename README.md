@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.24
+git checkout v0.4.0-alpha.26
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.24 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.26 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -310,3 +310,11 @@ Ajoutez des PDF, PNG ou JPEG aux factures fournisseurs, crédits et dépenses : 
 ![Justificatif privé](docs/images/justificatif-depense-desktop.png)
 
 ![Justificatif sur mobile](docs/images/justificatif-depense-mobile.png)
+
+### Justificatifs des factures clients
+
+Les factures et avoirs clients acceptent les justificatifs privés sous permissions Ventes, indépendamment de l’accès Comptabilité. Les fichiers des achats restent protégés par leur propre portée ([guide](docs/Justificatifs.md)).
+
+![Justificatif client](docs/images/justificatif-client-desktop.png)
+
+![Justificatif client mobile](docs/images/justificatif-client-mobile.png)
