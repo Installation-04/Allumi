@@ -39,3 +39,15 @@ Depuis une facture validée, le panneau Paiements permet de saisir un règlement
 ![Paiement fournisseur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/paiement-fournisseur-desktop.png)
 
 ![Paiement sur téléphone](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/paiement-fournisseur-mobile.png)
+
+## Préparer un crédit fournisseur
+
+Depuis une facture validée, **Nouveau crédit fournisseur** permet de saisir un motif, une date au moins égale à la date comptable de la facture et un montant hors taxes pour chaque ligne corrigée. Laissez zéro pour exclure une ligne. Chaque montant est limité au montant original de sa ligne; les taux de taxes enregistrés sur la facture et son mode d’arrondi sont repris. Seules les factures avec taxes intégralement récupérables sont prises en charge.
+
+Le brouillon se consulte dans **Dépenses → Crédits fournisseurs**. Les droits Comptabilité autorisent la consultation ou l’écriture. Il peut être modifié ou supprimé; une modification concurrente exige de recharger la fiche. Si la facture d’origine est annulée, le brouillon reste consultable et supprimable.
+
+**Ce lot prépare uniquement les brouillons : aucune écriture, aucun numéro définitif, aucune réservation de montant et aucune réduction du solde fournisseur.** La validation, l’affectation et l’annulation comptable des crédits seront ajoutées dans un prochain lot. Plusieurs brouillons peuvent donc corriger les mêmes montants; ils ne représentent pas des crédits validés.
+
+![Brouillon de crédit fournisseur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/credit-fournisseur-brouillon-desktop.png)
+
+![Brouillon sur téléphone](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/credit-fournisseur-brouillon-mobile.png)
