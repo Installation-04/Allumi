@@ -7,3 +7,4 @@ export * from "./domain/statements";
 export { getBalanceSheet, getIncomeStatement, type BalanceSheetReport, type IncomeStatementReport } from "./service/statements";
 export { getAccountLedger, getLedgerExport, LEDGER_PAGE_SIZE, MAX_EXPORT_LINES, type AccountLedger, type ExportedLedger, type LedgerAccount } from "./service/ledger-report";
 export { getReceivablesAging, type ReceivablesAging } from "./service/aging";
+export { getPayablesAging, type PayablesAging } from "./service/payables-aging";

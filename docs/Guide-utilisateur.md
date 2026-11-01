@@ -80,3 +80,7 @@ Les factures et avoirs clients disposent de [[Justificatifs]] privés sous permi
 ## Envoyer une facture
 
 Ouvre une facture validée puis **Envoi par courriel**. Vérifie le destinataire, choisis la langue et confirme. L’historique distingue l’acceptation SMTP d’un résultat incertain; aucun renvoi automatique. Voir [[Envoi-des-factures]].
+
+## Vérifier les comptes fournisseurs
+
+Dans **Rapports → Âge des comptes fournisseurs**, choisis une date pour retrouver les factures ouvertes, les montants non affectés et leur concordance avec le grand livre. Le détail et le CSV suivent cette même date. Voir [[Age-des-comptes-fournisseurs]].

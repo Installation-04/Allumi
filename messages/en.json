@@ -1079,7 +1079,7 @@
     "rapports": {
       "title": "Reports",
       "description": "Consult the reports available for your company.",
-      "planned": "GST/QST summary, payables aging, period comparisons and PDF exports: phase 6."
+      "planned": "GST/QST summary, period comparisons and PDF exports: phase 6."
     },
     "taxes": {
       "title": "Taxes",
@@ -1134,7 +1134,8 @@
       "resultats": "Income statement",
       "bilan": "Balance sheet",
       "grand-livre": "General ledger",
-      "age-clients": "Receivables aging"
+      "age-clients": "Receivables aging",
+      "age-fournisseurs": "Payables aging"
     }
   },
   "updates": {
@@ -1987,5 +1988,41 @@
       "FAILED": "Rejected by SMTP server",
       "UNKNOWN": "Uncertain result — the message may have been accepted"
     }
+  },
+  "payablesAging": {
+    "title": "Payables aging",
+    "intro": "Amounts owed to suppliers as of a date, grouped by days past due. Unapplied credits and payments are shown separately.",
+    "asOf": "As of",
+    "apply": "Show",
+    "export": "Export as CSV",
+    "status": "Balances as of {date}.",
+    "empty": "No open amounts as of this date.",
+    "customer": "Supplier",
+    "current": "Current",
+    "d1_30": "1–30 days",
+    "d31_60": "31–60 days",
+    "d61_90": "61–90 days",
+    "d91_plus": "91 days and over",
+    "unapplied": "Not applied",
+    "total": "Total",
+    "detail": "Detail by supplier",
+    "document": "Document",
+    "number": "Number",
+    "date": "Date",
+    "dueDate": "Due date",
+    "daysPastDue": "Days past due",
+    "notDue": "Not due",
+    "amount": "Amount",
+    "kinds": {
+      "INVOICE": "Supplier bill",
+      "CREDIT_NOTE": "Unapplied supplier credit",
+      "PAYMENT": "Unapplied payment",
+      "REFUND": "Unapplied refund"
+    },
+    "ledgerBalance": "Ledger balance — accounts payable",
+    "difference": "Difference",
+    "agrees": "The total agrees with the accounts payable ledger balance.",
+    "differs": "The total differs from the ledger by {amount}: review entries posted to accounts payable.",
+    "file": "payables-aging"
   }
 }

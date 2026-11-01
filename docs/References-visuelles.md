@@ -301,3 +301,11 @@ Facture fictive acceptée par le relais SMTP local des tests. Le statut ne const
 ![Courriel de facture — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/courriel-facture-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/courriel-facture-mobile.png" alt="Courriel de facture — téléphone" width="412">
+
+## Âge des comptes fournisseurs
+
+Rapport historique d’une entreprise fictive, concordant avec le grand livre après paiement, annulation du paiement et crédit fournisseur. Voir [[Age-des-comptes-fournisseurs]].
+
+![Âge fournisseurs — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/rapport-age-fournisseurs-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/rapport-age-fournisseurs-mobile.png" alt="Âge fournisseurs — téléphone" width="412">

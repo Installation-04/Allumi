@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.28
+git checkout v0.4.0-alpha.31
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.28 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.31 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -326,3 +326,11 @@ Envoyez une facture validée en français ou anglais via votre relais SMTP. Dest
 ![Envoi par courriel](docs/images/courriel-facture-desktop.png)
 
 ![Envoi par courriel mobile](docs/images/courriel-facture-mobile.png)
+
+### Âge des comptes fournisseurs
+
+Consultez les factures encore dues à une date donnée, réparties par retard, avec paiements/crédits historiques, comparaison au grand livre et export CSV bilingue ([guide](docs/Age-des-comptes-fournisseurs.md)).
+
+![Âge fournisseurs](docs/images/rapport-age-fournisseurs-desktop.png)
+
+![Âge fournisseurs mobile](docs/images/rapport-age-fournisseurs-mobile.png)

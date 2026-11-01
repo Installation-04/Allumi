@@ -53,7 +53,8 @@ Mêmes règles que les autres exports ([[Etats-financiers]]) : UTF-8 avec marque
 
 ## Ce qui n'est pas inclus
 
-- L'**âge des comptes fournisseurs**, avec les factures fournisseurs (phase 4.4, [[Feuille-de-route]]).
+L’[[Age-des-comptes-fournisseurs]] est un rapport distinct, disponible dans Rapports.
+
 - Les rappels de paiement et les relevés de compte client.
 - La comparaison avec un autre jour, et l'export PDF : à venir.
 
