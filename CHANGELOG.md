@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.30] - 2026-11-01
+
 - Âge des comptes fournisseurs à une date donnée : factures par tranche, crédits/paiements non affectés, annulations historiques, contrôle du grand livre dans un même instantané, consultation FR/EN et export CSV sous permissions Comptabilité.
 
 ## [0.4.0-alpha.28] - 2026-11-01
