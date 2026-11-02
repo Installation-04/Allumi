@@ -10,7 +10,7 @@ import { searchText } from "@/app/_lib/search-params";
 import { formatMoney, listAccounts, listFiscalYears, todayIso } from "@/modules/ledger";
 import { getAccountLedger,listLedgerContacts } from "@/modules/reports";
 import { accountName, loadCompany } from "../_lib";
-import { validId } from "../factures/editor";
+import { reportAccountId } from "@/app/_lib/report-account";
 
 export const dynamic = "force-dynamic";
 
@@ -22,8 +22,8 @@ export default async function GeneralLedgerPage({ params, searchParams }: { para
   const query = await searchParams;
   const [accounts, years] = [await listAccounts(actor), await listFiscalYears(actor)];
   const { from, to } = statementPeriod(query, years, todayIso());
-  const rawAccount = searchText(query.compte);
-  const accountId = rawAccount && validId(rawAccount) ? rawAccount : undefined;
+  const accountId = reportAccountId(query.compte);
+  if(accountId&&!accounts.some(a=>a.id===accountId))notFound();
   const mayFilter=can(company,"contact.read");
   if(!mayFilter&&searchText(query.contact))notFound();
   const contact=await resolveLedgerContact(actor,query.contact);

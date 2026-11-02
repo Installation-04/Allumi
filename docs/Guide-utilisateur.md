@@ -104,3 +104,7 @@ Dans les résultats, le bilan ou leurs comparatifs, **Imprimer / PDF** ouvre la 
 ## Consulter les écritures d’un contact
 
 Dans **Rapports → Grand livre**, choisis le compte et le contact puis **Afficher**. Les soldes et les deux CSV suivent les lignes portant ce contact. Le filtre exige Comptabilité et Contacts en lecture. Voir [[Grand-livre-par-contact]].
+
+## Suivre les comptes de trésorerie
+
+Dans **Trésorerie → Suivi de trésorerie**, sélectionne la période et le compte ou tous les comptes BANK/CASH. Consulte les soldes, entrées/sorties et virements purs, puis le détail et le CSV. Voir [[Suivi-de-tresorerie]] pour le périmètre et les écritures mixtes.

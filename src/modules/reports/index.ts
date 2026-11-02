@@ -16,3 +16,5 @@ export * from "./domain/balance-comparison";
 export { getBalanceComparison } from "./service/balance-comparison";
 
 export { findLedgerContact,listLedgerContacts,LEDGER_CONTACT_LIMIT } from "./service/ledger-contacts";
+export * from "./domain/cash-movements";
+export { getCashMovements,CASH_PAGE_SIZE,CASH_EXPORT_LIMIT } from "./service/cash-movements";

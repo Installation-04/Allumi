@@ -273,6 +273,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await supplierBillsJourney(page);
   await paidExpensesJourney(page);
   await taxSummaryJourney(page);
+  await cashMovementsJourney(page);
   const settingsBase = new URL(page.url()).pathname.match(/^\/c\/[^/]+/)?.[0];
   expect(settingsBase).toBeTruthy();
   await page.getByRole("button", { name: "Français", exact: true }).click();
@@ -1887,6 +1888,12 @@ async function generalLedgerJourney(page: Page) {
   expect(allCsv).toContain("\r\n4000;Revenus de services;");
   expect(allCsv).toContain("\r\n6010;Frais bancaires;");
 
+  // Invalid or repeated account selection never broadens a file to all accounts.
+  const chosenAccount=await page.locator('select[name="compte"]').inputValue();
+  for(const bad of ["bad","00000000-0000-7000-8000-999999999999",`${chosenAccount}&compte=bad`]){
+    expect((await page.request.get(`${company}/grand-livre?du=${from}&au=${to}&compte=${bad}`)).status()).toBe(404);
+    expect((await page.request.get(`${company}/grand-livre/export?du=${from}&au=${to}&compte=${bad}`)).status()).toBe(404);
+  }
   // a customer's name on a receivable line, over the whole fiscal year
   await page.getByRole("link", { name: /^\d{4}-\d{2}-\d{2} → \d{4}-\d{2}-\d{2}$/ }).first().click();
   await expect(page.locator('input[type="date"][name="du"]')).not.toHaveValue(from); // the page is the fiscal year's before the form is used again
@@ -1931,6 +1938,41 @@ async function generalLedgerJourney(page: Page) {
   await expectNoPageOverflow(page);
   await page.getByRole("button", { name: "Français", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Grand livre", exact: true })).toBeVisible();
+}
+
+/** Posted bank/cash movements, a pure transfer, filtered totals, CSV and strict scope URLs. */
+async function cashMovementsJourney(page:Page){
+ const company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0]??"";
+ const [from,to]=reportDays();
+ await page.goto(`${company}/journal/nouvelle`);
+ await page.getByLabel("Date",{exact:true}).fill(to);await page.getByLabel("Description").fill("Virement de trésorerie");
+ await page.getByLabel("Ligne 1 – Compte").selectOption({label:"1999 – Caisse secondaire (atelier)"});await page.getByLabel("Ligne 1 – Débit").fill("40");
+ await page.getByLabel("Ligne 2 – Compte").selectOption({label:"1000 – Banque – compte courant"});await page.getByLabel("Ligne 2 – Crédit").fill("40");
+ await page.getByRole("button",{name:"Enregistrer l'écriture",exact:true}).click();
+ await expect(page.getByRole("heading",{name:/^Écriture J-\d{5}$/})).toBeVisible();
+ await openSection(page,"Trésorerie");await page.getByRole("link",{name:"Suivi de trésorerie",exact:true}).first().click();
+ await expect(page.getByRole("heading",{name:"Suivi de trésorerie",exact:true})).toBeVisible();
+ await page.getByLabel("Du",{exact:true}).fill(from);await page.getByLabel("Au",{exact:true}).fill(to);await page.getByRole("button",{name:"Afficher",exact:true}).click();
+ await expect(page.getByText(`Du ${from} au ${to}, dates incluses.`,{exact:true})).toBeVisible();
+ const figure=(label:string)=>page.locator("dt").filter({hasText:new RegExp(`^${label}$`)}).locator("xpath=following-sibling::dd[1]");
+ await expect(figure("Variation nette")).toContainText(/580,00/);await expect(figure("Virements entrants")).toContainText(/40,00/);await expect(figure("Virements sortants")).toContainText(/40,00/);
+ await expect(page.getByText("Les mouvements concordent avec les soldes comptables.",{exact:true})).toBeVisible();
+ const details=page.getByRole("table",{name:"Mouvements comptabilisés",exact:true});await expect(details.getByRole("row").filter({hasText:"Virement de trésorerie"})).toHaveCount(2);
+ if((page.viewportSize()?.width??0)>=1024)expect(await page.getByRole("table",{name:"Détail par compte",exact:true}).evaluate(el=>el.scrollWidth<=el.parentElement!.clientWidth)).toBe(true);
+ await expectNoPageOverflow(page);await captureReference(page,"suivi-tresorerie","Soldes et mouvements");
+ const file=await page.request.get((await page.getByRole("link",{name:"Exporter en CSV",exact:true}).getAttribute("href"))!);expect(file.status()).toBe(200);expect(file.headers()["cache-control"]).toContain("private");const csv=await file.text();expect(csv.charCodeAt(0)).toBe(0xfeff);expect(csv).toMatch(/Total;[^;\r\n]+;1005,00;425,00;40,00;40,00;/);expect(csv).toContain("Virement interne pur");
+ await page.getByLabel("Compte",{exact:true}).selectOption({label:"1000 – Banque – compte courant"});await page.getByRole("button",{name:"Afficher",exact:true}).click();await expect(figure("Variation nette")).toContainText(/540,00/);
+ const accountId=await page.getByLabel("Compte",{exact:true}).inputValue();
+ const accountCsv=await page.request.get((await page.getByRole("link",{name:"Exporter en CSV",exact:true}).getAttribute("href"))!);expect(accountCsv.headers()["content-disposition"]).toContain(`suivi-tresorerie_1000_${from}_${to}.csv`);
+ for(const bad of ["bad","00000000-0000-7000-8000-999999999999",`${accountId}&compte=bad`]){
+  expect((await page.request.get(`${company}/flux-tresorerie?du=${from}&au=${to}&compte=${bad}`)).status()).toBe(404);
+  expect((await page.request.get(`${company}/flux-tresorerie/export?du=${from}&au=${to}&compte=${bad}`)).status()).toBe(404);
+ }
+ await page.getByRole("button",{name:"English",exact:true}).click();await expect(page.getByRole("heading",{name:"Cash account movements",exact:true})).toBeVisible();
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
+ await expect(page.getByText("Movements agree with the ledger balances.",{exact:true})).toBeVisible();const en=await page.request.get((await page.getByRole("link",{name:"Export as CSV",exact:true}).getAttribute("href"))!);expect(await en.text()).toContain("Pure internal transfer");await expectNoPageOverflow(page);
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await expect(page.locator("html")).toHaveAttribute("data-theme","light");
+ await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.getByRole("heading",{name:"Suivi de trésorerie",exact:true})).toBeVisible();
 }
 
 /**
