@@ -40,3 +40,5 @@ Voir [[Etats-financiers]], [[Comparaison-des-resultats]], [[Exercices-et-periode
 ![Bilans comparatifs — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/bilans-comparatifs-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/bilans-comparatifs-mobile.png" alt="Bilans comparatifs — téléphone" width="412">
+
+La commande **Imprimer / PDF** conserve les colonnes en paysage sur papier : [[Impression-des-etats-financiers]].

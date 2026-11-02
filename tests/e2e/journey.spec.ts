@@ -1670,6 +1670,41 @@ async function bankReconciliationJourney(page: Page) {
   await expect(page.getByRole("heading", { name: `Rapprochement de 1000 · Banque – compte courant au ${day}`, exact: true })).toBeVisible();
 }
 
+/** Browser printing uses exactly the report already rendered under accounting permissions. */
+async function checkStatementPrint(page: Page, name: string, comparison = false) {
+  const report = page.locator(".statement-print");
+  const balances = await report.locator("table").innerText();
+  const tips=report.locator(".print-controls details");
+  await tips.locator("summary").click();await expect(tips.locator("p")).toBeVisible();
+  await tips.locator("summary").click();await expect(tips.locator("p")).toBeHidden();
+  await page.evaluate(() => {
+    delete document.documentElement.dataset.printRequested;
+    window.print = () => { document.documentElement.dataset.printRequested = "true"; };
+  });
+  await page.getByRole("button", {name: /^(Imprimer \/ PDF|Print \/ PDF)$/}).click();
+  await expect(page.locator("html")).toHaveAttribute("data-print-requested", "true");
+  if (process.env.E2E_MOBILE === "1") await captureReference(page, name);
+  await page.emulateMedia({media:"print"});
+  await expect(page.locator(".workspace-header")).toBeHidden();
+  await expect(page.locator(".workspace-sidebar")).toBeHidden();
+  await expect(page.locator("nav:visible")).toHaveCount(0);
+  for (const control of await report.locator(".print-controls").all()) await expect(control).toBeHidden();
+  await expect(report.locator(".statement-print-heading")).toContainText("Atelier Exemple inc.");
+  await expect(report.locator(".statement-print-heading")).toContainText("CAD");
+  expect(await report.locator("table").innerText()).toBe(balances);
+  expect(await page.locator("body").evaluate(el=>getComputedStyle(el).backgroundColor)).toBe("rgb(255, 255, 255)");
+  expect(await report.getByRole("heading",{level:1}).evaluate(el=>getComputedStyle(el).color)).toBe("rgb(0, 0, 0)");
+  if (process.env.E2E_MOBILE !== "1") {
+    const pdf=await page.pdf({preferCSSPageSize:true,printBackground:true});
+    expect(pdf.subarray(0,5).toString()).toBe("%PDF-");expect(pdf.length).toBeGreaterThan(3000);
+    const boxes=[...pdf.toString("latin1").matchAll(/\/MediaBox\s*\[\s*0\s+0\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s*\]/g)];
+    expect(boxes.length).toBeGreaterThan(0);for(const box of boxes)expect(Number(box[1])>Number(box[2])).toBe(comparison);
+    await captureReference(page,name);
+  }
+  await page.emulateMedia({media:"screen"});
+  await expect(page.getByRole("button",{name:/^(Imprimer \/ PDF|Print \/ PDF)$/})).toBeVisible();
+}
+
 /**
  * The income statement and the balance sheet: entries made by hand on two days of the current month
  * (a window no other journey writes in), the statement of exactly those days with every subtotal, the fiscal year
@@ -1711,6 +1746,7 @@ async function financialStatementsJourney(page: Page) {
   await expect(row(/^Résultat net/)).toContainText(amount("580,00 $"));
   await expectNoPageOverflow(page);
   await captureReference(page, "rapport-resultats", "État des résultats");
+  await checkStatementPrint(page,"impression-resultats");
   // a fiscal year in one click, and a bad address that does not break the page
   const fiscalYear = page.getByRole("link", { name: /^\d{4}-\d{2}-\d{2} → \d{4}-\d{2}-\d{2}$/ }).first();
   const [yearStart, yearEnd] = ((await fiscalYear.textContent()) ?? "").split(" → ");
@@ -1742,6 +1778,7 @@ async function financialStatementsJourney(page: Page) {
   const comparedNet=page.getByRole("row").filter({hasText:/^Résultat net/});
   await expect(comparedNet.getByRole("cell").nth(0)).toContainText(amount("580,00 $"));await expect(comparedNet.getByRole("cell").nth(1)).toContainText(amount("975,00 $"));await expect(comparedNet.getByRole("cell").nth(2)).toContainText(amount("-395,00 $"));await expect(comparedNet.getByRole("cell").nth(3)).toContainText("-40,51 %");
   await expectNoPageOverflow(page);await captureReference(page,"resultats-comparatifs","Montants comparés");
+  await checkStatementPrint(page,"impression-resultats-comparatifs",true);
   const comparisonFile=await page.request.get((await page.getByRole("link",{name:"Exporter en CSV",exact:true}).getAttribute("href"))!);expect(comparisonFile.status()).toBe(200);expect(comparisonFile.headers()["cache-control"]).toContain("no-store");
   const comparisonCsv=await comparisonFile.text();expect(comparisonCsv.charCodeAt(0)).toBe(0xfeff);expect(comparisonCsv).toContain(";Résultat net;580,00;975,00;-395,00;-40,51");
   await page.getByRole("button",{name:"English",exact:true}).click();await expect(page.getByRole("heading",{name:"Income statement comparison",exact:true})).toBeVisible();
@@ -1758,6 +1795,7 @@ async function financialStatementsJourney(page: Page) {
   await expect(page.getByText("Le bilan est équilibré : l’actif égale le passif plus les capitaux propres.")).toBeVisible();
   await expectNoPageOverflow(page);
   await captureReference(page, "rapport-bilan", "Bilan");
+  await checkStatementPrint(page,"impression-bilan");
   const sheetFile = await page.request.get((await page.getByRole("link", { name: "Exporter en CSV", exact: true }).getAttribute("href")) ?? "");
   expect(sheetFile.headers()["content-disposition"]).toContain(`bilan_${to}.csv`);
   expect(await sheetFile.text()).toContain(";Total du passif et des capitaux propres;");
@@ -1768,10 +1806,16 @@ async function financialStatementsJourney(page: Page) {
   await expect(page.getByText(`Le bilan au ${to} est équilibré.`,{exact:true})).toBeVisible();await expect(page.getByText(`Le bilan au ${from} est équilibré.`,{exact:true})).toBeVisible();
   await expect(row(/^Total de l’actif/)).toContainText(/-395,00/);
   await expectNoPageOverflow(page);await captureReference(page,"bilans-comparatifs","Soldes comparés");
+  await checkStatementPrint(page,"impression-bilans-comparatifs",true);
   const balanceFile=await page.request.get((await page.getByRole("link",{name:"Exporter en CSV",exact:true}).getAttribute("href"))!);
   expect(balanceFile.status()).toBe(200);expect(balanceFile.headers()["cache-control"]).toContain("no-store");expect(balanceFile.headers()["content-disposition"]).toContain(`bilans-comparatifs_${to}_${from}.csv`);
   const balanceCsv=await balanceFile.text();expect(balanceCsv.charCodeAt(0)).toBe(0xfeff);expect(balanceCsv).toMatch(/;Total de l’actif;[^\r\n]+;-395,00;/);
   await page.getByRole("button",{name:"English",exact:true}).click();await expect(page.getByRole("heading",{name:"Balance sheet comparison",exact:true})).toBeVisible();
+  await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");
+  await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
+  await checkStatementPrint(page,"impression-bilan-en-dark",true);
+  await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");
+  await expect(page.locator("html")).toHaveAttribute("data-theme","light");
   const balanceEn=await page.request.get((await page.getByRole("link",{name:"Export as CSV",exact:true}).getAttribute("href"))!);expect(await balanceEn.text()).toMatch(/,Total assets,[^\r\n]+,-395.00,/);
   await page.getByLabel("Reference date",{exact:true}).fill(to);await page.getByRole("button",{name:"Compare",exact:true}).click();await expect(row(/^Total assets/).getByRole("cell").nth(2)).toHaveText("$0.00");
   await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.getByRole("heading",{name:"Comparaison des bilans",exact:true})).toBeVisible();

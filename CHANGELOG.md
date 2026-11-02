@@ -4,6 +4,10 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.35] - 2026-11-02
+
+- Impression et enregistrement PDF via le navigateur pour les résultats, le bilan et leurs comparatifs : identité de l’entreprise et devise, contrôles masqués, papier blanc en thème sombre et comparatifs en paysage, sans nouveau calcul ni dépendance PDF serveur.
+
 ## [0.4.0-alpha.34] - 2026-11-02
 
 - Comparaison de deux bilans : soldes cumulatifs, écarts et pourcentages exacts, répartition des résultats selon chaque exercice, contrôles d’équilibre distincts et export CSV FR/EN dans un même instantané comptable, sous permissions Comptabilité.

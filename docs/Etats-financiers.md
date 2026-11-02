@@ -47,7 +47,7 @@ Chaque rapport s'exporte avec **Exporter en CSV** :
 
 ## Ce qui n'est pas inclus
 
-Ventilation par projet ou par contact, notes aux états et PDF : à venir. La comparaison de deux périodes de résultats est disponible : [[Comparaison-des-resultats]]. Une adresse avec des dates invalides n'est pas une erreur : la page revient à la période ou au jour par défaut.
+Ventilation par projet ou par contact, notes aux états et PDF généré par le serveur : à venir. L’impression et l’enregistrement PDF via le navigateur sont disponibles : [[Impression-des-etats-financiers]]. La comparaison de deux périodes de résultats est disponible : [[Comparaison-des-resultats]]. Une adresse avec des dates invalides n'est pas une erreur : la page revient à la période ou au jour par défaut.
 
 ## Captures
 

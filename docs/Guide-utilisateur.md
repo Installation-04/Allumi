@@ -96,3 +96,7 @@ Dans l’état des résultats, ouvre **Comparer des périodes**, choisis les deu
 ## Comparer les bilans
 
 Dans le bilan, **Comparer deux dates** montre les soldes cumulatifs, leurs écarts et le contrôle d’équilibre de chaque date, avec export CSV. Voir [[Comparaison-des-bilans]].
+
+## Imprimer les états financiers
+
+Dans les résultats, le bilan ou leurs comparatifs, **Imprimer / PDF** ouvre la boîte d’impression du navigateur. Elle permet d’imprimer ou d’enregistrer un PDF selon les options de l’appareil. Voir [[Impression-des-etats-financiers]].

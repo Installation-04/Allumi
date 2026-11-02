@@ -34,6 +34,7 @@
 - [[Sommaire-des-taxes]]
 - [[Comparaison-des-resultats]]
 - [[Comparaison-des-bilans]]
+- [[Impression-des-etats-financiers]]
 - [[Exercices-et-periodes]]
 - [[Piste-d-audit]]
 

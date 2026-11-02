@@ -1079,7 +1079,7 @@
     "rapports": {
       "title": "Rapports",
       "description": "Consultez les rapports disponibles pour votre entreprise.",
-      "planned": "Formulaires de déclaration et exports PDF : phase 6."
+      "planned": "Formulaires de déclaration et PDF générés par le serveur : phase 6."
     },
     "taxes": {
       "title": "Taxes",
@@ -2117,5 +2117,11 @@
     "control": "Écart d’équilibre (actif − passif et capitaux propres)",
     "figures": "Soldes comparés",
     "file": "bilans-comparatifs"
+  },
+  "statementPrint": {
+    "tips": "Conseils d’impression",
+    "print": "Imprimer / PDF",
+    "currency": "Montants en dollars canadiens (CAD)",
+    "hint": "Imprimez le rapport affiché ou enregistrez-le en PDF dans la boîte d’impression du navigateur. Désactivez les en-têtes et pieds de page du navigateur pour omettre l’adresse de la page. Les comparatifs utilisent l’orientation paysage."
   }
 }
