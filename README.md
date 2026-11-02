@@ -350,3 +350,11 @@ Comparez deux périodes depuis l’état des résultats : montants par compte, �
 ![Résultats comparatifs](docs/images/resultats-comparatifs-desktop.png)
 
 ![Résultats comparatifs mobile](docs/images/resultats-comparatifs-mobile.png)
+
+### Comparaison des bilans
+
+Comparez les soldes à deux dates, les écarts par compte et l’équilibre de chaque bilan, avec un export CSV bilingue ([guide](docs/Comparaison-des-bilans.md)).
+
+![Bilans comparatifs](docs/images/bilans-comparatifs-desktop.png)
+
+![Bilans comparatifs mobile](docs/images/bilans-comparatifs-mobile.png)

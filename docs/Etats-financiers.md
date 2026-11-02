@@ -47,7 +47,7 @@ Chaque rapport s'exporte avec **Exporter en CSV** :
 
 ## Ce qui n'est pas inclus
 
-Comparatif du bilan, ventilation par projet ou par contact, notes aux états et PDF : à venir. La comparaison de deux périodes de résultats est disponible : [[Comparaison-des-resultats]]. Une adresse avec des dates invalides n'est pas une erreur : la page revient à la période ou au jour par défaut.
+Ventilation par projet ou par contact, notes aux états et PDF : à venir. La comparaison de deux périodes de résultats est disponible : [[Comparaison-des-resultats]]. Une adresse avec des dates invalides n'est pas une erreur : la page revient à la période ou au jour par défaut.
 
 ## Captures
 
@@ -57,6 +57,6 @@ Données fictives, Chromium ordinateur et téléphone émulé.
 ![Bilan](images/rapport-bilan-desktop.png)
 ![État des résultats sur téléphone](images/rapport-resultats-mobile.png)
 
-## Comparer deux périodes
+## Comparer les rapports
 
-Depuis l’état des résultats, le lien **Comparer des périodes** ouvre les montants des deux plages, leurs écarts et un CSV bilingue. Voir [[Comparaison-des-resultats]] pour les règles de pourcentage et de dates. Le comparatif du bilan reste à venir.
+Depuis l’état des résultats, le lien **Comparer des périodes** ouvre les montants des deux plages, leurs écarts et un CSV bilingue. Voir [[Comparaison-des-resultats]] pour les règles de pourcentage et de dates. Depuis le bilan, **Comparer deux dates** ouvre les soldes, écarts et contrôles aux deux dates : [[Comparaison-des-bilans]].

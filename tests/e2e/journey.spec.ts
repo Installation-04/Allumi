@@ -1675,7 +1675,7 @@ async function bankReconciliationJourney(page: Page) {
  * (a window no other journey writes in), the statement of exactly those days with every subtotal, the fiscal year
  * shortcut, a bad address falling back to a sensible period, the CSV files (UTF-8 byte-order mark, the language's
  * delimiter and decimal mark, a hostile account name defused), the balance sheet and its check, both languages, and
- * no overflow.
+ * no overflow. Both comparison reports also verify signed differences, bilingual CSV and identical-date balances.
  */
 async function financialStatementsJourney(page: Page) {
   const company = new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0] ?? "";
@@ -1761,6 +1761,20 @@ async function financialStatementsJourney(page: Page) {
   const sheetFile = await page.request.get((await page.getByRole("link", { name: "Exporter en CSV", exact: true }).getAttribute("href")) ?? "");
   expect(sheetFile.headers()["content-disposition"]).toContain(`bilan_${to}.csv`);
   expect(await sheetFile.text()).toContain(";Total du passif et des capitaux propres;");
+  await page.getByRole("link",{name:"Comparer deux dates",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Comparaison des bilans",exact:true})).toBeVisible();
+  await page.getByLabel("Date de référence",{exact:true}).fill(from);await page.getByRole("button",{name:"Comparer",exact:true}).click();
+  await expect(page.getByText(`Situation au ${to} comparée au ${from}.`,{exact:true})).toBeVisible();
+  await expect(page.getByText(`Le bilan au ${to} est équilibré.`,{exact:true})).toBeVisible();await expect(page.getByText(`Le bilan au ${from} est équilibré.`,{exact:true})).toBeVisible();
+  await expect(row(/^Total de l’actif/)).toContainText(/-395,00/);
+  await expectNoPageOverflow(page);await captureReference(page,"bilans-comparatifs","Soldes comparés");
+  const balanceFile=await page.request.get((await page.getByRole("link",{name:"Exporter en CSV",exact:true}).getAttribute("href"))!);
+  expect(balanceFile.status()).toBe(200);expect(balanceFile.headers()["cache-control"]).toContain("no-store");expect(balanceFile.headers()["content-disposition"]).toContain(`bilans-comparatifs_${to}_${from}.csv`);
+  const balanceCsv=await balanceFile.text();expect(balanceCsv.charCodeAt(0)).toBe(0xfeff);expect(balanceCsv).toMatch(/;Total de l’actif;[^\r\n]+;-395,00;/);
+  await page.getByRole("button",{name:"English",exact:true}).click();await expect(page.getByRole("heading",{name:"Balance sheet comparison",exact:true})).toBeVisible();
+  const balanceEn=await page.request.get((await page.getByRole("link",{name:"Export as CSV",exact:true}).getAttribute("href"))!);expect(await balanceEn.text()).toMatch(/,Total assets,[^\r\n]+,-395.00,/);
+  await page.getByLabel("Reference date",{exact:true}).fill(to);await page.getByRole("button",{name:"Compare",exact:true}).click();await expect(row(/^Total assets/).getByRole("cell").nth(2)).toHaveText("$0.00");
+  await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.getByRole("heading",{name:"Comparaison des bilans",exact:true})).toBeVisible();
   await page.goto(`${company}/bilan?au=2026-02-30`);
   await expect(page.getByText(/^Situation au \d{4}-\d{2}-\d{2}\.$/)).toBeVisible();
 

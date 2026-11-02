@@ -92,3 +92,7 @@ Dans **Rapports → Sommaire TPS/TVQ**, sélectionne une période pour consulter
 ## Comparer les résultats
 
 Dans l’état des résultats, ouvre **Comparer des périodes**, choisis les deux plages et consulte les montants et écarts par compte. Voir [[Comparaison-des-resultats]].
+
+## Comparer les bilans
+
+Dans le bilan, **Comparer deux dates** montre les soldes cumulatifs, leurs écarts et le contrôle d’équilibre de chaque date, avec export CSV. Voir [[Comparaison-des-bilans]].
