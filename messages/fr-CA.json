@@ -1079,7 +1079,7 @@
     "rapports": {
       "title": "Rapports",
       "description": "Consultez les rapports disponibles pour votre entreprise.",
-      "planned": "Comparatif du bilan, formulaires de déclaration et exports PDF : phase 6."
+      "planned": "Formulaires de déclaration et exports PDF : phase 6."
     },
     "taxes": {
       "title": "Taxes",
@@ -2092,5 +2092,30 @@
     "rules": "Écart = période étudiée − référence. Le pourcentage est calculé uniquement pour une référence positive, arrondi à deux décimales. Les durées ne sont pas normalisées; un écart positif n’est pas nécessairement favorable.",
     "periods": "Étudiée : {from} au {to}. Référence : {referenceFrom} au {referenceTo}.",
     "file": "resultats-comparatifs"
+  },
+  "balanceComparison": {
+    "title": "Comparaison des bilans",
+    "open": "Comparer deux dates",
+    "back": "Bilan",
+    "intro": "Comparez les soldes cumulés de deux dates, avec les résultats propres à chaque exercice.",
+    "current": "Date étudiée",
+    "reference": "Date de référence",
+    "apply": "Comparer",
+    "export": "Exporter en CSV",
+    "difference": "Écart",
+    "percent": "Variation (%)",
+    "noPercent": "Pourcentage non calculé : référence nulle ou négative.",
+    "dates": "Situation au {current} comparée au {reference}.",
+    "rules": "Écart = date étudiée − référence. Le pourcentage est calculé uniquement sur une référence positive. Le passage à un nouvel exercice peut déplacer les résultats courants vers les résultats antérieurs sans mouvement de trésorerie.",
+    "currentYear": "Début d’exercice — date étudiée",
+    "referenceYear": "Début d’exercice — référence",
+    "fiscalYearStart": "Début d’exercice",
+    "none": "Aucun exercice correspondant",
+    "fallback": "Sans exercice correspondant, tous les résultats accumulés sont regroupés dans le résultat courant, comme dans le bilan standard.",
+    "balanced": "Le bilan au {date} est équilibré.",
+    "unbalanced": "Le bilan au {date} présente un écart à vérifier.",
+    "control": "Écart d’équilibre (actif − passif et capitaux propres)",
+    "figures": "Soldes comparés",
+    "file": "bilans-comparatifs"
   }
 }

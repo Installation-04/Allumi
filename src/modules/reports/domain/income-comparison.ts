@@ -12,7 +12,7 @@ export function compareAmount(currentCents:bigint,referenceCents:bigint):Compare
  const differenceCents=currentCents-referenceCents;
  return {currentCents,referenceCents,differenceCents,percentHundredths:referenceCents>0n?roundDiv(differenceCents*10_000n,referenceCents):null};
 }
-function compareSection(current:StatementSection,reference:StatementSection):ComparisonSection{
+export function compareStatementSection(current:StatementSection,reference:StatementSection):ComparisonSection{
  const byId=new Map<string,{line:StatementLine;current:bigint;reference:bigint}>();
  for(const line of reference.lines)byId.set(line.accountId,{line,current:0n,reference:line.cents});
  for(const line of current.lines){const old=byId.get(line.accountId);byId.set(line.accountId,{line,current:line.cents,reference:old?.reference??0n});}
@@ -20,7 +20,7 @@ function compareSection(current:StatementSection,reference:StatementSection):Com
  return {lines,total:compareAmount(current.totalCents,reference.totalCents)};
 }
 export function buildIncomeComparison(current:IncomeStatement,reference:IncomeStatement,periods:Pick<IncomeComparison,"current"|"reference">):IncomeComparison{
- const sections=Object.fromEntries(COMPARISON_SECTIONS.map(k=>[k,compareSection(current[k],reference[k])])) as IncomeComparison["sections"];
+ const sections=Object.fromEntries(COMPARISON_SECTIONS.map(k=>[k,compareStatementSection(current[k],reference[k])])) as IncomeComparison["sections"];
  return {...periods,sections,grossProfit:compareAmount(current.grossProfitCents,reference.grossProfitCents),operatingIncome:compareAmount(current.operatingIncomeCents,reference.operatingIncomeCents),netIncome:compareAmount(current.netIncomeCents,reference.netIncomeCents)};
 }
 /** Numeric text, two decimals, without floating point or locale-dependent grouping. */

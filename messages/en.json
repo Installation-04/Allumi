@@ -1079,7 +1079,7 @@
     "rapports": {
       "title": "Reports",
       "description": "Consult the reports available for your company.",
-      "planned": "Balance sheet comparison, tax return forms and PDF exports: phase 6."
+      "planned": "Tax return forms and PDF exports: phase 6."
     },
     "taxes": {
       "title": "Taxes",
@@ -2092,5 +2092,30 @@
     "rules": "Difference = selected period − reference. Percentages are calculated only for a positive reference, rounded to two decimals. Period lengths are not normalized; a positive difference is not necessarily favorable.",
     "periods": "Selected: {from} to {to}. Reference: {referenceFrom} to {referenceTo}.",
     "file": "income-comparison"
+  },
+  "balanceComparison": {
+    "title": "Balance sheet comparison",
+    "open": "Compare two dates",
+    "back": "Balance sheet",
+    "intro": "Compare cumulative balances at two dates, with earnings assigned to each date’s fiscal year.",
+    "current": "Selected date",
+    "reference": "Reference date",
+    "apply": "Compare",
+    "export": "Export as CSV",
+    "difference": "Difference",
+    "percent": "Change (%)",
+    "noPercent": "Percentage not calculated: zero or negative reference.",
+    "dates": "Position at {current} compared with {reference}.",
+    "rules": "Difference = selected date − reference. Percentages are calculated only for a positive reference. A fiscal year boundary can move current earnings to prior earnings without a cash movement.",
+    "currentYear": "Fiscal year start — selected date",
+    "referenceYear": "Fiscal year start — reference",
+    "fiscalYearStart": "Fiscal year start",
+    "none": "No matching fiscal year",
+    "fallback": "Without a matching fiscal year, accumulated earnings are included in current earnings, as on the standard balance sheet.",
+    "balanced": "The balance sheet at {date} balances.",
+    "unbalanced": "Review the balance sheet difference at {date}.",
+    "control": "Balance gap (assets − liabilities and equity)",
+    "figures": "Compared balances",
+    "file": "balance-comparison"
   }
 }

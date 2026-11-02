@@ -4,6 +4,10 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.34] - 2026-11-02
+
+- Comparaison de deux bilans : soldes cumulatifs, écarts et pourcentages exacts, répartition des résultats selon chaque exercice, contrôles d’équilibre distincts et export CSV FR/EN dans un même instantané comptable, sous permissions Comptabilité.
+
 ## [0.4.0-alpha.33] - 2026-11-01
 
 - État des résultats comparatif sur deux périodes libres : comptes alignés, écarts exacts, pourcentages sur références positives, lecture cohérente dans un instantané, consultation et CSV FR/EN intégrés au rapport existant sous permissions Comptabilité.

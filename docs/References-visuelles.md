@@ -325,3 +325,11 @@ Deux périodes d’une entreprise fictive, avec un écart de résultat net de �
 ![Résultats comparatifs — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/resultats-comparatifs-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/resultats-comparatifs-mobile.png" alt="Résultats comparatifs — téléphone" width="412">
+
+## Bilans comparatifs
+
+Deux dates d’une entreprise fictive, avec contrôle d’équilibre à chaque date. Voir [[Comparaison-des-bilans]].
+
+![Bilans comparatifs — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/bilans-comparatifs-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/bilans-comparatifs-mobile.png" alt="Bilans comparatifs — téléphone" width="412">

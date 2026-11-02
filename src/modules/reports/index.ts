@@ -12,3 +12,5 @@ export * from "./domain/tax-summary";
 export { getTaxSummary, TAX_DETAIL_PAGE_SIZE, TAX_EXPORT_MAX_LINES } from "./service/tax-summary";
 export * from "./domain/income-comparison";
 export { getIncomeComparison } from "./service/income-comparison";
+export * from "./domain/balance-comparison";
+export { getBalanceComparison } from "./service/balance-comparison";
