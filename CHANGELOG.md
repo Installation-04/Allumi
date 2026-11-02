@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Suivi de trésorerie BANK/CASH par période et compte : soldes exacts, virements purs séparés, écritures mixtes signalées en brut, contrôle du grand livre et détail paginé dans un même instantané, avec CSV FR/EN complet sous permissions Comptabilité. Disponibilités des espaces d’activité corrigées.
+
 ## [0.4.0-alpha.36] - 2026-11-01
 
 - Grand livre par contact : lignes et soldes filtrés, pagination et raccourcis conservés, recherche bornée des contacts historiques et exports CSV FR/EN contextualisés. Le filtre respecte les permissions Comptabilité et Contacts et refuse les contacts invalides ou étrangers.

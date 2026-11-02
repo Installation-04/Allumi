@@ -351,3 +351,11 @@ Lignes et soldes d’un contact fictif, avec sélection conservée après une re
 ![Grand livre par contact](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/grand-livre-contact-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/grand-livre-contact-mobile.png" alt="Grand livre par contact sur téléphone" width="412">
+
+## Suivi de trésorerie
+
+Un virement pur fictif de 40,00 $ reste séparé des entrées/sorties : [[Suivi-de-tresorerie]].
+
+![Suivi de trésorerie](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/suivi-tresorerie-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/suivi-tresorerie-mobile.png" alt="Suivi de trésorerie sur téléphone" width="412">

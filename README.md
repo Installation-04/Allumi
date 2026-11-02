@@ -374,3 +374,11 @@ Retrouvez les lignes et soldes d’un client ou fournisseur dans le grand livre.
 ![Grand livre par contact](docs/images/grand-livre-contact-desktop.png)
 
 ![Grand livre par contact mobile](docs/images/grand-livre-contact-mobile.png)
+
+### Suivi de trésorerie
+
+Consultez les soldes et mouvements comptabilisés BANK/CASH, avec virements purs séparés, détail paginé et export CSV bilingue ([guide](docs/Suivi-de-tresorerie.md)).
+
+![Suivi de trésorerie](docs/images/suivi-tresorerie-desktop.png)
+
+![Suivi de trésorerie mobile](docs/images/suivi-tresorerie-mobile.png)

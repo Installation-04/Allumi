@@ -72,6 +72,7 @@
 
 - [[Etats-financiers]]
 
+- [[Suivi-de-tresorerie]]
 - [[Grand-livre]]
 - [[Grand-livre-par-contact]]
 - [[Age-des-comptes]]
