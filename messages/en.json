@@ -1079,7 +1079,7 @@
     "rapports": {
       "title": "Reports",
       "description": "Consult the reports available for your company.",
-      "planned": "Tax return forms and PDF exports: phase 6."
+      "planned": "Tax return forms and server-generated PDF exports: phase 6."
     },
     "taxes": {
       "title": "Taxes",
@@ -2117,5 +2117,11 @@
     "control": "Balance gap (assets − liabilities and equity)",
     "figures": "Compared balances",
     "file": "balance-comparison"
+  },
+  "statementPrint": {
+    "tips": "Printing tips",
+    "print": "Print / PDF",
+    "currency": "Amounts in Canadian dollars (CAD)",
+    "hint": "Print the displayed report or save it as PDF in your browser’s print dialog. Turn off browser headers and footers to omit the page address. Comparative reports use landscape orientation."
   }
 }

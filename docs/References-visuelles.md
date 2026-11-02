@@ -333,3 +333,13 @@ Deux dates d’une entreprise fictive, avec contrôle d’équilibre à chaque d
 ![Bilans comparatifs — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/bilans-comparatifs-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/bilans-comparatifs-mobile.png" alt="Bilans comparatifs — téléphone" width="412">
+
+## Impression des états financiers
+
+Rapports d’une entreprise fictive : papier sans navigation, commande mobile et comparatifs en paysage. Voir [[Impression-des-etats-financiers]].
+
+![Résultats imprimables](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/impression-resultats-desktop.png)
+
+![Bilan comparatif imprimable](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/impression-bilans-comparatifs-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/impression-resultats-mobile.png" alt="Impression sur téléphone" width="412">

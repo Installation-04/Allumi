@@ -121,3 +121,30 @@ main:has(> .company-workspace) { max-width: none; padding: 0; }
   .invoice-paper thead { display: table-header-group; }
   .invoice-paper tr, .invoice-totals { break-inside: avoid; }
 }
+
+/* Financial reports keep every column on paper, independently of screen width and theme. */
+@media print {
+  @page financial-statement { size: auto; margin: 12mm; }
+  @page financial-comparison { size: landscape; margin: 12mm; }
+  html:has(.statement-print) { color-scheme: light !important; }
+  body:has(.statement-print) { display: block; min-height: 0; background: white !important; color: black !important; padding: 0 !important; }
+  body:has(.statement-print) .workspace-sidebar,
+  body:has(.statement-print) .workspace-header,
+  body:has(.statement-print) .global-header,
+  body:has(.statement-print) nav,
+  body:has(.statement-print) footer { display: none !important; }
+  body:has(.statement-print) .company-workspace { display: block; min-height: 0; background: white !important; }
+  body:has(.statement-print) main,
+  body:has(.statement-print) .workspace-content { max-width: none; padding: 0; }
+  .statement-print { page: financial-statement; font-size: 10pt; }
+  .statement-print-comparison { page: financial-comparison; }
+  .statement-print-heading { display: block !important; }
+  .statement-print, .statement-print * { color: black !important; background: transparent !important; box-shadow: none !important; }
+  .statement-print .overflow-x-auto { overflow: visible !important; border: 0 !important; }
+  .statement-print table { width: 100%; min-width: 0 !important; border-collapse: collapse; font-size: 9pt; }
+  .statement-print th, .statement-print td { padding: 2mm; min-width: 0 !important; border-color: #aaa !important; }
+  .statement-print th:first-child, .statement-print td:first-child { overflow-wrap: anywhere; }
+  .statement-print thead { display: table-header-group; }
+  .statement-print tr { break-inside: avoid; }
+  .statement-print h1, .statement-print h2 { break-after: avoid; }
+}

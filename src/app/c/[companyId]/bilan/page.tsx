@@ -1,3 +1,4 @@
+import { StatementPrint } from "../_statement-print";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { FOCUS } from "@/app/_components/focus";
@@ -24,13 +25,14 @@ export default async function BalanceSheetPage({ params, searchParams }: { param
   const empty = [sheet.currentAssets, sheet.fixedAssets, sheet.otherAssets, sheet.currentLiabilities, sheet.longTermLiabilities, sheet.equity].every((part) => part.lines.length === 0)
     && sheet.priorEarningsCents === 0n && sheet.currentEarningsCents === 0n;
   return (
-    <section className="space-y-5">
+    <section className="statement-print space-y-5">
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold">{t("balanceTitle")}</h1>
         <p className="text-sm text-stone-600 dark:text-stone-400">{t("balanceIntro")}</p>
       </div>
-      <Link className={`inline-flex min-h-11 items-center underline ${FOCUS}`} href={`/c/${company.id}/bilan/comparer?${new URLSearchParams({au:asOf})}`}>{c("open")}</Link>
-      <form key={asOf} method="get" className="flex flex-wrap items-end gap-3">
+      <StatementPrint companyName={company.name} />
+      <Link className={`print-controls inline-flex min-h-11 items-center underline ${FOCUS}`} href={`/c/${company.id}/bilan/comparer?${new URLSearchParams({au:asOf})}`}>{c("open")}</Link>
+      <form key={asOf} method="get" className="print-controls flex flex-wrap items-end gap-3">
         <label className="text-sm"><span className="mb-1 block font-medium">{t("asOf")}</span><input type="date" name="au" defaultValue={asOf} required className={control} /></label>
         <button type="submit" className={`min-h-11 rounded-md border border-stone-300 px-4 text-sm font-medium hover:bg-stone-100 dark:border-stone-700 dark:hover:bg-stone-800 ${FOCUS}`}>{t("apply")}</button>
         <a href={`${base}/export?${new URLSearchParams({ au: asOf })}`} className={`inline-flex min-h-11 items-center rounded-md border border-stone-300 px-4 text-sm font-medium hover:bg-stone-100 dark:border-stone-700 dark:hover:bg-stone-800 ${FOCUS}`}>{t("export")}</a>

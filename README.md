@@ -358,3 +358,11 @@ Comparez les soldes à deux dates, les écarts par compte et l’équilibre de c
 ![Bilans comparatifs](docs/images/bilans-comparatifs-desktop.png)
 
 ![Bilans comparatifs mobile](docs/images/bilans-comparatifs-mobile.png)
+
+### Impression des états financiers et PDF
+
+Imprimez les résultats, le bilan et leurs comparatifs, ou enregistrez un PDF depuis le navigateur. Les menus sont masqués et les comparatifs passent en paysage ([guide](docs/Impression-des-etats-financiers.md)).
+
+![Résultats en mode impression](docs/images/impression-resultats-desktop.png)
+
+![Commande sur téléphone](docs/images/impression-resultats-mobile.png)

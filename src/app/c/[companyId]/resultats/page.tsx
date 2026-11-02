@@ -1,3 +1,4 @@
+import { StatementPrint } from "../_statement-print";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { FOCUS } from "@/app/_components/focus";
@@ -25,20 +26,21 @@ export default async function IncomeStatementPage({ params, searchParams }: { pa
   const link = `inline-flex min-h-11 items-center rounded px-2 text-sm underline ${FOCUS}`;
   const empty = [statement.operatingRevenue, statement.costOfSales, statement.operatingExpenses, statement.otherRevenue, statement.otherExpenses].every((part) => part.lines.length === 0);
   return (
-    <section className="space-y-5">
+    <section className="statement-print space-y-5">
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold">{t("incomeTitle")}</h1>
         <p className="text-sm text-stone-600 dark:text-stone-400">{t("incomeIntro")}</p>
       </div>
-      <Link className={`inline-flex min-h-11 items-center underline ${FOCUS}`} href={`/c/${company.id}/resultats/comparer?${new URLSearchParams({du:from,au:to})}`}>{c("open")}</Link>
-      <form key={`${from}|${to}`} method="get" className="flex flex-wrap items-end gap-3">
+      <StatementPrint companyName={company.name} />
+      <Link className={`print-controls inline-flex min-h-11 items-center underline ${FOCUS}`} href={`/c/${company.id}/resultats/comparer?${new URLSearchParams({du:from,au:to})}`}>{c("open")}</Link>
+      <form key={`${from}|${to}`} method="get" className="print-controls flex flex-wrap items-end gap-3">
         <label className="text-sm"><span className="mb-1 block font-medium">{t("from")}</span><input type="date" name="du" defaultValue={from} required className={control} /></label>
         <label className="text-sm"><span className="mb-1 block font-medium">{t("to")}</span><input type="date" name="au" defaultValue={to} required className={control} /></label>
         <button type="submit" className={`min-h-11 rounded-md border border-stone-300 px-4 text-sm font-medium hover:bg-stone-100 dark:border-stone-700 dark:hover:bg-stone-800 ${FOCUS}`}>{t("apply")}</button>
         <a href={`${base}/export?${new URLSearchParams({ du: from, au: to })}`} className={`inline-flex min-h-11 items-center rounded-md border border-stone-300 px-4 text-sm font-medium hover:bg-stone-100 dark:border-stone-700 dark:hover:bg-stone-800 ${FOCUS}`}>{t("export")}</a>
       </form>
       {years.length > 0 ? (
-        <p className="flex flex-wrap items-center gap-x-1 text-sm">
+        <p className="print-controls flex flex-wrap items-center gap-x-1 text-sm">
           <span>{t("fiscalYears")}</span>
           {years.map((year) => <Link key={year.id} href={`${base}?${new URLSearchParams({ du: year.start, au: year.end })}`} className={link}>{year.start} → {year.end}</Link>)}
         </p>
