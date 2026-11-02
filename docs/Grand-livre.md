@@ -25,7 +25,7 @@ Mêmes règles que les autres exports ([[Etats-financiers]]) : UTF-8 avec marque
 
 ## Ce qui n'est pas inclus
 
-Filtrer par contact, projet ou montant; regrouper plusieurs comptes; PDF; comparer deux périodes : à venir ([[Feuille-de-route]]).
+Filtrer par projet ou montant; regrouper plusieurs comptes; PDF; comparer deux périodes : à venir ([[Feuille-de-route]]).
 
 ## Captures
 
@@ -33,3 +33,7 @@ Données fictives, Chromium ordinateur et téléphone émulé.
 
 ![Grand livre d'un compte](images/rapport-grand-livre-desktop.png)
 ![Grand livre sur téléphone](images/rapport-grand-livre-mobile.png)
+
+## Filtrer par contact
+
+Le sélecteur **Contact** limite les lignes et tous les soldes au contact choisi, sous permissions Comptabilité et Contacts. Les raccourcis, pages et deux CSV conservent le filtre; une recherche permet de retrouver les contacts historiques. Voir [[Grand-livre-par-contact]] pour le périmètre et les limites.

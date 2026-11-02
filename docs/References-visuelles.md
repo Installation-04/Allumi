@@ -343,3 +343,11 @@ Rapports d’une entreprise fictive : papier sans navigation, commande mobile et
 ![Bilan comparatif imprimable](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/impression-bilans-comparatifs-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/impression-resultats-mobile.png" alt="Impression sur téléphone" width="412">
+
+## Grand livre par contact
+
+Lignes et soldes d’un contact fictif, avec sélection conservée après une recherche : [[Grand-livre-par-contact]].
+
+![Grand livre par contact](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/grand-livre-contact-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/grand-livre-contact-mobile.png" alt="Grand livre par contact sur téléphone" width="412">

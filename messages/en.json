@@ -658,6 +658,7 @@
       "reconReason": "Write the reason for reopening (at least ten characters)."
     },
     "reports": {
+      "contact": "Contact not found in this company.",
       "period": "The period is not valid: both days must exist and the start must come before the end.",
       "account": "Choose an account of this company.",
       "tooManyLines": "The period has too many entries for one file (200,000 lines at most): choose a shorter period or a single account."
@@ -1896,6 +1897,16 @@
     "balanceFile": "balance-sheet"
   },
   "ledgerReport": {
+    "contactFilter": "Contact",
+    "allContacts": "All contacts",
+    "inactiveContact": "Inactive",
+    "searchContacts": "Find a contact",
+    "contactSearch": "Contact name",
+    "search": "Search",
+    "searchHint": "Search narrows the available choices. Then select the contact and choose Show. Contacts linked to the journal, including inactive contacts, are offered.",
+    "searchResults": "Contact choices for “{query}”.",
+    "contactLimit": "The first 100 contacts are offered. Refine your search to find others.",
+    "filtered": "Contact: {contact}. Lines and all balances relate only to this contact and may differ from the full account balance.",
     "title": "General ledger",
     "intro": "The detail of an account over a period: its balance at the start, each journal line with the balance after it, its balance at the end. Balances are in the account’s usual direction (an asset or an expense grows with debits, the other accounts with credits).",
     "account": "Account",

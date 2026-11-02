@@ -658,6 +658,7 @@
       "reconReason": "Écrivez le motif de la réouverture (dix caractères au moins)."
     },
     "reports": {
+      "contact": "Contact introuvable dans cette entreprise.",
       "period": "La période n’est pas valide : les deux jours doivent exister et le début précède la fin.",
       "account": "Choisissez un compte de cette entreprise.",
       "tooManyLines": "La période contient trop d’écritures pour un seul fichier (200 000 lignes au plus) : choisissez une période plus courte ou un seul compte."
@@ -1896,6 +1897,16 @@
     "balanceFile": "bilan"
   },
   "ledgerReport": {
+    "contactFilter": "Contact",
+    "allContacts": "Tous les contacts",
+    "inactiveContact": "Inactif",
+    "searchContacts": "Rechercher un contact",
+    "contactSearch": "Nom du contact",
+    "search": "Rechercher",
+    "searchHint": "La recherche limite les choix de la liste. Sélectionnez ensuite le contact et cliquez sur Afficher. Les contacts déjà liés au journal, y compris inactifs, sont proposés.",
+    "searchResults": "Contacts proposés pour « {query} ».",
+    "contactLimit": "Les 100 premiers contacts sont proposés. Précisez la recherche pour trouver les autres.",
+    "filtered": "Contact : {contact}. Les lignes et tous les soldes concernent uniquement ce contact; ils peuvent différer du solde complet du compte.",
     "title": "Grand livre",
     "intro": "Le détail d’un compte sur une période : son solde au début, chaque ligne du journal avec le solde qui suit, son solde à la fin. Les soldes sont dans le sens habituel du compte (un actif ou une charge augmente par le débit, les autres comptes par le crédit).",
     "account": "Compte",
