@@ -1889,16 +1889,43 @@ async function generalLedgerJourney(page: Page) {
 
   // a customer's name on a receivable line, over the whole fiscal year
   await page.getByRole("link", { name: /^\d{4}-\d{2}-\d{2} → \d{4}-\d{2}-\d{2}$/ }).first().click();
-  await expect(page.locator('input[name="du"]')).not.toHaveValue(from); // the page is the fiscal year's before the form is used again
+  await expect(page.locator('input[type="date"][name="du"]')).not.toHaveValue(from); // the page is the fiscal year's before the form is used again
   await page.locator('select[name="compte"]').selectOption({ label: "1100 – Comptes clients" });
   await page.getByRole("button", { name: "Afficher", exact: true }).click();
   await expect(page.getByRole("heading", { name: "1100 – Comptes clients", exact: true })).toBeVisible();
   await expect(ledgerRow(/Atelier Boréal/).first()).toBeVisible();
   await expectNoPageOverflow(page);
 
+  // Filter by journal-line contact, preserving scope in files and fiscal shortcuts.
+  const contactFilter=page.getByLabel("Contact",{exact:true});await expect(contactFilter).toBeVisible();
+  const contactOption=contactFilter.locator("option").filter({hasText:/^Atelier Boréal(?: · Inactif)?$/});await expect(contactOption).toHaveCount(1);
+  await contactFilter.selectOption((await contactOption.getAttribute("value"))!);
+  await page.getByRole("button",{name:"Afficher",exact:true}).click();
+  await expect(page.getByRole("status").filter({hasText:"Contact : Atelier Boréal."})).toBeVisible();
+  const selectedContact=await page.getByLabel("Contact",{exact:true}).inputValue();
+  const filteredUrl=page.url();
+  for(const title of ["Exporter ce compte en CSV","Exporter tous les comptes en CSV"]){
+    const href=(await page.getByRole("link",{name:title,exact:true}).getAttribute("href"))!;
+    expect(new URL(href,"http://localhost").searchParams.get("contact")).toBe(selectedContact);
+    const file=await page.request.get(href);expect(file.status()).toBe(200);expect(file.headers()["content-disposition"]).toContain("_contact_");expect(file.headers()["cache-control"]).toContain("private");expect(await file.text()).toContain("\r\nContact;Atelier Boréal;;;;;;;\r\n");
+  }
+  const fiscalHref=(await page.getByRole("link",{name:/^\d{4}-\d{2}-\d{2} → \d{4}-\d{2}-\d{2}$/}).first().getAttribute("href"))!;
+  expect(new URL(fiscalHref,"http://localhost").searchParams.get("contact")).toBe(selectedContact);
+  // Searching changes the options without dropping the selected filter.
+  await page.getByText("Rechercher un contact",{exact:true}).click();await page.getByLabel("Nom du contact",{exact:true}).fill("no-such-contact");await page.getByRole("button",{name:"Rechercher",exact:true}).click();
+  await expect(page.getByLabel("Contact",{exact:true})).toHaveValue(selectedContact);
+  await expect(page.getByLabel("Contact",{exact:true}).locator("option")).toHaveCount(2);
+  await expectNoPageOverflow(page);await captureReference(page,"grand-livre-contact","Grand livre");
+  for(const bad of ["invalid","00000000-0000-7000-8000-999999999999",`${selectedContact}&contact=invalid`]){
+    const badUrl=new URL(filteredUrl);badUrl.searchParams.delete("contact");
+    const response=await page.request.get(`${badUrl}&contact=${bad}`);expect(response.status()).toBe(404);
+    const fileUrl=new URL(badUrl);fileUrl.pathname+="/export";expect((await page.request.get(`${fileUrl}&contact=${bad}`)).status()).toBe(404);
+  }
   // English
   await page.getByRole("button", { name: "English", exact: true }).click();
   await expect(page.getByRole("heading", { name: "General ledger", exact: true })).toBeVisible();
+  await expect(page.getByRole("status").filter({hasText:"Contact: Atelier Boréal."})).toBeVisible();
+  const filteredEn=await page.request.get((await page.getByRole("link",{name:"Export this account as CSV",exact:true}).getAttribute("href"))!);expect(await filteredEn.text()).toContain("\r\nContact,Atelier Boréal,,,,,,,\r\n");
   await expect(ledgerRow(/^Closing balance/)).toBeVisible();
   await expect(page.getByRole("link", { name: "Export all accounts as CSV", exact: true })).toBeVisible();
   await expectNoPageOverflow(page);

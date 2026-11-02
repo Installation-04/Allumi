@@ -1,3 +1,4 @@
+import { requireLedgerContact } from "./ledger-contacts";
 import "server-only";
 import { requireRole } from "@/modules/companies";
 import { formatNumber, isValidIsoDate, naturalBalance, type AccountType } from "@/modules/ledger";
@@ -50,19 +51,20 @@ const toLine = (row: LineRow, format: { prefix: string; padding: number }): Ledg
  * keeps them (date, entry number, line number) with the balance after it, and its balance at the end. Read by the
  * hundred; every figure is exact, and the balances run across pages. Every member who reads the ledger reads it.
  */
-export async function getAccountLedger(actor: CompanyContext, input: { accountId: string; from: string; to: string; page?: number }): Promise<AccountLedger> {
+export async function getAccountLedger(actor: CompanyContext, input: { accountId: string; from: string; to: string; page?: number; contactId?: string | null }): Promise<AccountLedger> {
   if (!isValidIsoDate(input.from) || !isValidIsoDate(input.to) || input.from > input.to) throw new AppError("reports.period");
   if (!UUID.test(input.accountId)) throw new AppError("reports.account");
   return withCompany(actor, async (tx) => {
     await requireRole(tx, "ledger.read");
+    await requireLedgerContact(tx,actor.companyId,input.contactId);
     const account = await tx.account.findFirst({ where: { companyId: actor.companyId, id: input.accountId }, select: { id: true, code: true, nameFr: true, nameEn: true, type: true } });
     if (!account) throw new AppError("reports.account");
     const [before] = await tx.$queryRaw<{ debit: bigint; credit: bigint }[]>`
       SELECT coalesce(sum(debit_cents), 0)::bigint AS debit, coalesce(sum(credit_cents), 0)::bigint AS credit
-        FROM journal_line WHERE company_id = ${actor.companyId}::uuid AND account_id = ${account.id}::uuid AND entry_date < ${input.from}::date`;
+        FROM journal_line WHERE company_id = ${actor.companyId}::uuid AND account_id = ${account.id}::uuid AND (${input.contactId ?? null}::uuid IS NULL OR contact_id = ${input.contactId ?? null}::uuid) AND entry_date < ${input.from}::date`;
     const [within] = await tx.$queryRaw<{ n: number; debit: bigint; credit: bigint }[]>`
       SELECT count(*)::int AS n, coalesce(sum(debit_cents), 0)::bigint AS debit, coalesce(sum(credit_cents), 0)::bigint AS credit
-        FROM journal_line WHERE company_id = ${actor.companyId}::uuid AND account_id = ${account.id}::uuid AND entry_date BETWEEN ${input.from}::date AND ${input.to}::date`;
+        FROM journal_line WHERE company_id = ${actor.companyId}::uuid AND account_id = ${account.id}::uuid AND (${input.contactId ?? null}::uuid IS NULL OR contact_id = ${input.contactId ?? null}::uuid) AND entry_date BETWEEN ${input.from}::date AND ${input.to}::date`;
     const lineCount = within?.n ?? 0;
     const pageCount = Math.max(1, Math.ceil(lineCount / LEDGER_PAGE_SIZE));
     const page = Math.min(Math.max(1, Math.trunc(input.page ?? 1) || 1), pageCount);
@@ -72,7 +74,7 @@ export async function getAccountLedger(actor: CompanyContext, input: { accountId
     const [skippedSums] = await tx.$queryRaw<{ debit: bigint; credit: bigint }[]>`
       SELECT coalesce(sum(s.debit_cents), 0)::bigint AS debit, coalesce(sum(s.credit_cents), 0)::bigint AS credit
         FROM (SELECT l.debit_cents, l.credit_cents FROM journal_line l JOIN journal_entry e ON e.company_id = l.company_id AND e.id = l.entry_id
-               WHERE l.company_id = ${actor.companyId}::uuid AND l.account_id = ${account.id}::uuid AND l.entry_date BETWEEN ${input.from}::date AND ${input.to}::date
+               WHERE l.company_id = ${actor.companyId}::uuid AND l.account_id = ${account.id}::uuid AND (${input.contactId ?? null}::uuid IS NULL OR l.contact_id = ${input.contactId ?? null}::uuid) AND l.entry_date BETWEEN ${input.from}::date AND ${input.to}::date
                ORDER BY l.entry_date, e.entry_number, l.line_no LIMIT ${skipped}) s`;
     const pageOpening = openingCents + naturalBalance(account.type, { debitCents: skippedSums?.debit ?? 0n, creditCents: skippedSums?.credit ?? 0n });
     const rows = await tx.$queryRaw<LineRow[]>`
@@ -82,7 +84,7 @@ export async function getAccountLedger(actor: CompanyContext, input: { accountId
         FROM journal_line l
         JOIN journal_entry e ON e.company_id = l.company_id AND e.id = l.entry_id
         LEFT JOIN contact c ON c.company_id = l.company_id AND c.id = l.contact_id
-       WHERE l.company_id = ${actor.companyId}::uuid AND l.account_id = ${account.id}::uuid AND l.entry_date BETWEEN ${input.from}::date AND ${input.to}::date
+       WHERE l.company_id = ${actor.companyId}::uuid AND l.account_id = ${account.id}::uuid AND (${input.contactId ?? null}::uuid IS NULL OR l.contact_id = ${input.contactId ?? null}::uuid) AND l.entry_date BETWEEN ${input.from}::date AND ${input.to}::date
        ORDER BY l.entry_date, e.entry_number, l.line_no
        LIMIT ${LEDGER_PAGE_SIZE} OFFSET ${skipped}`;
     const format = await numberFormat(tx, actor.companyId);
@@ -101,11 +103,12 @@ export type ExportedLedger = LedgerAccountReport & { account: LedgerAccount };
  * The ledger of one account, or of every account that moved or holds a balance in the period, whole, for a file: each
  * with its opening balance, its lines with the running balance, and its closing balance. Refused past 200 000 lines.
  */
-export async function getLedgerExport(actor: CompanyContext, input: { accountId: string | null; from: string; to: string }, options: { maxLines?: number } = {}): Promise<ExportedLedger[]> {
+export async function getLedgerExport(actor: CompanyContext, input: { accountId: string | null; from: string; to: string; contactId?: string | null }, options: { maxLines?: number } = {}): Promise<ExportedLedger[]> {
   if (!isValidIsoDate(input.from) || !isValidIsoDate(input.to) || input.from > input.to) throw new AppError("reports.period");
   if (input.accountId !== null && !UUID.test(input.accountId)) throw new AppError("reports.account");
   return withCompany(actor, async (tx) => {
     await requireRole(tx, "ledger.read");
+    await requireLedgerContact(tx,actor.companyId,input.contactId);
     const accounts = await tx.account.findMany({
       where: { companyId: actor.companyId, ...(input.accountId ? { id: input.accountId } : {}) },
       select: { id: true, code: true, nameFr: true, nameEn: true, type: true }, orderBy: { code: "asc" },
@@ -113,11 +116,11 @@ export async function getLedgerExport(actor: CompanyContext, input: { accountId:
     if (input.accountId !== null && accounts.length === 0) throw new AppError("reports.account");
     const ids = accounts.map((account) => account.id);
     const [counted] = await tx.$queryRaw<{ n: number }[]>`
-      SELECT count(*)::int AS n FROM journal_line WHERE company_id = ${actor.companyId}::uuid AND account_id = ANY(${ids}::uuid[]) AND entry_date BETWEEN ${input.from}::date AND ${input.to}::date`;
+      SELECT count(*)::int AS n FROM journal_line WHERE company_id = ${actor.companyId}::uuid AND account_id = ANY(${ids}::uuid[]) AND (${input.contactId ?? null}::uuid IS NULL OR contact_id = ${input.contactId ?? null}::uuid) AND entry_date BETWEEN ${input.from}::date AND ${input.to}::date`;
     if ((counted?.n ?? 0) > (options.maxLines ?? MAX_EXPORT_LINES)) throw new AppError("reports.tooManyLines");
     const openings = await tx.$queryRaw<{ account_id: string; debit: bigint; credit: bigint }[]>`
       SELECT account_id, sum(debit_cents)::bigint AS debit, sum(credit_cents)::bigint AS credit
-        FROM journal_line WHERE company_id = ${actor.companyId}::uuid AND account_id = ANY(${ids}::uuid[]) AND entry_date < ${input.from}::date GROUP BY account_id`;
+        FROM journal_line WHERE company_id = ${actor.companyId}::uuid AND account_id = ANY(${ids}::uuid[]) AND (${input.contactId ?? null}::uuid IS NULL OR contact_id = ${input.contactId ?? null}::uuid) AND entry_date < ${input.from}::date GROUP BY account_id`;
     const lines = await tx.$queryRaw<(LineRow & { account_id: string })[]>`
       SELECT l.account_id, l.id AS line_id, l.entry_id, e.entry_number, e.entry_date, e.source_type::text AS source_type, e.memo, l.description, c.display_name AS contact_name,
              l.debit_cents, l.credit_cents,
@@ -125,7 +128,7 @@ export async function getLedgerExport(actor: CompanyContext, input: { accountId:
         FROM journal_line l
         JOIN journal_entry e ON e.company_id = l.company_id AND e.id = l.entry_id
         LEFT JOIN contact c ON c.company_id = l.company_id AND c.id = l.contact_id
-       WHERE l.company_id = ${actor.companyId}::uuid AND l.account_id = ANY(${ids}::uuid[]) AND l.entry_date BETWEEN ${input.from}::date AND ${input.to}::date
+       WHERE l.company_id = ${actor.companyId}::uuid AND l.account_id = ANY(${ids}::uuid[]) AND (${input.contactId ?? null}::uuid IS NULL OR l.contact_id = ${input.contactId ?? null}::uuid) AND l.entry_date BETWEEN ${input.from}::date AND ${input.to}::date
        ORDER BY l.account_id, l.entry_date, e.entry_number, l.line_no`;
     const format = await numberFormat(tx, actor.companyId);
     const opening = new Map(openings.map((row) => [row.account_id, row]));

@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Grand livre par contact : lignes et soldes filtrés, pagination et raccourcis conservés, recherche bornée des contacts historiques et exports CSV FR/EN contextualisés. Le filtre respecte les permissions Comptabilité et Contacts et refuse les contacts invalides ou étrangers.
+
 ## [0.4.0-alpha.35] - 2026-11-02
 
 - Impression et enregistrement PDF via le navigateur pour les résultats, le bilan et leurs comparatifs : identité de l’entreprise et devise, contrôles masqués, papier blanc en thème sombre et comparatifs en paysage, sans nouveau calcul ni dépendance PDF serveur.

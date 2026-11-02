@@ -14,3 +14,5 @@ export * from "./domain/income-comparison";
 export { getIncomeComparison } from "./service/income-comparison";
 export * from "./domain/balance-comparison";
 export { getBalanceComparison } from "./service/balance-comparison";
+
+export { findLedgerContact,listLedgerContacts,LEDGER_CONTACT_LIMIT } from "./service/ledger-contacts";

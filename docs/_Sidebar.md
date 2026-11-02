@@ -73,6 +73,7 @@
 - [[Etats-financiers]]
 
 - [[Grand-livre]]
+- [[Grand-livre-par-contact]]
 - [[Age-des-comptes]]
 
 - [[Parametres-et-administration]]

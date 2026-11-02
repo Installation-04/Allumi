@@ -366,3 +366,11 @@ Imprimez les résultats, le bilan et leurs comparatifs, ou enregistrez un PDF de
 ![Résultats en mode impression](docs/images/impression-resultats-desktop.png)
 
 ![Commande sur téléphone](docs/images/impression-resultats-mobile.png)
+
+### Grand livre par contact
+
+Retrouvez les lignes et soldes d’un client ou fournisseur dans le grand livre. Le filtre suit la pagination et les exports CSV bilingues ([guide](docs/Grand-livre-par-contact.md)).
+
+![Grand livre par contact](docs/images/grand-livre-contact-desktop.png)
+
+![Grand livre par contact mobile](docs/images/grand-livre-contact-mobile.png)

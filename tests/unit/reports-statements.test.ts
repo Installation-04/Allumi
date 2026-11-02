@@ -189,6 +189,11 @@ describe("the ledger of an account", () => {
     }));
   });
   const labels: LedgerLabels = { code: "L:code", account: "L:account", date: "L:date", entry: "L:entry", description: "L:description", contact: "L:contact", debit: "L:debit", credit: "L:credit", balance: "L:balance", opening: "L:opening", closing: "L:closing" };
+  it("identifies a contact filter in both CSV locales and neutralizes its formula text",()=>{
+    const period={from:"2026-06-01",to:"2026-06-30",contactName:"=2+2"};
+    expect(ledgerCsv([],period,"Ledger",labels,"fr-CA")).toContain("L:contact;'=2+2;;;;;;;\r\n");
+    expect(ledgerCsv([],period,"Ledger",labels,"en")).toContain("L:contact,'=2+2,,,,,,,\r\n");
+  });
   it("exports a flat file: the account on every row, an opening row and a closing row with the period's totals", () => {
     const run = runLedger("ASSET", 10_000n, [line(1, 5_000n, 0n, { memo: "Dépôt", contactName: "Client; Un" }), line(2, 0n, 1_250n, { description: "=Frais", date: "2026-03-11" })]);
     const csv = ledgerCsv([{ account: { code: "1000", nameFr: "Banque", nameEn: "Bank" }, openingCents: 10_000n, closingCents: run.closingCents, rows: run.rows }], { from: "2026-03-01", to: "2026-03-31" }, "Grand livre", labels, "fr-CA");

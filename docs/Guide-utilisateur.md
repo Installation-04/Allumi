@@ -100,3 +100,7 @@ Dans le bilan, **Comparer deux dates** montre les soldes cumulatifs, leurs écar
 ## Imprimer les états financiers
 
 Dans les résultats, le bilan ou leurs comparatifs, **Imprimer / PDF** ouvre la boîte d’impression du navigateur. Elle permet d’imprimer ou d’enregistrer un PDF selon les options de l’appareil. Voir [[Impression-des-etats-financiers]].
+
+## Consulter les écritures d’un contact
+
+Dans **Rapports → Grand livre**, choisis le compte et le contact puis **Afficher**. Les soldes et les deux CSV suivent les lignes portant ce contact. Le filtre exige Comptabilité et Contacts en lecture. Voir [[Grand-livre-par-contact]].

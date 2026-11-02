@@ -67,10 +67,11 @@ export type LedgerLabels = {
  * row and a closing row (with the period's debits and credits) for each account. Balances are in the direction the
  * account's type normally holds.
  */
-export function ledgerCsv(ledgers: readonly LedgerAccountReport[], period: { from: string; to: string }, title: string, labels: LedgerLabels, locale: Locale): string {
+export function ledgerCsv(ledgers: readonly LedgerAccountReport[], period: { from: string; to: string; contactName?: string }, title: string, labels: LedgerLabels, locale: Locale): string {
   const rows: CsvCell[][] = [
     [title, "", "", "", "", "", "", "", ""],
     [`${period.from} → ${period.to}`, "", "", "", "", "", "", "", ""],
+    ...(period.contactName ? [[labels.contact,period.contactName,"","","","","","",""]] : []),
     [labels.code, labels.account, labels.date, labels.entry, labels.description, labels.contact, labels.debit, labels.credit, labels.balance],
   ];
   for (const ledger of ledgers) {
