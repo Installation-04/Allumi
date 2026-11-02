@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Sélection de compte du grand livre et de ses CSV refusée lorsqu’elle est invalide, inconnue, étrangère ou répétée, sans repli involontaire vers tous les comptes; validation partagée avec le suivi de trésorerie.
+
 - Suivi de trésorerie BANK/CASH par période et compte : soldes exacts, virements purs séparés, écritures mixtes signalées en brut, contrôle du grand livre et détail paginé dans un même instantané, avec CSV FR/EN complet sous permissions Comptabilité. Disponibilités des espaces d’activité corrigées.
 
 ## [0.4.0-alpha.36] - 2026-11-01

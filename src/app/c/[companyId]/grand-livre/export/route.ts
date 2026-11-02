@@ -6,7 +6,8 @@ import { statementPeriod } from "@/app/_lib/report-period";
 import { listFiscalYears, todayIso } from "@/modules/ledger";
 import { getLedgerExport, ledgerCsv } from "@/modules/reports";
 import { loadCompany } from "../../_lib";
-import { validId } from "../../factures/editor";
+import { reportAccountId } from "@/app/_lib/report-account";
+import { AppError } from "@/platform/errors";
 
 export const dynamic = "force-dynamic";
 
@@ -16,11 +17,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ comp
   const t = await getTranslations("ledgerReport");
   const query = Object.fromEntries(new URL(request.url).searchParams);
   const { from, to } = statementPeriod(query, await listFiscalYears(actor), todayIso());
-  const accountId = query.compte && validId(query.compte) ? query.compte : null;
+  const ids=new URL(request.url).searchParams.getAll("compte");
+  const accountId = reportAccountId(ids.length?ids:undefined)??null;
   if(query.contact&&!can(company,"contact.read"))notFound();
   const contactValues=new URL(request.url).searchParams.getAll("contact");
   const contact=await resolveLedgerContact(actor,contactValues.length?contactValues:undefined);
-  const ledgers = await getLedgerExport(actor, { accountId, from, to,contactId:contact?.id });
+  const ledgers = await getLedgerExport(actor, { accountId, from, to,contactId:contact?.id }).catch(e=>{if(e instanceof AppError&&e.key==="reports.account")notFound();throw e;});
   const labels = { code: t("code"), account: t("accountName"), date: t("date"), entry: t("entry"), description: t("description"), contact: t("contact"), debit: t("debit"), credit: t("credit"), balance: t("balance"), opening: t("opening"), closing: t("closing") };
   const body = ledgerCsv(ledgers, { from, to,contactName:contact?.displayName }, t("title"), labels, locale);
   const scope = accountId ? ledgers[0]?.account.code ?? "compte" : t("allFile");

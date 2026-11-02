@@ -1888,6 +1888,12 @@ async function generalLedgerJourney(page: Page) {
   expect(allCsv).toContain("\r\n4000;Revenus de services;");
   expect(allCsv).toContain("\r\n6010;Frais bancaires;");
 
+  // Invalid or repeated account selection never broadens a file to all accounts.
+  const chosenAccount=await page.locator('select[name="compte"]').inputValue();
+  for(const bad of ["bad","00000000-0000-7000-8000-999999999999",`${chosenAccount}&compte=bad`]){
+    expect((await page.request.get(`${company}/grand-livre?du=${from}&au=${to}&compte=${bad}`)).status()).toBe(404);
+    expect((await page.request.get(`${company}/grand-livre/export?du=${from}&au=${to}&compte=${bad}`)).status()).toBe(404);
+  }
   // a customer's name on a receivable line, over the whole fiscal year
   await page.getByRole("link", { name: /^\d{4}-\d{2}-\d{2} → \d{4}-\d{2}-\d{2}$/ }).first().click();
   await expect(page.locator('input[type="date"][name="du"]')).not.toHaveValue(from); // the page is the fiscal year's before the form is used again
