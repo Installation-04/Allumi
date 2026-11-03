@@ -34,7 +34,8 @@ BEGIN
  IF TG_OP='INSERT' THEN
   NEW.revision:=1;
   NEW.created_at:=now();
-  PERFORM id FROM company WHERE id=NEW.company_id FOR UPDATE;
+  -- Every accounting writer can take this lock; locking company would silently fail under owner-only RLS.
+  PERFORM pg_advisory_xact_lock(hashtextextended('bank-rule:'||NEW.company_id::text,0));
   IF (SELECT count(*) FROM bank_rule WHERE company_id=NEW.company_id)>=200 THEN
    RAISE EXCEPTION 'bank rule limit' USING ERRCODE='AL004';
   END IF;

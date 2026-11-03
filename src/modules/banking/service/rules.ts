@@ -39,7 +39,7 @@ export async function saveBankRule(actor: CompanyContext, input: BankRuleInput, 
     await requireRole(tx, "bank.manage");
     if (existing) await lockRule(tx, actor, existing.id, existing.revision);
     else {
-      await tx.$queryRaw`SELECT id FROM company WHERE id=${actor.companyId}::uuid FOR UPDATE`;
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`bank-rule:${actor.companyId}`},0))`;
       if (await tx.bankRule.count({ where: { companyId: actor.companyId } }) >= MAX_BANK_RULES) throw new AppError("bankRules.limit");
     }
     await accountsValid(tx, actor.companyId, parsed.data.targetAccountId, parsed.data.sourceAccountId);

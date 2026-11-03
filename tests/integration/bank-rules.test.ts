@@ -7,6 +7,7 @@ import { owner } from "./helpers";
 import { seedWorld, W } from "./world";
 const actor={userId:W.userOwnerA,companyId:W.companyA};
 const reader={...actor,userId:W.userReader};
+const accountant={...actor,userId:W.userAccountant};
 const other={userId:W.userOwnerB,companyId:W.companyB};
 const input: BankRuleInput={name:"Abonnement cloud",enabled:true,priority:10,field:"DESCRIPTION",text:"Fournisseur cloud",direction:"OUT",sourceAccountId:W.bank,targetAccountId:W.expenses,minCents:1000n,maxCents:5000n};
 let db:pg.Client;
@@ -66,6 +67,12 @@ describe("company bank rules",()=>{
   await expect(applyBankRule(actor,{ruleId:rule.id,revision:1,transactionId})).rejects.toMatchObject({key:"bankRules.accounts"});
   await setBankRuleEnabled(actor,rule.id,1,false);
  });
+ it("lets accountants prepare global rules without company administration",async()=>{
+  expect(await withCompany(accountant,tx=>tx.$queryRaw`SELECT id FROM company WHERE id=${W.companyA}::uuid FOR UPDATE`)).toEqual([]);
+  const rule=await saveBankRule(accountant,{...input,sourceAccountId:null});
+  const transactionId=await line();
+  expect((await suggestedBankRules(accountant,transactionId)).some(r=>r.id===rule.id)).toBe(true);
+ });
  it("checks module denial in both the service and row policies",async()=>{
   await db.query("UPDATE membership SET module_access='{\"accounting\":\"none\"}'::jsonb WHERE company_id=$1 AND user_id=$2",[W.companyA,W.userReader]);
   try {
@@ -81,7 +88,9 @@ describe("company bank rules",()=>{
  });
  it("enforces the company rule cap even for direct writes",async()=>{
   const count=(await db.query("SELECT count(*)::int n FROM bank_rule WHERE company_id=$1",[W.companyA])).rows[0].n as number;
-  await db.query("INSERT INTO bank_rule(id,company_id,name,enabled,field,text,direction,target_account_id,updated_at) SELECT gen_random_uuid(),$1::uuid,'Cap '||i,false,'DESCRIPTION','cap','OUT',$2::uuid,now() FROM generate_series(1,$3::int) i",[W.companyA,W.expenses,200-count]);
+  await db.query("INSERT INTO bank_rule(id,company_id,name,enabled,field,text,direction,target_account_id,updated_at) SELECT gen_random_uuid(),$1::uuid,'Cap '||i,false,'DESCRIPTION','cap','OUT',$2::uuid,now() FROM generate_series(1,$3::int) i",[W.companyA,W.expenses,199-count]);
+  const competing=await Promise.allSettled(Array.from({length:4},()=>saveBankRule(accountant,input)));
+  expect(competing.filter(result=>result.status==="fulfilled")).toHaveLength(1);
   await expect(saveBankRule(actor,input)).rejects.toMatchObject({key:"bankRules.limit"});
   await expect(withCompany(actor,tx=>tx.bankRule.create({data:{companyId:actor.companyId,...input}}))).rejects.toThrow();
   expect(await listBankRules(actor)).toHaveLength(200);
