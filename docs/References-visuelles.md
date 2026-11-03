@@ -378,3 +378,14 @@ Voir [[Avoirs-disponibles-et-remboursements]] et [[Releve-de-compte-client]]. Ce
 ![Remboursement mobile](images/remboursement-detail-mobile.png)
 
 ![Relevé client mobile](images/releve-client-mobile.png)
+
+
+## Recherche des paiements clients
+
+[[Recherche-des-paiements-clients]] : filtres conservés entre les pages, encaissements et remboursements.
+
+![Encaissements filtrés](images/historique-encaissements-desktop.png)
+
+![Remboursements en anglais sombre](images/historique-remboursements-en-dark-desktop.png)
+
+![Filtres sur téléphone](images/historique-encaissements-mobile.png)

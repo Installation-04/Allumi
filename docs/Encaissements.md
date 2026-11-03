@@ -54,3 +54,6 @@ Données fictives, Chromium ordinateur et téléphone émulé.
 ![Encaissement annulé sur téléphone](images/encaissement-annule-mobile.png)
 
 Les encaissements reçus dans les fonds non déposés peuvent être regroupés vers la banque : [[Depots-bancaires]]. Un encaissement inclus dans un dépôt actif nécessite d’abord l’annulation du dépôt avant sa propre annulation.
+
+
+La recherche, les filtres de dates/état et la pagination des paiements sont décrits dans [[Recherche-des-paiements-clients]]. La consultation exige Ventes et Comptabilité en lecture; Contacts peut rester désactivé.

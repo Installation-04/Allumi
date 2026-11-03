@@ -117,3 +117,6 @@ Pour les catégories récurrentes, ouvrir **Transactions bancaires → Règles b
 Sur une facture réglée, préparer un avoir puis choisir **Conserver disponible pour remboursement** lors de sa validation. L’avoir validé propose **Enregistrer un remboursement**, avec confirmation du compte, de la date et du montant déjà remboursé séparément. Allumi ne transmet pas d’argent. Voir [[Avoirs-disponibles-et-remboursements]].
 
 Dans **Rapports → Relevés clients**, sélectionner le client et la période. Les mouvements réglés restent visibles; les soldes suivent les dates des écritures et contre-passations. Le CSV et la vue imprimable complète excluent les notes internes. Voir [[Releve-de-compte-client]].
+
+
+La recherche, les filtres de dates/état et la pagination des paiements sont décrits dans [[Recherche-des-paiements-clients]]. La consultation exige Ventes et Comptabilité en lecture; Contacts peut rester désactivé.

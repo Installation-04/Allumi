@@ -61,3 +61,5 @@ Taxes et produits/services : [[Taxes-et-catalogue]].
 
 - [[Avoirs-disponibles-et-remboursements]] — avoir sur facture payée, remboursement comptabilisé et annulation.
 - [[Releve-de-compte-client]] — mouvements datés, CSV et impression complète.
+
+- [[Recherche-des-paiements-clients]] — client, numéro, référence, état et période.

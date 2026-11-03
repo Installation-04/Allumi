@@ -411,3 +411,14 @@ Un avoir peut rester disponible sur une facture payée. Les remboursements sont 
 ![Relevé client en anglais et thème sombre](docs/images/releve-client-en-dark-desktop.png)
 
 ![Relevé client mobile](docs/images/releve-client-mobile.png)
+
+
+### Retrouver les paiements clients
+
+Recherchez les encaissements et remboursements par client, numéro ou référence, avec dates, état et pagination conservée. Les identités des pièces restent disponibles selon les droits financiers, même sans accès au répertoire Contacts.
+
+[Guide de recherche](docs/Recherche-des-paiements-clients.md)
+
+![Encaissements filtrés](docs/images/historique-encaissements-desktop.png)
+
+![Recherche sur téléphone](docs/images/historique-encaissements-mobile.png)

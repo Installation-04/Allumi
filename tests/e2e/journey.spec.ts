@@ -280,6 +280,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await test.step("cashMovementsJourney", () => cashMovementsJourney(page));
   await test.step("bankDepositsJourney", () => bankDepositsJourney(page));
   await test.step("customerBalancesJourney", () => customerBalancesJourney(page, paidInvoiceUrl));
+  await test.step("paymentHistoryJourney", () => paymentHistoryJourney(page));
   const settingsBase = new URL(page.url()).pathname.match(/^\/c\/[^/]+/)?.[0];
   expect(settingsBase).toBeTruthy();
   await page.getByRole("button", { name: "Français", exact: true }).click();
@@ -2662,4 +2663,56 @@ async function customerBalancesJourney(page: Page, invoiceUrl: string) {
  await expect(page.getByText(`Annulé le ${today}`,{exact:true})).toBeVisible();
  await page.goto(creditUrl);await expect(page.getByText(/Disponible :.*11,50/)).toBeVisible();
  await expect(page.getByText(`retiré le ${today}`,{exact:true})).toBeVisible();
+}
+
+/** Legacy unallocated receipts exercise pagination without re-running the already tested receipt form 27 times. */
+async function seedPaymentHistory(companyId: string, date: string) {
+ const db=new pg.Client({connectionString:e2eUrls().owner});await db.connect();
+ try {
+  const user=(await db.query("SELECT id FROM app_user WHERE email=$1",[EMAIL])).rows[0].id;
+  const contact=(await db.query("SELECT id FROM contact WHERE company_id=$1 AND is_customer AND display_name='Atelier Boréal'",[companyId])).rows[0].id;
+  const bank=(await db.query("SELECT id FROM account WHERE company_id=$1 AND subtype='BANK' ORDER BY code LIMIT 1",[companyId])).rows[0].id;
+  const ar=(await db.query("SELECT id FROM account WHERE company_id=$1 AND system_key='ACCOUNTS_RECEIVABLE'",[companyId])).rows[0].id;
+  await db.query("BEGIN");await db.query("SET LOCAL ROLE allumi_app");
+  await db.query("SELECT set_config('app.user_id',$1,true),set_config('app.company_id',$2,true)",[user,companyId]);
+  for(let i=0;i<27;i++){
+   const ids=(await db.query("SELECT gen_random_uuid() AS payment,gen_random_uuid() AS entry")).rows[0];
+   const sequence=(await db.query("UPDATE number_sequence SET next_value=next_value+1 WHERE company_id=$1 AND key='JOURNAL_ENTRY' RETURNING next_value-1 AS n",[companyId])).rows[0].n;
+   await db.query("INSERT INTO journal_entry(id,company_id,entry_number,entry_date,fiscal_period_id,source_type,source_id,created_by_id) SELECT $1,$2,$3,$4::date,id,'PAYMENT',$5,$6 FROM fiscal_period WHERE company_id=$2 AND $4::date BETWEEN start_date AND end_date",[ids.entry,companyId,sequence,date,ids.payment,user]);
+   await db.query("INSERT INTO journal_line(id,company_id,entry_id,line_no,account_id,debit_cents,credit_cents,contact_id,entry_date) VALUES(gen_random_uuid(),$1,$2,1,$3,100,0,NULL,$5::date),(gen_random_uuid(),$1,$2,2,$4,0,100,$6,$5::date)",[companyId,ids.entry,bank,ar,date,contact]);
+   await db.query("INSERT INTO payment(id,company_id,number,direction,ledger,contact_id,payment_date,amount_cents,account_id,method,reference,journal_entry_id,created_by_id,updated_at) VALUES($1,$2,$3,'RECEIVED','RECEIVABLE',$4,$5::date,100,$6,'EFT',$7,$8,$9,now())",[ids.payment,companyId,`H-${String(i+1).padStart(5,'0')}`,contact,date,bank,`Historique %_\\ ${String(i).padStart(2,'0')}`,ids.entry,user]);
+  }
+  await db.query("COMMIT");
+ } catch(e){await db.query("ROLLBACK");throw e;}finally{await db.end();}
+}
+async function paymentHistoryJourney(page: Page) {
+ const company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0]??"",today=todayInToronto();
+ await seedPaymentHistory(company.slice(3),today);
+ await page.goto(`${company}/encaissements`);
+ await page.getByLabel("Client, numéro ou référence",{exact:true}).fill("Historique %_\\");
+ await page.getByLabel("État du paiement",{exact:true}).selectOption("POSTED");
+ await page.getByLabel("Date du paiement — du",{exact:true}).fill(today);await page.getByLabel("Date du paiement — au",{exact:true}).fill(today);
+ await page.getByRole("button",{name:"Filtrer les paiements",exact:true}).click();
+ await expect(page.getByRole("status").filter({hasText:"27 encaissements"})).toBeVisible();
+ await expect(page.locator(".workspace-content").getByRole("heading",{level:2})).toHaveCount(25);
+ await page.getByRole("link",{name:"Suivant",exact:true}).click();
+ await expect(page.locator(".workspace-content").getByRole("heading",{level:2})).toHaveCount(2);
+ const filters=new URL(page.url()).searchParams;expect(filters.get("q")).toBe("Historique %_\\");expect(filters.get("etat")).toBe("POSTED");expect(filters.get("du")).toBe(today);expect(filters.get("au")).toBe(today);expect(filters.get("page")).toBe("2");
+ await expectNoPageOverflow(page);await captureReference(page,"historique-encaissements","Encaissements");
+ await page.getByRole("button",{name:"English",exact:true}).click();await expect(page.getByRole("heading",{name:"Payments received",exact:true})).toBeVisible();
+ await expect(page.getByLabel("Customer, number or reference",{exact:true})).toHaveValue("Historique %_\\");
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
+ await expectNoPageOverflow(page);await captureReference(page,"historique-encaissements-en-dark","Payments received");
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await expect(page.locator("html")).toHaveAttribute("data-theme","light");
+ await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.getByRole("heading",{name:"Encaissements",exact:true})).toBeVisible();
+ await page.getByLabel("Client, numéro ou référence",{exact:true}).fill("Modification non soumise");
+ await page.getByRole("link",{name:"Réinitialiser les filtres",exact:true}).click();
+ await expect(page.getByLabel("Client, numéro ou référence",{exact:true})).toHaveValue("");await expect(page.getByLabel("État du paiement",{exact:true})).toHaveValue("");await expect(page.getByLabel("Date du paiement — du",{exact:true})).toHaveValue("");
+ await page.getByLabel("Client, numéro ou référence",{exact:true}).fill("Aucun résultat fictif 999");await page.getByRole("button",{name:"Filtrer les paiements",exact:true}).click();await expect(page.getByRole("heading",{name:"Aucun paiement correspondant",exact:true})).toBeVisible();
+ for(const route of ["encaissements","remboursements"])for(const query of ["q=a&q=b","etat=invalid","du=2026-02-30","du=2026-03-01&au=2026-02-01","etat=POSTED&etat=VOID"])expect((await page.request.get(`${company}/${route}?${query}`)).status()).toBe(404);
+ await page.goto(`${company}/remboursements`);await page.getByLabel("Client, numéro ou référence",{exact:true}).fill("Atelier Boréal");await page.getByLabel("État du paiement",{exact:true}).selectOption("VOID");await page.getByLabel("Date du paiement — du",{exact:true}).fill(today);await page.getByLabel("Date du paiement — au",{exact:true}).fill(today);await page.getByRole("button",{name:"Filtrer les paiements",exact:true}).click();
+ await expect(page.locator(".workspace-content").getByRole("heading",{level:2})).toHaveCount(1);await expect(page.getByRole("status").filter({hasText:"1 remboursement"})).toBeVisible();
+ await expectNoPageOverflow(page);await captureReference(page,"historique-remboursements","Remboursements clients");
+ await page.getByRole("button",{name:"English",exact:true}).click();await expect(page.getByRole("heading",{name:"Customer refunds",exact:true})).toBeVisible();await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");await expect(page.locator("html")).toHaveAttribute("data-theme","dark");await expectNoPageOverflow(page);await captureReference(page,"historique-remboursements-en-dark","Customer refunds");
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await expect(page.locator("html")).toHaveAttribute("data-theme","light");await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.getByRole("heading",{name:"Remboursements clients",exact:true})).toBeVisible();
 }
