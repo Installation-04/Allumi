@@ -16,3 +16,5 @@ export { getTrialBalance, type TrialBalance, type TrialBalanceLine } from "./ser
 export { initializeLedger, ledgerStatus, type LedgerStatus } from "./service/setup";
 export { todayIso } from "./service/dates";
 export type { Actor } from "./service/support";
+
+export { createDepositEntry, createDepositReversal } from "./service/entries";

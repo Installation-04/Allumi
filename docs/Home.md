@@ -56,3 +56,5 @@ Taxes et produits/services : [[Taxes-et-catalogue]].
 - [[Administration-serveur]]
 
 - [[Regles-bancaires]] — conditions, aperçu, suggestions et confirmation explicite.
+
+- [[Depots-bancaires]] — encaissements en attente, dépôt groupé et annulation contrôlée.

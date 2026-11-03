@@ -95,6 +95,7 @@ export async function voidReceipt(actor: CompanyContext, id: string, input: unkn
       if (!locked[0]) throw new AppError("payments.notFound");
       const payment = await tx.payment.findFirstOrThrow({ where: { companyId: actor.companyId, id } });
       if (payment.status === "VOID") return id;
+      if (await tx.bankDepositItem.findFirst({ where: { companyId: actor.companyId, paymentId: id, deposit: { status: "POSTED" } }, select: { id: true } })) throw new AppError("deposits.receiptBlocked");
       const allocations = await tx.paymentAllocation.findMany({ where: { companyId: actor.companyId, paymentId: id, unappliedDate: null }, select: { id: true, appliedDate: true } });
       const latest = allocations.reduce((max, allocation) => (iso(allocation.appliedDate) > max ? iso(allocation.appliedDate) : max), iso(payment.paymentDate));
       if (date < latest) throw new AppError("payments.invalidVoid");
@@ -178,6 +179,7 @@ export async function getReceipt(actor: CompanyContext, id: string) {
         contact: { select: { displayName: true } },
         account: { select: { code: true, nameFr: true, nameEn: true } },
         voidEntry: { select: { entryDate: true } },
+        depositItems: { select: { deposit: { select: { id: true, number: true, status: true, depositDate: true } } }, orderBy: [{ deposit: { status: "asc" } }, { deposit: { depositDate: "desc" } }, { depositId: "desc" }], take: 100 },
         allocations: { orderBy: [{ appliedDate: "asc" }, { id: "asc" }], select: { id: true, amountCents: true, appliedDate: true, unappliedDate: true, salesDocument: { select: { id: true, number: true } } } },
       },
     });
@@ -186,6 +188,7 @@ export async function getReceipt(actor: CompanyContext, id: string) {
       id: row.id, number: row.number ?? "", date: iso(row.paymentDate), amountCents: row.amountCents, status: row.status, method: row.method,
       reference: row.reference, memo: row.memo, customer: row.contact.displayName, contactId: row.contactId, account: row.account,
       journalEntryId: row.journalEntryId, voidEntryId: row.voidEntryId, voidDate: row.voidEntry ? iso(row.voidEntry.entryDate) : null, voidReason: row.voidReason,
+      deposits: row.depositItems.map(item => ({ ...item.deposit, number: item.deposit.number ?? "", date: iso(item.deposit.depositDate) })),
       allocations: row.allocations.map((a) => ({
         id: a.id, amountCents: a.amountCents, appliedDate: iso(a.appliedDate), unappliedDate: a.unappliedDate ? iso(a.unappliedDate) : null,
         invoiceId: a.salesDocument?.id ?? "", invoiceNumber: a.salesDocument?.number ?? "",

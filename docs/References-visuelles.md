@@ -361,3 +361,5 @@ Un virement pur fictif de 40,00 $ reste séparé des entrées/sorties : [[Suivi-
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/suivi-tresorerie-mobile.png" alt="Suivi de trésorerie sur téléphone" width="412">
 
 - [[Regles-bancaires]] — conditions, aperçu, suggestions et confirmation explicite.
+
+- [[Depots-bancaires]] — encaissements en attente, dépôt groupé et annulation contrôlée.

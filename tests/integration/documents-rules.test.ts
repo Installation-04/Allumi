@@ -317,7 +317,7 @@ async function deposit(c: pg.Client, d: DepositInput): Promise<PostedDeposit> {
 }
 
 const voidDeposit = (c: pg.Client, id: string, voidEntry: string) =>
-  c.query("UPDATE bank_deposit SET status = 'VOID', void_entry_id = $2, voided_at = now(), voided_by_id = app_current_user_id(), updated_at = now() WHERE id = $1", [id, voidEntry]);
+  c.query("UPDATE bank_deposit SET status = 'VOID', void_entry_id = $2, voided_at = now(), voided_by_id = app_current_user_id(), void_reason = 'Annulation du dépôt', updated_at = now() WHERE id = $1", [id, voidEntry]);
 
 /** A credit note applied to an invoice. */
 async function applyCredit(c: pg.Client, a: { creditNote: string; invoice: string; cents: number; date: string }): Promise<void> {
@@ -1309,14 +1309,14 @@ describe("deposit rules", () => {
     expect(await code(depositInto(W.expenses))).toBe("AL005");
   });
 
-  it("rejects changing a posted deposit other than by voiding it (AL010)", async () => {
+  it("denies updates to immutable deposit columns and allows a proper void", async () => {
     const change = (void_: boolean) => async () => {
       const dep = await deposit(app, { date: "2026-04-15", payments: [await receiptsOf(5000)] });
       if (void_) await voidDeposit(app, dep.id, await reverse(app, dep.entry, "2026-04-20"));
       else await app.query("UPDATE bank_deposit SET deposit_date = '2026-04-16' WHERE id = $1", [dep.id]);
     };
     await run(change(true));
-    expect(await code(change(false))).toBe("AL010");
+    expect(await code(change(false))).toBe("42501");
   });
 
   it("voids a deposit with the reversal of its entry, which frees its receipts for a new deposit", async () => {

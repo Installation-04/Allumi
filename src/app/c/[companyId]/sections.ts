@@ -2,7 +2,7 @@
 export const AREAS = {
   ventes: { icon: "contacts", links: ["factures", "avoirs", "encaissements", "age-clients", "contacts", "catalogue", "journal"] },
   depenses: { icon: "journal", links: ["achats", "depenses", "credits-fournisseurs", "decaissements", "contacts", "catalogue", "journal"] },
-  banque: { icon: "accounts", links: ["integrations", "transactions", "rapprochement", "comptes", "journal"] },
+  banque: { icon: "accounts", links: ["integrations", "transactions", "depots", "rapprochement", "comptes", "journal"] },
   tresorerie: { icon: "trial", links: ["flux-tresorerie", "balance", "journal"] },
   rapports: { icon: "trial", links: ["resultats", "bilan", "grand-livre", "age-clients", "age-fournisseurs", "sommaire-taxes", "flux-tresorerie", "balance"] },
   taxes: { icon: "fiscal", links: ["taxes", "sommaire-taxes", "comptes"] },

@@ -24,6 +24,7 @@ export default async function EntryPage({ params }: { params: Promise<{ companyI
   const entry = await getEntry(actor, entryId);
   if (!entry) notFound();
   const [t, ts, tj, te] = [await getTranslations("entryDetail"), await getTranslations("enums.source"), await getTranslations("journal"), await getTranslations("entry")];
+  const td = await getTranslations("deposits");
   const base = `/c/${company.id}/journal`;
 
   // Numbers of the linked entries, for the "reversed by / reverses" sentences.
@@ -42,6 +43,7 @@ export default async function EntryPage({ params }: { params: Promise<{ companyI
         {entry.memo ? <p>{entry.memo}</p> : null}
         {reversedBy ? <p className="font-medium">{t("reversedBy", { number: reversedBy })}</p> : null}
         {reverses ? <p className="font-medium">{t("reverses", { number: reverses })}</p> : null}
+        {entry.source === "DEPOSIT" && entry.sourceId ? <Link href={`/c/${company.id}/depots/${entry.sourceId}`} className={`inline-flex min-h-11 items-center rounded underline ${FOCUS}`}>{td("sourceLink")}</Link> : null}
         {fromDocument ? <p className="text-sm">{t("voidHint")}</p> : null}
         {entry.source === "BANK" ? <p className="text-sm">{t("bankHint")}</p> : null}
       </div>

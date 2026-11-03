@@ -1225,6 +1225,8 @@ model BankDeposit {
   id             String        @id @default(uuid(7)) @db.Uuid
   companyId      String        @map("company_id") @db.Uuid
   number         String?
+  reference      String?
+  voidReason     String?       @map("void_reason")
   /// Compte de banque ou d'encaisse qui reçoit le dépôt.
   accountId      String        @map("account_id") @db.Uuid
   depositDate    DateTime      @map("deposit_date") @db.Date

@@ -30,6 +30,7 @@ export type EntryDto = {
   numberLabel: string;
   date: IsoDate;
   source: JournalSourceKind;
+  sourceId: string | null;
   memo: string | null;
   reversesEntryId: string | null;
   reversedByEntryId: string | null;
@@ -75,7 +76,7 @@ async function nextEntryNumber(tx: Tx, companyId: string): Promise<bigint> {
 async function insertEntry(
   tx: Tx,
   actor: Actor,
-  entry: { date: IsoDate; source: "MANUAL" | "OPENING_BALANCE" | "REVERSAL" | "SALES_DOCUMENT" | "PURCHASE_DOCUMENT" | "PAYMENT" | "BANK"; sourceId?: string; deferChecks?: boolean; memo: string | null; lines: EntryLine[]; reversesEntryId?: string },
+  entry: { date: IsoDate; source: "MANUAL" | "OPENING_BALANCE" | "REVERSAL" | "SALES_DOCUMENT" | "PURCHASE_DOCUMENT" | "PAYMENT" | "DEPOSIT" | "BANK"; sourceId?: string; deferChecks?: boolean; memo: string | null; lines: EntryLine[]; reversesEntryId?: string },
 ): Promise<{ id: string; number: bigint }> {
   const period = await tx.fiscalPeriod.findFirst({
     where: { companyId: actor.companyId, startDate: { lte: toDbDate(entry.date) }, endDate: { gte: toDbDate(entry.date) } },
@@ -115,7 +116,7 @@ async function insertEntry(
     })),
   });
   // Sales/purchase documents, payments and bank entries are linked (to the document, the payment, the transaction) before the deferred source checks fire.
-  if (entry.source !== "SALES_DOCUMENT" && entry.source !== "PURCHASE_DOCUMENT" && entry.source !== "PAYMENT" && entry.source !== "BANK" && !entry.deferChecks) await tx.$executeRaw`SET CONSTRAINTS ALL IMMEDIATE`;
+  if (entry.source !== "SALES_DOCUMENT" && entry.source !== "PURCHASE_DOCUMENT" && entry.source !== "PAYMENT" && entry.source !== "BANK" && entry.source !== "DEPOSIT" && !entry.deferChecks) await tx.$executeRaw`SET CONSTRAINTS ALL IMMEDIATE`;
   return { id: created.id, number };
 }
 
@@ -194,6 +195,7 @@ type EntryRow = {
   entryNumber: bigint;
   entryDate: Date;
   sourceType: JournalSourceKind;
+  sourceId: string | null;
   memo: string | null;
   reversesEntryId: string | null;
   createdById: string;
@@ -209,6 +211,7 @@ function toEntryDto(row: EntryRow, format: { prefix: string; padding: number }):
     numberLabel: formatNumber(format.prefix, format.padding, row.entryNumber),
     date: fromDbDate(row.entryDate),
     source: row.sourceType,
+    sourceId: row.sourceId,
     memo: row.memo,
     reversesEntryId: row.reversesEntryId,
     reversedByEntryId: row.reversedBy?.id ?? null,
@@ -291,7 +294,7 @@ export async function createPurchaseReversal(tx: Tx, actor: Actor, input: { docu
 }
 
 /** Builds the exact reversal of a document's or a payment's entry; the caller must link the void before commit. */
-async function reverseSourceEntry(tx: Tx, actor: Actor, input: { sourceType: "SALES_DOCUMENT" | "PURCHASE_DOCUMENT" | "PAYMENT"; sourceId: string; entryId: string; date: IsoDate; memo: string }) {
+async function reverseSourceEntry(tx: Tx, actor: Actor, input: { sourceType: "SALES_DOCUMENT" | "PURCHASE_DOCUMENT" | "PAYMENT" | "DEPOSIT"; sourceId: string; entryId: string; date: IsoDate; memo: string }) {
   await requireRole(tx, "entry.reverse");
   const original = await tx.journalEntry.findFirst({ where: { companyId: actor.companyId, id: input.entryId, sourceType: input.sourceType, sourceId: input.sourceId }, include: { lines: true } });
   if (!original || !isValidIsoDate(input.date) || input.date < fromDbDate(original.entryDate)) throw new AppError("AL008");
@@ -340,4 +343,16 @@ export async function createBankEntry(tx: Tx, actor: Actor, input: { transaction
 /** Builds the exact reversal of a payment's entry; the caller must mark the payment void before commit. */
 export async function createPaymentReversal(tx: Tx, actor: Actor, input: { paymentId: string; entryId: string; date: IsoDate; memo: string }) {
   return reverseSourceEntry(tx, actor, { sourceType: "PAYMENT", sourceId: input.paymentId, entryId: input.entryId, date: input.date, memo: input.memo });
+}
+
+
+/** Posts a grouped receipt deposit; the caller links its header and items before settling constraints. */
+export async function createDepositEntry(tx: Tx, actor: Actor, input: { depositId: string; date: IsoDate; memo: string; lines: EntryLine[] }) {
+  await requireRole(tx, "entry.post");
+  const [problem] = checkEntry(input.lines);
+  if (problem) throw new AppError(problemKey(problem));
+  return insertEntry(tx, actor, { date: input.date, source: "DEPOSIT", sourceId: input.depositId, memo: input.memo, lines: input.lines });
+}
+export async function createDepositReversal(tx: Tx, actor: Actor, input: { depositId: string; entryId: string; date: IsoDate; memo: string }) {
+  return reverseSourceEntry(tx, actor, { sourceType: "DEPOSIT", sourceId: input.depositId, entryId: input.entryId, date: input.date, memo: input.memo });
 }
