@@ -37,3 +37,7 @@ Données fictives, Chromium ordinateur et téléphone émulé.
 ## Filtrer par contact
 
 Le sélecteur **Contact** limite les lignes et tous les soldes au contact choisi, sous permissions Comptabilité et Contacts. Les raccourcis, pages et deux CSV conservent le filtre; une recherche permet de retrouver les contacts historiques. Voir [[Grand-livre-par-contact]] pour le périmètre et les limites.
+
+## Sélection du compte dans l’adresse
+
+Un identifiant de compte mal formé, inconnu, étranger à l’entreprise ou répété dans l’adresse est refusé, à l’écran et dans le CSV. Il n’est jamais interprété comme **tous les comptes**. L’absence de compte ou une valeur vide conserve le parcours normal : choisir un compte à l’écran ou exporter tous les comptes explicitement.

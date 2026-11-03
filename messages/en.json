@@ -1060,22 +1060,22 @@
     "ventes": {
       "title": "Sales",
       "description": "Prepare invoice drafts and find your customers and items.",
-      "planned": "Sending, refunds and receiving payments are not yet available."
+      "planned": "Direct refunds and advanced overpayment scenarios are still planned."
     },
     "depenses": {
       "title": "Expenses",
       "description": "Find suppliers and consult the journal.",
-      "planned": "Supplier credits, immediately paid expenses, partial tax recovery and attachments are still planned."
+      "planned": "Partial tax recovery and advanced adjustments are still planned."
     },
     "banque": {
       "title": "Banking and transactions",
       "description": "Open your chart of accounts and recorded entries.",
-      "planned": "CSV/OFX import and bank reconciliation: phase 5. No automatic bank feed currently."
+      "planned": "Direct bank feeds, automatic rules and tax splits on a line are still planned."
     },
     "tresorerie": {
       "title": "Cash flow",
       "description": "Consult accounting balances and journal movements.",
-      "planned": "Cash flow reporting and payment tracking: batch 4.5 and phase 6. No cash forecasts currently."
+      "planned": "Cash flow statements by activity and cash forecasts are still planned."
     },
     "rapports": {
       "title": "Reports",
@@ -1085,7 +1085,7 @@
     "taxes": {
       "title": "Taxes",
       "description": "Find tax accounts in your chart of accounts.",
-      "planned": "Returns, summaries and GST/QST remittances in a later release."
+      "planned": "Preparing and filing returns and automating remittances are still planned."
     },
     "comptabilite": {
       "title": "Accounting",
@@ -1115,6 +1115,7 @@
     "planned": "Planned — not available",
     "progress": "Features and limitations",
     "links": {
+      "flux-tresorerie": "Cash account movements",
       "depenses": "Paid expenses",
       "credits-fournisseurs": "Supplier credits",
       "decaissements": "Supplier payments",
@@ -2134,5 +2135,55 @@
     "print": "Print / PDF",
     "currency": "Amounts in Canadian dollars (CAD)",
     "hint": "Print the displayed report or save it as PDF in your browser’s print dialog. Turn off browser headers and footers to omit the page address. Comparative reports use landscape orientation."
+  },
+  "cashReport": {
+    "title": "Cash account movements",
+    "intro": "Posted bank and cash account balances and movements, with internal transfers shown separately.",
+    "account": "Account",
+    "all": "All cash accounts",
+    "allFile": "all",
+    "inactive": "Inactive",
+    "from": "From",
+    "to": "To",
+    "apply": "Show",
+    "export": "Export as CSV",
+    "file": "cash-movements",
+    "period": "From {from} to {to}, both dates included.",
+    "rulesTitle": "Scope and calculations",
+    "scope": "ASSET accounts with BANK or CASH subtype, active or inactive. Undeposited funds, credit cards, receivables and payables are excluded. Balances come from the journal, not imported bank statements.",
+    "rules": "A pure internal transfer touches only at least two accounts in this scope. Its movements are separated from other inflows and outflows. Entries with cash movements in both directions that are not pure transfers remain gross, without estimated matching.",
+    "limits": "This view does not classify operating, investing or financing activities. It is neither a statutory cash flow statement nor a forecast. Depositing undeposited funds is an inflow into this scope, not necessarily revenue.",
+    "summary": "Balances and movements",
+    "openingCents": "Opening balance",
+    "incomingCents": "Inflows excluding pure transfers",
+    "outgoingCents": "Outflows excluding pure transfers",
+    "transferInCents": "Transfers in",
+    "transferOutCents": "Transfers out",
+    "closingCents": "Closing balance",
+    "net": "Net change",
+    "control": "Control difference",
+    "agrees": "Movements agree with the ledger balances.",
+    "warning": "Review the control difference in the general ledger.",
+    "mixedNotice": "{count, plural, one {# entry with movements in both directions is shown gross.} other {# entries with movements in both directions are shown gross.}}",
+    "mixedCount": "Mixed entries (gross)",
+    "accounts": "By account",
+    "emptyAccounts": "No bank or cash accounts in this scope.",
+    "detail": "Posted movements",
+    "count": "{count, plural, =0 {No line in this period} one {# line} other {# lines}}",
+    "empty": "No movements in this selection.",
+    "date": "Date",
+    "entry": "Entry",
+    "memo": "Description",
+    "kind": "Kind",
+    "debit": "Debit",
+    "credit": "Credit",
+    "total": "Total",
+    "movement": "Movement",
+    "transfer": "Pure internal transfer",
+    "mixed": "Mixed entry (gross)",
+    "pagination": "Cash movement pagination",
+    "page": "Page {page} of {pages}",
+    "previous": "Previous",
+    "next": "Next"
   }
 }

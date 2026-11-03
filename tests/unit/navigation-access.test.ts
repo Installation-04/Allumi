@@ -38,6 +38,11 @@ describe("company navigation authorization", () => {
     for(const moduleAccess of [{accounting:"none",taxes:"read"},{accounting:"read",taxes:"none"}])expect(canAccessRoute({role:"READ_ONLY",moduleAccess},"sommaire-taxes")).toBe(false);
   });
 
+  it("keeps cash movement reporting under accounting access only",()=>{
+    expect(canAccessRoute({role:"READ_ONLY",moduleAccess:{contacts:"none",sales:"none",taxes:"none"}},"flux-tresorerie")).toBe(true);
+    expect(canAccessRoute({role:"READ_ONLY",moduleAccess:{accounting:"none"}},"flux-tresorerie")).toBe(false);
+    expect(visibleAreaRoutes({role:"READ_ONLY"},"tresorerie")).toContain("flux-tresorerie");
+  });
   it("requires an explicit policy for each current shortcut and rejects unknown routes", () => {
     for (const area of Object.values(AREAS)) for (const route of area.links) expect(Object.hasOwn(ROUTE_ACCESS, route), route).toBe(true);
     expect(canAccessRoute({ role: "OWNER" }, "future-unregistered-page")).toBe(false);

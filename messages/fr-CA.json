@@ -1060,22 +1060,22 @@
     "ventes": {
       "title": "Ventes",
       "description": "Préparez vos brouillons et retrouvez vos clients et articles.",
-      "planned": "Envoi, remboursements et encaissements ne sont pas encore disponibles."
+      "planned": "Remboursements directs et scénarios avancés de trop-perçus restent à venir."
     },
     "depenses": {
       "title": "Dépenses",
       "description": "Retrouvez vos fournisseurs et consultez le journal.",
-      "planned": "Crédits fournisseurs, dépenses payées immédiatement, récupération partielle des taxes et pièces jointes restent à venir."
+      "planned": "Récupération partielle des taxes et ajustements avancés restent à venir."
     },
     "banque": {
       "title": "Banque et transactions",
       "description": "Accédez au plan comptable et aux écritures enregistrées.",
-      "planned": "Import CSV/OFX, connexion des opérations et rapprochement bancaire : phase 5. Aucun flux bancaire automatique actuellement."
+      "planned": "Flux bancaires directs, règles automatiques et taxes réparties sur une ligne restent à venir."
     },
     "tresorerie": {
       "title": "Trésorerie",
       "description": "Consultez les soldes comptables et les mouvements du journal.",
-      "planned": "Rapport de flux de trésorerie et suivi des paiements : lots 4.5 et phase 6. Aucune prévision de trésorerie actuellement."
+      "planned": "État des flux par activité et prévisions de trésorerie restent à venir."
     },
     "rapports": {
       "title": "Rapports",
@@ -1085,7 +1085,7 @@
     "taxes": {
       "title": "Taxes",
       "description": "Retrouvez les comptes de taxes dans votre plan comptable.",
-      "planned": "Déclarations, sommaires et versements de TPS/TVQ dans un prochain lot."
+      "planned": "Préparation et dépôt des déclarations, et automatisation des versements restent à venir."
     },
     "comptabilite": {
       "title": "Comptabilité",
@@ -1115,6 +1115,7 @@
     "planned": "À venir — non disponible",
     "progress": "Fonctionnalités et limites",
     "links": {
+      "flux-tresorerie": "Suivi de trésorerie",
       "depenses": "Dépenses payées",
       "credits-fournisseurs": "Crédits fournisseurs",
       "decaissements": "Paiements fournisseurs",
@@ -2134,5 +2135,55 @@
     "print": "Imprimer / PDF",
     "currency": "Montants en dollars canadiens (CAD)",
     "hint": "Imprimez le rapport affiché ou enregistrez-le en PDF dans la boîte d’impression du navigateur. Désactivez les en-têtes et pieds de page du navigateur pour omettre l’adresse de la page. Les comparatifs utilisent l’orientation paysage."
+  },
+  "cashReport": {
+    "title": "Suivi de trésorerie",
+    "intro": "Soldes et mouvements comptabilisés des comptes bancaires et de caisse, avec virements internes séparés.",
+    "account": "Compte",
+    "all": "Tous les comptes de trésorerie",
+    "allFile": "tous",
+    "inactive": "Inactif",
+    "from": "Du",
+    "to": "Au",
+    "apply": "Afficher",
+    "export": "Exporter en CSV",
+    "file": "suivi-tresorerie",
+    "period": "Du {from} au {to}, dates incluses.",
+    "rulesTitle": "Périmètre et calculs",
+    "scope": "Comptes d’actif BANK et CASH, actifs ou inactifs. Fonds non déposés, cartes de crédit, comptes clients et fournisseurs exclus. Les soldes proviennent du journal, pas des relevés bancaires importés.",
+    "rules": "Un virement interne pur touche exclusivement au moins deux comptes de ce périmètre. Ses mouvements sont séparés des entrées et sorties. Les écritures comportant des mouvements dans les deux sens sans être des virements purs restent présentées en brut, sans appariement estimé.",
+    "limits": "Ce suivi ne classe pas les activités d’exploitation, d’investissement ou de financement. Il ne constitue pas un état réglementaire des flux ni une prévision. Un dépôt de fonds non déposés est une entrée dans ce périmètre, sans être nécessairement un revenu.",
+    "summary": "Soldes et mouvements",
+    "openingCents": "Solde d’ouverture",
+    "incomingCents": "Entrées hors virements purs",
+    "outgoingCents": "Sorties hors virements purs",
+    "transferInCents": "Virements entrants",
+    "transferOutCents": "Virements sortants",
+    "closingCents": "Solde de clôture",
+    "net": "Variation nette",
+    "control": "Écart de contrôle",
+    "agrees": "Les mouvements concordent avec les soldes comptables.",
+    "warning": "Un écart de contrôle est à vérifier dans le grand livre.",
+    "mixedNotice": "{count, plural, one {# écriture dans les deux sens est présentée en brut.} other {# écritures dans les deux sens sont présentées en brut.}}",
+    "mixedCount": "Écritures mixtes (brut)",
+    "accounts": "Détail par compte",
+    "emptyAccounts": "Aucun compte bancaire ou de caisse dans ce périmètre.",
+    "detail": "Mouvements comptabilisés",
+    "count": "{count, plural, =0 {Aucune ligne dans cette période} one {# ligne} other {# lignes}}",
+    "empty": "Aucun mouvement dans cette sélection.",
+    "date": "Date",
+    "entry": "Écriture",
+    "memo": "Description",
+    "kind": "Nature",
+    "debit": "Débit",
+    "credit": "Crédit",
+    "total": "Total",
+    "movement": "Mouvement",
+    "transfer": "Virement interne pur",
+    "mixed": "Écriture mixte (brut)",
+    "pagination": "Pagination des mouvements de trésorerie",
+    "page": "Page {page} sur {pages}",
+    "previous": "Précédent",
+    "next": "Suivant"
   }
 }

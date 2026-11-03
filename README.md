@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.36
+git checkout v0.4.0-alpha.37
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.36 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.37 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -374,3 +374,11 @@ Retrouvez les lignes et soldes d’un client ou fournisseur dans le grand livre.
 ![Grand livre par contact](docs/images/grand-livre-contact-desktop.png)
 
 ![Grand livre par contact mobile](docs/images/grand-livre-contact-mobile.png)
+
+### Suivi de trésorerie
+
+Consultez les soldes et mouvements comptabilisés BANK/CASH, avec virements purs séparés, détail paginé et export CSV bilingue ([guide](docs/Suivi-de-tresorerie.md)).
+
+![Suivi de trésorerie](docs/images/suivi-tresorerie-desktop.png)
+
+![Suivi de trésorerie mobile](docs/images/suivi-tresorerie-mobile.png)
