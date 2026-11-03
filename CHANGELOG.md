@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.40] - 2026-11-03
+
 - Dépôts bancaires groupés des encaissements en fonds non déposés : sélection et total exact, références, historique, annulation par contre-passation, navigation et écrans FR/EN adaptatifs. Contrôles en base des écritures exactes, doubles dépôts, dates de libération, permissions et courses entre appariement/pointage et annulation.
 
 ## [0.4.0-alpha.39] - 2026-11-03
