@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Fiche d’avoir consultable avec le module Taxes désactivé : montants conservés et libellé générique pour les références fiscales masquées, sans droit supplémentaire.
+
 - Avoir disponible sur facture déjà payée, remboursements clients partiels ou complets et annulation comptabilisée avec libération du disponible; permissions modulaires, vérification du solde revu et historique conservé.
 - Relevé de compte client daté : recherche bornée, soldes et mouvements dans un même instantané, pagination, CSV et impression complète sans notes internes; écrans FR/EN, mobile et sombre, guides illustrés.
 - Annulation d’encaissement protégée contre un ancien instantané après dépôt concurrent : READ COMMITTED imposé par le trigger PostgreSQL, avec reproduction déterministe sur deux connexions.

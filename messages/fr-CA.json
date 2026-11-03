@@ -1403,7 +1403,8 @@
     "applicationMode": "Traitement de l’avoir",
     "applySource": "Appliquer à la facture source",
     "retainAvailable": "Conserver disponible pour remboursement",
-    "applicationHint": "L’application réduit le solde impayé de la facture. Un avoir disponible peut aussi concerner une facture déjà payée; il ne s’applique pas automatiquement."
+    "applicationHint": "L’application réduit le solde impayé de la facture. Un avoir disponible peut aussi concerner une facture déjà payée; il ne s’applique pas automatiquement.",
+    "taxLine": "Taxe"
   },
   "members": {
     "title": "Utilisateurs et permissions",

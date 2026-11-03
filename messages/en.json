@@ -1403,7 +1403,8 @@
     "applicationMode": "Credit treatment",
     "applySource": "Apply to source invoice",
     "retainAvailable": "Keep available for refund",
-    "applicationHint": "Application reduces the unpaid source balance. An available credit can also refer to a paid invoice; it is not applied automatically."
+    "applicationHint": "Application reduces the unpaid source balance. An available credit can also refer to a paid invoice; it is not applied automatically.",
+    "taxLine": "Tax"
   },
   "members": {
     "title": "Users and permissions",

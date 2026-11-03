@@ -33,7 +33,7 @@ Un avoir avec un remboursement actif ne peut pas être annulé. Annuler d’abor
 
 ## Droits, langue et mobile
 
-La consultation exige **Ventes** et **Comptabilité** en lecture. La saisie exige la gestion des ventes et la validation des écritures; l’annulation exige aussi la contre-passation. Les permissions modulaires de l’entreprise restent applicables. Aucun droit de gestion des contacts n’est ajouté pour rembourser un avoir déjà validé : l’identité du client provient de l’instantané de la pièce.
+La consultation exige **Ventes** et **Comptabilité** en lecture. La saisie exige la gestion des ventes et la validation des écritures; l’annulation exige aussi la contre-passation. Les permissions modulaires de l’entreprise restent applicables. Aucun droit de gestion des contacts n’est ajouté pour rembourser un avoir déjà validé : l’identité du client provient de l’instantané de la pièce. Si le module Taxes est désactivé, la fiche de l’avoir conserve les montants de taxes avec un libellé générique; les paramètres fiscaux restent masqués.
 
 ![Remboursement en anglais et thème sombre](images/remboursement-detail-en-dark-desktop.png)
 

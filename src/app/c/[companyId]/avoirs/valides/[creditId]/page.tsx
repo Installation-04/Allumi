@@ -33,7 +33,7 @@ export default async function Page({ params }: { params: Promise<{ companyId: st
     <p>{t("date")}: {credit.issueDate.toISOString().slice(0, 10)} · {s("postingDate")}: {credit.postingDate.toISOString().slice(0, 10)}</p>
     <p className="whitespace-pre-wrap break-words">{t("reason")}: {credit.memo}</p>
     <ul className="space-y-3">{credit.lines.map(l => <li key={l.id} className="rounded border bg-white p-4 dark:bg-stone-900"><h2 className="font-semibold break-words">{l.description}</h2><p>{formatMoney(l.amountCents, locale)}</p></li>)}</ul>
-    <div className="space-y-2 rounded border p-4"><p>{s("subtotal")}: {formatMoney(credit.subtotalCents, locale)}</p>{credit.taxes.map(tax => <p key={tax.id}>{tax.tax.code}: {formatMoney(tax.amountCents, locale)}</p>)}<p className="text-xl font-semibold">{s("total")}: {formatMoney(credit.totalCents, locale)}</p></div>
+    <div className="space-y-2 rounded border p-4"><p>{s("subtotal")}: {formatMoney(credit.subtotalCents, locale)}</p>{credit.taxes.map(tax => <p key={tax.id}>{tax.tax?.code || t("taxLine")}: {formatMoney(tax.amountCents, locale)}</p>)}<p className="text-xl font-semibold">{s("total")}: {formatMoney(credit.totalCents, locale)}</p></div>
     <section className="space-y-3 rounded border p-4"><h2 className="font-semibold">{t("applications")}</h2>{credit.creditsApplied.map(a => <div key={a.id}>
       <Link className="inline-flex min-h-11 items-center underline" href={`/c/${company.id}/factures/validees/${a.invoiceId}`}>{a.invoice.number}</Link>
       <p>{a.appliedDate.toISOString().slice(0, 10)} · {formatMoney(a.amountCents, locale)}</p>

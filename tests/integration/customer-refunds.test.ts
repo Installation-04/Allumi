@@ -251,9 +251,17 @@ it("serializes duplicate forms and refuses wrong accounts, dates, balances and c
   ).not.toContain(W.undeposited);
   await db.query(
     "UPDATE membership SET module_access=$3::jsonb WHERE company_id=$1 AND user_id=$2",
-    [W.companyA, W.userAccountant, JSON.stringify({ contacts: "none" })],
+    [
+      W.companyA,
+      W.userAccountant,
+      JSON.stringify({ contacts: "none", taxes: "none" }),
+    ],
   );
   const accountant = { ...actor, userId: W.userAccountant };
+  const restrictedCredit = (await getPostedCredit(accountant, id))!;
+  expect(restrictedCredit.taxes).toHaveLength(2);
+  expect(restrictedCredit.taxes[0]?.tax?.code).toBeUndefined();
+  expect(restrictedCredit.totalCents).toBe(11498n);
   expect((await getCustomerRefund(accountant, result.value.id))!.customer).toBe(
     "Client Fictif",
   );
