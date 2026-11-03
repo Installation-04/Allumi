@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.41] - 2026-11-03
+
 - Fiche d’avoir consultable avec le module Taxes désactivé : montants conservés et libellé générique pour les références fiscales masquées, sans droit supplémentaire.
 
 - Avoir disponible sur facture déjà payée, remboursements clients partiels ou complets et annulation comptabilisée avec libération du disponible; permissions modulaires, vérification du solde revu et historique conservé.
