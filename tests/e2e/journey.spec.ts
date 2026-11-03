@@ -1546,8 +1546,11 @@ async function bankMatchingJourney(page: Page) {
   await page.getByRole("button", { name: "Activer : Frais bancaires récurrents", exact: true }).click();
   await expect(page.getByText(/1 correspondance\(s\) parmi/)).toBeVisible();
   await page.getByLabel("Priorité (0 à 10 000)", { exact: true }).fill("20");
+  await page.getByLabel("Compte bancaire", { exact: true }).selectOption("");
   await page.getByRole("button", { name: "Enregistrer la règle", exact: true }).click();
-  await expect(page.getByLabel("Priorité (0 à 10 000)", { exact: true })).toHaveValue("20");
+  await expect(page.getByText(/^Active · 20 · 6010/)).toBeVisible();
+  await expect(page.getByLabel("Compte bancaire", { exact: true })).toHaveValue("");
+  await expect(page.getByText(/1 correspondance\(s\) parmi/)).toBeVisible();
   await page.getByRole("button", { name: "English", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Bank rules", exact: true })).toBeVisible();
   await expect(page.getByLabel("Minimum CAD amount (optional)", { exact: true })).toHaveValue("10.00");

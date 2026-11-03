@@ -4,8 +4,6 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
-## [0.4.0-alpha.38] - 2026-11-02
-
 - Règles bancaires par entreprise : création depuis une opération, conditions littérales et montants exacts, priorité, modification et pause, aperçu borné, suggestions FR/EN et confirmation explicite. Application atomique avec contrôle de révision, comptes actifs, permissions modulaires, audit et protection des doubles confirmations; aucun calcul de taxe ni paiement de facture automatique.
 
 ## [0.4.0-alpha.37] - 2026-11-02

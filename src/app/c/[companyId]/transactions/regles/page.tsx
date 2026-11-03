@@ -55,7 +55,7 @@ export default async function RulesPage({ params, searchParams }: { params: Prom
           <SelectField name="field" label={t("field")} defaultValue={selected?.field ?? (from?.payee ? "PAYEE" : "DESCRIPTION")} options={[{ value: "DESCRIPTION", label: t("description") }, { value: "PAYEE", label: t("payee") }]} />
           <Field name="text" label={t("text")} defaultValue={selected?.text ?? (from?.payee || from?.description)?.slice(0,200)} hint={t("textHint")} />
           <SelectField name="direction" label={t("direction")} defaultValue={selected?.direction ?? (from && from.amountCents > 0n ? "IN" : "OUT")} options={(["ANY", "IN", "OUT"] as const).map(value => ({ value, label: t(value) }))} />
-          <SelectField name="sourceAccountId" label={t("source")} defaultValue={selected ? selected.sourceAccountId ?? "" : from?.accountId ?? ""} options={[{ value: "", label: t("allBanks") }, ...bankOptions]} />
+          <SelectField name="sourceAccountId" required={false} label={t("source")} defaultValue={selected ? selected.sourceAccountId ?? "" : from?.accountId ?? ""} options={[{ value: "", label: t("allBanks") }, ...bankOptions]} />
           <SelectField name="targetAccountId" label={t("target")} defaultValue={selected?.targetAccountId ?? ""} options={[{ value: "", label: t("chooseCategory") }, ...targets.map(a => ({ value: a.id, label: `${a.code} · ${accountName(a, locale)}` }))]} />
           <Field name="min" label={t("min")} defaultValue={moneyInput(selected?.minCents)} required={false} inputMode="decimal" />
           <Field name="max" label={t("max")} defaultValue={moneyInput(selected?.maxCents)} required={false} inputMode="decimal" />
