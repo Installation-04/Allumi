@@ -14,6 +14,8 @@ import { withCompany, type CompanyContext, type Tx } from "@/platform/tenant";
 import { acceptsRefunds, refundSchema } from "../domain/refund";
 import { receiptVoidSchema } from "../domain/receipt";
 
+import { paymentHistoryWhere } from "./history";
+
 export const CUSTOMER_REFUNDS_PER_PAGE = 25;
 
 const iso = (date: Date) => date.toISOString().slice(0, 10);
@@ -321,15 +323,12 @@ export async function listCreditRefunds(
 export async function listCustomerRefunds(
   actor: CompanyContext,
   requestedPage = 1,
+  filters: unknown = {},
 ) {
   return withCompany(actor, async (tx) => {
     await requireRole(tx, "sales.read");
     await requireRole(tx, "ledger.read");
-    const where = {
-      companyId: actor.companyId,
-      direction: "SENT",
-      ledger: "RECEIVABLE",
-    } as const;
+    const where = paymentHistoryWhere(actor.companyId, "SENT", filters);
     const total = await tx.payment.count({ where });
     const pageCount = Math.max(1, Math.ceil(total / CUSTOMER_REFUNDS_PER_PAGE));
     const page = Math.min(

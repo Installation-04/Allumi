@@ -6,6 +6,8 @@ import { AppError, toAppError } from "@/platform/errors";
 import { withCompany, type CompanyContext, type Tx } from "@/platform/tenant";
 import { acceptsReceipts, receiptSchema, receiptVoidSchema } from "../domain/receipt";
 
+import { paymentHistoryWhere, receiptCustomerNames } from "./history";
+
 export const RECEIPTS_PER_PAGE = 25;
 
 const iso = (date: Date) => date.toISOString().slice(0, 10);
@@ -143,10 +145,11 @@ export async function listInvoicePayments(actor: CompanyContext, invoiceId: stri
   });
 }
 
-export async function listReceipts(actor: CompanyContext, requestedPage = 1) {
+export async function listReceipts(actor: CompanyContext, requestedPage = 1, filters: unknown = {}) {
   return withCompany(actor, async (tx) => {
     await requireRole(tx, "sales.read");
-    const where = { companyId: actor.companyId, direction: "RECEIVED", ledger: "RECEIVABLE" } as const;
+    await requireRole(tx, "ledger.read");
+    const where = paymentHistoryWhere(actor.companyId, "RECEIVED", filters);
     const total = await tx.payment.count({ where });
     const pageCount = Math.max(1, Math.ceil(total / RECEIPTS_PER_PAGE));
     const page = Math.min(Math.max(1, Math.trunc(requestedPage) || 1), pageCount);
@@ -154,16 +157,17 @@ export async function listReceipts(actor: CompanyContext, requestedPage = 1) {
       where,
       select: {
         id: true, number: true, paymentDate: true, amountCents: true, status: true, method: true, reference: true,
-        contact: { select: { displayName: true } },
-        allocations: { select: { salesDocument: { select: { id: true, number: true } } }, orderBy: { id: "asc" } },
+        contactId: true,
+        allocations: { select: { salesDocument: { select: { id: true, number: true, billingSnapshot: true } } }, orderBy: { id: "asc" } },
       },
       orderBy: [{ paymentDate: "desc" }, { createdAt: "desc" }, { id: "desc" }],
       skip: (page - 1) * RECEIPTS_PER_PAGE,
       take: RECEIPTS_PER_PAGE,
     });
+    const customers = await receiptCustomerNames(tx, actor.companyId, rows);
     const receipts = rows.map((row) => ({
       id: row.id, number: row.number ?? "", date: iso(row.paymentDate), amountCents: row.amountCents, status: row.status, method: row.method, reference: row.reference,
-      customer: row.contact.displayName,
+      customer: customers.get(row.id) ?? "",
       invoices: [...new Map(row.allocations.flatMap((a) => (a.salesDocument ? [[a.salesDocument.id, a.salesDocument.number ?? ""] as const] : []))).entries()].map(([invoiceId, number]) => ({ id: invoiceId, number })),
     }));
     return { receipts, total, page, pageCount };
@@ -173,20 +177,21 @@ export async function listReceipts(actor: CompanyContext, requestedPage = 1) {
 export async function getReceipt(actor: CompanyContext, id: string) {
   return withCompany(actor, async (tx) => {
     await requireRole(tx, "sales.read");
+    await requireRole(tx, "ledger.read");
     const row = await tx.payment.findFirst({
       where: { companyId: actor.companyId, id, direction: "RECEIVED", ledger: "RECEIVABLE" },
       include: {
-        contact: { select: { displayName: true } },
         account: { select: { code: true, nameFr: true, nameEn: true } },
         voidEntry: { select: { entryDate: true } },
         depositItems: { select: { deposit: { select: { id: true, number: true, status: true, depositDate: true } } }, orderBy: [{ deposit: { status: "asc" } }, { deposit: { depositDate: "desc" } }, { depositId: "desc" }], take: 100 },
-        allocations: { orderBy: [{ appliedDate: "asc" }, { id: "asc" }], select: { id: true, amountCents: true, appliedDate: true, unappliedDate: true, salesDocument: { select: { id: true, number: true } } } },
+        allocations: { orderBy: [{ appliedDate: "asc" }, { id: "asc" }], select: { id: true, amountCents: true, appliedDate: true, unappliedDate: true, salesDocument: { select: { id: true, number: true, billingSnapshot: true } } } },
       },
     });
     if (!row) return null;
+    const customers = await receiptCustomerNames(tx, actor.companyId, [row]);
     return {
       id: row.id, number: row.number ?? "", date: iso(row.paymentDate), amountCents: row.amountCents, status: row.status, method: row.method,
-      reference: row.reference, memo: row.memo, customer: row.contact.displayName, contactId: row.contactId, account: row.account,
+      reference: row.reference, memo: row.memo, customer: customers.get(row.id) ?? "", contactId: row.contactId, account: row.account,
       journalEntryId: row.journalEntryId, voidEntryId: row.voidEntryId, voidDate: row.voidEntry ? iso(row.voidEntry.entryDate) : null, voidReason: row.voidReason,
       deposits: row.depositItems.map(item => ({ ...item.deposit, number: item.deposit.number ?? "", date: iso(item.deposit.depositDate) })),
       allocations: row.allocations.map((a) => ({
