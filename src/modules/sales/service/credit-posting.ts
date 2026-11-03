@@ -6,11 +6,12 @@ import { withCompany, type CompanyContext } from "@/platform/tenant";
 import { creditFitsInvoice } from "../domain/credit";
 import type { Prisma } from "@/platform/db";
 
-/** Post and fully apply to the source invoice in one transaction; retries do not allocate new numbers. */
-export async function postCreditNote(actor: CompanyContext, id: string, revision: string, postingDate: string) {
-  if (!revision || !isValidIsoDate(postingDate)) throw new AppError("sales.invalidCredit");
+/** Post an exact source-linked credit; optionally retain it for a later customer refund. */
+export async function postCreditNote(actor: CompanyContext, id: string, revision: string, postingDate: string, options: { applicationMode?: "SOURCE_INVOICE" | "UNAPPLIED" } = {}) {
+  if (!revision || !isValidIsoDate(postingDate) || (options.applicationMode !== undefined && !["SOURCE_INVOICE", "UNAPPLIED"].includes(options.applicationMode))) throw new AppError("sales.invalidCredit");
   try { return await withCompany(actor, async tx => {
     await requireRole(tx, "sales.manage");
+    await requireRole(tx, "entry.post");
     const reference = await tx.salesDocument.findFirst({ where: { companyId: actor.companyId, id, kind: "CREDIT_NOTE" }, select: { creditedDocumentId: true } });
     if (!reference?.creditedDocumentId) throw new AppError("sales.creditSource");
     await tx.$queryRaw`SELECT id FROM sales_document WHERE company_id=${actor.companyId}::uuid AND id=${reference.creditedDocumentId}::uuid FOR UPDATE`;
@@ -23,7 +24,7 @@ export async function postCreditNote(actor: CompanyContext, id: string, revision
     const previous = await tx.salesDocument.findMany({ where: { companyId: actor.companyId, creditedDocumentId: invoice.id, status: "POSTED" }, include: { lines: true, taxes: true } });
     if (!creditFitsInvoice(invoice, draft, previous)) throw new AppError("sales.creditLimit");
     const open = await tx.$queryRaw<{ amount: bigint }[]>`SELECT sales_document_open_cents(${actor.companyId}::uuid,${invoice.id}::uuid) AS amount`;
-    if (!open[0] || open[0].amount < draft.totalCents) throw new AppError("sales.creditBalance");
+    if (options.applicationMode !== "UNAPPLIED" && (!open[0] || open[0].amount < draft.totalCents)) throw new AppError("sales.creditBalance");
     await tx.$queryRaw`SELECT id FROM tax WHERE company_id=${actor.companyId}::uuid ORDER BY id FOR SHARE`;
     const exact = await tx.$queryRaw<{ valid: boolean }[]>`SELECT sales_document_taxes_are_exact(d) AS valid FROM sales_document d WHERE company_id=${actor.companyId}::uuid AND id=${id}::uuid`;
     if (!exact[0]?.valid) throw new AppError("sales.rate");
@@ -39,7 +40,7 @@ export async function postCreditNote(actor: CompanyContext, id: string, revision
     ];
     const entry = await createInvoiceEntry(tx, actor, { documentId: id, date: postingDate, memo: number, lines });
     await tx.salesDocument.update({ where: { companyId: actor.companyId, id }, data: { status:"POSTED",number,postingDate:new Date(`${postingDate}T00:00:00Z`),journalEntryId:entry.id,postedAt:new Date(),postedById:actor.userId,issuerSnapshot:invoice.issuerSnapshot as Prisma.InputJsonObject,billingSnapshot:invoice.billingSnapshot as Prisma.InputJsonObject } });
-    await tx.salesCreditApplication.create({ data: { companyId:actor.companyId,creditNoteId:id,invoiceId:invoice.id,amountCents:draft.totalCents,appliedDate:new Date(`${postingDate}T00:00:00Z`),createdById:actor.userId } });
+    if (options.applicationMode !== "UNAPPLIED") await tx.salesCreditApplication.create({ data: { companyId:actor.companyId,creditNoteId:id,invoiceId:invoice.id,amountCents:draft.totalCents,appliedDate:new Date(`${postingDate}T00:00:00Z`),createdById:actor.userId } });
     await tx.$executeRaw`SET CONSTRAINTS ALL IMMEDIATE`;
     return id;
   }); } catch(error) { throw toAppError(error); }
@@ -61,5 +62,14 @@ export async function getInvoiceOpenCents(actor: CompanyContext, id: string) {
     await requireRole(tx,"sales.read");
     const rows=await tx.$queryRaw<{amount:bigint}[]>`SELECT sales_document_open_cents(company_id,id) AS amount FROM sales_document WHERE company_id=${actor.companyId}::uuid AND id=${id}::uuid AND kind='INVOICE'`;
     return rows[0]?.amount ?? null;
+  });
+}
+
+/** Only posted customer credits have a refundable open balance. */
+export async function getCreditOpenCents(actor: CompanyContext, id: string): Promise<bigint> {
+  return withCompany(actor, async tx => {
+    await requireRole(tx, "sales.read");
+    const rows = await tx.$queryRaw<{amount: bigint}[]>`SELECT sales_document_open_cents(company_id,id) AS amount FROM sales_document WHERE company_id=${actor.companyId}::uuid AND id=${id}::uuid AND kind='CREDIT_NOTE' AND status='POSTED'`;
+    return rows[0]?.amount ?? 0n;
   });
 }

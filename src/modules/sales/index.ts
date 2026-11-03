@@ -2,6 +2,6 @@ export { getDraftOptions, listDrafts, getDraft, saveDraft, deleteDraft } from ".
 export { postInvoice, listInvoices, getInvoice } from "./service/posting";
 export { voidInvoice } from "./service/voiding";
 export { listCreditDrafts, getCreditDraft, saveCreditDraft, deleteCreditDraft, creditAmount } from "./service/credit-drafts";
-export { postCreditNote, getPostedCredit, listPostedCredits, getInvoiceOpenCents } from "./service/credit-posting";
+export { postCreditNote, getPostedCredit, listPostedCredits, getInvoiceOpenCents, getCreditOpenCents } from "./service/credit-posting";
 export { voidCreditNote } from "./service/credit-voiding";
 export { getInvoiceEmails, sendInvoiceEmail } from "./service/email";
