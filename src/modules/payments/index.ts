@@ -4,3 +4,5 @@ export { RECEIPTS_PER_PAGE, getReceipt, listInvoicePayments, listReceiptAccounts
 export { recordDisbursement, voidDisbursement, getDisbursement, listDisbursements, listDisbursementAccounts, listBillPayments, DISBURSEMENTS_PER_PAGE } from "./service/disbursements";
 
 export { acceptsDisbursements } from "./domain/disbursement";
+export { listDepositAccounts, listPendingDepositReceipts, recordDeposit, listDeposits, getDeposit, voidDeposit, DEPOSITS_PER_PAGE, PENDING_DEPOSITS_PER_PAGE } from "./service/deposits";
+export { MAX_DEPOSIT_ITEMS } from "./domain/deposit";

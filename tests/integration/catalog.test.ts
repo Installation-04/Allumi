@@ -212,3 +212,10 @@ it("protects bank rule identity, revisions and audit history in the database", a
  expect(columns.map(c=>c.column_name).filter(c=>['id','company_id','revision','created_at'].includes(c))).toEqual([]);
  expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='bank_rule_guard' AND NOT tgisinternal")).toHaveLength(1);
 });
+
+it("keeps grouped deposits immutable and guards exact postings and bank links",async()=>{
+ const columns=await q<{column_name:string}>("SELECT column_name FROM information_schema.column_privileges WHERE grantee='allumi_app' AND table_name='bank_deposit' AND privilege_type='UPDATE'");
+ expect(columns.map(c=>c.column_name).sort()).toEqual(['status','updated_at','void_entry_id','void_reason','voided_at','voided_by_id']);
+ const rows=await q<{tgname:string}>("SELECT tgname FROM pg_trigger WHERE tgname IN ('deposit_posting_exact','deposit_items_exact','deposit_bank_link','deposit_reconciled_link') AND NOT tgisinternal");
+ expect(rows).toHaveLength(4);
+});
