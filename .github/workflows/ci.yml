@@ -83,9 +83,32 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - name: Parcours dans un navigateur (serveur autonome, base neuve)
+        id: desktop
         run: npm run test:e2e
+      - name: Conserver les diagnostics du parcours ordinateur
+        if: always() && steps.desktop.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: navigateur-ordinateur
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Parcours mobile tactile (base neuve)
+        id: mobile
         run: E2E_MOBILE=1 npm run test:e2e
+
+      - name: Conserver les diagnostics du parcours mobile
+        if: always() && steps.mobile.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: navigateur-mobile
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7
 
   docker:
     name: docker (${{ matrix.arch }})
