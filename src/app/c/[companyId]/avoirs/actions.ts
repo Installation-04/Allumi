@@ -27,12 +27,12 @@ export async function deleteCreditAction(companyId: string, id: string, revision
   });
 }
 export async function postCreditAction(companyId: string, id: string, revision: string, _previous: FormState, form: FormData): Promise<FormState> {
-  const values=textValues(form,["postingDate"]);
+  const values=textValues(form,["postingDate","applicationMode"]);
   return safeAction(async()=>{
     if(form.get("confirm")!=="yes") throw new AppError("sales.confirmCreditPost");
     const session=await requireSession();
     const {postCreditNote}=await import("@/modules/sales");
-    await postCreditNote({userId:session.userId,companyId},id,revision,values.postingDate??"");
+    await postCreditNote({userId:session.userId,companyId},id,revision,values.postingDate??"", {applicationMode: values.applicationMode === "UNAPPLIED" ? "UNAPPLIED" : "SOURCE_INVOICE"});
     revalidatePath(`/c/${companyId}`,"layout");
     redirect(`/c/${companyId}/avoirs/valides/${id}`);
   },values);

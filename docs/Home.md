@@ -2,7 +2,7 @@
 
 Allumi est un logiciel de comptabilité **open source** (MIT) et **auto-hébergeable** pour les PME et travailleurs autonomes du Québec et du Canada. Français par défaut, anglais disponible.
 
-> **État : pré-alpha.** L'infrastructure, le squelette de l'application (premier démarrage, connexion, 2FA, FR/EN), le moteur comptable (plan comptable, journal, périodes, audit) et la documentation sont prêts; les contacts, le module taxes/catalogue et la préparation et la validation des factures sont disponibles, de même que les avoirs, les encaissements de factures et l'import des transactions Stripe et PayPal; les remboursements, les dépôts et les paiements fournisseurs arrivent ensuite. Ne l'utilise pas pour de la comptabilité réelle avant une version stable.
+> **État : pré-alpha.** Comptabilité à partie double, factures et avoirs clients, encaissements et remboursements, achats et paiements fournisseurs, dépôts groupés, imports et rapprochements bancaires, rapports datés, rôles modulaires et administration serveur sont disponibles. Interface FR/EN, mobile, claire et sombre. Préversion réservée aux données fictives avant une version stable.
 
 ## Pour installer et exploiter
 - [[Proxmox]] — tester dans une VM Ubuntu dédiée
@@ -58,3 +58,6 @@ Taxes et produits/services : [[Taxes-et-catalogue]].
 - [[Regles-bancaires]] — conditions, aperçu, suggestions et confirmation explicite.
 
 - [[Depots-bancaires]] — encaissements en attente, dépôt groupé et annulation contrôlée.
+
+- [[Avoirs-disponibles-et-remboursements]] — avoir sur facture payée, remboursement comptabilisé et annulation.
+- [[Releve-de-compte-client]] — mouvements datés, CSV et impression complète.

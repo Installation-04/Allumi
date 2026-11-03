@@ -110,3 +110,10 @@ Dans **Rapports → Grand livre**, choisis le compte et le contact puis **Affich
 Dans **Trésorerie → Suivi de trésorerie**, sélectionne la période et le compte ou tous les comptes BANK/CASH. Consulte les soldes, entrées/sorties et virements purs, puis le détail et le CSV. Voir [[Suivi-de-tresorerie]] pour le périmètre et les écritures mixtes.
 
 Pour les catégories récurrentes, ouvrir **Transactions bancaires → Règles bancaires**. Les suggestions exigent une confirmation par opération; voir [[Regles-bancaires]].
+
+
+## Avoirs disponibles et compte client
+
+Sur une facture réglée, préparer un avoir puis choisir **Conserver disponible pour remboursement** lors de sa validation. L’avoir validé propose **Enregistrer un remboursement**, avec confirmation du compte, de la date et du montant déjà remboursé séparément. Allumi ne transmet pas d’argent. Voir [[Avoirs-disponibles-et-remboursements]].
+
+Dans **Rapports → Relevés clients**, sélectionner le client et la période. Les mouvements réglés restent visibles; les soldes suivent les dates des écritures et contre-passations. Le CSV et la vue imprimable complète excluent les notes internes. Voir [[Releve-de-compte-client]].

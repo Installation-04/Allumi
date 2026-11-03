@@ -13,6 +13,8 @@ export const ROUTE_ACCESS: Record<string, readonly Action[]> = {
   achats: ["ledger.read"],
   factures: ["sales.read"],
   avoirs: ["sales.read"],
+  remboursements: ["sales.read", "ledger.read"],
+  "releves-clients": ["sales.read", "ledger.read", "contact.read"],
   encaissements: ["sales.read"],
   catalogue: ["catalog.read"],
   comptes: ["ledger.read"],

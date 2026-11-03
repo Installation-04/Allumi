@@ -219,3 +219,10 @@ it("keeps grouped deposits immutable and guards exact postings and bank links",a
  const rows=await q<{tgname:string}>("SELECT tgname FROM pg_trigger WHERE tgname IN ('deposit_posting_exact','deposit_items_exact','deposit_bank_link','deposit_reconciled_link') AND NOT tgisinternal");
  expect(rows).toHaveLength(4);
 });
+
+it("requires current snapshots for payment cancellations", async () => {
+  const [row] = await q<{ definition: string }>("SELECT pg_get_functiondef('payment_guard()'::regprocedure) AS definition");
+  expect(row?.definition).toContain("payment cancellation requires read committed isolation");
+  expect(row?.definition).toContain("payment_open_cents");
+  expect(row?.definition).toContain("bank_deposit_item");
+});

@@ -363,3 +363,18 @@ Un virement pur fictif de 40,00 $ reste séparé des entrées/sorties : [[Suivi-
 - [[Regles-bancaires]] — conditions, aperçu, suggestions et confirmation explicite.
 
 - [[Depots-bancaires]] — encaissements en attente, dépôt groupé et annulation contrôlée.
+
+
+## Avoir disponible, remboursement et relevé client
+
+Voir [[Avoirs-disponibles-et-remboursements]] et [[Releve-de-compte-client]]. Ces captures utilisent exclusivement l’entreprise fictive du parcours navigateur.
+
+![Traitement de l’avoir](images/avoir-disponible-formulaire-desktop.png)
+
+![Remboursement client](images/remboursement-detail-desktop.png)
+
+![Relevé client anglais sombre](images/releve-client-en-dark-desktop.png)
+
+![Remboursement mobile](images/remboursement-detail-mobile.png)
+
+![Relevé client mobile](images/releve-client-mobile.png)

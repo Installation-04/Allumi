@@ -4,6 +4,15 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.41] - 2026-11-03
+
+- Fiche d’avoir consultable avec le module Taxes désactivé : montants conservés et libellé générique pour les références fiscales masquées, sans droit supplémentaire.
+
+- Avoir disponible sur facture déjà payée, remboursements clients partiels ou complets et annulation comptabilisée avec libération du disponible; permissions modulaires, vérification du solde revu et historique conservé.
+- Relevé de compte client daté : recherche bornée, soldes et mouvements dans un même instantané, pagination, CSV et impression complète sans notes internes; écrans FR/EN, mobile et sombre, guides illustrés.
+- Annulation d’encaissement protégée contre un ancien instantané après dépôt concurrent : READ COMMITTED imposé par le trigger PostgreSQL, avec reproduction déterministe sur deux connexions.
+- Diagnostics navigateur CI conservés séparément pour ordinateur/mobile et étapes métier nommées et actions bornées à 30 s; délai global de 300 s et assertions conservés.
+
 ## [0.4.0-alpha.40] - 2026-11-03
 
 - Dépôts bancaires groupés des encaissements en fonds non déposés : sélection et total exact, références, historique, annulation par contre-passation, navigation et écrans FR/EN adaptatifs. Contrôles en base des écritures exactes, doubles dépôts, dates de libération, permissions et courses entre appariement/pointage et annulation.

@@ -16,6 +16,8 @@ export default defineConfig({
   use: {
     baseURL: `http://127.0.0.1:${PORT}`,
     trace: "retain-on-failure",
+    // Fail a missing control or stalled download promptly; the complete journey keeps its 300 s limit.
+    actionTimeout: 30_000,
     locale: "fr-CA",
     launchOptions: {
       // Locally and in cloud sessions Chromium is preinstalled; elsewhere Playwright downloads its own.
