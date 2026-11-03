@@ -108,3 +108,5 @@ Dans **Rapports → Grand livre**, choisis le compte et le contact puis **Affich
 ## Suivre les comptes de trésorerie
 
 Dans **Trésorerie → Suivi de trésorerie**, sélectionne la période et le compte ou tous les comptes BANK/CASH. Consulte les soldes, entrées/sorties et virements purs, puis le détail et le CSV. Voir [[Suivi-de-tresorerie]] pour le périmètre et les écritures mixtes.
+
+Pour les catégories récurrentes, ouvrir **Transactions bancaires → Règles bancaires**. Les suggestions exigent une confirmation par opération; voir [[Regles-bancaires]].

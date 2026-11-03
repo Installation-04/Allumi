@@ -444,6 +444,7 @@ model Company {
   taxCodes               TaxCode[]
   salesDocuments         SalesDocument[]
   invoiceEmails          InvoiceEmail[]
+  bankRules              BankRule[]
   purchaseDocuments      PurchaseDocument[]
   payments               Payment[]
   bankDeposits           BankDeposit[]
@@ -585,6 +586,8 @@ model Account {
   bankProfile            BankAccountProfile?
   bankImports            BankImport[]
   bankTransactions       BankTransaction[]
+  sourceBankRules        BankRule[] @relation("RuleSource")
+  targetBankRules        BankRule[] @relation("RuleTarget")
   integrationConnections IntegrationConnection[] @relation("ConnectionAccount")
   feeConnections         IntegrationConnection[] @relation("ConnectionFeeAccount")
   reconciliations        BankReconciliation[]
@@ -1645,4 +1648,28 @@ model AuditLog {
   @@index([actorUserId, occurredAt])
   @@index([subjectUserId, occurredAt])
   @@map("audit_log")
+}
+
+/// Règles suggérées seulement : chaque écriture demande une validation explicite.
+model BankRule {
+  id String @id @default(uuid(7)) @db.Uuid
+  companyId String @map("company_id") @db.Uuid
+  name String
+  enabled Boolean @default(true)
+  priority Int @default(100)
+  field String
+  text String
+  direction String
+  sourceAccountId String? @map("source_account_id") @db.Uuid
+  targetAccountId String @map("target_account_id") @db.Uuid
+  minCents BigInt? @map("min_cents")
+  maxCents BigInt? @map("max_cents")
+  revision Int @default(1)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  company Company @relation(fields:[companyId],references:[id],onDelete:Restrict)
+  sourceAccount Account? @relation("RuleSource",fields:[companyId,sourceAccountId],references:[companyId,id],onDelete:Restrict)
+  targetAccount Account @relation("RuleTarget",fields:[companyId,targetAccountId],references:[companyId,id],onDelete:Restrict)
+  @@index([companyId,enabled,priority,id])
+  @@map("bank_rule")
 }

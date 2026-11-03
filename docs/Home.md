@@ -54,3 +54,5 @@ Taxes et produits/services : [[Taxes-et-catalogue]].
 
 - [[Utilisateurs-et-permissions]]
 - [[Administration-serveur]]
+
+- [[Regles-bancaires]] — conditions, aperçu, suggestions et confirmation explicite.

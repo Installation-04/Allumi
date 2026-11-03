@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Règles bancaires par entreprise : création depuis une opération, conditions littérales et montants exacts, priorité, modification et pause, aperçu borné, suggestions FR/EN et confirmation explicite. Application atomique avec contrôle de révision, comptes actifs, permissions modulaires, audit et protection des doubles confirmations; aucun calcul de taxe ni paiement de facture automatique.
+
 ## [0.4.0-alpha.37] - 2026-11-02
 
 - Sélection de compte du grand livre et de ses CSV refusée lorsqu’elle est invalide, inconnue, étrangère ou répétée, sans repli involontaire vers tous les comptes; validation partagée avec le suivi de trésorerie.

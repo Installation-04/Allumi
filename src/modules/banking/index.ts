@@ -13,3 +13,6 @@ export {
   clearMatchedLines, completeReconciliation, discardReconciliation, getWorksheet, listAccountReconciliations, listReconciliations, reopenReconciliation, saveCleared, startReconciliation,
   type AccountReconciliation, type ReconciliationDto, type ReconciliationStatus, type Worksheet, type WorksheetLine,
 } from "./service/reconciliation";
+
+export { listBankRules, saveBankRule, setBankRuleEnabled, previewBankRule, suggestedBankRules, applyBankRule, MAX_BANK_RULES, RULE_PREVIEW_LIMIT } from "./service/rules";
+export type { BankRuleInput } from "./domain/rules";

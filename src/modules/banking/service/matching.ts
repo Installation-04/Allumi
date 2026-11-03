@@ -200,25 +200,30 @@ export async function categorizeTransaction(actor: CompanyContext, transactionId
   if (!parsed.success) throw new AppError("banking.invalid");
   return failing(() =>
     withCompany(actor, async (tx) => {
-      await requireRole(tx, "bank.manage");
-      const txn = await lockOne(tx, actor.companyId, transactionId);
-      requireUnmatchedCad(txn);
-      if (parsed.data.accountId === txn.accountId) throw new AppError("banking.sameAccount");
-      if (await alreadyRecorded(tx, actor.companyId, txn.id)) throw new AppError("banking.alreadyRecorded");
-      const description = cleanText(txn.description, 200) || null;
-      const entry = await createBankEntry(tx, actor, {
-        transactionId: txn.id,
-        date: isoDay(txn.txnDate),
-        memo: memoOf(parsed.data.memo, txn.description),
-        lines: categorizeLines(txn.amountCents, txn.accountId, parsed.data.accountId, description),
-      });
-      const own = entry.lines.find((line) => line.accountId === txn.accountId);
-      if (!own) throw new AppError("banking.invalid");
-      await attach(tx, actor.companyId, txn.id, [own.id]);
-      await settle(tx);
-      return { entryId: entry.id, entryNumber: entry.number };
+      return categorizeWithin(tx, actor, transactionId, parsed.data);
     }),
   );
+}
+
+/** Internal transaction-aware posting shared by explicit rule confirmation. */
+export async function categorizeWithin(tx: Tx, actor: CompanyContext, transactionId: string, input: { accountId: string; memo?: string | null }) {
+  await requireRole(tx, "bank.manage");
+  const txn = await lockOne(tx, actor.companyId, transactionId);
+  requireUnmatchedCad(txn);
+  if (input.accountId === txn.accountId) throw new AppError("banking.sameAccount");
+  if (await alreadyRecorded(tx, actor.companyId, txn.id)) throw new AppError("banking.alreadyRecorded");
+  const description = cleanText(txn.description, 200) || null;
+  const entry = await createBankEntry(tx, actor, {
+    transactionId: txn.id,
+    date: isoDay(txn.txnDate),
+    memo: memoOf(input.memo, txn.description),
+    lines: categorizeLines(txn.amountCents, txn.accountId, input.accountId, description),
+  });
+  const own = entry.lines.find((line) => line.accountId === txn.accountId);
+  if (!own) throw new AppError("banking.invalid");
+  await attach(tx, actor.companyId, txn.id, [own.id]);
+  await settle(tx);
+  return { entryId: entry.id, entryNumber: entry.number };
 }
 
 /**

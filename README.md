@@ -382,3 +382,11 @@ Consultez les soldes et mouvements comptabilisés BANK/CASH, avec virements purs
 ![Suivi de trésorerie](docs/images/suivi-tresorerie-desktop.png)
 
 ![Suivi de trésorerie mobile](docs/images/suivi-tresorerie-mobile.png)
+
+### Règles bancaires
+
+Préparez les catégories des opérations récurrentes, vérifiez les correspondances et confirmez chaque écriture. Création depuis une opération, pause, priorités et montants exacts, avec permissions et audit ([guide illustré](docs/Regles-bancaires.md)).
+
+![Règles bancaires](docs/images/regles-bancaires-gestion-desktop.png)
+
+![Suggestion mobile](docs/images/regles-bancaires-suggestion-mobile.png)

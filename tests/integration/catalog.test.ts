@@ -204,3 +204,11 @@ it("preserves invoice email attempts and grants only outcome transitions",async(
  expect(columns.map(c=>c.column_name)).toEqual(["completed_at","status"]);
  expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='invoice_email_guard' AND NOT tgisinternal")).toHaveLength(1);
 });
+
+it("protects bank rule identity, revisions and audit history in the database", async()=>{
+ const [grants]=await q<{del:boolean;trunc:boolean}>("SELECT has_table_privilege('allumi_app','bank_rule','DELETE') AS del,has_table_privilege('allumi_app','bank_rule','TRUNCATE') AS trunc");
+ expect(grants).toEqual({del:false,trunc:false});
+ const columns=await q<{column_name:string}>("SELECT column_name FROM information_schema.column_privileges WHERE grantee='allumi_app' AND table_name='bank_rule' AND privilege_type='UPDATE'");
+ expect(columns.map(c=>c.column_name).filter(c=>['id','company_id','revision','created_at'].includes(c))).toEqual([]);
+ expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='bank_rule_guard' AND NOT tgisinternal")).toHaveLength(1);
+});
