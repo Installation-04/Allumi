@@ -390,3 +390,11 @@ Préparez les catégories des opérations récurrentes, vérifiez les correspond
 ![Règles bancaires](docs/images/regles-bancaires-gestion-desktop.png)
 
 ![Suggestion mobile](docs/images/regles-bancaires-suggestion-mobile.png)
+
+### Dépôts bancaires groupés
+
+Regroupez les encaissements des fonds non déposés vers la banque, vérifiez le total et conservez leur historique, avec annulation contrôlée et contre-passation ([guide illustré](docs/Depots-bancaires.md)).
+
+![Dépôt bancaire groupé](docs/images/depots-detail-desktop.png)
+
+![Préparation d’un dépôt sur mobile](docs/images/depots-formulaire-mobile.png)

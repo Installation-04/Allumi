@@ -2,7 +2,7 @@
 export const NAVIGATION_GROUPS = {
   depenses: ["achats", "depenses", "credits-fournisseurs", "decaissements"],
   ventes: ["factures", "avoirs", "encaissements", "contacts", "catalogue"],
-  banque: ["transactions", "rapprochement", "integrations"],
+  banque: ["transactions", "depots", "rapprochement", "integrations"],
   comptabilite: ["comptes", "journal", "balance", "exercices"],
   tresorerie: ["flux-tresorerie"],
   rapports: ["resultats", "bilan", "grand-livre", "age-clients", "age-fournisseurs", "sommaire-taxes"],

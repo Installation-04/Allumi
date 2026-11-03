@@ -19,6 +19,8 @@ export default async function PaymentPage({ params }: { params: Promise<{ compan
   const payment = await getReceipt(actor, paymentId);
   if (!payment) notFound();
   const t = await getTranslations("payments");
+  const td = await getTranslations("deposits");
+  const deposited = payment.deposits.some(d => d.status === "POSTED");
   const base = `/c/${company.id}`;
   const rows: [string, React.ReactNode][] = [
     [t("customer"), payment.customer],
@@ -53,13 +55,14 @@ export default async function PaymentPage({ params }: { params: Promise<{ compan
         </ul>
         <Link href={`${base}/journal/${payment.journalEntryId}`} className={`inline-flex min-h-11 items-center rounded underline ${FOCUS}`}>{t("journalEntry")}</Link>
       </section>
+      {can(company, "bank.read") && payment.deposits.length ? <section className="space-y-2 rounded border border-stone-300 p-4 dark:border-stone-700"><h2 className="font-semibold">{td("receiptDeposits")}</h2><ul>{payment.deposits.map(d => <li key={d.id}><Link className={`inline-flex min-h-11 items-center rounded underline ${FOCUS}`} href={`${base}/depots/${d.id}`}>{d.number} · {d.date} · {td(d.status === "POSTED" ? "posted" : "void")}</Link></li>)}</ul>{deposited ? <p className="text-sm">{td("receiptBlocked")}</p> : null}</section> : null}
       {payment.status === "VOID" ? (
         <div className="space-y-1 rounded border border-amber-600 p-4">
           <p>{t("voidedOn", { date: payment.voidDate ?? "" })}</p>
           <p className="whitespace-pre-wrap">{t("voidedReason", { reason: payment.voidReason ?? "" })}</p>
           {payment.voidEntryId ? <Link href={`${base}/journal/${payment.voidEntryId}`} className={`inline-flex min-h-11 items-center rounded underline ${FOCUS}`}>{t("journalEntry")}</Link> : null}
         </div>
-      ) : can(company, "sales.manage") ? (
+      ) : can(company, "sales.manage") && !deposited ? (
         <details className="rounded border border-stone-300 p-4 dark:border-stone-700">
           <summary className="min-h-11 cursor-pointer">{t("voidTitle")}</summary>
           <div className="mt-3">

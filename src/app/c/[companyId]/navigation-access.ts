@@ -24,6 +24,7 @@ export const ROUTE_ACCESS: Record<string, readonly Action[]> = {
   audit: ["audit.read"],
   integrations: ["integration.manage"],
   transactions: ["bank.read"],
+  depots: ["bank.read"],
   rapprochement: ["bank.read"],
   resultats: ["ledger.read"],
   bilan: ["ledger.read"],

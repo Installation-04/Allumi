@@ -274,6 +274,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await paidExpensesJourney(page);
   await taxSummaryJourney(page);
   await cashMovementsJourney(page);
+  await bankDepositsJourney(page);
   const settingsBase = new URL(page.url()).pathname.match(/^\/c\/[^/]+/)?.[0];
   expect(settingsBase).toBeTruthy();
   await page.getByRole("button", { name: "Français", exact: true }).click();
@@ -2498,4 +2499,78 @@ async function taxSummaryJourney(page:Page){
  await expect(page.locator("table").first().locator("tfoot td").nth(3)).toContainText(/0,00\s*\$/);
  await expect(page.getByText("8 lignes comptabilisées.",{exact:true})).toBeVisible();
  const entry=page.locator("table").nth(1).getByRole("link").first();await entry.click();await expect(page).toHaveURL(/\/journal\//);
+}
+
+
+/** Real receipts, grouped deposits and a reversal, after the reports so their independent fixtures remain stable. */
+async function bankDepositsJourney(page: Page) {
+ const company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0]??"";
+ const companyId=company.split("/")[2];const today=todayInToronto();
+ await page.getByRole("button",{name:"Français",exact:true}).click();
+ await expect(page.getByRole("heading",{name:"Suivi de trésorerie",exact:true})).toBeVisible();
+ const db=new pg.Client({connectionString:e2eUrls().owner});await db.connect();
+ let invoiceId:string;
+ try{const rows=(await db.query("SELECT id FROM sales_document WHERE company_id=$1 AND kind='INVOICE' AND status='POSTED' AND posting_date<=$2::date AND sales_document_open_cents(company_id,id)>3000 ORDER BY posting_date DESC,id LIMIT 1",[companyId,today])).rows;expect(rows.length).toBe(1);invoiceId=rows[0].id as string;}finally{await db.end();}
+ const receipts:{number:string;url:string}[]=[];
+ for(const [index,amount] of ["10,00","20,00"].entries()){
+  await page.goto(`${company}/factures/validees/${invoiceId}`);
+  await page.locator("summary",{hasText:"Enregistrer un encaissement"}).click();
+  await page.getByLabel("Montant reçu",{exact:true}).fill(amount);
+  await page.getByLabel("Date de réception",{exact:true}).fill(today);
+  await page.getByLabel("Compte de réception",{exact:true}).selectOption({label:"1050 · Fonds non déposés"});
+  await page.getByLabel("Mode de paiement",{exact:true}).selectOption("CHEQUE");
+  await page.getByLabel(/^Référence/).fill(`Lot dépôt test ${index+1}`);
+  await page.getByRole("button",{name:"Enregistrer l’encaissement",exact:true}).click();
+  const heading=page.getByRole("heading",{name:/^Encaissement E-\d{5}$/});await expect(heading).toBeVisible();
+  receipts.push({number:(await heading.innerText()).replace("Encaissement ",""),url:page.url()});
+ }
+ await page.goto(`${company}/depots`);
+ await expect(page.getByRole("heading",{name:"Dépôts bancaires",exact:true})).toBeVisible();
+ await page.getByRole("link",{name:"Préparer un dépôt",exact:true}).click();
+ await page.getByLabel("Rechercher un encaissement ou une référence",{exact:true}).fill("Lot dépôt test");
+ await page.getByRole("button",{name:"Rechercher",exact:true}).click();
+ for(const receipt of receipts)await page.getByRole("checkbox",{name:`Déposer ${receipt.number}`,exact:true}).check();
+ await page.getByLabel("Compte de destination",{exact:true}).selectOption({label:"1000 · Banque – compte courant"});
+ const account=await page.getByLabel("Compte de destination",{exact:true}).inputValue();
+ await page.getByLabel("Référence du bordereau (facultative)",{exact:true}).fill("Bordereau groupé de test");
+ await expect(page.getByRole("status").filter({hasText:"2 sélectionné(s)"})).toContainText("30,00");
+ await expectNoPageOverflow(page);await captureReference(page,"depots-formulaire","Encaissements à déposer");
+ await page.getByRole("button",{name:"English",exact:true}).click();
+ await expect(page.getByRole("heading",{name:"Prepare a deposit",exact:true})).toBeVisible();
+ for(const receipt of receipts)await expect(page.getByRole("checkbox",{name:`Deposit ${receipt.number}`,exact:true})).toBeChecked();
+ await expect(page.getByLabel("Destination account",{exact:true})).toHaveValue(account);
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");
+ await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
+ await expectNoPageOverflow(page);await captureReference(page,"depots-formulaire-en-dark","Payments to deposit");
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");
+ await expect(page.locator("html")).toHaveAttribute("data-theme","light");
+ await page.getByRole("button",{name:"Français",exact:true}).click();
+ await expect(page.getByRole("heading",{name:"Préparer un dépôt",exact:true})).toBeVisible();
+ await expect(page.getByLabel("Référence du bordereau (facultative)",{exact:true})).toHaveValue("Bordereau groupé de test");
+ await page.getByRole("checkbox",{name:"Je confirme les encaissements, le total, le compte et la date de ce dépôt comptable.",exact:true}).check();
+ await page.getByRole("button",{name:"Comptabiliser le dépôt",exact:true}).click();
+ const heading=page.getByRole("heading",{name:/^Dépôt DP-\d{5}$/});await expect(heading).toBeVisible();
+ const depositNumber=(await heading.innerText()).replace("Dépôt ","");const depositUrl=page.url();
+ await expect(page.getByText("Bordereau groupé de test",{exact:true})).toBeVisible();
+ for(const receipt of receipts)await expect(page.getByRole("link",{name:receipt.number,exact:true})).toBeVisible();
+ await expectNoPageOverflow(page);await captureReference(page,"depots-detail","Encaissements inclus");
+ await page.getByRole("link",{name:"Voir l’écriture du dépôt",exact:true}).click();
+ await expect(page.getByRole("heading",{name:/^Écriture J-/})).toBeVisible();
+ await expect(page.getByRole("cell",{name:/1050 – Fonds non déposés/})).toBeVisible();
+ await page.getByRole("link",{name:"Voir le dépôt d’origine",exact:true}).click();
+ await page.getByRole("link",{name:receipts[0]!.number,exact:true}).click();
+ await expect(page.getByText("Cet encaissement est dans un dépôt actif. Annulez d’abord le dépôt pour pouvoir annuler l’encaissement.",{exact:true})).toBeVisible();
+ await expect(page.locator("summary",{hasText:"Annuler cet encaissement"})).toHaveCount(0);
+ await page.goto(depositUrl);await page.locator("summary",{hasText:"Annuler ce dépôt"}).click();
+ await page.getByLabel("Date d’annulation du dépôt",{exact:true}).fill(today);
+ await page.getByLabel("Motif d’annulation du dépôt",{exact:true}).fill("Bordereau à refaire");
+ await page.getByRole("checkbox",{name:"Je confirme l’annulation du dépôt par contre-passation.",exact:true}).check();
+ await page.getByRole("button",{name:"Annuler le dépôt",exact:true}).click();
+ await expect(page.getByText(`Dépôt annulé le ${today}`,{exact:true})).toBeVisible();
+ await expect(page.getByText("Bordereau à refaire",{exact:true})).toBeVisible();
+ await expectNoPageOverflow(page);await captureReference(page,"depots-annule","Encaissements inclus");
+ await page.goto(receipts[0]!.url);await expect(page.locator("summary",{hasText:"Annuler cet encaissement"})).toBeVisible();
+ await page.goto(`${company}/depots/nouveau?q=Lot%20dépôt%20test`);
+ for(const receipt of receipts)await expect(page.getByRole("checkbox",{name:`Déposer ${receipt.number}`,exact:true})).toBeVisible();
+ await page.goto(`${company}/depots`);await expect(page.getByRole("link",{name:depositNumber,exact:true})).toBeVisible();
 }

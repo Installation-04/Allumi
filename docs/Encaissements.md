@@ -52,3 +52,5 @@ Données fictives, Chromium ordinateur et téléphone émulé.
 ![Facture payée](images/facture-payee-desktop.png)
 ![Liste des encaissements](images/encaissements-desktop.png)
 ![Encaissement annulé sur téléphone](images/encaissement-annule-mobile.png)
+
+Les encaissements reçus dans les fonds non déposés peuvent être regroupés vers la banque : [[Depots-bancaires]]. Un encaissement inclus dans un dépôt actif nécessite d’abord l’annulation du dépôt avant sa propre annulation.
