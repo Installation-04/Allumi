@@ -35,6 +35,7 @@ export default async function TransactionsPage({ params, searchParams }: { param
     listConnections(actor),
   ]);
   const t = await getTranslations("transactions");
+  const rulesText = await getTranslations("bankRules");
   const base = `/c/${company.id}/transactions`;
   const url = (change: Record<string, string | undefined>) => {
     const next = new URLSearchParams();
@@ -56,6 +57,7 @@ export default async function TransactionsPage({ params, searchParams }: { param
         <div className="min-w-0"><h1 className="text-2xl font-semibold">{t("title")}</h1><p className="mt-1 text-sm text-stone-600 dark:text-stone-400">{t("intro")}</p></div>
         {canManage ? <Link href={`${base}/importer`} className={`inline-flex min-h-11 items-center rounded-md bg-brand-700 px-4 text-sm font-medium text-white hover:bg-brand-800 ${FOCUS}`}>{t("import")}</Link> : null}
       </div>
+      <Link href={`${base}/regles`} className={link}>{rulesText("title")}</Link>
       {imported !== null ? (
         <div role="status" className="space-y-1 rounded border border-brand-700 p-3 text-sm">
           <p>{t("importDone", { imported })}</p>

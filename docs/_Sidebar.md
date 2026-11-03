@@ -83,3 +83,5 @@
 - [[Factures-fournisseurs]]
 - [[Depenses-payees]]
 - [[Justificatifs]]
+
+- [[Regles-bancaires]] — conditions, aperçu, suggestions et confirmation explicite.

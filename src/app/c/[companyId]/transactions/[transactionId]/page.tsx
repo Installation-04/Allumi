@@ -3,12 +3,13 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { can } from "@/modules/companies";
 import { acceptsManualEntries, formatMoney, listAccounts } from "@/modules/ledger";
-import { DEFAULT_CANDIDATE_DAYS, getBankTransaction, listMatchCandidates, listTransferCandidates, MAX_CANDIDATE_DAYS } from "@/modules/banking";
+import { suggestedBankRules, DEFAULT_CANDIDATE_DAYS, getBankTransaction, listMatchCandidates, listTransferCandidates, MAX_CANDIDATE_DAYS } from "@/modules/banking";
 import { searchText } from "@/app/_lib/search-params";
 import { ActionForm, Field, SelectField } from "@/app/_components/ui";
 import { FOCUS } from "@/app/_components/focus";
 import { accountName, loadCompany } from "../../_lib";
 import { recordAction, setStatusAction, transferAction, unmatchAction } from "../actions";
+import { applyRuleAction } from "../regles/actions";
 import { LedgerLine } from "../matched-lines";
 import { MatchPicker } from "./match-picker";
 
@@ -32,6 +33,7 @@ export default async function TransactionPage({ params, searchParams }: { params
   const days = WIDER.find((value) => value === asked) ?? DEFAULT_CANDIDATE_DAYS;
   const t = await getTranslations("transactionDetail");
   const ts = await getTranslations("transactions");
+  const tr = await getTranslations("bankRules");
   const base = `/c/${company.id}/transactions`;
   const canManage = can(company, "bank.manage");
   const canPost = can(company, "entry.post");
@@ -43,6 +45,7 @@ export default async function TransactionPage({ params, searchParams }: { params
 
   const candidates = working ? await listMatchCandidates(actor, transaction.id, { days }) : [];
   const accounts = working && canPost ? (await listAccounts(actor)).filter((account) => acceptsManualEntries(account) && account.id !== transaction.accountId) : [];
+  const rules = working && canPost ? await suggestedBankRules(actor, transaction.id) : [];
   const transfers = working && canPost ? await listTransferCandidates(actor, transaction.id) : [];
   const section = "space-y-3 rounded-lg border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900";
   const link = `inline-flex min-h-11 items-center rounded px-3 text-sm underline ${FOCUS}`;
@@ -108,6 +111,18 @@ export default async function TransactionPage({ params, searchParams }: { params
               {WIDER.filter((value) => value > days).map((value) => <Link key={value} href={`${base}/${transaction.id}?days=${value}`} className={link}>{t("widen", { days: value })}</Link>)}
             </p>
           </div>
+
+          {canPost ? <Link href={`${base}/regles?from=${transaction.id}`} className={link}>{tr("fromTransaction")}</Link> : null}
+          {rules.length ? <div className={section}>
+            <h2 className="text-lg font-semibold">{tr("suggestions")}</h2>
+            <p className="text-sm">{tr("confirmHint")}</p>
+            {rules.length > 1 ? <p className="text-sm">{tr("multiple")}</p> : null}
+            <ul className="space-y-3">{rules.map(rule => <li key={rule.id} className="space-y-2 rounded border border-stone-300 p-3 dark:border-stone-700">
+              <Link href={`${base}/regles?edit=${rule.id}`} className={link}>{rule.name}</Link>
+              <p className="break-words text-sm">{tr("target")} : {rule.targetAccount.code} · {accountName(rule.targetAccount, locale)} · {money(transaction.amountCents)}</p>
+              <ActionForm action={applyRuleAction.bind(null, company.id, transaction.id, rule.id, rule.revision)} label={tr("apply")} ariaLabel={tr("applyNamed", { name: rule.name })} variant="primary" />
+            </li>)}</ul>
+          </div> : null}
 
           {canPost ? (
             <div className={section}>

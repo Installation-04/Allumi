@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.37
+git checkout v0.4.0-alpha.39
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.37 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.39 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -382,3 +382,11 @@ Consultez les soldes et mouvements comptabilisés BANK/CASH, avec virements purs
 ![Suivi de trésorerie](docs/images/suivi-tresorerie-desktop.png)
 
 ![Suivi de trésorerie mobile](docs/images/suivi-tresorerie-mobile.png)
+
+### Règles bancaires
+
+Préparez les catégories des opérations récurrentes, vérifiez les correspondances et confirmez chaque écriture. Création depuis une opération, pause, priorités et montants exacts, avec permissions et audit ([guide illustré](docs/Regles-bancaires.md)).
+
+![Règles bancaires](docs/images/regles-bancaires-gestion-desktop.png)
+
+![Suggestion mobile](docs/images/regles-bancaires-suggestion-mobile.png)
