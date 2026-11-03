@@ -2,7 +2,8 @@ import { SalesAttachments } from "../../../_attachments/sales-panel";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { getPostedCredit } from "@/modules/sales";
+import { CustomerRefundPanel } from "../../../remboursements/panel";
+import { getCreditOpenCents, getPostedCredit } from "@/modules/sales";
 import { can } from "@/modules/companies";
 import { formatMoney, todayIso } from "@/modules/ledger";
 import { ActionForm, Field } from "@/app/_components/ui";
@@ -38,8 +39,9 @@ export default async function Page({ params }: { params: Promise<{ companyId: st
       <p>{a.appliedDate.toISOString().slice(0, 10)} · {formatMoney(a.amountCents, locale)}</p>
       <p>{a.unappliedDate ? t("unapplied", { date: a.unappliedDate.toISOString().slice(0, 10) }) : t("active")}</p>
     </div>)}</section>
+    {credit.status==="POSTED" && can(company,"ledger.read") && <CustomerRefundPanel actor={actor} access={company} creditNoteId={creditId} openCents={await getCreditOpenCents(actor,creditId)} locale={locale} />}
     <Link className="inline-flex min-h-11 items-center underline" href={`/c/${company.id}/journal/${credit.journalEntryId}`}>{s("journal")}</Link>
-    {credit.status === "POSTED" && can(company, "sales.manage") && <details className="rounded border p-4">
+    {credit.status === "POSTED" && can(company, "sales.manage") && can(company,"entry.reverse") && <details className="rounded border p-4">
       <summary className="min-h-11 cursor-pointer">{t("void")}</summary>
       <ActionForm action={voidCreditAction.bind(null, company.id, creditId)} label={t("void")}>
         <p>{t("voidWarning")}</p><Field name="voidDate" label={s("voidDate")} type="date" defaultValue={todayIso() > credit.postingDate.toISOString().slice(0, 10) ? todayIso() : credit.postingDate.toISOString().slice(0, 10)} />

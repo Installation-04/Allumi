@@ -87,3 +87,6 @@
 - [[Regles-bancaires]] — conditions, aperçu, suggestions et confirmation explicite.
 
 - [[Depots-bancaires]] — encaissements en attente, dépôt groupé et annulation contrôlée.
+
+- [[Avoirs-disponibles-et-remboursements]]
+- [[Releve-de-compte-client]]

@@ -21,7 +21,11 @@ async function captureReference(page: Page, name: string, mobileHeading?: string
   if (process.env.ALLUMI_SCREENSHOT_PREFIX && !process.env.ALLUMI_SCREENSHOT_PREFIX.split(",").some((prefix) => name.startsWith(prefix))) return;
   mkdirSync("docs/images", { recursive: true });
   await page.evaluate(() => window.scrollTo(0, 0));
-  if (mobileHeading && process.env.E2E_MOBILE === "1") await page.getByRole("heading", { name: mobileHeading, exact: true }).evaluate((heading) => heading.scrollIntoView({ block: "start" }));
+  if (mobileHeading && process.env.E2E_MOBILE === "1") {
+    const heading = page.getByRole("heading", { name: mobileHeading, exact: true });
+    await expect(heading, `reference ${name}: ${mobileHeading}`).toBeVisible();
+    await heading.evaluate((element) => element.scrollIntoView({ block: "start" }));
+  }
   await page.screenshot({ scale: "css", path: `docs/images/${name}-${process.env.E2E_MOBILE === "1" ? "mobile" : "desktop"}.png`, fullPage: process.env.E2E_MOBILE !== "1", animations: "disabled" });
 }
 
@@ -216,12 +220,12 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await page.getByRole("button", { name: "Vérifier" }).click();
   await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
 
-  await securityJourney(page, browser, recoveryCodes);
-  await ledgerJourney(page, totp);
-  await contactsJourney(page, recoveryCodes[3] ?? "");
-  await catalogJourney(page);
-  await companyJourney(page);
-  await draftsJourney(page);
+  await test.step("securityJourney", () => securityJourney(page, browser, recoveryCodes));
+  await test.step("ledgerJourney", () => ledgerJourney(page, totp));
+  await test.step("contactsJourney", () => contactsJourney(page, recoveryCodes[3] ?? ""));
+  await test.step("catalogJourney", () => catalogJourney(page));
+  await test.step("companyJourney", () => companyJourney(page));
+  await test.step("draftsJourney", () => draftsJourney(page));
   await page.goto('/versions');
   await expect(page.getByRole('heading', { name: 'Versions et mises à jour' })).toBeVisible();
   await expectNoPageOverflow(page);
@@ -258,23 +262,24 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await page.getByRole("button", { name: "English" }).click();
   await expect(page.getByText("Your role: Admin")).toBeVisible();
   await captureReference(page, "dashboard-en");
-  await appearanceJourney(page);
-  await postingJourney(page);
-  const paidInvoiceUrl = await creditPostingJourney(page);
-  await paymentsJourney(page, paidInvoiceUrl);
-  await integrationsJourney(page);
-  await onlinePaymentsJourney(page, paidInvoiceUrl);
-  await bankImportJourney(page);
-  await bankMatchingJourney(page);
-  await bankReconciliationJourney(page);
-  await financialStatementsJourney(page);
-  await generalLedgerJourney(page);
-  await receivablesAgingJourney(page);
-  await supplierBillsJourney(page);
-  await paidExpensesJourney(page);
-  await taxSummaryJourney(page);
-  await cashMovementsJourney(page);
-  await bankDepositsJourney(page);
+  await test.step("appearanceJourney", () => appearanceJourney(page));
+  await test.step("postingJourney", () => postingJourney(page));
+  const paidInvoiceUrl = await test.step("creditPostingJourney", () => creditPostingJourney(page));
+  await test.step("paymentsJourney", () => paymentsJourney(page, paidInvoiceUrl));
+  await test.step("integrationsJourney", () => integrationsJourney(page));
+  await test.step("onlinePaymentsJourney", () => onlinePaymentsJourney(page, paidInvoiceUrl));
+  await test.step("bankImportJourney", () => bankImportJourney(page));
+  await test.step("bankMatchingJourney", () => bankMatchingJourney(page));
+  await test.step("bankReconciliationJourney", () => bankReconciliationJourney(page));
+  await test.step("financialStatementsJourney", () => financialStatementsJourney(page));
+  await test.step("generalLedgerJourney", () => generalLedgerJourney(page));
+  await test.step("receivablesAgingJourney", () => receivablesAgingJourney(page));
+  await test.step("supplierBillsJourney", () => supplierBillsJourney(page));
+  await test.step("paidExpensesJourney", () => paidExpensesJourney(page));
+  await test.step("taxSummaryJourney", () => taxSummaryJourney(page));
+  await test.step("cashMovementsJourney", () => cashMovementsJourney(page));
+  await test.step("bankDepositsJourney", () => bankDepositsJourney(page));
+  await test.step("customerBalancesJourney", () => customerBalancesJourney(page, paidInvoiceUrl));
   const settingsBase = new URL(page.url()).pathname.match(/^\/c\/[^/]+/)?.[0];
   expect(settingsBase).toBeTruthy();
   await page.getByRole("button", { name: "Français", exact: true }).click();
@@ -285,7 +290,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await expect(settings.getByRole("link", { name: "Serveur, sauvegardes et journaux", exact: true })).toBeVisible();
   await expectNoPageOverflow(page);
   await captureReference(page, "parametres-administration");
-  await membersJourney(page, browser);
+  await test.step("membersJourney", () => membersJourney(page, browser));
   // Nothing in the whole journey (both locales, every form, the security pages, a second browser) was blocked.
   expect(cspViolations, "Content-Security-Policy violations").toEqual([]);
 });
@@ -515,7 +520,7 @@ async function contactsJourney(page: Page, recoveryCode: string) {
   await expect(page.getByRole("link", { name: /Atelier Boréal/ })).toBeVisible();
   await expectNoPageOverflow(page);
   await captureReference(page, "contacts");
-  await anonymizeJourney(page, recoveryCode);
+  await test.step("anonymizeJourney", () => anonymizeJourney(page, recoveryCode));
 }
 
 /** The attempts at a one-time code are counted per user (8 per 15 minutes) and the journey has used most of them. */
@@ -928,15 +933,15 @@ async function creditPostingJourney(page: Page): Promise<string> {
   await page.getByLabel("Motif de l’avoir",{exact:true}).fill("Ajustement du service");
   await page.getByLabel("Consultation comptable",{exact:true}).fill("25");
   await page.getByRole("button",{name:"Enregistrer le brouillon d’avoir",exact:true}).click();
-  await page.locator("summary",{hasText:"Valider et affecter l’avoir"}).click();
+  await page.locator("summary",{hasText:"Valider l’avoir"}).click();
   await page.getByLabel("Date comptable",{exact:true}).fill("2026-06-01");
-  await page.getByLabel("Je confirme la validation et l’affectation intégrale de cet avoir.").check();
-  await page.getByRole("button",{name:"Valider et affecter l’avoir",exact:true}).click();
+  await page.getByLabel("Je confirme les montants et le traitement choisi pour cet avoir.").check();
+  await page.getByRole("button",{name:"Valider l’avoir",exact:true}).click();
   await expect(page.locator("form").getByRole("alert")).toBeVisible();
   await page.getByLabel("Date comptable",{exact:true}).fill("2026-07-01");
-  await page.getByLabel("Je confirme la validation et l’affectation intégrale de cet avoir.").check();
+  await page.getByLabel("Je confirme les montants et le traitement choisi pour cet avoir.").check();
   await captureReference(page,"validation-avoir");
-  await page.getByRole("button",{name:"Valider et affecter l’avoir",exact:true}).click();
+  await page.getByRole("button",{name:"Valider l’avoir",exact:true}).click();
   await expect(page.getByRole("heading",{name:"AV-00001",exact:true})).toBeVisible();
   await expect(page.getByText(/Total:.*28,74/)).toBeVisible();
   await expect(page.getByRole("link",{name:"Modifier l’avoir",exact:true})).toHaveCount(0);
@@ -2573,4 +2578,88 @@ async function bankDepositsJourney(page: Page) {
  await page.goto(`${company}/depots/nouveau?q=Lot%20dépôt%20test`);
  for(const receipt of receipts)await expect(page.getByRole("checkbox",{name:`Déposer ${receipt.number}`,exact:true})).toBeVisible();
  await page.goto(`${company}/depots`);await expect(page.getByRole("link",{name:depositNumber,exact:true})).toBeVisible();
+}
+
+/** Paid-invoice credit, a recorded refund, dated customer statement and reversal. */
+async function customerBalancesJourney(page: Page, invoiceUrl: string) {
+ const today=todayInToronto(),company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0]??"";
+ await page.goto(invoiceUrl);
+ // Settle the fixture's remaining balance through the real form before crediting a paid invoice.
+ const receive=page.locator("summary",{hasText:"Enregistrer un encaissement"});
+ if(await receive.count()){
+  await receive.click();await page.getByLabel("Date de réception",{exact:true}).fill(today);
+  await page.getByLabel("Compte de réception",{exact:true}).selectOption({label:"1000 · Banque – compte courant"});
+  await page.getByRole("button",{name:"Enregistrer l’encaissement",exact:true}).click();
+  await expect(page.getByRole("heading",{name:/^Encaissement E-/})).toBeVisible();await page.goto(invoiceUrl);
+ }
+ await expect(page.getByText("Cette facture est payée en entier.",{exact:true})).toBeVisible();
+ await page.getByRole("link",{name:"Préparer un avoir",exact:true}).click();
+ await page.getByLabel("Date de l’avoir",{exact:true}).fill(today);
+ await page.getByLabel("Motif de l’avoir",{exact:true}).fill("Note interne non destinée au relevé client");
+ await page.getByLabel("Consultation comptable",{exact:true}).fill("10");
+ await page.getByRole("button",{name:"Enregistrer le brouillon d’avoir",exact:true}).click();
+ await page.locator("summary",{hasText:"Valider l’avoir"}).click();
+ await page.getByLabel("Traitement de l’avoir",{exact:true}).selectOption("UNAPPLIED");
+ await page.getByLabel("Date comptable",{exact:true}).fill(today);
+ await page.getByLabel("Je confirme les montants et le traitement choisi pour cet avoir.",{exact:true}).check();
+ await captureReference(page,"avoir-disponible-formulaire","Avoir en brouillon");
+ await page.getByRole("button",{name:"Valider l’avoir",exact:true}).click();
+ await expect(page.getByRole("heading",{name:"Remboursement de l’avoir",exact:true})).toBeVisible();
+ const creditUrl=page.url();
+ await page.locator("summary",{hasText:"Enregistrer un remboursement"}).click();
+ await page.getByLabel("Montant remboursé",{exact:true}).fill("5,00");
+ await expectNoPageOverflow(page);await captureReference(page,"remboursement-formulaire","Remboursement de l’avoir");
+ await page.getByLabel("Montant remboursé",{exact:true}).fill("99,00");
+ await page.getByLabel("Date du remboursement",{exact:true}).fill(today);
+ await page.getByLabel("Compte du remboursement",{exact:true}).selectOption({label:"1000 · Banque – compte courant"});
+ await page.getByLabel("Je confirme le montant, la date et le compte du remboursement déjà effectué.",{exact:true}).check();
+ await page.getByRole("button",{name:"Comptabiliser le remboursement",exact:true}).click();
+ await expect(page.locator("form").getByRole("alert")).toContainText("Le montant dépasse l’avoir disponible.");
+ await expect(page.getByLabel("Montant remboursé",{exact:true})).toHaveValue("99,00");
+ await page.getByLabel("Montant remboursé",{exact:true}).fill("5,00");
+ await page.getByLabel("Je confirme le montant, la date et le compte du remboursement déjà effectué.",{exact:true}).check();
+ await page.getByRole("button",{name:"Comptabiliser le remboursement",exact:true}).click();
+ await expect(page.getByRole("heading",{name:/^Remboursement D-\d{5}$/})).toBeVisible();
+ const refundUrl=page.url();
+ await expect(page.getByText("5,00 $",{exact:true})).toBeVisible();
+ await expectNoPageOverflow(page);await captureReference(page,"remboursement-detail","Avoirs remboursés");
+ await page.getByRole("button",{name:"English",exact:true}).click();
+ await expect(page.getByRole("heading",{name:/^Refund D-/})).toBeVisible();
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");
+ await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
+ await expectNoPageOverflow(page);await captureReference(page,"remboursement-detail-en-dark","Refunded credits");
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");
+ await expect(page.locator("html")).toHaveAttribute("data-theme","light");
+ await page.getByRole("button",{name:"Français",exact:true}).click();
+ await expect(page.getByRole("heading",{name:/^Remboursement D-/})).toBeVisible();
+ await page.goto(`${company}/releves-clients`);
+ await page.getByLabel("Client",{exact:true}).selectOption({label:"Atelier Boréal"});
+ await page.getByLabel("Du",{exact:true}).fill("2026-01-01");await page.getByLabel("Au",{exact:true}).fill(today);
+ await page.getByRole("button",{name:"Afficher le relevé",exact:true}).click();
+ await expect(page.getByRole("heading",{name:"Atelier Boréal",exact:true})).toBeVisible();
+ await expect(page.locator(".workspace-content")).not.toContainText("Note interne non destinée au relevé client");
+ await expectNoPageOverflow(page);await captureReference(page,"releve-client","Atelier Boréal");
+ const statementUrl=page.url(),csv=page.getByRole("link",{name:"Exporter en CSV",exact:true});
+ const response=await page.request.get((await csv.getAttribute("href"))!);expect(response.status()).toBe(200);
+ const body=await response.text();expect(body).toContain("Remboursement D-");expect(body).not.toMatch(/Note interne|journalEntryId|[a-f0-9]{8}-[a-f0-9]{4}-/);
+ await page.getByRole("link",{name:"Vue imprimable complète",exact:true}).click();
+ await expect(page.getByRole("button",{name:"Imprimer / PDF",exact:true})).toBeVisible();
+ await page.emulateMedia({media:"print"});
+ await expect(page.locator(".workspace-header")).toBeHidden();await expect(page.getByRole("table")).toBeVisible();
+ await page.emulateMedia({media:"screen"});await page.goto(statementUrl);
+ await page.getByRole("button",{name:"English",exact:true}).click();
+ await expect(page.getByRole("heading",{name:"Customer account statement",exact:true})).toBeVisible();
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");
+ await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
+ await expectNoPageOverflow(page);await captureReference(page,"releve-client-en-dark","Atelier Boréal");
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await expect(page.locator("html")).toHaveAttribute("data-theme","light");
+ await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.getByRole("heading",{name:"Relevé de compte client",exact:true})).toBeVisible();
+ for(const suffix of ["?contact=invalid","?contact=invalid&contact=","/export?contact=invalid","/export?contact=&contact=invalid"])expect((await page.request.get(`${company}/releves-clients${suffix}`)).status()).toBe(404);
+ await page.goto(refundUrl);await page.locator("summary",{hasText:"Annuler le remboursement"}).click();
+ await page.getByLabel("Date d’annulation",{exact:true}).fill(today);await page.getByLabel(/^Motif/).fill("Remboursement saisi deux fois");
+ await page.getByLabel("Je confirme la contre-passation de ce remboursement.",{exact:true}).check();
+ await page.getByRole("button",{name:"Contre-passer le remboursement",exact:true}).click();
+ await expect(page.getByText(`Annulé le ${today}`,{exact:true})).toBeVisible();
+ await page.goto(creditUrl);await expect(page.getByText(/Disponible :.*11,50/)).toBeVisible();
+ await expect(page.getByText(`retiré le ${today}`,{exact:true})).toBeVisible();
 }

@@ -4,7 +4,7 @@
 
 Logiciel de comptabilité **open source** et **auto-hébergeable** pour les PME et les travailleurs autonomes du Québec et du Canada. Une alternative libre aux logiciels de comptabilité infonuagiques propriétaires.
 
-> **État : pré-alpha.** Le squelette fonctionne (premier démarrage, connexion, vérification en deux étapes, interface FR/EN, Docker); le moteur comptable (plan comptable, journal, périodes, audit) est en place, les contacts, taxes configurables, produits/services et brouillons et validation des factures sont disponibles; brouillons, validation, affectation et annulation des avoirs disponibles; encaissements de factures disponibles; import des transactions Stripe et PayPal disponible; remboursements, dépôts et paiements fournisseurs à venir ([feuille de route](docs/Feuille-de-route.md)). N'utilise pas Allumi pour de la comptabilité réelle avant une version stable.
+> **État : pré-alpha.** Comptabilité à partie double, factures et avoirs clients, encaissements et remboursements, achats et paiements fournisseurs, dépôts groupés, imports et rapprochements bancaires, rapports datés, rôles modulaires et administration serveur sont disponibles en FR/EN, avec thèmes clair/sombre et interface mobile. Les versions de test Windows et Docker AMD64/ARM64 sont publiées dans les Releases. Voir la [feuille de route](docs/Feuille-de-route.md); utiliser des données fictives avant une version stable.
 
 *English summary: Allumi is an open-source, self-hostable accounting app for Canadian small businesses (QST/GST aware, French-first, bilingual). The repo ships a Docker Compose stack, an Ubuntu install script, encrypted backups and a full wiki in `docs/`. Application code is in pre-alpha.*
 
@@ -398,3 +398,16 @@ Regroupez les encaissements des fonds non déposés vers la banque, vérifiez le
 ![Dépôt bancaire groupé](docs/images/depots-detail-desktop.png)
 
 ![Préparation d’un dépôt sur mobile](docs/images/depots-formulaire-mobile.png)
+
+
+### Compte client : avoirs disponibles, remboursements et relevés
+
+Un avoir peut rester disponible sur une facture payée. Les remboursements sont comptabilisés avec leur historique; Allumi ne transmet aucun ordre bancaire. Le relevé daté conserve les mouvements réglés, avec CSV et impression complète sans notes internes.
+
+[Guide des remboursements](docs/Avoirs-disponibles-et-remboursements.md) · [Guide du relevé client](docs/Releve-de-compte-client.md)
+
+![Remboursement client](docs/images/remboursement-detail-desktop.png)
+
+![Relevé client en anglais et thème sombre](docs/images/releve-client-en-dark-desktop.png)
+
+![Relevé client mobile](docs/images/releve-client-mobile.png)
