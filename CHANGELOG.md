@@ -4,6 +4,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.42] - 2026-11-03
+
+- Historiques des encaissements et remboursements clients : recherche littérale client/numéro/référence, filtres de dates inclusives et d’état, pagination conservée, réinitialisation et états sans résultat FR/EN/mobile/sombre.
+- Consultation des encaissements sans relation Contact obligatoire : identité figée des pièces et repli facultatif pour les anciens paiements sans pièce; permissions Ventes/Comptabilité explicites sur services, écrans et navigation.
+
 ## [0.4.0-alpha.41] - 2026-11-03
 
 - Fiche d’avoir consultable avec le module Taxes désactivé : montants conservés et libellé générique pour les références fiscales masquées, sans droit supplémentaire.

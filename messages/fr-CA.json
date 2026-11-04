@@ -593,7 +593,8 @@
       "account": "Choisissez un compte bancaire, la caisse ou « Fonds non déposés » actif.",
       "notFound": "Encaissement introuvable.",
       "invalidVoid": "Indiquez un motif de 1 à 500 caractères et une date égale ou postérieure à l’encaissement et à ses affectations.",
-      "confirmVoid": "Confirmez l’annulation définitive de l’encaissement."
+      "confirmVoid": "Confirmez l’annulation définitive de l’encaissement.",
+      "invalidFilters": "Vérifiez la recherche, l’état et les dates des filtres."
     },
     "onlinePayments": {
       "invalid": "Demande invalide.",
@@ -2427,5 +2428,20 @@
       "REVERSAL": "Contre-passation",
       "ADJUSTMENT": "Ajustement"
     }
+  },
+  "paymentHistory": {
+    "search": "Client, numéro ou référence",
+    "status": "État du paiement",
+    "all": "Tous les états",
+    "posted": "Comptabilisé",
+    "void": "Annulé",
+    "from": "Date du paiement — du",
+    "to": "Date du paiement — au",
+    "apply": "Filtrer les paiements",
+    "reset": "Réinitialiser les filtres",
+    "empty": "Aucun paiement correspondant",
+    "emptyHint": "Modifiez les filtres ou réinitialisez-les pour retrouver l’historique complet.",
+    "reference": "Référence",
+    "customerUnavailable": "Client non disponible"
   }
 }

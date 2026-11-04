@@ -40,3 +40,6 @@ La consultation exige **Ventes** et **Comptabilité** en lecture. La saisie exig
 ![Remboursement sur mobile](images/remboursement-detail-mobile.png)
 
 L’interface est disponible en français et en anglais, sur ordinateur et mobile, en thèmes clair et sombre. Voir aussi [[Validation-des-avoirs]], [[Encaissements]], [[Releve-de-compte-client]] et [[Utilisateurs-et-permissions]].
+
+
+La recherche, les filtres de dates/état et la pagination des paiements sont décrits dans [[Recherche-des-paiements-clients]]. La consultation exige Ventes et Comptabilité en lecture; Contacts peut rester désactivé.

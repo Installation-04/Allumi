@@ -13,17 +13,19 @@ import { voidReceiptAction } from "../actions";
 export async function generateMetadata() { return { title: (await getTranslations("payments"))("title") }; }
 
 export default async function PaymentPage({ params }: { params: Promise<{ companyId: string; paymentId: string }> }) {
-  const { company, actor, locale } = await loadCompany(params, "sales.read");
+  const { company, actor, locale } = await loadCompany(params, "ledger.read");
+  if (!can(company, "sales.read")) notFound();
   const { paymentId } = await params;
   if (!validId(paymentId)) notFound();
   const payment = await getReceipt(actor, paymentId);
   if (!payment) notFound();
   const t = await getTranslations("payments");
+  const h = await getTranslations("paymentHistory");
   const td = await getTranslations("deposits");
   const deposited = payment.deposits.some(d => d.status === "POSTED");
   const base = `/c/${company.id}`;
   const rows: [string, React.ReactNode][] = [
-    [t("customer"), payment.customer],
+    [t("customer"), payment.customer || h("customerUnavailable")],
     [t("amount"), <span key="a" className="tabular-nums">{formatMoney(payment.amountCents, locale)}</span>],
     [t("date"), payment.date],
     [t("method"), t(`methods.${payment.method}`)],

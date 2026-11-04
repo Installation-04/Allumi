@@ -64,3 +64,10 @@ describe("contextual navigation", () => {
     expect(matchesNavigationPath("/c/other/factures", "/c/acme/factures")).toBe(false);
   });
 });
+
+it("requires sales and accounting, but not Contacts, for customer payment histories",()=>{
+ for(const route of ["encaissements","remboursements"]){
+  expect(canAccessRoute({role:"READ_ONLY",moduleAccess:{contacts:"none"}},route)).toBe(true);
+  for(const moduleAccess of [{sales:"none"},{accounting:"none"}] as const)expect(canAccessRoute({role:"READ_ONLY",moduleAccess},route)).toBe(false);
+ }
+});

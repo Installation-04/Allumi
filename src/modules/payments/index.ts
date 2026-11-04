@@ -9,3 +9,6 @@ export { MAX_DEPOSIT_ITEMS } from "./domain/deposit";
 
 export { refundSchema, acceptsRefunds, type CustomerRefundInput } from "./domain/refund";
 export { recordCustomerRefund, voidCustomerRefund, getCustomerRefund, listCustomerRefunds, listCustomerRefundAccounts, listCreditRefunds, CUSTOMER_REFUNDS_PER_PAGE } from "./service/refunds";
+
+export type { PaymentHistoryFilters } from "./domain/history";
+export { parsePaymentHistoryFilters } from "./service/history";

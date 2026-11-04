@@ -593,7 +593,8 @@
       "account": "Choose an active bank account, cash account or \"Undeposited funds\".",
       "notFound": "Payment not found.",
       "invalidVoid": "Give a reason of 1 to 500 characters and a date on or after the payment and its applications.",
-      "confirmVoid": "Confirm the permanent voiding of the payment."
+      "confirmVoid": "Confirm the permanent voiding of the payment.",
+      "invalidFilters": "Check the search, status and date filters."
     },
     "onlinePayments": {
       "invalid": "Invalid request.",
@@ -2427,5 +2428,20 @@
       "REVERSAL": "Reversal",
       "ADJUSTMENT": "Adjustment"
     }
+  },
+  "paymentHistory": {
+    "search": "Customer, number or reference",
+    "status": "Payment status",
+    "all": "All statuses",
+    "posted": "Posted",
+    "void": "Voided",
+    "from": "Payment date — from",
+    "to": "Payment date — to",
+    "apply": "Filter payments",
+    "reset": "Clear filters",
+    "empty": "No matching payments",
+    "emptyHint": "Change or clear the filters to see the full history.",
+    "reference": "Reference",
+    "customerUnavailable": "Customer unavailable"
   }
 }
