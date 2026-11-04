@@ -7,6 +7,7 @@ import { withCompany, type CompanyContext, type Tx } from "@/platform/tenant";
 import { acceptsReceipts, receiptSchema, receiptVoidSchema } from "../domain/receipt";
 
 import { paymentHistoryWhere, receiptCustomerNames } from "./history";
+import { assertCustomerMovementDate } from "./movement-dates";
 
 export const RECEIPTS_PER_PAGE = 25;
 
@@ -50,6 +51,7 @@ export async function recordReceiptWithin(tx: Tx, actor: CompanyContext, input: 
   const openCents = open[0]?.cents ?? 0n;
   if (openCents !== expectedOpenCents) throw new AppError("payments.stale");
   if (amountCents > openCents) throw new AppError("payments.exceeds");
+  await assertCustomerMovementDate(tx, actor.companyId, invoiceId, date, "payments.dateBeforeMovement");
 
   const account = await tx.account.findFirst({ where: { companyId: actor.companyId, id: accountId }, select: { subtype: true, systemKey: true, isActive: true } });
   if (!account || !acceptsReceipts(account)) throw new AppError("payments.account");
@@ -103,7 +105,8 @@ export async function voidReceipt(actor: CompanyContext, id: string, input: unkn
       if (date < latest) throw new AppError("payments.invalidVoid");
 
       // Invoices first, in a fixed order: a concurrent invoice void or payment waits instead of crossing.
-      await tx.$queryRaw`SELECT id FROM sales_document WHERE company_id = ${actor.companyId}::uuid AND id IN (SELECT sales_document_id FROM payment_allocation WHERE company_id = ${actor.companyId}::uuid AND payment_id = ${id}::uuid) ORDER BY id FOR UPDATE`;
+      const documents = await tx.$queryRaw<{ id: string }[]>`SELECT id FROM sales_document WHERE company_id = ${actor.companyId}::uuid AND id IN (SELECT sales_document_id FROM payment_allocation WHERE company_id = ${actor.companyId}::uuid AND payment_id = ${id}::uuid) ORDER BY id FOR UPDATE`;
+      for (const document of documents) await assertCustomerMovementDate(tx, actor.companyId, document.id, date, "payments.dateBeforeMovement");
       await tx.paymentAllocation.updateMany({ where: { companyId: actor.companyId, paymentId: id, unappliedDate: null }, data: { unappliedDate: new Date(`${date}T00:00:00Z`), unappliedById: actor.userId } });
       const reversal = await createPaymentReversal(tx, actor, { paymentId: id, entryId: payment.journalEntryId, date, memo: reason });
       await tx.payment.update({ where: { companyId_id: { companyId: actor.companyId, id } }, data: { status: "VOID", voidEntryId: reversal.id, voidedAt: new Date(), voidedById: actor.userId, voidReason: reason } });

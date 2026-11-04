@@ -226,3 +226,36 @@ it("requires current snapshots for payment cancellations", async () => {
   expect(row?.definition).toContain("payment_open_cents");
   expect(row?.definition).toContain("bank_deposit_item");
 });
+
+it("installs immediate customer application and cancellation guards on the intended events", async () => {
+  const rows = await q<{ name: string; table_name: string; function_name: string; events: number; enabled: string; deferred: boolean }>(
+    `SELECT t.tgname AS name, c.relname AS table_name, p.proname AS function_name,
+            t.tgtype::integer AS events, t.tgenabled AS enabled, t.tgdeferrable AS deferred
+       FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
+       JOIN pg_namespace n ON n.oid = c.relnamespace JOIN pg_proc p ON p.oid = t.tgfoid
+      WHERE n.nspname = 'public' AND NOT t.tgisinternal
+        AND t.tgname IN ('customer_credit_application_guard', 'customer_payment_allocation_guard', 'customer_document_void_isolation')
+      ORDER BY t.tgname`,
+  );
+  // pg_trigger bits: ROW=1, BEFORE=2, INSERT=4, UPDATE=16.
+  expect(rows).toEqual([
+    { name: "customer_credit_application_guard", table_name: "sales_credit_application", function_name: "customer_application_guard", events: 23, enabled: "O", deferred: false },
+    { name: "customer_document_void_isolation", table_name: "sales_document", function_name: "customer_document_void_isolation", events: 19, enabled: "O", deferred: false },
+    { name: "customer_payment_allocation_guard", table_name: "payment_allocation", function_name: "customer_application_guard", events: 23, enabled: "O", deferred: false },
+  ]);
+});
+
+it("keeps customer guards under caller privileges with restricted function execution", async () => {
+  const rows = await q<{ name: string; definer: boolean; config: string[]; public_execute: boolean }>(
+    `SELECT p.proname AS name, p.prosecdef AS definer, p.proconfig AS config,
+            has_function_privilege('public', p.oid, 'EXECUTE') AS public_execute
+       FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+      WHERE n.nspname = 'public' AND p.pronargs = 0
+        AND p.proname IN ('customer_application_guard', 'customer_document_void_isolation')
+      ORDER BY p.proname`,
+  );
+  expect(rows).toEqual([
+    { name: "customer_application_guard", definer: false, config: ["search_path=public, pg_temp"], public_execute: false },
+    { name: "customer_document_void_isolation", definer: false, config: ["search_path=public, pg_temp"], public_execute: false },
+  ]);
+});

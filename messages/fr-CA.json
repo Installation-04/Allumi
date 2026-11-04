@@ -594,7 +594,8 @@
       "notFound": "Encaissement introuvable.",
       "invalidVoid": "Indiquez un motif de 1 à 500 caractères et une date égale ou postérieure à l’encaissement et à ses affectations.",
       "confirmVoid": "Confirmez l’annulation définitive de l’encaissement.",
-      "invalidFilters": "Vérifiez la recherche, l’état et les dates des filtres."
+      "invalidFilters": "Vérifiez la recherche, l’état et les dates des filtres.",
+      "dateBeforeMovement": "La date doit être égale ou postérieure au dernier règlement ou à la dernière désaffectation de cette pièce."
     },
     "onlinePayments": {
       "invalid": "Demande invalide.",
@@ -696,6 +697,22 @@
       "invalidVoid": "Vérifiez le motif et la date de contre-passation.",
       "confirm": "Confirmez le remboursement.",
       "confirmVoid": "Confirmez la contre-passation."
+    },
+    "salesApplications": {
+      "invalid": "Vérifiez les montants, les pièces et la date de l’affectation.",
+      "futureDate": "La date ne peut pas être dans le futur.",
+      "creditNotFound": "Cet avoir client est introuvable.",
+      "invoiceNotFound": "Cette facture est introuvable.",
+      "customerMismatch": "L’avoir et la facture doivent appartenir au même client.",
+      "notPosted": "Seuls un avoir et une facture validés peuvent être affectés ou désaffectés.",
+      "dateBeforeDocuments": "La date doit être égale ou postérieure aux dates comptables des pièces et à l’affectation initiale.",
+      "dateBeforeMovement": "La date doit être égale ou postérieure au dernier règlement ou à la dernière désaffectation de ces pièces.",
+      "periodClosed": "La date doit appartenir à une période comptable ouverte.",
+      "stale": "Le solde disponible a changé. Actualisez la page avant de confirmer.",
+      "exceeds": "Le montant dépasse le solde disponible de l’avoir ou de la facture.",
+      "alreadyApplied": "Cet avoir est déjà affecté à cette facture. Désaffectez le lien existant avant de modifier le montant.",
+      "applicationNotFound": "Cette affectation est introuvable.",
+      "confirm": "Confirmez l’affectation ou la désaffectation avant de continuer."
     }
   },
   "settingsPage": {
@@ -2443,5 +2460,34 @@
     "emptyHint": "Modifiez les filtres ou réinitialisez-les pour retrouver l’historique complet.",
     "reference": "Référence",
     "customerUnavailable": "Client non disponible"
+  },
+  "creditApplications": {
+    "title": "Affectations aux factures",
+    "intro": "Appliquez cet avoir à une facture ouverte du même client. Aucun argent n’est envoyé et aucune nouvelle écriture comptable n’est créée.",
+    "available": "Avoir disponible : {amount}",
+    "search": "Rechercher une facture par numéro ou référence",
+    "searchAction": "Rechercher",
+    "invoice": "Facture à régler",
+    "choose": "Choisir une facture",
+    "review": "Réviser l’affectation",
+    "target": "Facture {number} — solde ouvert : {amount}",
+    "amount": "Montant à affecter",
+    "date": "Date d’affectation",
+    "apply": "Affecter cet avoir",
+    "confirmApply": "Je confirme cette affectation et les soldes affichés.",
+    "noTargets": "Aucune facture ouverte admissible.",
+    "limit": "Seules les 50 premières factures sont proposées. Précisez la recherche.",
+    "historyEmpty": "Aucune affectation pour cet avoir.",
+    "release": "Désaffecter",
+    "releaseHint": "Le montant redevient disponible sur cet avoir et la facture redevient à payer. Aucun argent n’est envoyé.",
+    "confirmRelease": "Je confirme la désaffectation de ce montant.",
+    "releaseDate": "Date de désaffectation",
+    "pagination": "Pages des affectations",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {page} sur {count}",
+    "reset": "Effacer la recherche",
+    "reviewHint": "Vérifiez la facture, le montant et la date avant de confirmer. Si un solde change entre-temps, rechargez la page.",
+    "targetUnavailable": "Cette facture n’est plus proposée. Recherchez et choisissez une facture ouverte avant de confirmer."
   }
 }

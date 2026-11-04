@@ -45,10 +45,10 @@ export async function postCreditNote(actor: CompanyContext, id: string, revision
     return id;
   }); } catch(error) { throw toAppError(error); }
 }
-export async function getPostedCredit(actor: CompanyContext, id: string) {
+export async function getPostedCredit(actor: CompanyContext, id: string, options: { includeApplications?: boolean } = {}) {
   return withCompany(actor, async tx => {
     await requireRole(tx,"sales.read");
-    return tx.salesDocument.findFirst({ where:{ companyId:actor.companyId,id,kind:"CREDIT_NOTE",status:{in:["POSTED","VOID"]} },include:{ lines:{orderBy:{position:"asc"}},taxes:{include:{tax:{select:{code:true}}}},creditedDocument:{select:{id:true,number:true}},creditsApplied:{orderBy:[{appliedDate:"asc"},{id:"asc"}],include:{invoice:{select:{number:true}}}},voidEntry:{select:{entryDate:true}} } });
+    return tx.salesDocument.findFirst({ where:{ companyId:actor.companyId,id,kind:"CREDIT_NOTE",status:{in:["POSTED","VOID"]} },include:{ lines:{orderBy:{position:"asc"}},taxes:{include:{tax:{select:{code:true}}}},creditedDocument:{select:{id:true,number:true}},creditsApplied:{take:options.includeApplications === false ? 0 : undefined,orderBy:[{appliedDate:"asc"},{id:"asc"}],include:{invoice:{select:{number:true}}}},voidEntry:{select:{entryDate:true}} } });
   });
 }
 export async function listPostedCredits(actor: CompanyContext, invoiceId?: string) {
