@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.44] - 2026-11-04
+
 - Encaissements au compte client sans facture, comptabilisés une seule fois par soumission, puis affectables partiellement à plusieurs factures du même client sans nouvelle écriture; désaffectations datées, disponible net, recherche bornée, historique paginé et contrôles des deux soldes, dates, périodes et permissions. Guides illustrés FR/EN/mobile/sombre. Migration `20261109000000_customer_account_receipts`.
 - Fiches de factures : soldes, encaissements et actions comptables respectent les permissions modulaires; consultation, impression et courriels conservés quand les références de taxes sont masquées.
 
