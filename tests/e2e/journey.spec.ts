@@ -281,7 +281,9 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await test.step("bankDepositsJourney", () => bankDepositsJourney(page));
   const availableCreditUrl = await test.step("customerBalancesJourney", () => customerBalancesJourney(page, paidInvoiceUrl));
   await test.step("paymentHistoryJourney", () => paymentHistoryJourney(page));
-  await test.step("creditApplicationsJourney", () => creditApplicationsJourney(page, availableCreditUrl));
+  const nextInvoiceUrl = await test.step("creditApplicationsJourney", () => creditApplicationsJourney(page, availableCreditUrl));
+  await test.step("invoiceModulePermissionsJourney", () => invoiceModulePermissionsJourney(page, nextInvoiceUrl));
+  await test.step("onAccountReceiptJourney", () => onAccountReceiptJourney(page, nextInvoiceUrl));
   const settingsBase = new URL(page.url()).pathname.match(/^\/c\/[^/]+/)?.[0];
   expect(settingsBase).toBeTruthy();
   await page.getByRole("button", { name: "Français", exact: true }).click();
@@ -2675,7 +2677,7 @@ async function customerBalancesJourney(page: Page, invoiceUrl: string): Promise<
 }
 
 /** Apply part of an available credit to another invoice, then restore both document balances. */
-async function creditApplicationsJourney(page: Page, creditUrl: string) {
+async function creditApplicationsJourney(page: Page, creditUrl: string): Promise<string> {
  const today=todayInToronto();
  await openSection(page,"Brouillons de factures");
  await page.getByRole("link",{name:"Nouveau brouillon",exact:true}).click();
@@ -2737,6 +2739,139 @@ async function creditApplicationsJourney(page: Page, creditUrl: string) {
   expect((await page.request.get(`${creditUrl}?${query}`)).status(),`invalid credit application query: ${query}`).toBe(404);
  }
  await page.goto(invoiceUrl);await expect(page.getByText(/^Solde restant:\s*23,00\s*\$/)).toBeVisible();
+ return invoiceUrl;
+}
+
+/** Sales readers retain the invoice itself when separate accounting or tax access is disabled. */
+async function invoiceModulePermissionsJourney(page: Page, invoiceUrl: string) {
+ const companyId=new URL(invoiceUrl).pathname.split("/")[2]!;
+ const db=new pg.Client({connectionString:e2eUrls().owner});await db.connect();
+ let original:Record<string,unknown>|null=null,userId:string|null=null,originalRole:string|null=null,backupUserId:string|null=null;
+ try{
+  const membership=await db.query("SELECT m.user_id,m.role,m.module_access FROM membership m JOIN app_user u ON u.id=m.user_id WHERE m.company_id=$1 AND u.email=$2",[companyId,EMAIL]);
+  expect(membership.rows).toHaveLength(1);
+  userId=membership.rows[0].user_id as string;originalRole=membership.rows[0].role as string;original=membership.rows[0].module_access as Record<string,unknown>|null;
+  // Owners deliberately retain all modules. A credential-free backup owner preserves the last-owner invariant
+  // while the signed-in fixture exercises real configurable accountant permissions.
+  const backup=await db.query("INSERT INTO app_user(id,email,display_name,updated_at) VALUES(gen_random_uuid(),'e2e-backup-'||gen_random_uuid()::text||'@exemple.test','Browser permission fixture',now()) RETURNING id");
+  backupUserId=backup.rows[0].id as string;
+  await db.query("INSERT INTO membership(id,company_id,user_id,role,updated_at) VALUES(gen_random_uuid(),$1,$2,'OWNER',now())",[companyId,backupUserId]);
+  await db.query("UPDATE membership SET role='ACCOUNTANT',module_access=$3::jsonb WHERE company_id=$1 AND user_id=$2",[companyId,userId,JSON.stringify({...original,accounting:"none"})]);
+  const accountingResponse=await page.goto(invoiceUrl);expect(accountingResponse?.status()).toBe(200);
+  await expect(page.getByRole("heading",{level:1,name:/^F-\d{5}$/})).toBeVisible();
+  await expect(page.getByText(/^Solde restant:/)).toHaveCount(0);
+  await expect(page.locator("#invoice-payments-title")).toHaveCount(0);
+  await expect(page.locator("summary",{hasText:"Enregistrer un encaissement"})).toHaveCount(0);
+  await expect(page.locator("summary",{hasText:"Annuler la facture"})).toHaveCount(0);
+  await expect(page.locator(`a[href^="/c/${companyId}/journal/"]`)).toHaveCount(0);
+  await db.query("UPDATE membership SET module_access=$3::jsonb WHERE company_id=$1 AND user_id=$2",[companyId,userId,JSON.stringify({...original,taxes:"none"})]);
+  const taxesResponse=await page.goto(invoiceUrl);expect(taxesResponse?.status()).toBe(200);
+  await expect(page.getByRole("heading",{level:1,name:/^F-\d{5}$/})).toBeVisible();
+  await expect(page.getByText(/^Taxe:\s*1,00\s*\$/)).toBeVisible();
+  await expect(page.getByText(/^Taxe:\s*2,00\s*\$/)).toBeVisible();
+  await expect(page.getByText(/^Solde restant:\s*23,00\s*\$/)).toBeVisible();
+  const printResponse=await page.goto(`${invoiceUrl}/imprimer`);expect(printResponse?.status()).toBe(200);
+  await expect(page.getByRole("heading",{level:1,name:/^Facture F-\d{5}$/})).toBeVisible();
+  const taxTotals=page.locator(".invoice-totals");
+  await expect(taxTotals.locator("p").filter({hasText:/^Taxe\s*1,00\s*\$/})).toBeVisible();
+  await expect(taxTotals.locator("p").filter({hasText:/^Taxe\s*2,00\s*\$/})).toBeVisible();
+  await expect(taxTotals.locator("p").filter({hasText:/23,00\s*\$/})).toBeVisible();
+ }finally{
+  try{
+   if(userId&&originalRole)await db.query("UPDATE membership SET role=$3::member_role,module_access=$4::jsonb WHERE company_id=$1 AND user_id=$2",[companyId,userId,originalRole,original===null?null:JSON.stringify(original)]);
+   if(backupUserId){
+    await db.query("DELETE FROM membership WHERE company_id=$1 AND user_id=$2",[companyId,backupUserId]);
+    await db.query("UPDATE app_user SET disabled_at=now() WHERE id=$1",[backupUserId]);
+   }
+  }finally{await db.end();}
+ }
+ await page.goto(invoiceUrl);
+ await expect(page.getByText(/^Solde restant:\s*23,00\s*\$/)).toBeVisible();
+}
+
+/** Record money already received, allocate across invoices, and release one allocation without moving money. */
+async function onAccountReceiptJourney(page: Page, firstInvoiceUrl: string) {
+ const today=todayInToronto(),company=new URL(firstInvoiceUrl).pathname.match(/^\/c\/[0-9a-f-]{36}/)![0];
+ const firstNumber=(await page.getByRole("heading",{level:1,name:/^F-\d{5}$/}).innerText()).trim();
+ await openSection(page,"Brouillons de factures");
+ await page.getByRole("link",{name:"Nouveau brouillon",exact:true}).click();
+ await page.getByLabel("Client",{exact:true}).selectOption({label:"Atelier Boréal"});
+ await page.getByLabel("Date de facture",{exact:true}).fill(today);
+ await page.getByLabel("Date d’échéance",{exact:true}).fill(today);
+ const line=page.getByRole("group",{name:"Ligne 1",exact:true});
+ await line.getByLabel("Article du catalogue").selectOption({label:"Consultation comptable"});
+ await line.getByLabel("Prix unitaire (CAD)").fill("10");
+ await line.getByLabel("Compte de revenus").selectOption({label:"4000 — Revenus de services"});
+ await page.getByRole("button",{name:"Enregistrer le brouillon",exact:true}).click();
+ await page.locator("summary",{hasText:"Valider la facture"}).click();
+ await page.getByLabel("Date comptable",{exact:true}).fill(today);
+ await page.getByLabel("Je confirme les montants et la validation définitive.",{exact:true}).check();
+ await page.getByRole("button",{name:"Valider la facture",exact:true}).click();
+ const secondHeading=page.getByRole("heading",{level:1,name:/^F-\d{5}$/});
+ await expect(secondHeading).toBeVisible();
+ const secondNumber=(await secondHeading.innerText()).trim(),secondInvoiceUrl=page.url();
+ await expect(page.getByText(/^Solde restant:\s*11,50\s*\$/)).toBeVisible();
+ await page.goto(`${company}/encaissements/nouveau`);
+ await page.locator("#on-account-customer-search").fill("Atelier Boréal");
+ await page.locator("form").filter({has:page.locator("#on-account-customer-search")}).getByRole("button",{name:"Rechercher",exact:true}).click();
+ await page.getByRole("link",{name:"Atelier Boréal",exact:true}).click();
+ await page.getByLabel("Montant reçu",{exact:true}).fill("30,00");
+ await page.getByLabel("Date de réception",{exact:true}).fill(today);
+ await page.getByLabel("Compte de réception",{exact:true}).selectOption({label:"1000 · Banque – compte courant"});
+ await page.getByLabel(/^Référence/).fill("Paiement au compte — test navigateur");
+ await expect(page.getByText("Cette opération crée un encaissement et son écriture comptable. Elle ne prélève ni ne transfère de fonds.",{exact:true})).toBeVisible();
+ await expectNoPageOverflow(page);await captureReference(page,"encaissement-au-compte-formulaire","Encaissement au compte");
+ await page.getByLabel("Je confirme avoir déjà reçu ce paiement du client.",{exact:true}).check();
+ await page.getByRole("button",{name:"Enregistrer l’encaissement",exact:true}).click();
+ await expect(page.getByRole("heading",{level:1,name:/^Encaissement E-\d{5}$/})).toBeVisible();
+ const receiptUrl=page.url(),panel=page.getByRole("region",{name:"Affectations aux factures",exact:true});
+ await expect(panel.getByText(/^Montant disponible :\s*30,00\s*\$/)).toBeVisible();
+ await expect(panel.getByText("Aucune affectation pour cet encaissement.",{exact:true})).toBeVisible();
+ await expectNoPageOverflow(page);await captureReference(page,"encaissement-au-compte-detail","Affectations aux factures");
+ const apply=async(invoiceUrl:string,number:string,amount:string)=>{
+  await panel.locator("#receipt-allocation-search").fill(number);
+  await panel.getByRole("button",{name:"Rechercher",exact:true}).click();
+  await panel.locator("#receipt-allocation-invoice").selectOption(new URL(invoiceUrl).pathname.split("/").at(-1)!);
+  await panel.getByRole("button",{name:"Réviser l’affectation",exact:true}).click();
+  await panel.getByLabel("Montant à affecter",{exact:true}).fill(amount);
+  await panel.getByLabel("Date d’affectation",{exact:true}).fill(today);
+  await panel.getByLabel("Je confirme cette affectation et les soldes affichés.",{exact:true}).check();
+  await panel.getByRole("button",{name:"Affecter cet encaissement",exact:true}).click();
+ };
+ await apply(firstInvoiceUrl,firstNumber,"10,00");
+ await expect(panel.getByText(/^Montant disponible :\s*20,00\s*\$/)).toBeVisible();
+ await apply(secondInvoiceUrl,secondNumber,"5,00");
+ await expect(panel.getByText(/^Montant disponible :\s*15,00\s*\$/)).toBeVisible();
+ await expect(panel.getByText("Affectation active",{exact:true})).toHaveCount(2);
+ await expect(panel.getByText("Affectez un encaissement déjà enregistré à une facture ouverte du même client. Aucun argent n’est transféré et aucune nouvelle écriture comptable n’est créée.",{exact:true})).toBeVisible();
+ await expectNoPageOverflow(page);await captureReference(page,"encaissement-au-compte-affectation","Affectations aux factures");
+ await page.getByRole("button",{name:"English",exact:true}).click();
+ const englishPanel=page.getByRole("region",{name:"Invoice applications",exact:true});
+ await expect(englishPanel.getByText(/^Available amount:\s*\$15\.00$/)).toBeVisible();
+ await expect(englishPanel.getByText("Active allocation",{exact:true})).toHaveCount(2);
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");
+ await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
+ await expectNoPageOverflow(page);await captureReference(page,"encaissement-au-compte-en-dark","Invoice applications");
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");
+ await expect(page.locator("html")).toHaveAttribute("data-theme","light");
+ await page.getByRole("button",{name:"Français",exact:true}).click();
+ await page.goto(firstInvoiceUrl);await expect(page.getByText(/^Solde restant:\s*13,00\s*\$/)).toBeVisible();
+ await page.goto(secondInvoiceUrl);await expect(page.getByText(/^Solde restant:\s*6,50\s*\$/)).toBeVisible();
+ await page.goto(receiptUrl);
+ const firstAllocation=panel.getByRole("listitem").filter({has:page.getByRole("link",{name:new RegExp(firstNumber)})});
+ await firstAllocation.locator("summary",{hasText:"Désaffecter"}).click();
+ await firstAllocation.getByLabel("Date de désaffectation",{exact:true}).fill(today);
+ await firstAllocation.getByLabel("Je confirme la désaffectation de ce montant.",{exact:true}).check();
+ await firstAllocation.getByRole("button",{name:"Désaffecter",exact:true}).click();
+ await expect(firstAllocation.getByText(`retiré le ${today}`,{exact:true})).toBeVisible();
+ await expect(firstAllocation.getByRole("button",{name:"Désaffecter",exact:true})).toHaveCount(0);
+ await expect(panel.getByText("Affectation active",{exact:true})).toHaveCount(1);
+ await expect(panel.getByText(/^Montant disponible :\s*25,00\s*\$/)).toBeVisible();
+ for(const query of ["q_affectation=a&q_affectation=b","page_affectation=0","q_affectation=%00"]){
+  expect((await page.request.get(`${receiptUrl}?${query}`)).status(),`invalid receipt allocation query: ${query}`).toBe(404);
+ }
+ await page.goto(firstInvoiceUrl);await expect(page.getByText(/^Solde restant:\s*23,00\s*\$/)).toBeVisible();
+ await page.goto(secondInvoiceUrl);await expect(page.getByText(/^Solde restant:\s*6,50\s*\$/)).toBeVisible();
 }
 
 /** Legacy unallocated receipts exercise pagination without re-running the already tested receipt form 27 times. */

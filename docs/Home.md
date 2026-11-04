@@ -63,4 +63,5 @@ Taxes et produits/services : [[Taxes-et-catalogue]].
 - [[Affectation-des-avoirs-clients]] — régler une facture du même client avec un avoir disponible et conserver les désaffectations datées.
 - [[Releve-de-compte-client]] — mouvements datés, CSV et impression complète.
 
+- [[Encaissements-au-compte]] — fonds reçus sans facture, affectations partielles et retraits datés.
 - [[Recherche-des-paiements-clients]] — client, numéro, référence, état et période.

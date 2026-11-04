@@ -59,6 +59,7 @@
 - [[Validation-des-avoirs]]
 
 - [[Encaissements]]
+- [[Encaissements-au-compte]]
 
 - [[Integrations]]
 

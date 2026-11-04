@@ -433,3 +433,14 @@ Réglez partiellement ou intégralement une facture ouverte du même client avec
 ![Révision d’une affectation client](docs/images/affectation-avoir-formulaire-desktop.png)
 
 ![Affectation en anglais et thème sombre sur mobile](docs/images/affectation-avoir-en-dark-mobile.png)
+
+
+### Encaissements au compte client
+
+Comptabilisez des fonds réellement reçus sans choisir immédiatement une facture, puis répartissez le disponible sur plusieurs factures du même client. Les affectations partielles et retraits datés conservent leur historique et ne créent aucune seconde écriture.
+
+[Guide des encaissements au compte](docs/Encaissements-au-compte.md)
+
+![Création d’un encaissement au compte](docs/images/encaissement-au-compte-formulaire-desktop.png)
+
+![Affectations en anglais et thème sombre sur téléphone](docs/images/encaissement-au-compte-en-dark-mobile.png)
