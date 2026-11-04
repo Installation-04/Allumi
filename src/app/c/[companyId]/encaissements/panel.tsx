@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { can, type Role } from "@/modules/companies";
+import { can, type AccessContext } from "@/modules/companies";
 import { formatMoney, todayIso, type Locale } from "@/modules/ledger";
 import { PAYMENT_METHODS, amountInput, listInvoicePayments, listReceiptAccounts, settlementStatus } from "@/modules/payments";
 import { ActionForm, Field, SelectField } from "@/app/_components/ui";
@@ -9,11 +9,11 @@ import { accountName } from "../_lib";
 import { recordReceiptAction } from "./actions";
 
 /** What a posted invoice shows about its payments: how settled it is, what was received, and the form to record one. */
-export async function PaymentsPanel(props: { companyId: string; role: Role; actor: { userId: string; companyId: string }; invoiceId: string; totalCents: bigint; openCents: bigint; locale: Locale }) {
-  const { companyId, role, actor, invoiceId, totalCents, openCents, locale } = props;
+export async function PaymentsPanel(props: { companyId: string; access: AccessContext; actor: { userId: string; companyId: string }; invoiceId: string; totalCents: bigint; openCents: bigint; locale: Locale }) {
+  const { companyId, access, actor, invoiceId, totalCents, openCents, locale } = props;
   const t = await getTranslations("payments");
   const payments = await listInvoicePayments(actor, invoiceId);
-  const canRecord = can(role, "sales.manage") && openCents > 0n;
+  const canRecord = can(access, "sales.manage") && can(access, "entry.post") && openCents > 0n;
   const accounts = canRecord ? await listReceiptAccounts(actor) : [];
   return (
     <section className="space-y-3 rounded border border-stone-300 p-4 dark:border-stone-700" aria-labelledby="invoice-payments-title">

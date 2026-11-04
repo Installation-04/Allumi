@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.43
+git checkout v0.4.0-alpha.44
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.43 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.44 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -433,3 +433,14 @@ Réglez partiellement ou intégralement une facture ouverte du même client avec
 ![Révision d’une affectation client](docs/images/affectation-avoir-formulaire-desktop.png)
 
 ![Affectation en anglais et thème sombre sur mobile](docs/images/affectation-avoir-en-dark-mobile.png)
+
+
+### Encaissements au compte client
+
+Comptabilisez des fonds réellement reçus sans choisir immédiatement une facture, puis répartissez le disponible sur plusieurs factures du même client. Les affectations partielles et retraits datés conservent leur historique et ne créent aucune seconde écriture.
+
+[Guide des encaissements au compte](docs/Encaissements-au-compte.md)
+
+![Création d’un encaissement au compte](docs/images/encaissement-au-compte-formulaire-desktop.png)
+
+![Affectations en anglais et thème sombre sur téléphone](docs/images/encaissement-au-compte-en-dark-mobile.png)

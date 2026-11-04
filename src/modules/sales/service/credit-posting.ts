@@ -60,6 +60,7 @@ export async function listPostedCredits(actor: CompanyContext, invoiceId?: strin
 export async function getInvoiceOpenCents(actor: CompanyContext, id: string) {
   return withCompany(actor, async tx => {
     await requireRole(tx,"sales.read");
+    await requireRole(tx,"ledger.read");
     const rows=await tx.$queryRaw<{amount:bigint}[]>`SELECT sales_document_open_cents(company_id,id) AS amount FROM sales_document WHERE company_id=${actor.companyId}::uuid AND id=${id}::uuid AND kind='INVOICE'`;
     return rows[0]?.amount ?? null;
   });
@@ -69,6 +70,7 @@ export async function getInvoiceOpenCents(actor: CompanyContext, id: string) {
 export async function getCreditOpenCents(actor: CompanyContext, id: string): Promise<bigint> {
   return withCompany(actor, async tx => {
     await requireRole(tx, "sales.read");
+    await requireRole(tx, "ledger.read");
     const rows = await tx.$queryRaw<{amount: bigint}[]>`SELECT sales_document_open_cents(company_id,id) AS amount FROM sales_document WHERE company_id=${actor.companyId}::uuid AND id=${id}::uuid AND kind='CREDIT_NOTE' AND status='POSTED'`;
     return rows[0]?.amount ?? 0n;
   });

@@ -595,7 +595,8 @@
       "invalidVoid": "Indiquez un motif de 1 à 500 caractères et une date égale ou postérieure à l’encaissement et à ses affectations.",
       "confirmVoid": "Confirmez l’annulation définitive de l’encaissement.",
       "invalidFilters": "Vérifiez la recherche, l’état et les dates des filtres.",
-      "dateBeforeMovement": "La date doit être égale ou postérieure au dernier règlement ou à la dernière désaffectation de cette pièce."
+      "dateBeforeMovement": "La date doit être égale ou postérieure au dernier règlement ou à la dernière désaffectation de cette pièce.",
+      "offsetsLinked": "Cet encaissement est lié à un remboursement. Retirez la compensation avant de l’annuler."
     },
     "onlinePayments": {
       "invalid": "Demande invalide.",
@@ -713,6 +714,28 @@
       "alreadyApplied": "Cet avoir est déjà affecté à cette facture. Désaffectez le lien existant avant de modifier le montant.",
       "applicationNotFound": "Cette affectation est introuvable.",
       "confirm": "Confirmez l’affectation ou la désaffectation avant de continuer."
+    },
+    "onAccountReceipts": {
+      "invalid": "Vérifiez le client, le montant, la date et les renseignements de l’encaissement.",
+      "futureDate": "La date de l’encaissement ne peut pas être dans le futur.",
+      "customer": "Choisissez un client actif et non anonymisé de cette entreprise.",
+      "idempotency": "Cette soumission correspond déjà à un autre encaissement. Rechargez le formulaire avant de recommencer.",
+      "confirm": "Confirmez cet encaissement avant de continuer."
+    },
+    "receiptAllocations": {
+      "invalid": "Vérifiez les pièces, les montants et la date de l’affectation.",
+      "futureDate": "La date ne peut pas être dans le futur.",
+      "paymentNotFound": "Cet encaissement client est introuvable.",
+      "invoiceNotFound": "Cette facture est introuvable.",
+      "allocationNotFound": "Cette affectation est introuvable.",
+      "notPosted": "L’encaissement et la facture doivent être validés.",
+      "customerMismatch": "L’encaissement et la facture doivent appartenir au même client.",
+      "dateBeforeMovement": "La date doit être égale ou postérieure à l’encaissement, à la facture et au dernier règlement ou à la dernière désaffectation de ces pièces.",
+      "periodClosed": "La date doit appartenir à une période comptable ouverte.",
+      "stale": "Le solde disponible a changé. Actualisez la page avant de confirmer.",
+      "exceeds": "Le montant dépasse le solde disponible de l’encaissement ou de la facture.",
+      "alreadyApplied": "Cet encaissement est déjà affecté à cette facture. Désaffectez le lien existant avant de changer le montant.",
+      "confirm": "Confirmez cette affectation ou son retrait avant de continuer."
     }
   },
   "settingsPage": {
@@ -2489,5 +2512,53 @@
     "reset": "Effacer la recherche",
     "reviewHint": "Vérifiez la facture, le montant et la date avant de confirmer. Si un solde change entre-temps, rechargez la page.",
     "targetUnavailable": "Cette facture n’est plus proposée. Recherchez et choisissez une facture ouverte avant de confirmer."
+  },
+  "receiptAllocations": {
+    "title": "Affectations aux factures",
+    "intro": "Affectez un encaissement déjà enregistré à une facture ouverte du même client. Aucun argent n’est transféré et aucune nouvelle écriture comptable n’est créée.",
+    "available": "Montant disponible : {amount}",
+    "search": "Rechercher une facture par numéro ou référence",
+    "searchAction": "Rechercher",
+    "invoice": "Facture à régler",
+    "choose": "Choisir une facture",
+    "review": "Réviser l’affectation",
+    "target": "Facture {number} — solde ouvert : {amount}",
+    "amount": "Montant à affecter",
+    "date": "Date d’affectation",
+    "apply": "Affecter cet encaissement",
+    "confirmApply": "Je confirme cette affectation et les soldes affichés.",
+    "noTargets": "Aucune facture ouverte admissible.",
+    "limit": "Seules les 50 premières factures sont proposées. Précisez la recherche.",
+    "historyEmpty": "Aucune affectation pour cet encaissement.",
+    "release": "Désaffecter",
+    "releaseHint": "Le montant redevient disponible sur cet encaissement et la facture redevient à payer. Aucun argent n’est transféré.",
+    "confirmRelease": "Je confirme la désaffectation de ce montant.",
+    "releaseDate": "Date de désaffectation",
+    "pagination": "Pages des affectations",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {page} sur {count}",
+    "reset": "Effacer la recherche",
+    "reviewHint": "Vérifiez la facture, le montant et la date avant de confirmer. Si un solde change entre-temps, rechargez la page.",
+    "targetUnavailable": "Cette facture n’est plus proposée. Recherchez et choisissez une facture ouverte avant de confirmer.",
+    "active": "Affectation active"
+  },
+  "onAccountReceipts": {
+    "title": "Encaissement au compte",
+    "intro": "Enregistrez un paiement client déjà reçu sans le lier immédiatement à une facture. Vous pourrez l’affecter plus tard aux factures de ce client.",
+    "chooseCustomer": "1. Choisir le client",
+    "search": "Rechercher un client",
+    "searchAction": "Rechercher",
+    "noCustomers": "Aucun client actif trouvé.",
+    "selected": "2. Enregistrer pour {customer}",
+    "recordHint": "Cette opération crée un encaissement et son écriture comptable. Elle ne prélève ni ne transfère de fonds.",
+    "confirm": "Je confirme avoir déjà reçu ce paiement du client.",
+    "submit": "Enregistrer l’encaissement",
+    "pagination": "Pages des clients",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {page} sur {count}",
+    "available": "Disponible : {amount}",
+    "moreAllocations": "Voir toutes les factures affectées"
   }
 }

@@ -595,7 +595,8 @@
       "invalidVoid": "Give a reason of 1 to 500 characters and a date on or after the payment and its applications.",
       "confirmVoid": "Confirm the permanent voiding of the payment.",
       "invalidFilters": "Check the search, status and date filters.",
-      "dateBeforeMovement": "The date must be on or after the latest settlement or release on this document."
+      "dateBeforeMovement": "The date must be on or after the latest settlement or release on this document.",
+      "offsetsLinked": "This receipt is linked to a refund. Release the offset before voiding it."
     },
     "onlinePayments": {
       "invalid": "Invalid request.",
@@ -713,6 +714,28 @@
       "alreadyApplied": "This credit is already applied to this invoice. Release the existing application before changing its amount.",
       "applicationNotFound": "This application could not be found.",
       "confirm": "Confirm the application or release before continuing."
+    },
+    "onAccountReceipts": {
+      "invalid": "Check the customer, amount, date and receipt details.",
+      "futureDate": "The receipt date cannot be in the future.",
+      "customer": "Choose an active customer in this company who has not been anonymized.",
+      "idempotency": "This submission already belongs to a different receipt. Reload the form before trying again.",
+      "confirm": "Confirm this receipt before continuing."
+    },
+    "receiptAllocations": {
+      "invalid": "Check the documents, amounts and allocation date.",
+      "futureDate": "The date cannot be in the future.",
+      "paymentNotFound": "This customer receipt could not be found.",
+      "invoiceNotFound": "This invoice could not be found.",
+      "allocationNotFound": "This allocation could not be found.",
+      "notPosted": "The receipt and invoice must both be posted.",
+      "customerMismatch": "The receipt and invoice must belong to the same customer.",
+      "dateBeforeMovement": "The date must be on or after the receipt, invoice and latest settlement or release on these records.",
+      "periodClosed": "The date must fall in an open accounting period.",
+      "stale": "An available balance has changed. Refresh the page before confirming.",
+      "exceeds": "The amount exceeds the available receipt or invoice balance.",
+      "alreadyApplied": "This receipt is already allocated to this invoice. Release the existing allocation before changing its amount.",
+      "confirm": "Confirm this allocation or release before continuing."
     }
   },
   "settingsPage": {
@@ -2489,5 +2512,53 @@
     "reset": "Clear search",
     "reviewHint": "Check the invoice, amount and date before confirming. If a balance changes meanwhile, reload the page.",
     "targetUnavailable": "This invoice is no longer available here. Find and choose an open invoice before confirming."
+  },
+  "receiptAllocations": {
+    "title": "Invoice applications",
+    "intro": "Apply a previously recorded receipt to an open invoice for the same customer. No money is transferred and no new journal entry is created.",
+    "available": "Available amount: {amount}",
+    "search": "Find an invoice by number or reference",
+    "searchAction": "Search",
+    "invoice": "Invoice to settle",
+    "choose": "Choose an invoice",
+    "review": "Review application",
+    "target": "Invoice {number} — open balance: {amount}",
+    "amount": "Amount to apply",
+    "date": "Application date",
+    "apply": "Apply this receipt",
+    "confirmApply": "I confirm this application and the displayed balances.",
+    "noTargets": "No eligible open invoices.",
+    "limit": "Only the first 50 invoices are shown. Refine your search.",
+    "historyEmpty": "No allocations for this receipt.",
+    "release": "Release application",
+    "releaseHint": "The amount becomes available on this receipt again and the invoice becomes payable again. No money is transferred.",
+    "confirmRelease": "I confirm releasing this amount.",
+    "releaseDate": "Release date",
+    "pagination": "Application pages",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {count}",
+    "reset": "Clear search",
+    "reviewHint": "Check the invoice, amount and date before confirming. If a balance changes meanwhile, reload the page.",
+    "targetUnavailable": "This invoice is no longer available here. Find and choose an open invoice before confirming.",
+    "active": "Active allocation"
+  },
+  "onAccountReceipts": {
+    "title": "Receive on account",
+    "intro": "Record a customer payment already received without linking it to an invoice immediately. You can apply it to this customer’s invoices later.",
+    "chooseCustomer": "1. Choose the customer",
+    "search": "Find a customer",
+    "searchAction": "Search",
+    "noCustomers": "No active customers found.",
+    "selected": "2. Record for {customer}",
+    "recordHint": "This creates a receipt and its journal entry. It does not collect or transfer money.",
+    "confirm": "I confirm this customer payment has already been received.",
+    "submit": "Record receipt",
+    "pagination": "Customer pages",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {count}",
+    "available": "Available: {amount}",
+    "moreAllocations": "View all allocated invoices"
   }
 }

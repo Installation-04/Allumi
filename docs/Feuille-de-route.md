@@ -49,3 +49,6 @@ Lot 4.2 : taxes configurables, moteur de calcul exact et catalogue, guide [[Taxe
 Lot 4.3a : brouillons de factures disponibles, guide [[Brouillons-de-factures]]. Validation comptable et numérotation définitive disponibles : [[Validation-des-factures]]. Brouillons d’avoirs disponibles : [[Brouillons-d-avoirs]]. Validation et annulation des avoirs disponibles : [[Validation-des-avoirs]]. Encaissements de factures disponibles : [[Encaissements]]. Envoi manuel SMTP des factures validées disponible : [[Envoi-des-factures]].
 
 Annulation des factures validées disponible avec contre-passation et historique conservé : [[Annulation-des-factures]].
+
+
+Lot 4.5 : encaissements sur facture et [[Encaissements-au-compte]] disponibles, avec affectations partielles sur plusieurs factures du même client et désaffectations datées. Dépôts groupés disponibles : [[Depots-bancaires]]. Remboursements liés aux avoirs disponibles : [[Avoirs-disponibles-et-remboursements]]. Paiements fournisseurs disponibles : [[Factures-fournisseurs]]. Ces parcours comptabilisent les fonds reçus ou envoyés séparément; ils ne transmettent aucun ordre bancaire.

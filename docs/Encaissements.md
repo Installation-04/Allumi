@@ -1,10 +1,12 @@
 # Encaissements
 
-Un **encaissement** est un paiement reçu d’un client et appliqué à une facture validée. Il met à jour le solde de la facture et ajoute une écriture au [[Journal-et-ecritures]]. Cette page décrit l’enregistrement, la consultation et l’annulation d’un encaissement. Les remboursements, les dépôts groupés, les trop-perçus et acomptes, l’affectation d’un paiement à plusieurs factures et le côté fournisseurs ne sont pas encore disponibles : voir [[Feuille-de-route]].
+Un **encaissement** est un paiement réellement reçu d’un client. Il peut être appliqué directement à une facture validée ou enregistré au compte, puis réparti sur une ou plusieurs factures du même client : [[Encaissements-au-compte]]. La réception ajoute une écriture au [[Journal-et-ecritures]]; une affectation ultérieure ne crée pas de seconde écriture. Cette page décrit le parcours depuis une facture, la consultation et l’annulation.
+
+Les dépôts groupés sont disponibles dans [[Depots-bancaires]], les remboursements liés aux avoirs dans [[Avoirs-disponibles-et-remboursements]] et les paiements fournisseurs dans [[Factures-fournisseurs]].
 
 ## Enregistrer un encaissement
 
-Ouvrir la facture dans **Brouillons de factures → Factures validées**. Sous le solde restant, le bloc **Encaissements de cette facture** indique si elle est **non payée**, **partiellement payée** ou **payée**, et liste les encaissements appliqués. Le propriétaire et les comptables ouvrent **Enregistrer un encaissement** et saisissent :
+Ouvrir la facture dans **Brouillons de factures → Factures validées**. Sous le solde restant, le bloc **Encaissements de cette facture** indique si elle est **non payée**, **partiellement payée** ou **payée**, et liste les encaissements appliqués. Les membres autorisés à gérer les ventes et valider les écritures ouvrent **Enregistrer un encaissement** et saisissent :
 
 - le **montant reçu**, proposé avec le solde restant (virgule en français, point en anglais), jamais plus que ce solde et avec deux décimales au plus;
 - la **date de réception**, égale ou postérieure à la date comptable de la facture, pas dans le futur, dans une période ouverte;
@@ -29,19 +31,19 @@ Le solde que la page affichait est joint à la demande. Si la facture a changé 
 
 ## Consulter
 
-**Ventes → Encaissements** liste les encaissements du plus récent au plus ancien, 25 par page, avec le client, le montant, l’état et les factures visées. La fiche d’un encaissement montre ses données, ses **affectations** (avec les liens vers les factures) et le lien **Écriture au journal**. Tous les membres peuvent consulter.
+**Ventes → Encaissements** liste les encaissements du plus récent au plus ancien, 25 par page, avec le client, le montant, l’état et les factures visées. La fiche d’un encaissement montre ses données, ses **affectations** (avec les liens vers les factures) et le lien **Écriture au journal**. La consultation exige Ventes et Comptabilité en lecture; Contacts peut rester désactivé.
 
 ## Annuler un encaissement
 
-Le propriétaire ou un comptable ouvre **Annuler cet encaissement** sur sa fiche et indique une **date d’annulation** (égale ou postérieure à l’encaissement, dans une période ouverte), un **motif** obligatoire de 1 à 500 caractères et la confirmation.
+Un membre disposant aussi du droit de contre-passation ouvre **Annuler cet encaissement** sur sa fiche et indique une **date d’annulation** (égale ou postérieure à l’encaissement, dans une période ouverte), un **motif** obligatoire de 1 à 500 caractères et la confirmation.
 
 L’annulation retire l’affectation à cette date, ajoute une **écriture inverse** exacte et garde l’encaissement avec son motif; le solde de la facture est rétabli et peut être encaissé de nouveau. Rien n’est supprimé. Répéter la demande ne crée pas une seconde écriture inverse.
 
-Tant qu’un encaissement est appliqué à une facture, celle-ci ne peut pas être annulée ([[Annulation-des-factures]]) : annuler d’abord l’encaissement.
+Tant qu’un encaissement est appliqué à une facture, celle-ci ne peut pas être annulée ([[Annulation-des-factures]]). Retirer explicitement l’affectation depuis la fiche de l’encaissement pour conserver les fonds reçus au compte, ou annuler l’encaissement si sa comptabilisation était erronée : [[Encaissements-au-compte]]. Un dépôt actif doit d’abord être annulé avant l’annulation de l’encaissement.
 
 ## Permissions et audit
 
-Lecture pour tous les membres; enregistrement et annulation pour le propriétaire et les comptables. L’isolation par entreprise est appliquée côté serveur et par la base. Chaque changement est consigné par la base dans la [[Piste-d-audit]] (encaissement, affectation, écritures).
+La lecture exige Ventes et Comptabilité en lecture; l’enregistrement exige la gestion des ventes et la validation des écritures, et l’annulation exige aussi la contre-passation. La création d’un encaissement au compte exige en plus Contacts en lecture pour choisir le client; les affectations sur un encaissement existant ne l’exigent pas. L’isolation par entreprise est appliquée côté serveur et par la base. Chaque changement est consigné par la base dans la [[Piste-d-audit]] (encaissement, affectation, écritures).
 
 ## Captures
 

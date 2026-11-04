@@ -19,6 +19,7 @@ export default async function InvoicePrintPage({ params }: { params: Promise<{ c
   if (!invoice) notFound();
   const t = await getTranslations("sales");
   const p = await getTranslations("invoicePrint");
+  const credits = await getTranslations("credits");
   return <section className="invoice-print space-y-5">
     <div className="print-controls flex flex-wrap items-center gap-4"><Link className="inline-flex min-h-11 items-center underline" href={`/c/${company.id}/factures/validees/${invoiceId}`}>{p("back")}</Link><PrintButton /><p className="w-full text-sm">{p("hint")}</p></div>
     <article className="invoice-paper max-w-4xl space-y-6 rounded border bg-white p-4 text-stone-950 sm:p-8">
@@ -27,7 +28,7 @@ export default async function InvoicePrintPage({ params }: { params: Promise<{ c
       <div className="grid gap-6 sm:grid-cols-2">{([["issuer",invoice.issuerSnapshot],["billedTo",invoice.billingSnapshot]] as const).map(([key,value]) => <section key={key} className="min-w-0 break-words"><h2 className="font-semibold">{t(key)}</h2>{address(value).map((line,index)=><p key={index}>{line}</p>)}</section>)}</div>
       {invoice.reference && <p className="break-words">{t("reference")}: {invoice.reference}</p>}
       <table className="w-full table-fixed text-sm"><thead><tr className="border-b-2 border-stone-400 text-left"><th className="w-[44%] py-3">{p("description")}</th><th className="w-[14%] break-words px-1">{p("quantity")}</th><th className="w-[21%] break-words px-1 text-right">{p("unitPrice")}</th><th className="w-[21%] px-1 text-right">{p("amount")}</th></tr></thead><tbody>{invoice.lines.map(line=><tr key={line.id} className="border-b border-stone-200 align-top"><td className="break-words py-3 pr-2">{line.description}</td><td className="break-words px-1 py-3">{line.quantity.toString()}</td><td className="break-words px-1 py-3 text-right">{line.unitPrice.toString()}</td><td className="break-words px-1 py-3 text-right">{formatMoney(line.amountCents,locale)}</td></tr>)}</tbody></table>
-      <div className="invoice-totals ml-auto max-w-sm space-y-2"><p className="flex justify-between gap-4"><span>{t("subtotal")}</span><span>{formatMoney(invoice.subtotalCents,locale)}</span></p>{invoice.taxes.map(tax=><p key={tax.id} className="flex justify-between gap-4"><span>{tax.tax.code}</span><span>{formatMoney(tax.amountCents,locale)}</span></p>)}<p className="flex justify-between gap-4 border-t pt-3 text-xl font-bold"><span>{t("total")}</span><span>{formatMoney(invoice.totalCents,locale)}</span></p></div>
+      <div className="invoice-totals ml-auto max-w-sm space-y-2"><p className="flex justify-between gap-4"><span>{t("subtotal")}</span><span>{formatMoney(invoice.subtotalCents,locale)}</span></p>{invoice.taxes.map(tax=><p key={tax.id} className="flex justify-between gap-4"><span>{tax.tax?.code || credits("taxLine")}</span><span>{formatMoney(tax.amountCents,locale)}</span></p>)}<p className="flex justify-between gap-4 border-t pt-3 text-xl font-bold"><span>{t("total")}</span><span>{formatMoney(invoice.totalCents,locale)}</span></p></div>
       {invoice.memo && <p className="whitespace-pre-wrap break-words">{invoice.memo}</p>}
     </article>
   </section>;

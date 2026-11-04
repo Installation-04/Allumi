@@ -12,3 +12,8 @@ export { recordCustomerRefund, voidCustomerRefund, getCustomerRefund, listCustom
 
 export type { PaymentHistoryFilters } from "./domain/history";
 export { parsePaymentHistoryFilters } from "./service/history";
+
+export { onAccountReceiptSchema, type OnAccountReceiptInput } from "./domain/on-account-receipt";
+export { receiptAllocationSchema, receiptUnallocationSchema, type ReceiptAllocationInput, type ReceiptUnallocationInput } from "./domain/receipt-allocation";
+export { recordOnAccountReceipt } from "./service/on-account-receipts";
+export { getReceiptOpenCents, applyReceiptToInvoice, unapplyReceiptAllocation, listReceiptAllocationTargets, listReceiptAllocations, RECEIPT_ALLOCATION_TARGET_LIMIT, RECEIPT_ALLOCATIONS_PER_PAGE } from "./service/receipt-allocations";

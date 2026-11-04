@@ -30,4 +30,6 @@ Désactiver le module Contacts ne bloque pas la consultation des pièces financi
 
 ![Filtres sur téléphone](images/historique-encaissements-mobile.png)
 
+Les encaissements au compte sans facture sont aussi accessibles depuis cette liste. Leur disponible et leurs affectations sont détaillés dans [[Encaissements-au-compte]].
+
 L’interface s’adapte au téléphone et aux thèmes clair/sombre. Voir [[Encaissements]], [[Avoirs-disponibles-et-remboursements]] et [[Utilisateurs-et-permissions]].

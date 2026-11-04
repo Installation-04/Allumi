@@ -22,12 +22,14 @@ export default async function PaymentsPage({ params, searchParams }: { params: P
   const rawPage = Number(searchText(query.page));
   const result = await listReceipts(actor, Number.isInteger(rawPage) && rawPage > 0 && rawPage <= 100000 ? rawPage : 1, filters);
   const t = await getTranslations("payments");
+  const oa = await getTranslations("onAccountReceipts");
   const base = `/c/${company.id}/encaissements`;
   const pageHref = (page: number) => `${base}?${new URLSearchParams({ ...paymentHistoryParams(filters), page: String(page) })}`;
   const link = `inline-flex min-h-11 items-center rounded px-3 text-sm underline ${FOCUS}`;
   return (
     <section className="space-y-5">
       <div><h1 className="text-2xl font-semibold">{t("title")}</h1><p className="mt-1 text-sm text-stone-600 dark:text-stone-400">{t("intro")}</p></div>
+      {can(company, "sales.manage") && can(company, "entry.post") && can(company, "contact.read") && <Link href={`${base}/nouveau`} className={`inline-flex min-h-11 items-center rounded bg-green-700 px-4 text-sm font-semibold text-white hover:bg-green-800 dark:bg-green-600 ${FOCUS}`}>{oa("title")}</Link>}
       <PaymentHistoryFilter base={base} filters={filters} />
       <p className="text-sm text-stone-600 dark:text-stone-400" role="status">{t("count", { count: result.total })}</p>
       {result.receipts.length === 0 ? (
@@ -41,6 +43,8 @@ export default async function PaymentsPage({ params, searchParams }: { params: P
                 <p className="break-words">{receipt.customer || h("customerUnavailable")}</p>
                 {receipt.reference ? <p className="break-words text-sm">{h("reference")}: {receipt.reference}</p> : null}
                 <p className="tabular-nums">{formatMoney(receipt.amountCents, locale)} · {receipt.date}</p>
+                <p className="text-sm tabular-nums">{oa("available", { amount: formatMoney(receipt.availableCents, locale) })}</p>
+                {receipt.hasMoreAllocations && <p className="text-sm underline">{oa("moreAllocations")}</p>}
                 <p className="text-sm">{t(`statuses.${receipt.status}`)} · {t(`methods.${receipt.method}`)}{receipt.invoices.length ? ` · ${receipt.invoices.map((invoice) => invoice.number).join(", ")}` : ""}</p>
               </Link>
             </li>

@@ -4,6 +4,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.44] - 2026-11-04
+
+- Encaissements au compte client sans facture, comptabilisés une seule fois par soumission, puis affectables partiellement à plusieurs factures du même client sans nouvelle écriture; désaffectations datées, disponible net, recherche bornée, historique paginé et contrôles des deux soldes, dates, périodes et permissions. Guides illustrés FR/EN/mobile/sombre. Migration `20261109000000_customer_account_receipts`.
+- Fiches de factures : soldes, encaissements et actions comptables respectent les permissions modulaires; consultation, impression et courriels conservés quand les références de taxes sont masquées.
+
 ## [0.4.0-alpha.43] - 2026-11-04
 
 - Affectation partielle ou complète d’un avoir disponible à une facture ouverte du même client, sans transfert de fonds ni nouvelle écriture : recherche bornée, contrôle des deux soldes, désaffectation datée et historique paginé FR/EN/mobile/sombre. Droits Ventes/Comptabilité et contrôles SQL renforcés sur dates, périodes et concurrence; migration `20261108000000_customer_credit_applications`.
