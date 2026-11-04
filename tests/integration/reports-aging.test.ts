@@ -7,7 +7,7 @@ import { getCreditDraft, getDraft, getInvoice, postCreditNote, postInvoice, save
 import { AppError } from "@/platform/errors";
 import type { CompanyContext } from "@/platform/tenant";
 import { owner } from "./helpers";
-import { seedWorld, W } from "./world";
+import { asOwnerA, seedWorld, setContext, W } from "./world";
 
 const actor: CompanyContext = { userId: W.userOwnerA, companyId: W.companyA };
 const accountant: CompanyContext = { ...actor, userId: W.userAccountant };
@@ -42,7 +42,7 @@ async function invoice(contactId: string, date: string, dueDate: string, unitPri
 const pay = (invoiceId: string, date: string, amountCents: bigint, openCents: bigint) =>
   recordReceipt(actor, { invoiceId, amountCents: String(amountCents), expectedOpenCents: String(openCents), date, accountId: W.bank, method: "EFT" }, { now: NOW });
 
-/** A payment with its entry and no allocation, written straight in the database (the services always apply a payment to an invoice). */
+/** Low-level aging fixture: a payment and its exact entry, without any invoice allocation. */
 async function loosePayment(o: { direction: "RECEIVED" | "SENT"; ledger: "RECEIVABLE" | "PAYABLE"; contact: string; date: string; cents: number }): Promise<string> {
   const id = randomUUID();
   const entryId = randomUUID();
@@ -50,6 +50,7 @@ async function loosePayment(o: { direction: "RECEIVED" | "SENT"; ledger: "RECEIV
   const control = o.ledger === "RECEIVABLE" ? W.receivable : W.payable;
   await db.query("BEGIN");
   try {
+    await setContext(db, asOwnerA);
     await db.query(
       "INSERT INTO journal_entry (id, company_id, entry_number, entry_date, fiscal_period_id, source_type, source_id, created_by_id) SELECT $1, $2, $3, $4::date, id, 'PAYMENT', $5, $6 FROM fiscal_period WHERE company_id = $2 AND $4::date BETWEEN start_date AND end_date",
       [entryId, W.companyA, ++entrySeq, o.date, id, W.userOwnerA],
@@ -174,40 +175,41 @@ describe("payments and refunds not yet applied", () => {
   const zebra = randomUUID();
   beforeAll(async () => {
     await db.query("INSERT INTO contact (id, company_id, is_customer, display_name, updated_at) VALUES ($1, $2, true, 'Zèbre inc.', now())", [zebra, W.companyA]);
-    ids.loose = await loosePayment({ direction: "RECEIVED", ledger: "RECEIVABLE", contact: zebra, date: "2026-11-02", cents: 3_000 });
-    ids.refund = await loosePayment({ direction: "SENT", ledger: "RECEIVABLE", contact: zebra, date: "2026-11-05", cents: 1_000 });
-    await loosePayment({ direction: "SENT", ledger: "PAYABLE", contact: W.supplier, date: "2026-11-03", cents: 4_000 }); // a supplier's, not a customer's
+    ids.loose = await loosePayment({ direction: "RECEIVED", ledger: "RECEIVABLE", contact: zebra, date: "2026-10-02", cents: 3_000 });
+    ids.refund = await loosePayment({ direction: "SENT", ledger: "RECEIVABLE", contact: zebra, date: "2026-10-05", cents: 1_000 });
+    await loosePayment({ direction: "SENT", ledger: "PAYABLE", contact: W.supplier, date: "2026-10-03", cents: 4_000 }); // a supplier's, not a customer's
   });
 
   it("shows them apart, a payment taking away from what the customer owes and a refund adding to it", async () => {
-    const { customer } = await ofCustomer(actor, "2026-11-30", "Zèbre inc.");
+    const { customer } = await ofCustomer(actor, "2026-10-30", "Zèbre inc.");
     expect(customer?.buckets).toEqual(empty);
     expect(customer?.unappliedCents).toBe(-2_000n);
     expect(customer?.totalCents).toBe(-2_000n);
-    expect(customer?.items.map((entry) => [entry.kind, entry.cents, entry.date, entry.bucket])).toEqual([["REFUND", 1_000n, "2026-11-05", null], ["PAYMENT", -3_000n, "2026-11-02", null]]);
+    expect(customer?.items.map((entry) => [entry.kind, entry.cents, entry.date, entry.bucket])).toEqual([["REFUND", 1_000n, "2026-10-05", null], ["PAYMENT", -3_000n, "2026-10-02", null]]);
   });
 
   it("holds them from the day they were made only, and leaves a supplier's payment out", async () => {
-    expect((await ofCustomer(actor, "2026-11-01", "Zèbre inc.")).customer).toBeUndefined();
-    expect((await ofCustomer(actor, "2026-11-02", "Zèbre inc.")).total).toBe(-3_000n);
-    expect((await ofCustomer(actor, "2026-11-04", "Zèbre inc.")).total).toBe(-3_000n);
-    expect((await ofCustomer(actor, "2026-11-05", "Zèbre inc.")).total).toBe(-2_000n);
-    const aging = await getReceivablesAging(actor, { asOf: "2026-11-30" });
+    expect((await ofCustomer(actor, "2026-10-01", "Zèbre inc.")).customer).toBeUndefined();
+    expect((await ofCustomer(actor, "2026-10-02", "Zèbre inc.")).total).toBe(-3_000n);
+    expect((await ofCustomer(actor, "2026-10-04", "Zèbre inc.")).total).toBe(-3_000n);
+    expect((await ofCustomer(actor, "2026-10-05", "Zèbre inc.")).total).toBe(-2_000n);
+    const aging = await getReceivablesAging(actor, { asOf: "2026-10-30" });
     expect(aging.customers.some((customer) => customer.contactName === "Fournisseur Fictif")).toBe(false);
   });
 
   it("stays out of the figures of a payment that was voided, from the day it was voided", async () => {
-    const id = await loosePayment({ direction: "RECEIVED", ledger: "RECEIVABLE", contact: zebra, date: "2026-11-10", cents: 700 });
+    const id = await loosePayment({ direction: "RECEIVED", ledger: "RECEIVABLE", contact: zebra, date: "2026-10-10", cents: 700 });
     const original = (await db.query("SELECT journal_entry_id FROM payment WHERE id = $1", [id])).rows[0].journal_entry_id as string;
     const reversal = randomUUID();
     await db.query("BEGIN");
     try {
+      await setContext(db, asOwnerA);
       await db.query(
-        "INSERT INTO journal_entry (id, company_id, entry_number, entry_date, fiscal_period_id, source_type, reverses_entry_id, created_by_id) SELECT $1, $2, $3, '2026-11-12', id, 'REVERSAL', $4, $5 FROM fiscal_period WHERE company_id = $2 AND '2026-11-12'::date BETWEEN start_date AND end_date",
+        "INSERT INTO journal_entry (id, company_id, entry_number, entry_date, fiscal_period_id, source_type, reverses_entry_id, created_by_id) SELECT $1, $2, $3, '2026-10-12', id, 'REVERSAL', $4, $5 FROM fiscal_period WHERE company_id = $2 AND '2026-10-12'::date BETWEEN start_date AND end_date",
         [reversal, W.companyA, ++entrySeq, original, W.userOwnerA],
       );
       await db.query(
-        "INSERT INTO journal_line (id, company_id, entry_id, line_no, account_id, debit_cents, credit_cents, contact_id, entry_date, tax_id, tax_box) SELECT gen_random_uuid(), l.company_id, $1, l.line_no, l.account_id, l.credit_cents, l.debit_cents, l.contact_id, '2026-11-12'::date, l.tax_id, l.tax_box FROM journal_line l WHERE l.entry_id = $2",
+        "INSERT INTO journal_line (id, company_id, entry_id, line_no, account_id, debit_cents, credit_cents, contact_id, entry_date, tax_id, tax_box) SELECT gen_random_uuid(), l.company_id, $1, l.line_no, l.account_id, l.credit_cents, l.debit_cents, l.contact_id, '2026-10-12'::date, l.tax_id, l.tax_box FROM journal_line l WHERE l.entry_id = $2",
         [reversal, original],
       );
       await db.query("UPDATE payment SET status = 'VOID', void_entry_id = $2, voided_at = now(), voided_by_id = $3, void_reason = 'Essai', updated_at = now() WHERE id = $1", [id, reversal, W.userOwnerA]);
@@ -216,14 +218,14 @@ describe("payments and refunds not yet applied", () => {
       await db.query("ROLLBACK");
       throw error;
     }
-    expect((await ofCustomer(actor, "2026-11-11", "Zèbre inc.")).total).toBe(-2_700n);
-    expect((await ofCustomer(actor, "2026-11-12", "Zèbre inc.")).total).toBe(-2_000n);
+    expect((await ofCustomer(actor, "2026-10-11", "Zèbre inc.")).total).toBe(-2_700n);
+    expect((await ofCustomer(actor, "2026-10-12", "Zèbre inc.")).total).toBe(-2_000n);
   });
 });
 
 describe("the check against the ledger", () => {
   it("adds up to the receivable accounts' balance on every day, whatever has happened since", async () => {
-    for (const asOf of ["2026-05-31", "2026-06-15", "2026-06-30", "2026-07-01", "2026-07-10", "2026-07-19", "2026-07-20", "2026-08-09", "2026-08-10", "2026-09-30", "2026-10-31", "2026-11-04", "2026-11-11", "2026-11-12", "2026-12-31"]) {
+    for (const asOf of ["2026-05-31", "2026-06-15", "2026-06-30", "2026-07-01", "2026-07-10", "2026-07-19", "2026-07-20", "2026-08-09", "2026-08-10", "2026-09-30", "2026-10-01", "2026-10-02", "2026-10-04", "2026-10-05", "2026-10-11", "2026-10-12", "2026-10-31", "2026-11-04", "2026-11-11", "2026-11-12", "2026-12-31"]) {
       const aging = await getReceivablesAging(actor, { asOf });
       expect(aging.differenceCents, asOf).toBe(0n);
       expect(aging.controlCents, asOf).toBe(aging.totalCents);

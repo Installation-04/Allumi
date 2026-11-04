@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { can, type Role } from "@/modules/companies";
+import { can, type AccessContext } from "@/modules/companies";
 import { listInvoicePaymentLinks, listPaymentConnections, type PaymentLinkDto } from "@/modules/integrations";
 import { formatMoney, type Locale } from "@/modules/ledger";
 import { ActionForm, SelectField } from "@/app/_components/ui";
@@ -16,11 +16,11 @@ const stamp = (date: Date) => `${date.toISOString().replace("T", " ").slice(0, 1
  * What a posted invoice shows about paying it online: the links made for it, the one that is live, what a payment
  * came to, and (for the owner, who holds the keys) the buttons to make a link, look for a payment and cancel.
  */
-export async function OnlinePaymentPanel(props: { companyId: string; role: Role; actor: { userId: string; companyId: string }; invoiceId: string; openCents: bigint; locale: Locale; query: Query }) {
-  const { companyId, role, actor, invoiceId, openCents, locale, query } = props;
+export async function OnlinePaymentPanel(props: { companyId: string; access: AccessContext; actor: { userId: string; companyId: string }; invoiceId: string; openCents: bigint; locale: Locale; query: Query }) {
+  const { companyId, access, actor, invoiceId, openCents, locale, query } = props;
   const t = await getTranslations("onlinePayments");
   const te = await getTranslations("errors");
-  const isOwner = can(role, "integration.manage");
+  const isOwner = can(access, "integration.manage") && can(access, "sales.manage") && can(access, "entry.post");
   const links = await listInvoicePaymentLinks(actor, invoiceId);
   const live = links.find((link) => link.status === "PENDING" || link.status === "ACTIVE");
   const connections = isOwner && !live && openCents > 0n ? await listPaymentConnections(actor) : [];

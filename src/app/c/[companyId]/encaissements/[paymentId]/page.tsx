@@ -1,3 +1,4 @@
+import { ReceiptAllocationsPanel } from "../receipt-allocations-panel";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -12,12 +13,12 @@ import { voidReceiptAction } from "../actions";
 
 export async function generateMetadata() { return { title: (await getTranslations("payments"))("title") }; }
 
-export default async function PaymentPage({ params }: { params: Promise<{ companyId: string; paymentId: string }> }) {
+export default async function PaymentPage({ params, searchParams }: { params: Promise<{ companyId: string; paymentId: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { company, actor, locale } = await loadCompany(params, "ledger.read");
   if (!can(company, "sales.read")) notFound();
   const { paymentId } = await params;
   if (!validId(paymentId)) notFound();
-  const payment = await getReceipt(actor, paymentId);
+  const payment = await getReceipt(actor, paymentId, { includeAllocations: false });
   if (!payment) notFound();
   const t = await getTranslations("payments");
   const h = await getTranslations("paymentHistory");
@@ -43,20 +44,8 @@ export default async function PaymentPage({ params }: { params: Promise<{ compan
       <dl className="grid gap-4 rounded-lg border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-900 sm:grid-cols-2">
         {rows.map(([label, value]) => <div key={label}><dt className="text-sm text-stone-600 dark:text-stone-400">{label}</dt><dd className="whitespace-pre-wrap">{value}</dd></div>)}
       </dl>
-      <section className="space-y-2" aria-labelledby="payment-allocations">
-        <h2 id="payment-allocations" className="font-semibold">{t("allocations")}</h2>
-        <ul className="space-y-1">
-          {payment.allocations.map((allocation) => (
-            <li key={allocation.id}>
-              <Link href={`${base}/factures/validees/${allocation.invoiceId}`} className={`inline-flex min-h-11 items-center rounded underline ${FOCUS}`}>
-                {t("allocationLine", { amount: formatMoney(allocation.amountCents, locale), number: allocation.invoiceNumber })}
-              </Link>
-              {allocation.unappliedDate ? <span className="text-sm text-stone-600 dark:text-stone-400"> · {t("released", { date: allocation.unappliedDate })}</span> : null}
-            </li>
-          ))}
-        </ul>
-        <Link href={`${base}/journal/${payment.journalEntryId}`} className={`inline-flex min-h-11 items-center rounded underline ${FOCUS}`}>{t("journalEntry")}</Link>
-      </section>
+      <ReceiptAllocationsPanel actor={actor} access={company} paymentId={paymentId} openCents={payment.openCents} posted={payment.status === "POSTED"} locale={locale} query={await searchParams} />
+      <Link href={`${base}/journal/${payment.journalEntryId}`} className={`inline-flex min-h-11 items-center rounded underline ${FOCUS}`}>{t("journalEntry")}</Link>
       {can(company, "bank.read") && payment.deposits.length ? <section className="space-y-2 rounded border border-stone-300 p-4 dark:border-stone-700"><h2 className="font-semibold">{td("receiptDeposits")}</h2><ul>{payment.deposits.map(d => <li key={d.id}><Link className={`inline-flex min-h-11 items-center rounded underline ${FOCUS}`} href={`${base}/depots/${d.id}`}>{d.number} · {d.date} · {td(d.status === "POSTED" ? "posted" : "void")}</Link></li>)}</ul>{deposited ? <p className="text-sm">{td("receiptBlocked")}</p> : null}</section> : null}
       {payment.status === "VOID" ? (
         <div className="space-y-1 rounded border border-amber-600 p-4">
@@ -64,7 +53,7 @@ export default async function PaymentPage({ params }: { params: Promise<{ compan
           <p className="whitespace-pre-wrap">{t("voidedReason", { reason: payment.voidReason ?? "" })}</p>
           {payment.voidEntryId ? <Link href={`${base}/journal/${payment.voidEntryId}`} className={`inline-flex min-h-11 items-center rounded underline ${FOCUS}`}>{t("journalEntry")}</Link> : null}
         </div>
-      ) : can(company, "sales.manage") && !deposited ? (
+      ) : can(company, "sales.manage") && can(company, "entry.reverse") && !deposited ? (
         <details className="rounded border border-stone-300 p-4 dark:border-stone-700">
           <summary className="min-h-11 cursor-pointer">{t("voidTitle")}</summary>
           <div className="mt-3">

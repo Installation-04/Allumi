@@ -5,7 +5,7 @@ import { getPayablesAging } from "@/modules/reports";
 import { recordDisbursement,voidDisbursement } from "@/modules/payments";
 import { saveDraft,getDraft,postBill,getBill,voidBill,saveCreditDraft,getCreditDraft,postCreditNote,voidCreditNote,saveExpenseDraft,getExpenseDraft,postExpense } from "@/modules/purchases";
 import { owner } from "./helpers";
-import { seedWorld,W } from "./world";
+import { asOwnerA, seedWorld, setContext, W } from "./world";
 const actor={userId:W.userOwnerA,companyId:W.companyA};
 let entrySeq=900_000;
 let db:pg.Client,first:string,second:string,payment:string,credit:string;
@@ -54,6 +54,7 @@ async function loosePayment(o: { direction: "RECEIVED" | "SENT"; ledger: "RECEIV
   const control = o.ledger === "RECEIVABLE" ? W.receivable : W.payable;
   await db.query("BEGIN");
   try {
+    await setContext(db, asOwnerA);
     await db.query(
       "INSERT INTO journal_entry (id, company_id, entry_number, entry_date, fiscal_period_id, source_type, source_id, created_by_id) SELECT $1, $2, $3, $4::date, id, 'PAYMENT', $5, $6 FROM fiscal_period WHERE company_id = $2 AND $4::date BETWEEN start_date AND end_date",
       [entryId, W.companyA, ++entrySeq, o.date, id, W.userOwnerA],

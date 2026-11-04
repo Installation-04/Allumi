@@ -48,7 +48,7 @@ export async function sendInvoiceEmail(actor: CompanyContext, documentId: string
       const money=(c:bigint)=>formatMoney(c,input.locale);
       const message=invoiceMail({number:invoice.number!,issuer:address(invoice.issuerSnapshot),customer:address(invoice.billingSnapshot),issueDate:invoice.issueDate.toISOString().slice(0,10),dueDate:invoice.dueDate?.toISOString().slice(0,10)??null,reference:invoice.reference,memo:invoice.memo,
         lines:invoice.lines.map(l=>({description:l.description,quantity:l.quantity.toString(),unitPrice:l.unitPrice.toString(),amount:money(l.amountCents)})),
-        taxes:invoice.taxes.map(t=>({label:t.tax.code,amount:money(t.amountCents)})),subtotal:money(invoice.subtotalCents),total:money(invoice.totalCents)},input.locale);
+        taxes:invoice.taxes.map(t=>({label:t.tax?.code ?? (input.locale === "en" ? "Tax" : "Taxe"),amount:money(t.amountCents)})),subtotal:money(invoice.subtotalCents),total:money(invoice.totalCents)},input.locale);
       const attempt=await tx.invoiceEmail.create({data:{id:input.attemptId,companyId:actor.companyId,documentId,recipient:input.recipient,locale:input.locale,createdById:actor.userId}});
       return {attempt,message};
     });

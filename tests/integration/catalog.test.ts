@@ -259,3 +259,33 @@ it("keeps customer guards under caller privileges with restricted function execu
     { name: "customer_document_void_isolation", definer: false, config: ["search_path=public, pg_temp"], public_execute: false },
   ]);
 });
+
+it("installs immediate customer receipt guards on payments, allocations and offsets", async () => {
+  const rows = await q<{ name: string; table_name: string; function_name: string; events: number; enabled: string; deferred: boolean }>(
+    `SELECT t.tgname AS name, c.relname AS table_name, p.proname AS function_name,
+            t.tgtype::integer AS events, t.tgenabled AS enabled, t.tgdeferrable AS deferred
+       FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
+       JOIN pg_namespace n ON n.oid = c.relnamespace JOIN pg_proc p ON p.oid = t.tgfoid
+      WHERE n.nspname = 'public' AND NOT t.tgisinternal
+        AND t.tgname IN ('customer_account_payment_guard', 'customer_account_allocation_guard', 'customer_account_offset_guard')
+      ORDER BY t.tgname`,
+  );
+  // pg_trigger bits: ROW=1, BEFORE=2, INSERT=4, UPDATE=16.
+  expect(rows).toEqual([
+    { name: "customer_account_allocation_guard", table_name: "payment_allocation", function_name: "customer_receipt_movement_guard", events: 23, enabled: "O", deferred: false },
+    { name: "customer_account_offset_guard", table_name: "payment_offset", function_name: "customer_receipt_movement_guard", events: 23, enabled: "O", deferred: false },
+    { name: "customer_account_payment_guard", table_name: "payment", function_name: "customer_receipt_movement_guard", events: 23, enabled: "O", deferred: false },
+  ]);
+});
+
+it("keeps customer receipt movement checks volatile under caller privileges", async () => {
+  const rows = await q<{ definer: boolean; volatility: string; config: string[]; public_execute: boolean }>(
+    `SELECT p.prosecdef AS definer, p.provolatile AS volatility, p.proconfig AS config,
+            has_function_privilege('public', p.oid, 'EXECUTE') AS public_execute
+       FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+      WHERE n.nspname = 'public' AND p.pronargs = 0 AND p.proname = 'customer_receipt_movement_guard'`,
+  );
+  expect(rows).toEqual([
+    { definer: false, volatility: "v", config: ["search_path=public, pg_temp"], public_execute: false },
+  ]);
+});

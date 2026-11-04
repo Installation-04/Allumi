@@ -7,7 +7,7 @@ import { withCompany, type CompanyContext, type Tx } from "@/platform/tenant";
 import { acceptsReceipts, receiptSchema, receiptVoidSchema } from "../domain/receipt";
 
 import { paymentHistoryWhere, receiptCustomerNames } from "./history";
-import { assertCustomerMovementDate } from "./movement-dates";
+import { assertCustomerMovementDate, assertReceiptMovementDate } from "./movement-dates";
 
 export const RECEIPTS_PER_PAGE = 25;
 
@@ -40,6 +40,7 @@ export async function recordReceiptWithin(tx: Tx, actor: CompanyContext, input: 
   const { invoiceId, amountCents, expectedOpenCents, date, accountId, method, reference, memo } = parsed.data;
   if (date > todayIso(options.now)) throw new AppError("payments.futureDate");
   await requireRole(tx, "sales.manage");
+  await requireRole(tx, "entry.post");
   const locked = await tx.$queryRaw<{ id: string }[]>`
     SELECT id FROM sales_document WHERE company_id = ${actor.companyId}::uuid AND id = ${invoiceId}::uuid AND kind = 'INVOICE' FOR UPDATE`;
   if (!locked[0]) throw new AppError("payments.invoiceNotFound");
@@ -91,9 +92,12 @@ export async function voidReceipt(actor: CompanyContext, id: string, input: unkn
   const parsed = receiptVoidSchema.safeParse(input);
   if (!parsed.success || !isValidIsoDate(parsed.data.date)) throw new AppError("payments.invalidVoid");
   const { date, reason } = parsed.data;
+  if (date > todayIso()) throw new AppError("payments.futureDate");
   try {
     return await withCompany(actor, async (tx) => {
       await requireRole(tx, "sales.manage");
+      await requireRole(tx, "entry.post");
+      await requireRole(tx, "entry.reverse");
       const locked = await tx.$queryRaw<{ id: string }[]>`
         SELECT id FROM payment WHERE company_id = ${actor.companyId}::uuid AND id = ${id}::uuid AND direction = 'RECEIVED' AND ledger = 'RECEIVABLE' FOR UPDATE`;
       if (!locked[0]) throw new AppError("payments.notFound");
@@ -103,6 +107,8 @@ export async function voidReceipt(actor: CompanyContext, id: string, input: unkn
       const allocations = await tx.paymentAllocation.findMany({ where: { companyId: actor.companyId, paymentId: id, unappliedDate: null }, select: { id: true, appliedDate: true } });
       const latest = allocations.reduce((max, allocation) => (iso(allocation.appliedDate) > max ? iso(allocation.appliedDate) : max), iso(payment.paymentDate));
       if (date < latest) throw new AppError("payments.invalidVoid");
+      await assertReceiptMovementDate(tx, actor.companyId, id, date, "payments.dateBeforeMovement");
+      if (await tx.paymentOffset.findFirst({ where: { companyId: actor.companyId, receivedPaymentId: id, unappliedDate: null }, select: { id: true } })) throw new AppError("payments.offsetsLinked");
 
       // Invoices first, in a fixed order: a concurrent invoice void or payment waits instead of crossing.
       const documents = await tx.$queryRaw<{ id: string }[]>`SELECT id FROM sales_document WHERE company_id = ${actor.companyId}::uuid AND id IN (SELECT sales_document_id FROM payment_allocation WHERE company_id = ${actor.companyId}::uuid AND payment_id = ${id}::uuid) ORDER BY id FOR UPDATE`;
@@ -122,6 +128,7 @@ export async function voidReceipt(actor: CompanyContext, id: string, input: unkn
 export async function listReceiptAccounts(actor: CompanyContext) {
   return withCompany(actor, async (tx) => {
     await requireRole(tx, "sales.read");
+    await requireRole(tx, "ledger.read");
     const accounts = await tx.account.findMany({
       where: { companyId: actor.companyId, isActive: true, OR: [{ subtype: { in: ["BANK", "CASH"] } }, { systemKey: "UNDEPOSITED_FUNDS" }] },
       select: { id: true, code: true, nameFr: true, nameEn: true, subtype: true, systemKey: true, isActive: true },
@@ -135,6 +142,7 @@ export async function listReceiptAccounts(actor: CompanyContext) {
 export async function listInvoicePayments(actor: CompanyContext, invoiceId: string) {
   return withCompany(actor, async (tx) => {
     await requireRole(tx, "sales.read");
+    await requireRole(tx, "ledger.read");
     const allocations = await tx.paymentAllocation.findMany({
       where: { companyId: actor.companyId, salesDocumentId: invoiceId, unappliedDate: null },
       select: { id: true, amountCents: true, appliedDate: true, payment: { select: { id: true, number: true, method: true, reference: true, paymentDate: true } } },
@@ -155,29 +163,33 @@ export async function listReceipts(actor: CompanyContext, requestedPage = 1, fil
     const where = paymentHistoryWhere(actor.companyId, "RECEIVED", filters);
     const total = await tx.payment.count({ where });
     const pageCount = Math.max(1, Math.ceil(total / RECEIPTS_PER_PAGE));
-    const page = Math.min(Math.max(1, Math.trunc(requestedPage) || 1), pageCount);
+    const page = Math.min(Math.max(1, Number.isFinite(requestedPage) ? Math.trunc(requestedPage) : 1), pageCount);
     const rows = await tx.payment.findMany({
       where,
       select: {
         id: true, number: true, paymentDate: true, amountCents: true, status: true, method: true, reference: true,
         contactId: true,
-        allocations: { select: { salesDocument: { select: { id: true, number: true, billingSnapshot: true } } }, orderBy: { id: "asc" } },
+        allocations: { select: { salesDocument: { select: { id: true, number: true, billingSnapshot: true } } }, orderBy: { id: "asc" }, take: 5 },
+        _count: { select: { allocations: true } },
       },
       orderBy: [{ paymentDate: "desc" }, { createdAt: "desc" }, { id: "desc" }],
       skip: (page - 1) * RECEIPTS_PER_PAGE,
       take: RECEIPTS_PER_PAGE,
     });
+    const ids = rows.map(row => row.id);
+    const balances = ids.length ? await tx.$queryRaw<{ id: string; cents: bigint }[]>`SELECT id,CASE WHEN status='POSTED' THEN payment_open_cents(company_id,id) ELSE 0 END AS cents FROM payment WHERE company_id=${actor.companyId}::uuid AND id=ANY(${ids}::uuid[]) AND direction='RECEIVED' AND ledger='RECEIVABLE'` : [];
+    const available = new Map(balances.map(row => [row.id, row.cents]));
     const customers = await receiptCustomerNames(tx, actor.companyId, rows);
     const receipts = rows.map((row) => ({
       id: row.id, number: row.number ?? "", date: iso(row.paymentDate), amountCents: row.amountCents, status: row.status, method: row.method, reference: row.reference,
-      customer: customers.get(row.id) ?? "",
+      customer: customers.get(row.id) ?? "", availableCents: available.get(row.id) ?? 0n, hasMoreAllocations: row._count.allocations > row.allocations.length,
       invoices: [...new Map(row.allocations.flatMap((a) => (a.salesDocument ? [[a.salesDocument.id, a.salesDocument.number ?? ""] as const] : []))).entries()].map(([invoiceId, number]) => ({ id: invoiceId, number })),
     }));
     return { receipts, total, page, pageCount };
   });
 }
 
-export async function getReceipt(actor: CompanyContext, id: string) {
+export async function getReceipt(actor: CompanyContext, id: string, options: { includeAllocations?: boolean } = {}) {
   return withCompany(actor, async (tx) => {
     await requireRole(tx, "sales.read");
     await requireRole(tx, "ledger.read");
@@ -187,14 +199,18 @@ export async function getReceipt(actor: CompanyContext, id: string) {
         account: { select: { code: true, nameFr: true, nameEn: true } },
         voidEntry: { select: { entryDate: true } },
         depositItems: { select: { deposit: { select: { id: true, number: true, status: true, depositDate: true } } }, orderBy: [{ deposit: { status: "asc" } }, { deposit: { depositDate: "desc" } }, { depositId: "desc" }], take: 100 },
-        allocations: { orderBy: [{ appliedDate: "asc" }, { id: "asc" }], select: { id: true, amountCents: true, appliedDate: true, unappliedDate: true, salesDocument: { select: { id: true, number: true, billingSnapshot: true } } } },
+        allocations: { ...(options.includeAllocations === false ? { take: 0 } : {}), orderBy: [{ appliedDate: "asc" }, { id: "asc" }], select: { id: true, amountCents: true, appliedDate: true, unappliedDate: true, salesDocument: { select: { id: true, number: true, billingSnapshot: true } } } },
       },
     });
     if (!row) return null;
-    const customers = await receiptCustomerNames(tx, actor.companyId, [row]);
+    // The paginated UI can omit the full history while retaining one immutable customer snapshot.
+    const nameAllocation = options.includeAllocations === false ? await tx.paymentAllocation.findFirst({ where: { companyId: actor.companyId, paymentId: id, salesDocumentId: { not: null } }, select: { salesDocument: { select: { billingSnapshot: true } } }, orderBy: { id: "asc" } }) : null;
+    const customers = await receiptCustomerNames(tx, actor.companyId, [{ ...row, allocations: nameAllocation ? [nameAllocation] : row.allocations }]);
+    const balances = row.status === "POSTED" ? await tx.$queryRaw<{ cents: bigint }[]>`SELECT payment_open_cents(${actor.companyId}::uuid,${id}::uuid) AS cents` : [];
+
     return {
       id: row.id, number: row.number ?? "", date: iso(row.paymentDate), amountCents: row.amountCents, status: row.status, method: row.method,
-      reference: row.reference, memo: row.memo, customer: customers.get(row.id) ?? "", contactId: row.contactId, account: row.account,
+      reference: row.reference, memo: row.memo, customer: customers.get(row.id) ?? "", contactId: row.contactId, account: row.account, openCents: balances[0]?.cents ?? 0n,
       journalEntryId: row.journalEntryId, voidEntryId: row.voidEntryId, voidDate: row.voidEntry ? iso(row.voidEntry.entryDate) : null, voidReason: row.voidReason,
       deposits: row.depositItems.map(item => ({ ...item.deposit, number: item.deposit.number ?? "", date: iso(item.deposit.depositDate) })),
       allocations: row.allocations.map((a) => ({

@@ -3,6 +3,7 @@ import { afterAll,beforeAll,expect,it,vi } from "vitest";
 import type pg from "pg";
 import { getInvoiceEmails,sendInvoiceEmail,saveDraft,getDraft,postInvoice,voidInvoice } from "@/modules/sales";
 import { withCompany } from "@/platform/tenant";
+import { formatMoney } from "@/modules/ledger";
 import { owner } from "./helpers";
 import { seedWorld,W } from "./world";
 const mail=vi.hoisted(()=>({deliver:vi.fn().mockResolvedValue("ACCEPTED"),configured:vi.fn()}));
@@ -65,6 +66,34 @@ it("serializes distinct concurrent submissions and enforces throttle and identit
  await expect(withCompany(actor,tx=>tx.invoiceEmail.create({data:{...data,id:randomUUID(),documentId:otherId,createdById:W.userOwnerB}}))).rejects.toThrow();
  const created=await withCompany(actor,tx=>tx.invoiceEmail.create({data:{...data,id:randomUUID(),documentId:otherId,createdAt:new Date("2010-01-01")}}));
  expect(created.createdAt.getTime()).toBeGreaterThan(Date.now()-60_000);
+});
+it("emails frozen tax amounts in both languages when the seller cannot read tax configuration",async()=>{
+ const original=(await db.query("SELECT module_access FROM membership WHERE company_id=$1 AND user_id=$2",[W.companyA,W.userAccountant])).rows[0].module_access;
+ await db.query("UPDATE membership SET module_access=$3::jsonb WHERE company_id=$1 AND user_id=$2",[W.companyA,W.userAccountant,JSON.stringify({...original,taxes:"none"})]);
+ try {
+  for(const locale of ["fr-CA","en"] as const) {
+   const id=await invoice();
+   const frozen=(await db.query("SELECT subtotal_cents::text AS subtotal,total_cents::text AS total,issuer_snapshot,billing_snapshot FROM sales_document WHERE id=$1",[id])).rows[0];
+   const taxAmounts=(await db.query("SELECT amount_cents::text AS amount FROM sales_document_tax WHERE company_id=$1 AND document_id=$2 ORDER BY id",[W.companyA,id])).rows.map(row=>row.amount as string);
+   expect(taxAmounts).toHaveLength(2);
+   const before=mail.deliver.mock.calls.length;
+   const sent=await sendInvoiceEmail(seller,id,{...input(),locale});
+   expect(sent.status).toBe("ACCEPTED");
+   expect(mail.deliver).toHaveBeenCalledTimes(before+1);
+   const message=mail.deliver.mock.calls.at(-1)![0];
+   const label=locale==="en"?"Tax":"Taxe";
+   expect(message.text.split("\n").filter((line:string)=>line.startsWith(`${label}: `)).sort()).toEqual(taxAmounts.map(amount=>`${label}: ${formatMoney(BigInt(amount),locale)}`).sort());
+   expect(message.text).toContain(`Total (CAD): ${formatMoney(BigInt(frozen.total),locale)}`);
+   expect(message.text).toContain(`${locale==="en"?"Subtotal":"Sous-total"}: ${formatMoney(BigInt(frozen.subtotal),locale)}`);
+   expect(message.text).toContain(frozen.issuer_snapshot.name);
+   expect(message.text).toContain(frozen.billing_snapshot.name);
+   for(const amount of taxAmounts) expect(message.html).toContain(`${label}: ${formatMoney(BigInt(amount),locale)}`);
+   expect((await db.query("SELECT subtotal_cents::text AS subtotal,total_cents::text AS total,issuer_snapshot,billing_snapshot FROM sales_document WHERE id=$1",[id])).rows[0]).toEqual(frozen);
+   expect((await db.query("SELECT amount_cents::text AS amount FROM sales_document_tax WHERE company_id=$1 AND document_id=$2 ORDER BY id",[W.companyA,id])).rows.map(row=>row.amount)).toEqual(taxAmounts);
+  }
+ } finally {
+  await db.query("UPDATE membership SET module_access=$3::jsonb WHERE company_id=$1 AND user_id=$2",[W.companyA,W.userAccountant,JSON.stringify(original)]);
+ }
 });
 it("requires configured SMTP, refuses void invoices and applies permission revocation to raw history",async()=>{
  const id=await invoice();mail.configured.mockImplementationOnce(()=>{throw new Error("unconfigured");});
