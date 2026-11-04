@@ -2855,6 +2855,8 @@ async function onAccountReceiptJourney(page: Page, firstInvoiceUrl: string) {
  await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");
  await expect(page.locator("html")).toHaveAttribute("data-theme","light");
  await page.getByRole("button",{name:"Français",exact:true}).click();
+ // Wait for the language action to commit before a navigation can cancel it.
+ await expect(panel.getByText(/^Montant disponible :\s*15,00\s*\$/)).toBeVisible();
  await page.goto(firstInvoiceUrl);await expect(page.getByText(/^Solde restant:\s*13,00\s*\$/)).toBeVisible();
  await page.goto(secondInvoiceUrl);await expect(page.getByText(/^Solde restant:\s*6,50\s*\$/)).toBeVisible();
  await page.goto(receiptUrl);
