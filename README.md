@@ -422,3 +422,14 @@ Recherchez les encaissements et remboursements par client, numéro ou référenc
 ![Encaissements filtrés](docs/images/historique-encaissements-desktop.png)
 
 ![Recherche sur téléphone](docs/images/historique-encaissements-mobile.png)
+
+
+### Affecter un avoir à une facture client
+
+Réglez partiellement ou intégralement une facture ouverte du même client avec un avoir disponible. Vérifiez les deux soldes avant confirmation; les désaffectations datées restent dans l’historique. Aucun transfert de fonds ni nouvelle écriture comptable.
+
+[Guide des affectations](docs/Affectation-des-avoirs-clients.md)
+
+![Révision d’une affectation client](docs/images/affectation-avoir-formulaire-desktop.png)
+
+![Affectation en anglais et thème sombre sur mobile](docs/images/affectation-avoir-en-dark-mobile.png)

@@ -89,6 +89,7 @@
 - [[Depots-bancaires]] — encaissements en attente, dépôt groupé et annulation contrôlée.
 
 - [[Avoirs-disponibles-et-remboursements]]
+- [[Affectation-des-avoirs-clients]]
 - [[Releve-de-compte-client]]
 
 - [[Recherche-des-paiements-clients]]

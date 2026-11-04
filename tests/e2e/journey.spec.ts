@@ -279,8 +279,9 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await test.step("taxSummaryJourney", () => taxSummaryJourney(page));
   await test.step("cashMovementsJourney", () => cashMovementsJourney(page));
   await test.step("bankDepositsJourney", () => bankDepositsJourney(page));
-  await test.step("customerBalancesJourney", () => customerBalancesJourney(page, paidInvoiceUrl));
+  const availableCreditUrl = await test.step("customerBalancesJourney", () => customerBalancesJourney(page, paidInvoiceUrl));
   await test.step("paymentHistoryJourney", () => paymentHistoryJourney(page));
+  await test.step("creditApplicationsJourney", () => creditApplicationsJourney(page, availableCreditUrl));
   const settingsBase = new URL(page.url()).pathname.match(/^\/c\/[^/]+/)?.[0];
   expect(settingsBase).toBeTruthy();
   await page.getByRole("button", { name: "Français", exact: true }).click();
@@ -930,7 +931,7 @@ async function creditPostingJourney(page: Page): Promise<string> {
   await expect(page.getByRole("heading",{name:"F-00002",exact:true})).toBeVisible();
   const invoiceUrl=page.url();
   await page.getByRole("link",{name:"Préparer un avoir",exact:true}).click();
-  await page.getByLabel("Date de l’avoir",{exact:true}).fill("2026-07-01");
+  await page.getByLabel("Date de l’avoir",{exact:true}).fill("2026-06-02");
   await page.getByLabel("Motif de l’avoir",{exact:true}).fill("Ajustement du service");
   await page.getByLabel("Consultation comptable",{exact:true}).fill("25");
   await page.getByRole("button",{name:"Enregistrer le brouillon d’avoir",exact:true}).click();
@@ -939,7 +940,7 @@ async function creditPostingJourney(page: Page): Promise<string> {
   await page.getByLabel("Je confirme les montants et le traitement choisi pour cet avoir.").check();
   await page.getByRole("button",{name:"Valider l’avoir",exact:true}).click();
   await expect(page.locator("form").getByRole("alert")).toBeVisible();
-  await page.getByLabel("Date comptable",{exact:true}).fill("2026-07-01");
+  await page.getByLabel("Date comptable",{exact:true}).fill("2026-06-02");
   await page.getByLabel("Je confirme les montants et le traitement choisi pour cet avoir.").check();
   await captureReference(page,"validation-avoir");
   await page.getByRole("button",{name:"Valider l’avoir",exact:true}).click();
@@ -961,16 +962,16 @@ async function creditPostingJourney(page: Page): Promise<string> {
   await expect(page.getByRole("heading",{name:"Entry J-00006",exact:true})).toBeVisible();
   await page.goto(creditUrl);
   await page.locator("summary",{hasText:"Void credit note"}).click();
-  await page.getByLabel("Reversal date",{exact:true}).fill("2026-06-30");
+  await page.getByLabel("Reversal date",{exact:true}).fill("2026-06-01");
   await page.getByLabel("Reason",{exact:true}).fill("Incorrect adjustment");
   await page.getByLabel("I confirm permanently voiding this credit note.").check();
   await page.getByRole("button",{name:"Void credit note",exact:true}).click();
   await expect(page.locator("form").getByRole("alert")).toBeVisible();
-  await page.getByLabel("Reversal date",{exact:true}).fill("2026-07-02");
+  await page.getByLabel("Reversal date",{exact:true}).fill("2026-06-03");
   await page.getByLabel("I confirm permanently voiding this credit note.").check();
   await page.getByRole("button",{name:"Void credit note",exact:true}).click();
   await expect(page.getByText("Voided credit note",{exact:true})).toBeVisible();
-  await expect(page.getByText("Unapplied on 2026-07-02",{exact:true})).toBeVisible();
+  await expect(page.getByText("Unapplied on 2026-06-03",{exact:true})).toBeVisible();
   await expect(page.locator("summary",{hasText:"Void credit note"})).toHaveCount(0);
   await expectNoPageOverflow(page);await captureReference(page,"avoir-annule-en-dark");
   await page.getByRole("button",{name:"Français",exact:true}).click();
@@ -2026,9 +2027,9 @@ async function cashMovementsJourney(page:Page){
 /**
  * The receivables aging, on what the earlier journeys left: invoices F-00001 (241,45 $, voided July 2) and F-00002
  * (114,98 $) of Atelier Boréal, both posted June 1st and due July 1st, payment E-00001 (50,00 $, June 15), payment
- * E-00002 (64,98 $, June 20, voided June 25) and credit note AV-00001 (28,74 $, July 1st, voided July 2). The report of
+ * E-00002 (64,98 $, June 20, voided June 25) and credit note AV-00001 (28,74 $, June 2, voided June 3). The report of
  * past days gives what it was then: before anything, with nothing due, the day a payment void took effect, the due
- * date, and the day after, when an invoice and a credit note were voided. Then the details with their links, the CSV
+ * date, and the day after, when the first invoice was voided. Then the details with their links, the CSV
  * file in both languages, and no overflow.
  */
 async function receivablesAgingJourney(page: Page) {
@@ -2055,20 +2056,27 @@ async function receivablesAgingJourney(page: Page) {
   // both invoices posted, nothing due yet
   await page.goto(`${company}/age-clients?au=2026-06-01`);
   expect(await figures(/^Atelier Boréal/)).toEqual(money("356,43", zero, zero, zero, zero, zero, "356,43"));
+  // The credit reduces the historical balance only between its application and its dated release.
+  await page.goto(`${company}/age-clients?au=2026-06-02`);
+  expect(await figures(/^Atelier Boréal/)).toEqual(money("327,69", zero, zero, zero, zero, zero, "327,69"));
+  await expect(agrees).toBeVisible();
+  await page.goto(`${company}/age-clients?au=2026-06-03`);
+  expect(await figures(/^Atelier Boréal/)).toEqual(money("356,43", zero, zero, zero, zero, zero, "356,43"));
+  await expect(agrees).toBeVisible();
   // the last day before the second payment was voided: only the first invoice is still open
   await page.goto(`${company}/age-clients?au=2026-06-24`);
   expect(await figures(/^Atelier Boréal/)).toEqual(money("241,45", zero, zero, zero, zero, zero, "241,45"));
   // the day it was voided, the invoice it had settled is open again, less the first payment
   await page.goto(`${company}/age-clients?au=2026-06-25`);
   expect(await figures(/^Atelier Boréal/)).toEqual(money("306,43", zero, zero, zero, zero, zero, "306,43"));
-  // the due date itself, with the credit note applied that day: due today is zero days late, not yet in a late column
+  // the due date itself: due today is zero days late, not yet in a late column
   await page.goto(`${company}/age-clients?au=2026-07-01`);
-  expect(await figures(/^Atelier Boréal/)).toEqual(money("277,69", zero, zero, zero, zero, zero, "277,69"));
+  expect(await figures(/^Atelier Boréal/)).toEqual(money("306,43", zero, zero, zero, zero, zero, "306,43"));
   await page.locator("summary").filter({ hasText: "Atelier Boréal" }).locator("span").last().click();
   await expect(row(/F-00001/).getByRole("cell").nth(4)).toHaveText("0");
-  await expect(row(/F-00002/)).toContainText(/36,24\s\$/);
+  await expect(row(/F-00002/)).toContainText(/64,98\s\$/);
 
-  // the day after: one day late; the first invoice was voided that day and the credit note with it
+  // the day after: one day late; the first invoice was voided that day
   await page.goto(`${company}/age-clients?au=2026-07-02`);
   expect(await figures(/^Atelier Boréal/)).toEqual(money(zero, "64,98", zero, zero, zero, zero, "64,98"));
   expect(await figures(/^Total/)).toEqual(money(zero, "64,98", zero, zero, zero, zero, "64,98"));
@@ -2582,7 +2590,7 @@ async function bankDepositsJourney(page: Page) {
 }
 
 /** Paid-invoice credit, a recorded refund, dated customer statement and reversal. */
-async function customerBalancesJourney(page: Page, invoiceUrl: string) {
+async function customerBalancesJourney(page: Page, invoiceUrl: string): Promise<string> {
  const today=todayInToronto(),company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0]??"";
  await page.goto(invoiceUrl);
  // Settle the fixture's remaining balance through the real form before crediting a paid invoice.
@@ -2663,6 +2671,72 @@ async function customerBalancesJourney(page: Page, invoiceUrl: string) {
  await expect(page.getByText(`Annulé le ${today}`,{exact:true})).toBeVisible();
  await page.goto(creditUrl);await expect(page.getByText(/Disponible :.*11,50/)).toBeVisible();
  await expect(page.getByText(`retiré le ${today}`,{exact:true})).toBeVisible();
+ return creditUrl;
+}
+
+/** Apply part of an available credit to another invoice, then restore both document balances. */
+async function creditApplicationsJourney(page: Page, creditUrl: string) {
+ const today=todayInToronto();
+ await openSection(page,"Brouillons de factures");
+ await page.getByRole("link",{name:"Nouveau brouillon",exact:true}).click();
+ await page.getByLabel("Client",{exact:true}).selectOption({label:"Atelier Boréal"});
+ await page.getByLabel("Date de facture",{exact:true}).fill(today);
+ await page.getByLabel("Date d’échéance",{exact:true}).fill(today);
+ const line=page.getByRole("group",{name:"Ligne 1",exact:true});
+ await line.getByLabel("Article du catalogue").selectOption({label:"Consultation comptable"});
+ await line.getByLabel("Prix unitaire (CAD)").fill("20");
+ await line.getByLabel("Compte de revenus").selectOption({label:"4000 — Revenus de services"});
+ await page.getByRole("button",{name:"Enregistrer le brouillon",exact:true}).click();
+ await page.locator("summary",{hasText:"Valider la facture"}).click();
+ await page.getByLabel("Date comptable",{exact:true}).fill(today);
+ await page.getByLabel("Je confirme les montants et la validation définitive.",{exact:true}).check();
+ await page.getByRole("button",{name:"Valider la facture",exact:true}).click();
+ const invoiceHeading=page.getByRole("heading",{level:1,name:/^F-\d{5}$/});
+ await expect(invoiceHeading).toBeVisible();
+ const invoiceNumber=(await invoiceHeading.innerText()).trim(),invoiceUrl=page.url();
+ await expect(page.getByText(/^Solde restant:\s*23,00\s*\$/)).toBeVisible();
+ await page.goto(creditUrl);
+ const panel=page.getByRole("region",{name:"Affectations aux factures",exact:true});
+ await expect(panel.getByText(/^Avoir disponible :\s*11,50\s*\$/)).toBeVisible();
+ await panel.getByLabel("Rechercher une facture par numéro ou référence",{exact:true}).fill(invoiceNumber);
+ await panel.getByRole("button",{name:"Rechercher",exact:true}).click();
+ await panel.getByLabel("Facture à régler",{exact:true}).selectOption(new URL(invoiceUrl).pathname.split("/").at(-1)!);
+ await panel.getByRole("button",{name:"Réviser l’affectation",exact:true}).click();
+ await panel.getByLabel("Montant à affecter",{exact:true}).fill("5,00");
+ await panel.getByLabel("Date d’affectation",{exact:true}).fill(today);
+ await expect(panel.getByRole("heading",{name:new RegExp(`^Facture ${invoiceNumber} — solde ouvert :`)})).toContainText("23,00");
+ await expectNoPageOverflow(page);await captureReference(page,"affectation-avoir-formulaire","Affectations aux factures");
+ await panel.getByLabel("Je confirme cette affectation et les soldes affichés.",{exact:true}).check();
+ await panel.getByRole("button",{name:"Affecter cet avoir",exact:true}).click();
+ const application=panel.getByRole("listitem").filter({has:page.getByRole("link",{name:invoiceNumber,exact:true})});
+ await expect(application).toHaveCount(1);
+ await expect(application.getByText("Active",{exact:true})).toBeVisible();
+ await expect(application).toContainText("5,00");
+ await expect(panel.getByText(/^Avoir disponible :\s*6,50\s*\$/)).toBeVisible();
+ await application.getByRole("link",{name:invoiceNumber,exact:true}).click();
+ await expect(page.getByText(/^Solde restant:\s*18,00\s*\$/)).toBeVisible();
+ await page.goto(creditUrl);
+ await page.getByRole("button",{name:"English",exact:true}).click();
+ const englishPanel=page.getByRole("region",{name:"Invoice applications",exact:true});
+ await expect(englishPanel.getByRole("link",{name:invoiceNumber,exact:true})).toBeVisible();
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");
+ await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
+ await expectNoPageOverflow(page);await captureReference(page,"affectation-avoir-en-dark","Invoice applications");
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");
+ await expect(page.locator("html")).toHaveAttribute("data-theme","light");
+ await page.getByRole("button",{name:"Français",exact:true}).click();
+ await application.locator("summary",{hasText:"Désaffecter"}).click();
+ await application.getByLabel("Date de désaffectation",{exact:true}).fill(today);
+ await application.getByLabel("Je confirme la désaffectation de ce montant.",{exact:true}).check();
+ await application.getByRole("button",{name:"Désaffecter",exact:true}).click();
+ await expect(application.getByText(`Retirée le ${today}`,{exact:true})).toBeVisible();
+ await expect(application.getByRole("button",{name:"Désaffecter",exact:true})).toHaveCount(0);
+ await expect(panel.getByText(/^Avoir disponible :\s*11,50\s*\$/)).toBeVisible();
+ await expectNoPageOverflow(page);await captureReference(page,"affectation-avoir-retiree","Affectations aux factures");
+ for(const query of ["q_affectation=a&q_affectation=b","page_affectation=0","q_affectation=%00"]){
+  expect((await page.request.get(`${creditUrl}?${query}`)).status(),`invalid credit application query: ${query}`).toBe(404);
+ }
+ await page.goto(invoiceUrl);await expect(page.getByText(/^Solde restant:\s*23,00\s*\$/)).toBeVisible();
 }
 
 /** Legacy unallocated receipts exercise pagination without re-running the already tested receipt form 27 times. */
