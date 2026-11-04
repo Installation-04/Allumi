@@ -15,6 +15,7 @@ import { acceptsRefunds, refundSchema } from "../domain/refund";
 import { receiptVoidSchema } from "../domain/receipt";
 
 import { paymentHistoryWhere } from "./history";
+import { assertCustomerMovementDate } from "./movement-dates";
 
 export const CUSTOMER_REFUNDS_PER_PAGE = 25;
 
@@ -73,16 +74,7 @@ async function recordCustomerRefundWithin(
   if (credit.status !== "POSTED") throw new AppError("refunds.creditNotOpen");
   if (date < iso(credit.postingDate))
     throw new AppError("refunds.dateBeforeCredit");
-  // Current availability may have been restored later by an unapplication. Never consume it retroactively.
-  const movements = await tx.$queryRaw<{ latest: Date | null }[]>`
-    SELECT max(d) AS latest FROM (
-      SELECT applied_date AS d FROM payment_allocation WHERE company_id=${actor.companyId}::uuid AND sales_document_id=${creditNoteId}::uuid
-      UNION ALL SELECT unapplied_date FROM payment_allocation WHERE company_id=${actor.companyId}::uuid AND sales_document_id=${creditNoteId}::uuid
-      UNION ALL SELECT applied_date FROM sales_credit_application WHERE company_id=${actor.companyId}::uuid AND credit_note_id=${creditNoteId}::uuid
-      UNION ALL SELECT unapplied_date FROM sales_credit_application WHERE company_id=${actor.companyId}::uuid AND credit_note_id=${creditNoteId}::uuid
-    ) history`;
-  if (movements[0]?.latest && date < iso(movements[0].latest))
-    throw new AppError("refunds.dateBeforeMovement");
+  await assertCustomerMovementDate(tx, actor.companyId, creditNoteId, date, "refunds.dateBeforeMovement");
 
   const open = await tx.$queryRaw<
     { cents: bigint }[]
@@ -211,7 +203,8 @@ export async function voidCustomerRefund(
       if (date < latest) throw new AppError("refunds.invalidVoid");
 
       // Credits first, in a fixed order: a concurrent credit void or payment waits instead of crossing.
-      await tx.$queryRaw`SELECT id FROM sales_document WHERE company_id = ${actor.companyId}::uuid AND id IN (SELECT sales_document_id FROM payment_allocation WHERE company_id = ${actor.companyId}::uuid AND payment_id = ${id}::uuid) ORDER BY id FOR UPDATE`;
+      const documents = await tx.$queryRaw<{ id: string }[]>`SELECT id FROM sales_document WHERE company_id = ${actor.companyId}::uuid AND id IN (SELECT sales_document_id FROM payment_allocation WHERE company_id = ${actor.companyId}::uuid AND payment_id = ${id}::uuid) ORDER BY id FOR UPDATE`;
+      for (const document of documents) await assertCustomerMovementDate(tx, actor.companyId, document.id, date, "refunds.dateBeforeMovement");
       await tx.paymentAllocation.updateMany({
         where: {
           companyId: actor.companyId,

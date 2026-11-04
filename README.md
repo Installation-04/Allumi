@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.42
+git checkout v0.4.0-alpha.43
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.42 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.43 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -422,3 +422,14 @@ Recherchez les encaissements et remboursements par client, numéro ou référenc
 ![Encaissements filtrés](docs/images/historique-encaissements-desktop.png)
 
 ![Recherche sur téléphone](docs/images/historique-encaissements-mobile.png)
+
+
+### Affecter un avoir à une facture client
+
+Réglez partiellement ou intégralement une facture ouverte du même client avec un avoir disponible. Vérifiez les deux soldes avant confirmation; les désaffectations datées restent dans l’historique. Aucun transfert de fonds ni nouvelle écriture comptable.
+
+[Guide des affectations](docs/Affectation-des-avoirs-clients.md)
+
+![Révision d’une affectation client](docs/images/affectation-avoir-formulaire-desktop.png)
+
+![Affectation en anglais et thème sombre sur mobile](docs/images/affectation-avoir-en-dark-mobile.png)

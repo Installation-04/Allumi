@@ -4,6 +4,10 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.43] - 2026-11-04
+
+- Affectation partielle ou complète d’un avoir disponible à une facture ouverte du même client, sans transfert de fonds ni nouvelle écriture : recherche bornée, contrôle des deux soldes, désaffectation datée et historique paginé FR/EN/mobile/sombre. Droits Ventes/Comptabilité et contrôles SQL renforcés sur dates, périodes et concurrence; migration `20261108000000_customer_credit_applications`.
+
 ## [0.4.0-alpha.42] - 2026-11-03
 
 - Historiques des encaissements et remboursements clients : recherche littérale client/numéro/référence, filtres de dates inclusives et d’état, pagination conservée, réinitialisation et états sans résultat FR/EN/mobile/sombre.

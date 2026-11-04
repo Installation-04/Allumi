@@ -594,7 +594,8 @@
       "notFound": "Payment not found.",
       "invalidVoid": "Give a reason of 1 to 500 characters and a date on or after the payment and its applications.",
       "confirmVoid": "Confirm the permanent voiding of the payment.",
-      "invalidFilters": "Check the search, status and date filters."
+      "invalidFilters": "Check the search, status and date filters.",
+      "dateBeforeMovement": "The date must be on or after the latest settlement or release on this document."
     },
     "onlinePayments": {
       "invalid": "Invalid request.",
@@ -696,6 +697,22 @@
       "invalidVoid": "Check the reversal reason and date.",
       "confirm": "Confirm the refund.",
       "confirmVoid": "Confirm the reversal."
+    },
+    "salesApplications": {
+      "invalid": "Check the amounts, documents and application date.",
+      "futureDate": "The date cannot be in the future.",
+      "creditNotFound": "This customer credit could not be found.",
+      "invoiceNotFound": "This invoice could not be found.",
+      "customerMismatch": "The credit and invoice must belong to the same customer.",
+      "notPosted": "Only posted credits and invoices can be applied or released.",
+      "dateBeforeDocuments": "The date must be on or after the documents’ posting dates and the original application.",
+      "dateBeforeMovement": "The date must be on or after the latest settlement or release on these documents.",
+      "periodClosed": "The date must fall in an open accounting period.",
+      "stale": "An available balance has changed. Refresh the page before confirming.",
+      "exceeds": "The amount exceeds the available credit or invoice balance.",
+      "alreadyApplied": "This credit is already applied to this invoice. Release the existing application before changing its amount.",
+      "applicationNotFound": "This application could not be found.",
+      "confirm": "Confirm the application or release before continuing."
     }
   },
   "settingsPage": {
@@ -2443,5 +2460,34 @@
     "emptyHint": "Change or clear the filters to see the full history.",
     "reference": "Reference",
     "customerUnavailable": "Customer unavailable"
+  },
+  "creditApplications": {
+    "title": "Invoice applications",
+    "intro": "Apply this credit to an open invoice for the same customer. No money is sent and no new journal entry is created.",
+    "available": "Available credit: {amount}",
+    "search": "Find an invoice by number or reference",
+    "searchAction": "Search",
+    "invoice": "Invoice to settle",
+    "choose": "Choose an invoice",
+    "review": "Review application",
+    "target": "Invoice {number} — open balance: {amount}",
+    "amount": "Amount to apply",
+    "date": "Application date",
+    "apply": "Apply this credit",
+    "confirmApply": "I confirm this application and the displayed balances.",
+    "noTargets": "No eligible open invoices.",
+    "limit": "Only the first 50 invoices are shown. Refine your search.",
+    "historyEmpty": "No applications for this credit.",
+    "release": "Release application",
+    "releaseHint": "The amount becomes available on this credit again and the invoice becomes payable again. No money is sent.",
+    "confirmRelease": "I confirm releasing this amount.",
+    "releaseDate": "Release date",
+    "pagination": "Application pages",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {count}",
+    "reset": "Clear search",
+    "reviewHint": "Check the invoice, amount and date before confirming. If a balance changes meanwhile, reload the page.",
+    "targetUnavailable": "This invoice is no longer available here. Find and choose an open invoice before confirming."
   }
 }
