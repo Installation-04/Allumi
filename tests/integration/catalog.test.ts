@@ -289,3 +289,33 @@ it("keeps customer receipt movement checks volatile under caller privileges", as
     { definer: false, volatility: "v", config: ["search_path=public, pg_temp"], public_execute: false },
   ]);
 });
+
+it("checks new customer refund postings after payment and journal line inserts", async () => {
+  const rows = await q<{ name: string; table_name: string; function_name: string; events: number; enabled: string; constraint_trigger: boolean; deferred: boolean; initially_deferred: boolean }>(
+    `SELECT t.tgname AS name, c.relname AS table_name, p.proname AS function_name,
+            t.tgtype::integer AS events, t.tgenabled AS enabled, t.tgconstraint <> 0 AS constraint_trigger,
+            t.tgdeferrable AS deferred, t.tginitdeferred AS initially_deferred
+       FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
+       JOIN pg_namespace n ON n.oid = c.relnamespace JOIN pg_proc p ON p.oid = t.tgfoid
+      WHERE n.nspname = 'public' AND NOT t.tgisinternal
+        AND t.tgname IN ('customer_refund_payment_exact', 'customer_refund_line_exact')
+      ORDER BY t.tgname`,
+  );
+  // pg_trigger bits: ROW=1, INSERT=4; AFTER has neither BEFORE nor INSTEAD OF.
+  expect(rows).toEqual([
+    { name: "customer_refund_line_exact", table_name: "journal_line", function_name: "customer_refund_posting_exact", events: 5, enabled: "O", constraint_trigger: true, deferred: true, initially_deferred: true },
+    { name: "customer_refund_payment_exact", table_name: "payment", function_name: "customer_refund_posting_exact", events: 5, enabled: "O", constraint_trigger: true, deferred: true, initially_deferred: true },
+  ]);
+});
+
+it("keeps exact customer refund checks volatile under caller privileges", async () => {
+  const rows = await q<{ definer: boolean; volatility: string; config: string[]; public_execute: boolean }>(
+    `SELECT p.prosecdef AS definer, p.provolatile AS volatility, p.proconfig AS config,
+            has_function_privilege('public', p.oid, 'EXECUTE') AS public_execute
+       FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+      WHERE n.nspname = 'public' AND p.pronargs = 0 AND p.proname = 'customer_refund_posting_exact'`,
+  );
+  expect(rows).toEqual([
+    { definer: false, volatility: "v", config: ["search_path=public, pg_temp"], public_execute: false },
+  ]);
+});

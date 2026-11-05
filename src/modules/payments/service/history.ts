@@ -36,6 +36,11 @@ export function paymentHistoryWhere(
           OR: [
             { number: { contains: term, mode: "insensitive" } },
             { reference: { contains: term, mode: "insensitive" } },
+            ...(direction === "SENT" ? [{ offsetsAsSent: { some: { companyId, receivedPayment: { companyId, direction: "RECEIVED" as const, ledger: "RECEIVABLE" as const, OR: [
+              { number: { contains: term, mode: "insensitive" as const } },
+              { reference: { contains: term, mode: "insensitive" as const } },
+              { allocations: { some: { companyId, salesDocument: { companyId, billingSnapshot: { path: ["name"], string_contains: term, mode: "insensitive" as const } } } } },
+            ] } } } }] : []),
             {
               contact: { displayName: { contains: term, mode: "insensitive" } },
             },

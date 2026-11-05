@@ -736,6 +736,17 @@
       "exceeds": "The amount exceeds the available receipt or invoice balance.",
       "alreadyApplied": "This receipt is already allocated to this invoice. Release the existing allocation before changing its amount.",
       "confirm": "Confirm this allocation or release before continuing."
+    },
+    "receiptRefunds": {
+      "invalid": "Check the receipt, amount, date and refund details.",
+      "futureDate": "The refund date cannot be in the future.",
+      "receiptNotFound": "This customer receipt could not be found.",
+      "idempotency": "This submission already belongs to a different refund. Reload the form before trying again.",
+      "notPosted": "Only a posted receipt can be refunded.",
+      "dateBeforeMovement": "The date must be on or after the receipt and its latest allocation, offset or release.",
+      "stale": "The available amount has changed. Refresh the page before confirming.",
+      "exceeds": "The amount exceeds the available receipt balance.",
+      "confirm": "Confirm that you want to record this refund."
     }
   },
   "settingsPage": {
@@ -2369,10 +2380,10 @@
   },
   "customerRefunds": {
     "title": "Customer refunds",
-    "intro": "Recorded refunds against available credits. Allumi does not send money.",
+    "intro": "Recorded refunds against available credits or receipts. Allumi does not send money.",
     "back": "All refunds",
     "empty": "No refunds",
-    "emptyHint": "Open a posted available credit to record a refund.",
+    "emptyHint": "Open a posted available credit or receipt to record a refund.",
     "number": "Number",
     "date": "Date",
     "customer": "Customer",
@@ -2413,11 +2424,11 @@
     "submit": "Post refund",
     "detail": "Refund {number}",
     "journalEntry": "Journal entry",
-    "allocations": "Refunded credits",
+    "allocations": "Refund origins",
     "allocationLine": "{number} · {amount}",
     "released": "released on {date}",
     "voidTitle": "Void refund",
-    "voidWarning": "A reversal restores the available credit. It does not recover the money sent.",
+    "voidWarning": "A reversal restores the available amounts on the affected origins (credits or receipts). It does not recover the money sent.",
     "voidDate": "Void date",
     "voidReason": "Reason (required, up to 500 characters)",
     "confirmVoid": "I confirm reversal of this refund.",
@@ -2560,5 +2571,24 @@
     "page": "Page {page} of {count}",
     "available": "Available: {amount}",
     "moreAllocations": "View all allocated invoices"
+  },
+  "receiptRefunds": {
+    "title": "Refunds from this receipt",
+    "intro": "Refund only the available amount on this receipt. Record a refund already made elsewhere: Allumi does not issue bank instructions or transfer money.",
+    "available": "Available to refund: {amount}",
+    "record": "Record a receipt refund",
+    "confirm": "I confirm this customer was already refunded separately using the amount, date and account shown.",
+    "empty": "No refunds for this receipt.",
+    "portion": "Portion from this receipt: {amount}",
+    "total": "Total refund amount: {amount}",
+    "sourceReceipt": "Receipt {number}",
+    "sourceCredit": "Credit {number}",
+    "origins": "Refund origins",
+    "moreOrigins": "View all origins",
+    "originsEmpty": "No origins available.",
+    "originDate": "Applied on {date}",
+    "refundBlocked": "This receipt has active refunds. Void them before voiding the receipt.",
+    "historyPagination": "Receipt refund pages",
+    "originPagination": "Refund origin pages"
   }
 }

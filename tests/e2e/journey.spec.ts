@@ -283,7 +283,8 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await test.step("paymentHistoryJourney", () => paymentHistoryJourney(page));
   const nextInvoiceUrl = await test.step("creditApplicationsJourney", () => creditApplicationsJourney(page, availableCreditUrl));
   await test.step("invoiceModulePermissionsJourney", () => invoiceModulePermissionsJourney(page, nextInvoiceUrl));
-  await test.step("onAccountReceiptJourney", () => onAccountReceiptJourney(page, nextInvoiceUrl));
+  const accountReceiptUrl = await test.step("onAccountReceiptJourney", () => onAccountReceiptJourney(page, nextInvoiceUrl));
+  await test.step("receiptRefundJourney", () => receiptRefundJourney(page, accountReceiptUrl));
   const settingsBase = new URL(page.url()).pathname.match(/^\/c\/[^/]+/)?.[0];
   expect(settingsBase).toBeTruthy();
   await page.getByRole("button", { name: "Français", exact: true }).click();
@@ -2633,12 +2634,12 @@ async function customerBalancesJourney(page: Page, invoiceUrl: string): Promise<
  await expect(page.getByRole("heading",{name:/^Remboursement D-\d{5}$/})).toBeVisible();
  const refundUrl=page.url();
  await expect(page.getByText("5,00 $",{exact:true})).toBeVisible();
- await expectNoPageOverflow(page);await captureReference(page,"remboursement-detail","Avoirs remboursés");
+ await expectNoPageOverflow(page);await captureReference(page,"remboursement-detail","Origines du remboursement");
  await page.getByRole("button",{name:"English",exact:true}).click();
  await expect(page.getByRole("heading",{name:/^Refund D-/})).toBeVisible();
  await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");
  await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
- await expectNoPageOverflow(page);await captureReference(page,"remboursement-detail-en-dark","Refunded credits");
+ await expectNoPageOverflow(page);await captureReference(page,"remboursement-detail-en-dark","Refund origins");
  await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");
  await expect(page.locator("html")).toHaveAttribute("data-theme","light");
  await page.getByRole("button",{name:"Français",exact:true}).click();
@@ -2790,7 +2791,7 @@ async function invoiceModulePermissionsJourney(page: Page, invoiceUrl: string) {
 }
 
 /** Record money already received, allocate across invoices, and release one allocation without moving money. */
-async function onAccountReceiptJourney(page: Page, firstInvoiceUrl: string) {
+async function onAccountReceiptJourney(page: Page, firstInvoiceUrl: string): Promise<string> {
  const today=todayInToronto(),company=new URL(firstInvoiceUrl).pathname.match(/^\/c\/[0-9a-f-]{36}/)![0];
  const firstNumber=(await page.getByRole("heading",{level:1,name:/^F-\d{5}$/}).innerText()).trim();
  await openSection(page,"Brouillons de factures");
@@ -2874,6 +2875,77 @@ async function onAccountReceiptJourney(page: Page, firstInvoiceUrl: string) {
  }
  await page.goto(firstInvoiceUrl);await expect(page.getByText(/^Solde restant:\s*23,00\s*\$/)).toBeVisible();
  await page.goto(secondInvoiceUrl);await expect(page.getByText(/^Solde restant:\s*6,50\s*\$/)).toBeVisible();
+ return receiptUrl;
+}
+
+/** Refund only the receipt's available part, retain the invoice allocation, then reverse the refund. */
+async function receiptRefundJourney(page: Page, receiptUrl: string) {
+ const today=todayInToronto(),invoiceUrl=page.url(),company=new URL(receiptUrl).pathname.match(/^\/c\/[0-9a-f-]{36}/)![0];
+ await page.goto(receiptUrl);
+ const receiptHeading=page.getByRole("heading",{level:1,name:/^Encaissement E-\d{5}$/});
+ await expect(receiptHeading).toBeVisible();
+ const receiptNumber=(await receiptHeading.innerText()).replace(/^Encaissement /,"").trim();
+ const refunds=page.getByRole("region",{name:"Remboursements de cet encaissement",exact:true});
+ const allocations=page.getByRole("region",{name:"Affectations aux factures",exact:true});
+ await expect(refunds.getByText(/^Disponible à rembourser :\s*25,00\s*\$/)).toBeVisible();
+ await expect(allocations.getByText("Affectation active",{exact:true})).toHaveCount(1);
+ await refunds.locator("summary",{hasText:"Enregistrer un remboursement de l’encaissement"}).click();
+ await refunds.getByLabel("Montant remboursé",{exact:true}).fill("10,00");
+ await refunds.getByLabel("Date du remboursement",{exact:true}).fill(today);
+ await refunds.getByLabel("Compte du remboursement",{exact:true}).selectOption({label:"1000 · Banque – compte courant"});
+ await expect(refunds.getByText("Remboursez uniquement le montant disponible de cet encaissement. Enregistrez un remboursement déjà effectué ailleurs : Allumi ne transmet aucun ordre bancaire et ne transfère pas de fonds.",{exact:true})).toBeVisible();
+ await expectNoPageOverflow(page);await captureReference(page,"remboursement-encaissement-formulaire","Remboursements de cet encaissement");
+ await refunds.getByLabel("Je confirme avoir déjà remboursé ce client séparément, avec le montant, la date et le compte indiqués.",{exact:true}).check();
+ await refunds.getByRole("button",{name:"Comptabiliser le remboursement",exact:true}).click();
+ const refundHeading=page.getByRole("heading",{level:1,name:/^Remboursement D-\d{5}$/});
+ await expect(refundHeading).toBeVisible();
+ const refundUrl=page.url(),refundNumber=(await refundHeading.innerText()).replace(/^Remboursement /,"").trim();
+ const origins=page.getByRole("region",{name:"Origines du remboursement",exact:true});
+ const origin=origins.getByRole("link",{name:new RegExp(`^Encaissement ${receiptNumber} ·\\s*10,00\\s*\\$`)});
+ await expect(origin).toBeVisible();await expect(origin).toHaveAttribute("href",new URL(receiptUrl).pathname);
+ await expectNoPageOverflow(page);await captureReference(page,"remboursement-encaissement-detail","Origines du remboursement");
+ await page.getByRole("button",{name:"English",exact:true}).click();
+ await expect(page.getByRole("heading",{level:1,name:new RegExp(`^Refund ${refundNumber}$`)})).toBeVisible();
+ await expect(page.getByRole("region",{name:"Refund origins",exact:true}).getByRole("link",{name:new RegExp(`^Receipt ${receiptNumber} ·\\s*\\$10\\.00$`)})).toBeVisible();
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");
+ await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
+ await expectNoPageOverflow(page);await captureReference(page,"remboursement-encaissement-en-dark","Refund origins");
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");
+ await expect(page.locator("html")).toHaveAttribute("data-theme","light");
+ await page.getByRole("button",{name:"Français",exact:true}).click();
+ await expect(refundHeading).toBeVisible();
+ await page.goto(receiptUrl);
+ await expect(allocations.getByText(/^Montant disponible :\s*15,00\s*\$/)).toBeVisible();
+ await expect(refunds.getByText(/^Disponible à rembourser :\s*15,00\s*\$/)).toBeVisible();
+ await expect(refunds.getByRole("link",{name:refundNumber,exact:true})).toBeVisible();
+ await expect(refunds.getByText(/^Part de cet encaissement :\s*10,00\s*\$/)).toBeVisible();
+ await expect(allocations.getByText("Affectation active",{exact:true})).toHaveCount(1);
+ await page.goto(invoiceUrl);await expect(page.getByText(/^Solde restant:\s*6,50\s*\$/)).toBeVisible();
+ await page.goto(`${company}/remboursements`);
+ await page.getByLabel("Client, numéro ou référence",{exact:true}).fill(receiptNumber);
+ await page.getByRole("button",{name:"Filtrer les paiements",exact:true}).click();
+ await expect(page.getByRole("status").filter({hasText:"1 remboursement"})).toBeVisible();
+ await page.getByRole("link").filter({has:page.getByRole("heading",{name:refundNumber,exact:true})}).click();
+ await expect(refundHeading).toBeVisible();
+ await page.locator("summary",{hasText:"Annuler le remboursement"}).click();
+ await page.getByLabel("Date d’annulation",{exact:true}).fill(today);
+ await page.getByLabel(/^Motif/).fill("Remboursement au compte saisi deux fois");
+ await page.getByLabel("Je confirme la contre-passation de ce remboursement.",{exact:true}).check();
+ await page.getByRole("button",{name:"Contre-passer le remboursement",exact:true}).click();
+ await expect(page.getByText(`Annulé le ${today}`,{exact:true})).toBeVisible();
+ await expect(origins.getByText(`· retiré le ${today}`,{exact:true})).toBeVisible();
+ await expect(origin).toBeVisible();
+ await expectNoPageOverflow(page);await captureReference(page,"remboursement-encaissement-annule","Origines du remboursement");
+ for(const [url,key] of [[receiptUrl,"page_remboursements"],[refundUrl,"page_origines"]])for(const query of [`${key}=1&${key}=2`,`${key}=0`,`${key}=%00`]){
+  expect((await page.request.get(`${url}?${query}`)).status(),`invalid refund history query: ${query}`).toBe(404);
+ }
+ await page.goto(invoiceUrl);await expect(page.getByText(/^Solde restant:\s*6,50\s*\$/)).toBeVisible();
+ await page.goto(receiptUrl);
+ await expect(allocations.getByText(/^Montant disponible :\s*25,00\s*\$/)).toBeVisible();
+ await expect(refunds.getByText(/^Disponible à rembourser :\s*25,00\s*\$/)).toBeVisible();
+ const refundedHistory=refunds.getByRole("listitem").filter({has:page.getByRole("link",{name:refundNumber,exact:true})});
+ await expect(refundedHistory).toContainText(`retiré le ${today}`);
+ await expect(allocations.getByText("Affectation active",{exact:true})).toHaveCount(1);
 }
 
 /** Legacy unallocated receipts exercise pagination without re-running the already tested receipt form 27 times. */

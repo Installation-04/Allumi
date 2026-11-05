@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { can } from "@/modules/companies";
 import { formatMoney, todayIso } from "@/modules/ledger";
-import { getCustomerRefund } from "@/modules/payments";
+import { getCustomerRefund, listCustomerRefundOrigins } from "@/modules/payments";
 import { ActionForm, Field } from "@/app/_components/ui";
 import { FOCUS } from "@/app/_components/focus";
 import { accountName, loadCompany } from "../../_lib";
@@ -16,19 +16,27 @@ export async function generateMetadata() {
 
 export default async function PaymentPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ companyId: string; paymentId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { company, actor, locale } = await loadCompany(params, "ledger.read");
   if (!can(company, "sales.read")) notFound();
   const { paymentId } = await params;
   if (!validId(paymentId)) notFound();
-  const payment = await getCustomerRefund(actor, paymentId);
+  const query = await searchParams;
+  const rawPage = query.page_origines;
+  if (Array.isArray(rawPage) || (rawPage !== undefined && !/^[1-9]\d{0,4}$/.test(rawPage))) notFound();
+  const payment = await getCustomerRefund(actor, paymentId, { includeOrigins: false });
   if (!payment) notFound();
   const t = await getTranslations("customerRefunds");
+  const r = await getTranslations("receiptRefunds");
+  const h = await getTranslations("paymentHistory");
+  const history = await listCustomerRefundOrigins(actor, paymentId, Number(rawPage ?? "1"));
   const base = `/c/${company.id}`;
   const rows: [string, React.ReactNode][] = [
-    [t("customer"), payment.customer],
+    [t("customer"), payment.customer || h("customerUnavailable")],
     [
       t("amount"),
       <span key="a" className="tabular-nums">
@@ -79,17 +87,15 @@ export default async function PaymentPage({
           {t("allocations")}
         </h2>
         <ul className="space-y-1">
-          {payment.allocations.map((allocation) => (
+          {history.origins.map((allocation) => (
             <li key={allocation.id}>
               <Link
-                href={`${base}/avoirs/valides/${allocation.creditNoteId}`}
+                href={allocation.kind === "CREDIT_NOTE" ? `${base}/avoirs/valides/${allocation.sourceId}` : `${base}/encaissements/${allocation.sourceId}`}
                 className={`inline-flex min-h-11 items-center rounded underline ${FOCUS}`}
               >
-                {t("allocationLine", {
-                  amount: formatMoney(allocation.amountCents, locale),
-                  number: allocation.creditNumber,
-                })}
+                {allocation.kind === "CREDIT_NOTE" ? t("allocationLine", { amount: formatMoney(allocation.amountCents, locale), number: allocation.number }) : `${r("sourceReceipt", { number: allocation.number })} · ${formatMoney(allocation.amountCents, locale)}`}
               </Link>
+              <p className="text-sm">{r("originDate", { date: allocation.appliedDate })}</p>
               {allocation.unappliedDate ? (
                 <span className="text-sm text-stone-600 dark:text-stone-400">
                   {" "}
@@ -99,6 +105,12 @@ export default async function PaymentPage({
             </li>
           ))}
         </ul>
+        {!history.origins.length && <p>{r("originsEmpty")}</p>}
+        {history.pageCount > 1 && <nav aria-label={r("originPagination")} className="flex flex-wrap items-center gap-3">
+          {history.page > 1 && <Link href={`${base}/remboursements/${paymentId}?page_origines=${history.page - 1}`} className={`inline-flex min-h-11 items-center underline ${FOCUS}`}>{t("previous")}</Link>}
+          <span className="text-sm">{t("page", { page: history.page, count: history.pageCount })}</span>
+          {history.page < history.pageCount && <Link href={`${base}/remboursements/${paymentId}?page_origines=${history.page + 1}`} className={`inline-flex min-h-11 items-center underline ${FOCUS}`}>{t("next")}</Link>}
+        </nav>}
         <Link
           href={`${base}/journal/${payment.journalEntryId}`}
           className={`inline-flex min-h-11 items-center rounded underline ${FOCUS}`}

@@ -1,3 +1,4 @@
+import { ReceiptRefundPanel } from "../../remboursements/receipt-panel";
 import { ReceiptAllocationsPanel } from "../receipt-allocations-panel";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -18,6 +19,9 @@ export default async function PaymentPage({ params, searchParams }: { params: Pr
   if (!can(company, "sales.read")) notFound();
   const { paymentId } = await params;
   if (!validId(paymentId)) notFound();
+  const query = await searchParams;
+  const refundPage = query.page_remboursements;
+  if (Array.isArray(refundPage) || (refundPage !== undefined && !/^[1-9]\d{0,4}$/.test(refundPage))) notFound();
   const payment = await getReceipt(actor, paymentId, { includeAllocations: false });
   if (!payment) notFound();
   const t = await getTranslations("payments");
@@ -44,7 +48,8 @@ export default async function PaymentPage({ params, searchParams }: { params: Pr
       <dl className="grid gap-4 rounded-lg border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-900 sm:grid-cols-2">
         {rows.map(([label, value]) => <div key={label}><dt className="text-sm text-stone-600 dark:text-stone-400">{label}</dt><dd className="whitespace-pre-wrap">{value}</dd></div>)}
       </dl>
-      <ReceiptAllocationsPanel actor={actor} access={company} paymentId={paymentId} openCents={payment.openCents} posted={payment.status === "POSTED"} locale={locale} query={await searchParams} />
+      <ReceiptAllocationsPanel actor={actor} access={company} paymentId={paymentId} openCents={payment.openCents} posted={payment.status === "POSTED"} locale={locale} query={query} />
+      <ReceiptRefundPanel actor={actor} access={company} receiptId={paymentId} openCents={payment.openCents} hasActiveRefunds={payment.hasActiveRefunds} posted={payment.status === "POSTED"} locale={locale} query={query} />
       <Link href={`${base}/journal/${payment.journalEntryId}`} className={`inline-flex min-h-11 items-center rounded underline ${FOCUS}`}>{t("journalEntry")}</Link>
       {can(company, "bank.read") && payment.deposits.length ? <section className="space-y-2 rounded border border-stone-300 p-4 dark:border-stone-700"><h2 className="font-semibold">{td("receiptDeposits")}</h2><ul>{payment.deposits.map(d => <li key={d.id}><Link className={`inline-flex min-h-11 items-center rounded underline ${FOCUS}`} href={`${base}/depots/${d.id}`}>{d.number} · {d.date} · {td(d.status === "POSTED" ? "posted" : "void")}</Link></li>)}</ul>{deposited ? <p className="text-sm">{td("receiptBlocked")}</p> : null}</section> : null}
       {payment.status === "VOID" ? (
@@ -53,7 +58,7 @@ export default async function PaymentPage({ params, searchParams }: { params: Pr
           <p className="whitespace-pre-wrap">{t("voidedReason", { reason: payment.voidReason ?? "" })}</p>
           {payment.voidEntryId ? <Link href={`${base}/journal/${payment.voidEntryId}`} className={`inline-flex min-h-11 items-center rounded underline ${FOCUS}`}>{t("journalEntry")}</Link> : null}
         </div>
-      ) : can(company, "sales.manage") && can(company, "entry.reverse") && !deposited ? (
+      ) : can(company, "sales.manage") && can(company, "entry.reverse") && !deposited && !payment.hasActiveRefunds ? (
         <details className="rounded border border-stone-300 p-4 dark:border-stone-700">
           <summary className="min-h-11 cursor-pointer">{t("voidTitle")}</summary>
           <div className="mt-3">

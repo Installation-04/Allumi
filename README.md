@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.44
+git checkout v0.4.0-alpha.45
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.44 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.45 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -444,3 +444,14 @@ Comptabilisez des fonds réellement reçus sans choisir immédiatement une factu
 ![Création d’un encaissement au compte](docs/images/encaissement-au-compte-formulaire-desktop.png)
 
 ![Affectations en anglais et thème sombre sur téléphone](docs/images/encaissement-au-compte-en-dark-mobile.png)
+
+
+### Rembourser le disponible d’un encaissement
+
+Comptabilisez un remboursement déjà effectué au client, sans créer d’avoir, sur tout ou partie du disponible d’un encaissement. Les factures déjà réglées restent inchangées; les origines et annulations conservent leur historique. Allumi ne transmet aucun ordre bancaire.
+
+[Guide des remboursements d’encaissements](docs/Remboursements-des-encaissements.md)
+
+![Formulaire de remboursement d’encaissement](docs/images/remboursement-encaissement-formulaire-desktop.png)
+
+![Remboursement en anglais et thème sombre sur téléphone](docs/images/remboursement-encaissement-en-dark-mobile.png)

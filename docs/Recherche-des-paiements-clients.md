@@ -6,6 +6,8 @@ Dans **Ventes → Encaissements** ou **Remboursements clients**, le formulaire p
 - **État du paiement** (*Payment status*) : tous les états, comptabilisé ou annulé.
 - **Date du paiement — du / au** (*Payment date — from / to*) : bornes inclusives. Chaque borne est facultative.
 
+Dans les remboursements, la recherche peut également retrouver le numéro de l’encaissement d’origine, y compris pour les compensations retirées. Les caractères spéciaux restent recherchés littéralement.
+
 Choisir **Filtrer les paiements** (*Filter payments*). Les liens de pagination conservent la recherche, les dates et l’état. Le nombre affiché couvre tous les résultats filtrés; chaque page contient au plus 25 paiements.
 
 ![Pagination des encaissements filtrés](images/historique-encaissements-desktop.png)
@@ -24,12 +26,14 @@ La consultation des encaissements et remboursements exige **Ventes** et **Compta
 
 Le nom du client des encaissements provient d’abord de l’identité figée sur les documents liés. Un changement ultérieur du répertoire ne réécrit pas cette identité. La recherche peut aussi utiliser le nom actuel du contact lorsqu’il est accessible. Pour les anciens encaissements sans pièce liée, le nom du contact est affiché seulement s’il est lisible; sinon **Client non disponible** apparaît.
 
-Désactiver le module Contacts ne bloque pas la consultation des pièces financières déjà autorisées et ne donne aucun accès supplémentaire à la fiche du contact. Les remboursements utilisent l’identité figée sur l’avoir.
+Désactiver le module Contacts ne bloque pas la consultation des pièces financières déjà autorisées et ne donne aucun accès supplémentaire à la fiche du contact. Les remboursements liés aux avoirs utilisent l’identité figée sur les pièces. Ceux provenant d’encaissements conservent leurs liens vers les paiements sources; ces liens financiers ne donnent pas accès au répertoire Contacts.
 
 ![Historique anglais sombre](images/historique-encaissements-en-dark-desktop.png)
 
 ![Filtres sur téléphone](images/historique-encaissements-mobile.png)
 
 Les encaissements au compte sans facture sont aussi accessibles depuis cette liste. Leur disponible et leurs affectations sont détaillés dans [[Encaissements-au-compte]].
+
+Les remboursements du disponible d’un encaissement sont décrits dans [[Remboursements-des-encaissements]].
 
 L’interface s’adapte au téléphone et aux thèmes clair/sombre. Voir [[Encaissements]], [[Avoirs-disponibles-et-remboursements]] et [[Utilisateurs-et-permissions]].
