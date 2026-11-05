@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.48] - 2026-11-05
+
 - HTTPS local par IP proposé par défaut aux nouvelles installations, via Caddy optionnel et autorité privée persistante, sans domaine public ni publication des ports 80/443. Conversion explicite des instances existantes, export du certificat public avec empreinte SHA-256 et guides de confiance Windows/iOS; mode HTTP explicite conservé.
 
 ## [0.4.0-alpha.47] - 2026-11-05
