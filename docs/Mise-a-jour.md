@@ -65,6 +65,11 @@ Ces captures sont une démonstration contrôlée du parcours administrateur : le
 
 Pour désactiver le traitement des demandes web : `sudo systemctl disable --now allumi-update.timer`, puis retirer la variable et le montage ajoutés au service app et le recréer. Les mises à jour du client Windows restent indépendantes : [[Client-Windows]].
 
-## Transition vers la pile sans SSL intégré
+## Ancienne transition vers HTTP direct
 
-À partir de v0.4.0-alpha.10, Caddy est retiré. Pour passer d’un ancien accès HTTPS intégré à HTTP direct, effectuer la transition manuelle de [[Installation-Docker]] et définir la nouvelle `APP_URL` avant de redémarrer. La mise à jour conserve les URL existantes, les secrets et les volumes; elle ne réécrit pas une URL HTTPS qui peut être servie par un proxy externe.
+La transition introduite en v0.4.0-alpha.10 retirait l’ancien Caddy intégré; elle reste une procédure explicite vers HTTP direct, distincte du nouveau HTTPS local par IP. Pour passer d’un ancien accès HTTPS intégré à HTTP direct, effectuer la transition manuelle de [[Installation-Docker]] et définir la nouvelle `APP_URL` avant de redémarrer. La mise à jour conserve les URL existantes, les secrets et les volumes; elle ne réécrit pas une URL HTTPS qui peut être servie par un proxy externe.
+
+
+## Conserver le protocole et l’autorité locale
+
+Une mise à jour conserve l’URL et le mode réseau existants : le nouveau défaut HTTPS ne convertit pas silencieusement une instance HTTP ou un proxy externe. Pour une conversion volontaire par IP, suivre [[HTTPS-local]]. Conserver les volumes de l’autorité locale et les inclure dans la reprise après sinistre; ne pas recréer cette autorité à chaque mise à jour. Après restauration, vérifier son empreinte avant de réutiliser la confiance des appareils : [[Sauvegardes]].

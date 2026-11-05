@@ -194,9 +194,9 @@ Dans une VM Linux avec Docker et Compose installés, lancez `./scripts/install-d
 
 ![Assistant Docker](docs/images/assistant-docker.png)
 
-L’assistant Docker utilise les port HTTP **28080** pour les nouvelles installations et conserve les réglages existants. Le serveur cible Linux **AMD64 et ARM64** (builds et tests Docker natifs pour les deux architectures). Voir le [guide Docker](docs/Installation-Docker.md).
+L’assistant Docker utilise le port d’accès **28080** pour les nouvelles installations et conserve les réglages existants. Le serveur cible Linux **AMD64 et ARM64** (builds et tests Docker natifs pour les deux architectures). Voir le [guide Docker](docs/Installation-Docker.md).
 
-La pile Docker contient uniquement l’application et PostgreSQL, avec un service ponctuel de migrations. Aucun SSL intégré : accès direct via `http://ADRESSE_VM:28080`; HTTPS peut être fourni par votre propre proxy. [Transition depuis Caddy](docs/Installation-Docker.md#passer-de-la-version-avec-caddy).
+La pile contient l’application et PostgreSQL privé, avec un service ponctuel de migrations. Les nouvelles installations proposent HTTPS local par IP sur `https://ADRESSE_VM:28080` via Caddy optionnel, sans domaine public ni ports 80/443. Exporter et approuver l’autorité locale sur Windows/iOS selon le [guide HTTPS local](docs/HTTPS-local.md). HTTP reste disponible explicitement; les anciennes installations ne changent pas silencieusement de protocole.
 
 ## Sécurité du compte
 

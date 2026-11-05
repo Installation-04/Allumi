@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- HTTPS local par IP proposé par défaut aux nouvelles installations, via Caddy optionnel et autorité privée persistante, sans domaine public ni publication des ports 80/443. Conversion explicite des instances existantes, export du certificat public avec empreinte SHA-256 et guides de confiance Windows/iOS; mode HTTP explicite conservé.
+
 ## [0.4.0-alpha.47] - 2026-11-05
 
 - Installateur Docker : activation par défaut de l’agent de mise à jour web après démarrage sain sur Linux en root avec Python 3 et systemd actif; option `--no-web-updates`, aucune activation en préparation seule et avertissement sur les hôtes non compatibles. Activation gérée relançable sans écraser les configurations Compose personnalisées; montage de contrôle conservé aux redémarrages et helpers de mise à jour rechargés. Les installations de nouvelles versions restent soumises à la demande et à la confirmation d’un administrateur autorisé.

@@ -66,3 +66,5 @@ Taxes et produits/services : [[Taxes-et-catalogue]].
 - [[Remboursements-des-encaissements]] — remboursement du disponible reçu et annulation avec historique conservé.
 - [[Encaissements-au-compte]] — fonds reçus sans facture, affectations partielles et retraits datés.
 - [[Recherche-des-paiements-clients]] — client, numéro, référence, état et période.
+
+- [[HTTPS-local]] — accès chiffré par IP, autorité privée et confiance Windows/iOS.

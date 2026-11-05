@@ -1,6 +1,6 @@
 # Installation Docker
 
-À partir de v0.4.0-alpha.10, la pile fournit **l’application en HTTP et PostgreSQL privé**, sans Caddy, certificat, domaine obligatoire ni service ACME. Le service ponctuel `migrate` applique les migrations avant le démarrage de l’application. Linux **AMD64 et ARM64** sont construits et testés nativement; Docker sélectionne l’architecture du serveur.
+La pile fournit l’application et PostgreSQL privé. Les nouvelles installations proposent **HTTPS local par IP** via le service Caddy optionnel de `compose.https.yaml`, sans domaine public ni ACME; seul le port TLS choisi est publié. Les installations existantes conservent leur protocole. HTTP direct reste disponible explicitement. Le service ponctuel `migrate` applique les migrations avant le démarrage de l’application. Linux **AMD64 et ARM64** sont construits et testés nativement; Docker sélectionne l’architecture du serveur.
 
 ## Images déjà construites
 
@@ -35,7 +35,7 @@ Le rapport indique le système (distribution, WSL), le processeur (`x86_64` ou `
 
 | Détecté | Décision |
 |---|---|
-| Debian, Ubuntu ou dérivée | `install.sh` : installe Docker au besoin, configure Allumi, active le pare-feu `ufw` (SSH et port HTTP) et planifie les sauvegardes |
+| Debian, Ubuntu ou dérivée | `install.sh` : installe Docker au besoin, configure Allumi, active le pare-feu `ufw` (SSH et port applicatif) et planifie les sauvegardes |
 | Autre Linux avec Docker | `install-docker.sh` (essais; demande `--force`) |
 | Autre Linux sans Docker | arrêt, avec le lien d’installation de Docker Engine |
 | macOS | réservé aux essais, avec `--force` et Docker Desktop ou OrbStack |
@@ -61,27 +61,27 @@ git checkout v0.4.0-alpha.47
 
 L’assistant propose un parcours standard ou avancé, puis demande :
 
-- L’URL utilisée dans le navigateur, par exemple `http://192.168.1.20:28080` (remplacer l’adresse par celle de la VM).
+- L’URL utilisée dans le navigateur, par exemple `https://192.168.1.20:28080` (remplacer l’adresse par celle de la VM).
 - La langue initiale, `fr-CA` ou `en`.
-- En mode avancé : adresse IPv4 d’écoute, port HTTP et délai de vérification.
+- En mode avancé : adresse IPv4 d’écoute, port d’accès et délai de vérification.
 - Configurer et démarrer, ou préparer `.env` uniquement.
 - Confirmation après affichage du récapitulatif. Annulation et fin de saisie ne modifient pas la configuration.
 
 Le port par défaut est **28080**. `0.0.0.0` écoute sur toutes les interfaces IPv4; `127.0.0.1` limite l’accès à la machine. L’URL et le port d’écoute sont distincts pour permettre un proxy externe : en accès direct, leurs ports doivent correspondre. `localhost` ne fonctionne que depuis le serveur lui-même.
 
-![Assistant Docker HTTP](images/assistant-docker.png)
+![Ancien assistant Docker en mode HTTP](images/assistant-docker.png)
 
-Cette capture reproduit le dialogue du script avec des données fictives.
+Cette capture reproduit un dialogue HTTP avec des données fictives; elle ne démontre pas l’installation de confiance du certificat HTTPS local.
 
 ## Installation sans questions
 
 ```bash
 ./scripts/install-docker.sh \
-  --app-url http://192.168.1.20:28080 \
+  --local-https --app-url https://192.168.1.20:28080 \
   --http-port 28080 --bind 0.0.0.0 --locale fr-CA
 ```
 
-Options : `--interactive`, `--app-url`, `--http-port`, `--bind`, `--locale`, `--timeout` (1 à 3600 secondes après le démarrage Compose), `--prepare-only`, `--no-web-updates`, `--help`. Sans argument et sans terminal, le script refuse de démarrer. Les anciennes options `--domain`, `--email` et `--https-port` ne sont plus utilisées.
+Options : `--interactive`, `--app-url`, `--http-port`, `--bind`, `--locale`, `--timeout` (1 à 3600 secondes après le démarrage Compose), `--prepare-only`, `--no-web-updates`, `--local-https`, `--http`, `--help`. Sans argument et sans terminal, le script refuse de démarrer. Les anciennes options `--domain`, `--email` et `--https-port` ne sont plus utilisées.
 
 Le script génère les secrets, prépare `.env` atomiquement avec permissions 600, conserve les secrets existants, valide Compose et attend la santé de l’application. Il refuse une configuration absente si des volumes du projet existent déjà : restaurer alors le `.env` associé, sans régénérer les mots de passe. Les ports et URL existants sont conservés sauf option explicite. Il n’installe pas Docker et ne configure ni pare-feu, ni VM, ni sauvegardes automatiques.
 
@@ -95,21 +95,25 @@ Sans root, sans Python 3 ou sans systemd actif, l’application peut être insta
 
 Le script d’activation peut être relancé pour son installation gérée. Il réutilise uniquement le fichier Compose généré à l’identique. Un fichier personnalisé ou un lien symbolique est refusé sans modification : faire intégrer le montage et organiser l’installation de l’agent par l’administrateur système. Voir [[Administration-serveur]] et [[Mise-a-jour]].
 
+## Certificat HTTPS local
+
+Pour le mode par défaut, fournir une IP LAN stable, pas une adresse loopback. Exporter le certificat public, vérifier son empreinte SHA-256 par un canal fiable et l’approuver sur chaque appareil avant le premier accès : [[HTTPS-local]]. Ni le navigateur ni le client Windows ne doivent contourner un avertissement TLS. `--http` ou une URL `--app-url http://…` choisissent explicitement HTTP; les anciennes URL sont conservées sans conversion silencieuse.
+
 ## Premier accès
 
-Ouvrir `http://ADRESSE_VM:28080`. **Le jeton d’installation est affiché à la fin de l’installation** (ligne « Jeton »); il se saisit une seule fois pour créer l’entreprise et l’administrateur. Il n’est montré que tant que la page `/setup` est ouverte : sur une instance déjà configurée, le script dit qu’il est inutile au lieu de l’afficher, et si l’application ne répond pas il renvoie vers `SETUP_TOKEN` dans le `.env` privé. C’est le seul secret affiché; les autres restent dans `.env`. Le résumé peut finir dans l’historique du terminal ou dans un journal : ne le copie pas dans un canal public. En production, `/setup` reste fermé sans ce jeton, même en HTTP. Les cookies de session fonctionnent en HTTP; l’URL `APP_URL` doit correspondre au protocole effectivement utilisé. Voir [[Premier-demarrage]].
+Ouvrir l’URL configurée, par défaut `https://ADRESSE_VM:28080` après approbation du certificat local. **Le jeton d’installation est affiché à la fin de l’installation** (ligne « Jeton »); il se saisit une seule fois pour créer l’entreprise et l’administrateur. Il n’est montré que tant que la page `/setup` est ouverte : sur une instance déjà configurée, le script dit qu’il est inutile au lieu de l’afficher, et si l’application ne répond pas il renvoie vers `SETUP_TOKEN` dans le `.env` privé. C’est le seul secret affiché; les autres restent dans `.env`. Le résumé peut finir dans l’historique du terminal ou dans un journal : ne le copie pas dans un canal public. En production, `/setup` reste fermé sans ce jeton, même en HTTP. Les cookies de session fonctionnent en HTTP; l’URL `APP_URL` doit correspondre au protocole effectivement utilisé. Voir [[Premier-demarrage]].
 
 ```bash
 docker compose ps
-curl -fsS http://127.0.0.1:28080/api/health
+curl --cacert ./local-https-root.crt -fsS https://ADRESSE_VM:28080/api/health
 docker compose logs migrate app db
 ```
 
 PostgreSQL n’a aucun port publié sur l’hôte. Ne pas utiliser `docker compose down -v` pour mettre à jour : cela supprime les volumes de données.
 
-## Passer de la version avec Caddy
+## Ancienne transition vers HTTP direct
 
-Sauvegarder la base et `.env` avant de changer de version. Depuis le dossier existant, récupérer le tag publié puis choisir explicitement la nouvelle URL HTTP :
+Cette procédure concerne l’abandon de l’ancien HTTPS intégré au profit de HTTP direct. Elle ne convertit pas une installation vers le nouveau HTTPS local, décrit dans [[HTTPS-local]]. Sauvegarder la base et `.env` avant de choisir explicitement la nouvelle URL HTTP :
 
 ```bash
 ./scripts/backup.sh
@@ -124,6 +128,6 @@ La mise à jour automatique conserve `APP_URL` : elle ne convertit pas une URL H
 
 ## Proxy externe facultatif
 
-HTTP direct convient aux essais sur un réseau privé. Pour HTTPS, votre proxy peut transmettre vers `http://ADRESSE_VM:28080`; Allumi ne gère aucun certificat. Définir `APP_URL=https://compta.exemple.ca`, limiter l’accès au port applicatif au proxy et configurer `TRUSTED_PROXY_HOPS` selon les proxys de confiance (1 pour un seul proxy). Sans proxy, laisser **0** : les en-têtes `X-Forwarded-For` sont ignorés et les clients partagent le budget de limitation par IP inconnue; les limites par compte restent actives.
+HTTP direct convient aux essais sur un réseau privé. Pour un HTTPS public, votre propre proxy peut transmettre vers `http://ADRESSE_VM:28080`; ce choix reste distinct de l’autorité privée du mode [[HTTPS-local]]. Définir `APP_URL=https://compta.exemple.ca`, limiter l’accès au port applicatif au proxy et configurer `TRUSTED_PROXY_HOPS` selon les proxys de confiance (1 pour un seul proxy). Sans proxy, laisser **0** : les en-têtes `X-Forwarded-For` sont ignorés et les clients partagent le budget de limitation par IP inconnue; les limites par compte restent actives.
 
-Le client Windows exige toujours HTTPS. Les fonctions PWA iOS nécessitant un contexte sécurisé demandent également un HTTPS fourni à l’extérieur de cette pile. Pour les essais HTTP, utiliser le navigateur web. Voir [[Configuration]], [[Application-mobile]] et [[Client-Windows]].
+Le client Windows exige toujours HTTPS. Les fonctions PWA iOS nécessitant un contexte sécurisé peuvent utiliser HTTPS local après approbation de son autorité, ou un HTTPS public externe. Pour les essais HTTP, utiliser le navigateur web. Voir [[Configuration]], [[Application-mobile]] et [[Client-Windows]].
