@@ -139,6 +139,7 @@ env_set ALLUMI_HTTP_PORT "$INSTALL_HTTP_PORT"
 env_set ALLUMI_BIND_ADDRESS "$INSTALL_BIND"
 env_set DEFAULT_LOCALE "$INSTALL_LOCALE"
 if [ "$LOCAL_HTTPS" = 1 ]; then
+  INSTALL_TLS_HOST="${INSTALL_URL#https://}"; INSTALL_TLS_HOST="${INSTALL_TLS_HOST%%:*}"
   ENV_FILE="$TEMP_ENV" bash "$ALLUMI_DIR/scripts/enable-local-https.sh" --host "$INSTALL_TLS_HOST" --port "$INSTALL_HTTP_PORT" --prepare-only
 else
   if [ "$(env_get ALLUMI_NETWORK_MODE)" = local-https ]; then env_set TRUSTED_PROXY_HOPS 0; fi

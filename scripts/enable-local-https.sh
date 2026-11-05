@@ -15,7 +15,7 @@ while [ "$#" -gt 0 ]; do
       [ "$mode" = start ] || die "choisis un seul mode."
       mode="${1#--}"; shift ;;
     --help)
-      printf '%s\n' 'Usage: ./scripts/enable-local-https.sh --host IPv4-locale [--port PORT] [--prepare-only]' '       ./scripts/enable-local-https.sh --check | --export-ca' 'Le certificat racine public est exporté dans local-https-root.crt; aucune clé privée n’est exportée.'
+      printf '%s\n' 'Usage: ./scripts/enable-local-https.sh --host IPv4-locale [--port PORT] [--prepare-only]' '       ./scripts/enable-local-https.sh --check | --export-ca' "Le certificat racine public est exporté dans local-https-root.crt; aucune clé privée n’est exportée."
       exit 0 ;;
     *) die "argument inconnu : $1" ;;
   esac
@@ -91,7 +91,7 @@ export_ca() {
   local raw certificate attempt
   raw="$(mktemp "$ALLUMI_DIR/.local-https-ca.raw.XXXXXX")"
   certificate="$(mktemp "$ALLUMI_DIR/.local-https-ca.public.XXXXXX")"
-  for attempt in $(seq 1 30); do
+  for ((attempt=0; attempt<30; attempt++)); do
     if compose exec -T caddy cat /data/caddy/pki/authorities/local/root.crt > "$raw" 2>/dev/null && openssl x509 -in "$raw" -out "$certificate" 2>/dev/null; then
       chmod 0644 "$certificate"
       # Replace the directory entry itself, never a symlink's target.

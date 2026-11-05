@@ -26,7 +26,6 @@ resolve_install_transport() {
     if [ -n "$port" ] && [ "$PORT_EXPLICIT" = 0 ]; then INSTALL_HTTP_PORT="$port"; fi
     [ -z "$port" ] || [ "$port" = "$INSTALL_HTTP_PORT" ] || die "le port de l’URL HTTPS locale doit correspondre à --http-port."
     INSTALL_URL="https://$address:$INSTALL_HTTP_PORT"
-    INSTALL_TLS_HOST="$address"
   elif [ "$TRANSPORT_EXPLICIT" = 1 ]; then
     [[ "$INSTALL_URL" == http://* ]] || die "--http exige une URL http://."
   fi
@@ -86,7 +85,7 @@ installer_wizard() {
   else
     printf '\nHTTP direct ou HTTPS fourni par votre proxy externe.\n' >&2
   fi
-  printf 'L’URL doit correspondre à celle utilisée dans le navigateur.\nAucun routage Proxmox modifié. Sauvegardes à configurer.\n\n' >&2
+  printf "L’URL doit correspondre à celle utilisée dans le navigateur.\nAucun routage Proxmox modifié. Sauvegardes à configurer.\n\n" >&2
   printf 'Appliquer cette configuration ? [o/N] : ' >&2
   IFS= read -r confirmation || die "saisie interrompue; aucune configuration modifiée."
   case "$confirmation" in o|O|oui|Oui|y|Y|yes) ;; *) printf 'Installation annulée. Aucun changement.\n' >&2; exit 130 ;; esac
