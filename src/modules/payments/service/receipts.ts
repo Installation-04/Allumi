@@ -203,6 +203,7 @@ export async function getReceipt(actor: CompanyContext, id: string, options: { i
       },
     });
     if (!row) return null;
+    const activeRefund = await tx.paymentOffset.findFirst({ where: { companyId: actor.companyId, receivedPaymentId: id, unappliedDate: null }, select: { id: true } });
     // The paginated UI can omit the full history while retaining one immutable customer snapshot.
     const nameAllocation = options.includeAllocations === false ? await tx.paymentAllocation.findFirst({ where: { companyId: actor.companyId, paymentId: id, salesDocumentId: { not: null } }, select: { salesDocument: { select: { billingSnapshot: true } } }, orderBy: { id: "asc" } }) : null;
     const customers = await receiptCustomerNames(tx, actor.companyId, [{ ...row, allocations: nameAllocation ? [nameAllocation] : row.allocations }]);
@@ -210,7 +211,7 @@ export async function getReceipt(actor: CompanyContext, id: string, options: { i
 
     return {
       id: row.id, number: row.number ?? "", date: iso(row.paymentDate), amountCents: row.amountCents, status: row.status, method: row.method,
-      reference: row.reference, memo: row.memo, customer: customers.get(row.id) ?? "", contactId: row.contactId, account: row.account, openCents: balances[0]?.cents ?? 0n,
+      reference: row.reference, memo: row.memo, customer: customers.get(row.id) ?? "", contactId: row.contactId, account: row.account, hasActiveRefunds: Boolean(activeRefund), openCents: balances[0]?.cents ?? 0n,
       journalEntryId: row.journalEntryId, voidEntryId: row.voidEntryId, voidDate: row.voidEntry ? iso(row.voidEntry.entryDate) : null, voidReason: row.voidReason,
       deposits: row.depositItems.map(item => ({ ...item.deposit, number: item.deposit.number ?? "", date: iso(item.deposit.depositDate) })),
       allocations: row.allocations.map((a) => ({

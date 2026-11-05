@@ -88,7 +88,7 @@ it("rejects RR refund allocation after a concurrently committed credit applicati
     await expect(stale.query(
       "INSERT INTO payment_allocation(id,company_id,payment_id,sales_document_id,amount_cents,applied_date,created_by_id) VALUES($1,$2,$3,$4,100,'2026-01-10',$5)",
       [randomUUID(), W.companyA, payment, credit, W.userOwnerA],
-    )).rejects.toMatchObject({ code: "AL007", message: "customer applications require read committed isolation" });
+    )).rejects.toMatchObject({ code: "AL007", message: "customer receipt movements require read committed isolation" });
   } finally { await rollback(stale); await other.end(); }
 });
 

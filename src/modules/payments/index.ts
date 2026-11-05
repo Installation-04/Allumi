@@ -8,7 +8,7 @@ export { listDepositAccounts, listPendingDepositReceipts, recordDeposit, listDep
 export { MAX_DEPOSIT_ITEMS } from "./domain/deposit";
 
 export { refundSchema, acceptsRefunds, type CustomerRefundInput } from "./domain/refund";
-export { recordCustomerRefund, voidCustomerRefund, getCustomerRefund, listCustomerRefunds, listCustomerRefundAccounts, listCreditRefunds, CUSTOMER_REFUNDS_PER_PAGE } from "./service/refunds";
+export { recordCustomerRefund, voidCustomerRefund, getCustomerRefund, listCustomerRefunds, listCustomerRefundAccounts, listCreditRefunds, CUSTOMER_REFUNDS_PER_PAGE, listCustomerRefundOrigins, CUSTOMER_REFUND_ORIGINS_PER_PAGE } from "./service/refunds";
 
 export type { PaymentHistoryFilters } from "./domain/history";
 export { parsePaymentHistoryFilters } from "./service/history";
@@ -17,3 +17,6 @@ export { onAccountReceiptSchema, type OnAccountReceiptInput } from "./domain/on-
 export { receiptAllocationSchema, receiptUnallocationSchema, type ReceiptAllocationInput, type ReceiptUnallocationInput } from "./domain/receipt-allocation";
 export { recordOnAccountReceipt } from "./service/on-account-receipts";
 export { getReceiptOpenCents, applyReceiptToInvoice, unapplyReceiptAllocation, listReceiptAllocationTargets, listReceiptAllocations, RECEIPT_ALLOCATION_TARGET_LIMIT, RECEIPT_ALLOCATIONS_PER_PAGE } from "./service/receipt-allocations";
+
+export { receiptRefundSchema, type ReceiptRefundInput } from "./domain/receipt-refund";
+export { recordReceiptRefund, listReceiptRefunds, RECEIPT_REFUNDS_PER_PAGE } from "./service/receipt-refunds";

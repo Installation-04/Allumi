@@ -14,17 +14,13 @@ import { withCompany, type CompanyContext, type Tx } from "@/platform/tenant";
 import { acceptsRefunds, refundSchema } from "../domain/refund";
 import { receiptVoidSchema } from "../domain/receipt";
 
-import { paymentHistoryWhere } from "./history";
-import { assertCustomerMovementDate } from "./movement-dates";
+import { paymentHistoryWhere, receiptCustomerNames } from "./history";
+import { assertCustomerMovementDate, assertReceiptMovementDate } from "./movement-dates";
 
 export const CUSTOMER_REFUNDS_PER_PAGE = 25;
 
 const iso = (date: Date) => date.toISOString().slice(0, 10);
-const customerName = (snapshot: unknown): string => {
-  if (!snapshot || typeof snapshot !== "object" || !("name" in snapshot))
-    return "";
-  return typeof snapshot.name === "string" ? snapshot.name : "";
-};
+
 
 /** Record a customer refund in the ledger; this does not send money through a bank or processor. */
 export async function recordCustomerRefund(
@@ -180,12 +176,15 @@ export async function voidCustomerRefund(
       await requireRole(tx, "sales.manage");
       await requireRole(tx, "entry.post");
       await requireRole(tx, "entry.reverse");
-      const locked = await tx.$queryRaw<{ id: string }[]>`
-        SELECT id FROM payment WHERE company_id = ${actor.companyId}::uuid AND id = ${id}::uuid AND direction = 'SENT' AND ledger = 'RECEIVABLE' FOR UPDATE`;
-      if (!locked[0]) throw new AppError("refunds.notFound");
-      const payment = await tx.payment.findFirstOrThrow({
-        where: { companyId: actor.companyId, id },
-      });
+      // Discover every historical peer before taking any payment lock. Offsets lock pairs in UUID order.
+      const peers = await tx.paymentOffset.findMany({ where: { companyId: actor.companyId, sentPaymentId: id }, select: { receivedPaymentId: true } });
+      const ids = [...new Set([id, ...peers.map(peer => peer.receivedPaymentId)])];
+      const locked = await tx.$queryRaw<{ id: string }[]>`SELECT id FROM payment WHERE company_id=${actor.companyId}::uuid AND id=ANY(${ids}::uuid[]) ORDER BY id FOR UPDATE`;
+      const payment = await tx.payment.findFirst({ where: { companyId: actor.companyId, id, direction: "SENT", ledger: "RECEIVABLE" } });
+      if (!payment) throw new AppError("refunds.notFound");
+      const offsets = await tx.paymentOffset.findMany({ where: { companyId: actor.companyId, sentPaymentId: id }, select: { id: true, receivedPaymentId: true } });
+      const held = new Set(locked.map(row => row.id));
+      if (offsets.some(offset => !held.has(offset.receivedPaymentId))) throw new AppError("refunds.stale");
       if (payment.status === "VOID") return id;
       const allocations = await tx.paymentAllocation.findMany({
         where: {
@@ -201,6 +200,7 @@ export async function voidCustomerRefund(
         iso(payment.paymentDate),
       );
       if (date < latest) throw new AppError("refunds.invalidVoid");
+      for (const paymentId of ids) await assertReceiptMovementDate(tx, actor.companyId, paymentId, date, "refunds.dateBeforeMovement");
 
       // Credits first, in a fixed order: a concurrent credit void or payment waits instead of crossing.
       const documents = await tx.$queryRaw<{ id: string }[]>`SELECT id FROM sales_document WHERE company_id = ${actor.companyId}::uuid AND id IN (SELECT sales_document_id FROM payment_allocation WHERE company_id = ${actor.companyId}::uuid AND payment_id = ${id}::uuid) ORDER BY id FOR UPDATE`;
@@ -216,6 +216,7 @@ export async function voidCustomerRefund(
           unappliedById: actor.userId,
         },
       });
+      await tx.paymentOffset.updateMany({ where: { companyId: actor.companyId, sentPaymentId: id, unappliedDate: null }, data: { unappliedDate: new Date(`${date}T00:00:00Z`), unappliedById: actor.userId } });
       const reversal = await createPaymentReversal(tx, actor, {
         paymentId: id,
         entryId: payment.journalEntryId,
@@ -313,124 +314,83 @@ export async function listCreditRefunds(
   });
 }
 
-export async function listCustomerRefunds(
-  actor: CompanyContext,
-  requestedPage = 1,
-  filters: unknown = {},
-) {
-  return withCompany(actor, async (tx) => {
+const creditOriginSelect = { id: true, number: true, billingSnapshot: true } as const;
+const receiptOriginSelect = {
+  id: true, number: true,
+  allocations: { select: { salesDocument: { select: { billingSnapshot: true } } }, orderBy: { id: "asc" as const }, take: 1 },
+} as const;
+
+export async function listCustomerRefunds(actor: CompanyContext, requestedPage = 1, filters: unknown = {}) {
+  return withCompany(actor, async tx => {
     await requireRole(tx, "sales.read");
     await requireRole(tx, "ledger.read");
     const where = paymentHistoryWhere(actor.companyId, "SENT", filters);
     const total = await tx.payment.count({ where });
     const pageCount = Math.max(1, Math.ceil(total / CUSTOMER_REFUNDS_PER_PAGE));
-    const page = Math.min(
-      Math.max(1, Math.trunc(requestedPage) || 1),
-      pageCount,
-    );
-    const rows = await tx.payment.findMany({
-      where,
-      select: {
-        id: true,
-        number: true,
-        paymentDate: true,
-        amountCents: true,
-        status: true,
-        method: true,
-        reference: true,
-        allocations: {
-          select: {
-            salesDocument: {
-              select: { id: true, number: true, billingSnapshot: true },
-            },
-          },
-          orderBy: { id: "asc" },
-        },
-      },
-      orderBy: [{ paymentDate: "desc" }, { createdAt: "desc" }, { id: "desc" }],
-      skip: (page - 1) * CUSTOMER_REFUNDS_PER_PAGE,
-      take: CUSTOMER_REFUNDS_PER_PAGE,
-    });
-    const receipts = rows.map((row) => ({
-      id: row.id,
-      number: row.number ?? "",
-      date: iso(row.paymentDate),
-      amountCents: row.amountCents,
-      status: row.status,
-      method: row.method,
-      reference: row.reference,
-      customer: customerName(
-        row.allocations[0]?.salesDocument?.billingSnapshot,
-      ),
-      credits: [
-        ...new Map(
-          row.allocations.flatMap((a) =>
-            a.salesDocument
-              ? [[a.salesDocument.id, a.salesDocument.number ?? ""] as const]
-              : [],
-          ),
-        ).entries(),
-      ].map(([creditNoteId, number]) => ({ id: creditNoteId, number })),
-    }));
-    return { refunds: receipts, total, page, pageCount };
+    const page = Math.min(Math.max(1, Number.isFinite(requestedPage) ? Math.trunc(requestedPage) : 1), pageCount);
+    const rows = await tx.payment.findMany({ where, select: {
+      id: true, number: true, paymentDate: true, amountCents: true, status: true, method: true, reference: true, contactId: true,
+      allocations: { select: { salesDocument: { select: creditOriginSelect } }, orderBy: { id: "asc" }, take: 5 },
+      offsetsAsSent: { select: { receivedPayment: { select: receiptOriginSelect } }, orderBy: { id: "asc" }, take: 5 },
+      _count: { select: { allocations: true, offsetsAsSent: true } },
+    }, orderBy: [{ paymentDate: "desc" }, { createdAt: "desc" }, { id: "desc" }], skip: (page - 1) * CUSTOMER_REFUNDS_PER_PAGE, take: CUSTOMER_REFUNDS_PER_PAGE });
+    const names = await receiptCustomerNames(tx, actor.companyId, rows.map(row => ({ ...row, allocations: [...row.allocations, ...row.offsetsAsSent.flatMap(offset => offset.receivedPayment.allocations)] })));
+    return { refunds: rows.map(row => ({
+      id: row.id, number: row.number ?? "", date: iso(row.paymentDate), amountCents: row.amountCents, status: row.status, method: row.method, reference: row.reference,
+      customer: names.get(row.id) ?? "",
+      credits: [...new Map(row.allocations.flatMap(a => a.salesDocument ? [[a.salesDocument.id, a.salesDocument.number ?? ""] as const] : [])).entries()].map(([id, number]) => ({ id, number })),
+      receiptSources: [...new Map(row.offsetsAsSent.map(offset => [offset.receivedPayment.id, offset.receivedPayment.number ?? ""] as const)).entries()].map(([id, number]) => ({ id, number })),
+      hasMoreOrigins: row._count.allocations > row.allocations.length || row._count.offsetsAsSent > row.offsetsAsSent.length,
+    })), total, page, pageCount };
   });
 }
 
-export async function getCustomerRefund(actor: CompanyContext, id: string) {
-  return withCompany(actor, async (tx) => {
+export async function getCustomerRefund(actor: CompanyContext, id: string, options: { includeOrigins?: boolean } = {}) {
+  return withCompany(actor, async tx => {
     await requireRole(tx, "sales.read");
     await requireRole(tx, "ledger.read");
-    const row = await tx.payment.findFirst({
-      where: {
-        companyId: actor.companyId,
-        id,
-        direction: "SENT",
-        ledger: "RECEIVABLE",
-      },
-      include: {
-        account: { select: { code: true, nameFr: true, nameEn: true } },
-        voidEntry: { select: { entryDate: true } },
-        allocations: {
-          orderBy: [{ appliedDate: "asc" }, { id: "asc" }],
-          select: {
-            id: true,
-            amountCents: true,
-            appliedDate: true,
-            unappliedDate: true,
-            salesDocument: {
-              select: { id: true, number: true, billingSnapshot: true },
-            },
-          },
-        },
-      },
-    });
+    const row = await tx.payment.findFirst({ where: { companyId: actor.companyId, id, direction: "SENT", ledger: "RECEIVABLE" }, include: {
+      account: { select: { code: true, nameFr: true, nameEn: true } }, voidEntry: { select: { entryDate: true } },
+      allocations: { ...(options.includeOrigins === false ? { take: 5 } : {}), orderBy: [{ appliedDate: "asc" }, { id: "asc" }], select: { id: true, amountCents: true, appliedDate: true, unappliedDate: true, salesDocument: { select: creditOriginSelect } } },
+      offsetsAsSent: { ...(options.includeOrigins === false ? { take: 5 } : {}), select: { receivedPayment: { select: receiptOriginSelect } }, orderBy: { id: "asc" } },
+      _count: { select: { allocations: true, offsetsAsSent: true } },
+    } });
     if (!row) return null;
+    const names = await receiptCustomerNames(tx, actor.companyId, [{ ...row, allocations: [...row.allocations, ...row.offsetsAsSent.flatMap(offset => offset.receivedPayment.allocations)] }]);
     return {
-      id: row.id,
-      number: row.number ?? "",
-      date: iso(row.paymentDate),
-      amountCents: row.amountCents,
-      status: row.status,
-      method: row.method,
-      reference: row.reference,
-      memo: row.memo,
-      customer: customerName(
-        row.allocations[0]?.salesDocument?.billingSnapshot,
-      ),
-      contactId: row.contactId,
-      account: row.account,
-      journalEntryId: row.journalEntryId,
-      voidEntryId: row.voidEntryId,
-      voidDate: row.voidEntry ? iso(row.voidEntry.entryDate) : null,
-      voidReason: row.voidReason,
-      allocations: row.allocations.map((a) => ({
-        id: a.id,
-        amountCents: a.amountCents,
-        appliedDate: iso(a.appliedDate),
-        unappliedDate: a.unappliedDate ? iso(a.unappliedDate) : null,
-        creditNoteId: a.salesDocument?.id ?? "",
-        creditNumber: a.salesDocument?.number ?? "",
-      })),
+      id: row.id, number: row.number ?? "", date: iso(row.paymentDate), amountCents: row.amountCents, status: row.status, method: row.method, reference: row.reference, memo: row.memo,
+      customer: names.get(row.id) ?? "", contactId: row.contactId, account: row.account, journalEntryId: row.journalEntryId, voidEntryId: row.voidEntryId,
+      voidDate: row.voidEntry ? iso(row.voidEntry.entryDate) : null, voidReason: row.voidReason,
+      allocations: options.includeOrigins === false ? [] : row.allocations.map(a => ({ id: a.id, amountCents: a.amountCents, appliedDate: iso(a.appliedDate), unappliedDate: a.unappliedDate ? iso(a.unappliedDate) : null, creditNoteId: a.salesDocument?.id ?? "", creditNumber: a.salesDocument?.number ?? "" })),
+      receiptSources: [...new Map(row.offsetsAsSent.map(offset => [offset.receivedPayment.id, offset.receivedPayment.number ?? ""] as const)).entries()].map(([id, number]) => ({ id, number })),
+      hasMoreOrigins: row._count.allocations > row.allocations.length || row._count.offsetsAsSent > row.offsetsAsSent.length,
     };
+  });
+}
+
+export const CUSTOMER_REFUND_ORIGINS_PER_PAGE = 25;
+
+/** A bounded union preserves partial and multi-source legacy histories without inventing a single origin. */
+export async function listCustomerRefundOrigins(actor: CompanyContext, refundId: string, requestedPage = 1) {
+  if (!refundSchema.shape.creditNoteId.safeParse(refundId).success) throw new AppError("refunds.invalid");
+  return withCompany(actor, async tx => {
+    await requireRole(tx, "sales.read");
+    await requireRole(tx, "ledger.read");
+    if (!await tx.payment.findFirst({ where: { companyId: actor.companyId, id: refundId, direction: "SENT", ledger: "RECEIVABLE" }, select: { id: true } })) throw new AppError("refunds.notFound");
+    const counts = await tx.$queryRaw<{ n: bigint }[]>`SELECT (SELECT count(*) FROM payment_allocation WHERE company_id=${actor.companyId}::uuid AND payment_id=${refundId}::uuid AND sales_document_id IS NOT NULL)+(SELECT count(*) FROM payment_offset WHERE company_id=${actor.companyId}::uuid AND sent_payment_id=${refundId}::uuid) AS n`;
+    const total = Number(counts[0]?.n ?? 0n);
+    const pageCount = Math.max(1, Math.ceil(total / CUSTOMER_REFUND_ORIGINS_PER_PAGE));
+    const page = Math.min(Math.max(1, Number.isFinite(requestedPage) ? Math.trunc(requestedPage) : 1), pageCount);
+    const rows = await tx.$queryRaw<{ id: string; kind: "CREDIT_NOTE" | "RECEIPT"; sourceId: string; number: string | null; amountCents: bigint; appliedDate: Date; unappliedDate: Date | null }[]>`
+      SELECT * FROM (
+        SELECT a.id,'CREDIT_NOTE'::text AS kind,a.sales_document_id AS "sourceId",d.number,a.amount_cents AS "amountCents",a.applied_date AS "appliedDate",a.unapplied_date AS "unappliedDate"
+        FROM payment_allocation a JOIN sales_document d ON d.company_id=a.company_id AND d.id=a.sales_document_id AND d.kind='CREDIT_NOTE'
+        WHERE a.company_id=${actor.companyId}::uuid AND a.payment_id=${refundId}::uuid
+        UNION ALL
+        SELECT o.id,'RECEIPT'::text,o.received_payment_id,p.number,o.amount_cents,o.applied_date,o.unapplied_date
+        FROM payment_offset o JOIN payment p ON p.company_id=o.company_id AND p.id=o.received_payment_id AND p.direction='RECEIVED' AND p.ledger='RECEIVABLE'
+        WHERE o.company_id=${actor.companyId}::uuid AND o.sent_payment_id=${refundId}::uuid
+      ) origins ORDER BY "appliedDate" DESC,id DESC,kind LIMIT ${CUSTOMER_REFUND_ORIGINS_PER_PAGE} OFFSET ${(page - 1) * CUSTOMER_REFUND_ORIGINS_PER_PAGE}`;
+    return { origins: rows.map(row => ({ ...row, number: row.number ?? "", appliedDate: iso(row.appliedDate), unappliedDate: row.unappliedDate ? iso(row.unappliedDate) : null })), total, page, pageCount };
   });
 }

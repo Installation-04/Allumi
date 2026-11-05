@@ -245,6 +245,9 @@ describe("the check against the ledger", () => {
         [id, W.companyA, ++entrySeq, W.userOwnerA, randomUUID()],
       );
       await db.query("INSERT INTO journal_line (id, company_id, entry_id, line_no, account_id, debit_cents, credit_cents, contact_id, entry_date) VALUES (gen_random_uuid(), $1, $2, 1, $3, 1234, 0, $5, '2026-12-01'), (gen_random_uuid(), $1, $2, 2, $4, 0, 1234, NULL, '2026-12-01')", [W.companyA, id, W.receivable, W.sales, W.customer]);
+      // Drain the new refund-only constraint before ALTER TABLE; this imported
+      // anomaly has no payment header, so the guard intentionally does nothing.
+      await db.query("SET CONSTRAINTS customer_refund_line_exact IMMEDIATE");
       await db.query("ALTER TABLE journal_entry ENABLE TRIGGER journal_entry_complete");
       await db.query("ALTER TABLE journal_line ENABLE TRIGGER journal_line_balanced");
       await db.query("COMMIT");
