@@ -39,7 +39,7 @@ else
   info "Docker déjà installé."
 fi
 docker compose version >/dev/null 2>&1 || die "le plugin docker compose est introuvable."
-apt-get install -y openssl age >/dev/null 2>&1 || apt-get install -y openssl >/dev/null
+apt-get install -y openssl python3 age >/dev/null 2>&1 || apt-get install -y openssl python3 >/dev/null
 
 # The child reports its selected action over a private descriptor, including interactive prepare-only.
 INSTALL_RESULT="$(mktemp)"

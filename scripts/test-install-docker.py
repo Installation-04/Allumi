@@ -19,7 +19,9 @@ with open(os.environ['DOCKER_TEST_LOG'],'a') as f: f.write(' '.join(args)+'\n')
 if args==['info'] and os.environ.get('DOCKER_TEST_DENY'): sys.exit(1)
 if args[:2]==['ps','-aq'] or args[:2]==['volume','ls']:
  if os.environ.get('DOCKER_TEST_EXISTING'): print('existing-resource')
-elif args and args[0]=='inspect': print(os.environ.get('DOCKER_TEST_HEALTH','healthy'))
+elif args and args[0]=='inspect':
+ if os.environ.get('DOCKER_TEST_WEB_UNHEALTHY') and Path(os.environ['ALLUMI_DIR'],'web-updates.log').exists(): print('unhealthy')
+ else: print(os.environ.get('DOCKER_TEST_HEALTH','healthy'))
 elif 'config' in args:
  if os.environ.get('DOCKER_TEST_BAD_CONFIG'): sys.exit(1)
 elif 'pull' in args:
@@ -42,6 +44,14 @@ class Harness(unittest.TestCase):
         for path in ['scripts/install-docker.sh','scripts/installer-options.sh','scripts/lib.sh','scripts/up.sh','scripts/update.sh','.env.example','docker-compose.yml']:
             shutil.copyfile(ROOT/path,self.root/path)
         docker=self.root/'bin/docker';docker.write_text(DOCKER);docker.chmod(0o755)
+        # Only the isolated helper is invoked: these tests never install a host service.
+        helper=self.root/'scripts/enable-web-updates.sh'
+        helper.write_text('#!/usr/bin/env bash\nset -eu\nprintf "enabled\\n" >> "$ALLUMI_DIR/web-updates.log"\n[ "${DOCKER_TEST_WEB_FAIL:-0}" != 1 ]\n')
+        for name,body in {
+            'id':'#!/bin/sh\nprintf "%s\\n" "${DOCKER_TEST_UID:-0}"\n',
+            'systemctl':'#!/bin/sh\n[ "${DOCKER_TEST_NO_SYSTEMD:-0}" != 1 ]\n',
+        }.items():
+            path=self.root/'bin'/name;path.write_text(body);path.chmod(0o755)
         self.log=self.root/'docker.log'
         self.env={**os.environ,'PATH':str(self.root/'bin')+os.pathsep+os.environ['PATH'],'ALLUMI_DIR':str(self.root),'ENV_FILE':str(self.root/'.env'),'DOCKER_TEST_LOG':str(self.log)}
         for key in ['COMPOSE_PROJECT_NAME','COMPOSE_FILE']:
@@ -54,6 +64,46 @@ class Harness(unittest.TestCase):
         return dict(line.split('=',1) for line in (self.root/'.env').read_text().splitlines() if line and not line.startswith('#'))
 
 class Installer(Harness):
+    def test_existing_control_override_is_kept_on_later_starts(self):
+        self.assertEqual(self.run_install('--prepare-only').returncode,0)
+        override=self.root/'compose.override.yaml'
+        override.write_text('services:\n  app:\n    environment:\n      ALLUMI_UPDATE_DIR: /app/storage/update-control\n')
+        result=subprocess.run(['bash',str(self.root/'scripts/up.sh'),'--build'],env=self.env,text=True,capture_output=True,timeout=15)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIn('-f '+str(override),self.log.read_text())
+
+    def test_web_updates_enabled_by_default_and_final_container_checked(self):
+        result=self.run_install()
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual((self.root/'web-updates.log').read_text(),'enabled\n')
+        self.assertGreaterEqual(self.log.read_text().count('inspect -f'),2)
+        self.assertIn('Mises à jour web : activées',result.stdout)
+
+    def test_web_updates_opt_out_and_prepare_do_not_install_host_agent(self):
+        for args in [('--no-web-updates',),('--prepare-only',)]:
+            result=self.run_install(*args)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertFalse((self.root/'web-updates.log').exists())
+
+    def test_unsupported_host_keeps_app_running_and_reports_disabled_agent(self):
+        for environment in [{'DOCKER_TEST_UID':'1000'},{'DOCKER_TEST_NO_SYSTEMD':'1'}]:
+            result=self.run_install(**environment)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertFalse((self.root/'web-updates.log').exists())
+            self.assertIn('activation automatique omise',result.stdout)
+            self.assertIn('Aucun agent hôte installé',result.stderr)
+
+    def test_activation_failure_is_not_reported_as_a_successful_installation(self):
+        result=self.run_install(DOCKER_TEST_WEB_FAIL='1')
+        self.assertNotEqual(result.returncode,0)
+        self.assertNotIn('Allumi est démarré',result.stdout)
+        self.assertTrue((self.root/'.env').exists())
+
+    def test_unhealthy_final_container_after_agent_setup_is_refused(self):
+        result=self.run_install('--timeout','1',DOCKER_TEST_WEB_UNHEALTHY='1')
+        self.assertNotEqual(result.returncode,0)
+        self.assertIn('application non saine',result.stderr)
+
     def test_new_install_and_repeat_preserve_secrets(self):
         first=self.run_install();self.assertEqual(first.returncode,0,first.stderr)
         original=self.config()

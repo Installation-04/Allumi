@@ -56,6 +56,11 @@ installer_wizard() {
   action_label="Configurer et démarrer Docker"
   [ "$PREPARE_ONLY" -eq 0 ] || action_label="Préparer .env uniquement"
   printf '\nRésumé\n  Adresse : %s\n  Écoute : %s — HTTP %s (TCP)\n  Langue initiale : %s\n  Délai : %s s\n  Action : %s\n' "$INSTALL_URL" "$INSTALL_BIND" "$INSTALL_HTTP_PORT" "$INSTALL_LOCALE" "$WAIT_SECONDS" "$action_label" >&2
+  if [ "$WEB_UPDATES" -eq 1 ]; then
+    printf '  Mises à jour web : activation automatique avec droits administrateur et systemd actif\n' >&2
+  else
+    printf '  Mises à jour web : activation désactivée (--no-web-updates)\n' >&2
+  fi
   printf "\nApplication + PostgreSQL privé; aucun certificat ni proxy intégré.\nL’URL doit correspondre à celle utilisée dans le navigateur.\nHTTP convient au réseau de test privé; votre proxy peut fournir HTTPS.\nAucun pare-feu ni routage Proxmox modifié. Sauvegardes à configurer.\n\n" >&2
   printf 'Appliquer cette configuration ? [o/N] : ' >&2
   IFS= read -r confirmation || die "saisie interrompue; aucune configuration modifiée."

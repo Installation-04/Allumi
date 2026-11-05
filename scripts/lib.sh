@@ -129,8 +129,11 @@ select_images() {
 # Démarre (ou met à jour) la pile selon IMAGE_MODE : jamais de construction quand les images ont été téléchargées.
 compose_up() {
   local build_flag=--build
+  local -a files=(-f "$ALLUMI_DIR/docker-compose.yml")
+  # Keep the updater's control mount on every later restart and update too.
+  [ ! -f "$ALLUMI_DIR/compose.override.yaml" ] || files+=(-f "$ALLUMI_DIR/compose.override.yaml")
   [ "$IMAGE_MODE" != pull ] || build_flag=--no-build
-  docker compose --project-directory "$ALLUMI_DIR" -f "$ALLUMI_DIR/docker-compose.yml" --env-file "$ENV_FILE" up -d "$build_flag" --remove-orphans
+  docker compose --project-directory "$ALLUMI_DIR" "${files[@]}" --env-file "$ENV_FILE" up -d "$build_flag" --remove-orphans
 }
 
 require_root() { [ "$(id -u)" -eq 0 ] || die "lance ce script avec sudo."; }

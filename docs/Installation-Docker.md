@@ -42,7 +42,7 @@ Le rapport indique le système (distribution, WSL), le processeur (`x86_64` ou `
 | Windows (Git Bash) | arrêt : le serveur tourne sous Linux (VM ou WSL 2); le client Windows s’y connecte |
 | Processeur autre qu’AMD64 ou ARM64 | arrêt (ex. ARM 32 bits) |
 
-Options : `--version v0.4.0-alpha.46` (sinon la plus récente, préversions comprises), `--branch main` (essais), `--dir`, `--docker-only` (Docker déjà installé : ni pare-feu ni tâche planifiée), `--yes` (sans confirmation), `--force`. Ce qui suit `--` va à l’installateur : `-- --app-url http://192.168.1.20:28080 --prepare-only`.
+Options : `--version v0.4.0-alpha.46` (sinon la plus récente, préversions comprises), `--branch main` (essais), `--dir`, `--docker-only` (Docker déjà installé : ni pare-feu ni sauvegardes planifiées; l’agent de mise à jour web reste activé par défaut sur un hôte root/Python 3/systemd compatible), `--yes` (sans confirmation), `--force`. Ce qui suit `--` va à l’installateur : `-- --app-url http://192.168.1.20:28080 --prepare-only`.
 
 Avant d’agir, le script résume l’installateur retenu et demande confirmation sur le terminal; sans terminal, il exige `--yes`. Le dépôt est cloné dans `/opt/allumi` (ou `~/allumi` sans droits), sur l’étiquette de version. Un dépôt existant n’est mis à jour que s’il est sans modification locale, et une installation existante garde ses secrets, ses volumes et son `APP_URL`.
 
@@ -81,9 +81,19 @@ Cette capture reproduit le dialogue du script avec des données fictives.
   --http-port 28080 --bind 0.0.0.0 --locale fr-CA
 ```
 
-Options : `--interactive`, `--app-url`, `--http-port`, `--bind`, `--locale`, `--timeout` (1 à 3600 secondes après le démarrage Compose), `--prepare-only`, `--help`. Sans argument et sans terminal, le script refuse de démarrer. Les anciennes options `--domain`, `--email` et `--https-port` ne sont plus utilisées.
+Options : `--interactive`, `--app-url`, `--http-port`, `--bind`, `--locale`, `--timeout` (1 à 3600 secondes après le démarrage Compose), `--prepare-only`, `--no-web-updates`, `--help`. Sans argument et sans terminal, le script refuse de démarrer. Les anciennes options `--domain`, `--email` et `--https-port` ne sont plus utilisées.
 
 Le script génère les secrets, prépare `.env` atomiquement avec permissions 600, conserve les secrets existants, valide Compose et attend la santé de l’application. Il refuse une configuration absente si des volumes du projet existent déjà : restaurer alors le `.env` associé, sans régénérer les mots de passe. Les ports et URL existants sont conservés sauf option explicite. Il n’installe pas Docker et ne configure ni pare-feu, ni VM, ni sauvegardes automatiques.
+
+## Mise à jour web prête après installation
+
+Après le démarrage et la vérification de santé, l’installateur active par défaut l’agent hôte des mises à jour web lorsqu’il s’exécute en **root sur Linux avec Python 3 et systemd actif**. Cela installe la copie privilégiée de l’agent, son service et son timer, et rend le parcours disponible aux administrateurs autorisés. Cela ne télécharge ni n’installe automatiquement une nouvelle version : chaque mise à jour exige une demande et la confirmation de la sauvegarde et de l’interruption dans l’interface.
+
+Passer `--no-web-updates` à `install-docker.sh` pour ne pas activer cet agent. Avec le lanceur `get.sh`, passer cette option après `--`. Le mode `--prepare-only` prépare uniquement la configuration : aucun conteneur ni agent n’est démarré ou activé. `get.sh --docker-only` conserve l’activation par défaut de cet agent sur les hôtes compatibles, même s’il ne configure ni pare-feu ni sauvegardes planifiées.
+
+Sans root, sans Python 3 ou sans systemd actif, l’application peut être installée mais l’activation automatique de l’agent est omise avec un avertissement. Pour une installation ancienne ou réalisée sans root, suivre l’activation manuelle de [[Mise-a-jour]] depuis un hôte compatible, avec les droits administrateur système. Un environnement dépourvu de systemd ne bénéficie pas de cet agent; utiliser la procédure de mise à jour manuelle. Une activation incomplète ne doit pas être interprétée comme une mise à jour disponible depuis le web.
+
+Le script d’activation peut être relancé pour son installation gérée. Il réutilise uniquement le fichier Compose généré à l’identique. Un fichier personnalisé ou un lien symbolique est refusé sans modification : faire intégrer le montage et organiser l’installation de l’agent par l’administrateur système. Voir [[Administration-serveur]] et [[Mise-a-jour]].
 
 ## Premier accès
 

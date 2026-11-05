@@ -30,15 +30,19 @@ Les migrations de base de données ne sont pas toujours réversibles. Le retour 
 
 ## Depuis le web ou le client Windows
 
+Les versions antérieures à alpha.47 utilisaient un redémarrage limité au Compose principal. Lors du premier passage depuis ces versions, si une installation déjà équipée de l’agent affiche ensuite celui-ci comme désactivé, lancer `sudo docker compose up -d app` depuis le dossier Allumi pour réappliquer son `compose.override.yaml` existant. Les nouveaux scripts conservent ce fichier lors des redémarrages et rechargent les helpers de la version récupérée.
+
 Le lien **Version** du pied de page ouvre `/versions`, affiche la version du serveur et consulte GitHub Releases. Le serveur doit pouvoir joindre `api.github.com`. Les versions stables ignorent les préversions; un serveur de préversion les inclut. L’interface web et l’app iOS suivent la version du serveur : recharger la page après son redémarrage.
 
-La mise à jour du serveur depuis l’interface est réservée à l’**administrateur de l’instance ou opérateur serveur explicitement autorisé** et désactivée par défaut. Dans la VM, depuis le dépôt, exécuter une fois :
+La mise à jour du serveur depuis l’interface est réservée à l’**administrateur de l’instance ou opérateur serveur explicitement autorisé**. Sur une nouvelle installation Docker, l’agent est activé par défaut après vérification de santé si l’installateur s’exécute en root sur Linux avec Python 3 et systemd actif. Il prépare seulement le traitement des demandes : aucune nouvelle version n’est installée automatiquement. `--no-web-updates` omet cette activation et `--prepare-only` n’active aucun agent. Sans root, sans Python 3 ou sans systemd actif, l’installateur avertit que l’activation a été omise.
+
+Pour une installation ancienne ou sans activation, depuis le clone installé dans une VM Linux Docker/systemd compatible, exécuter :
 
 ```bash
 sudo ./scripts/enable-web-updates.sh
 ```
 
-Le script installe un agent root et un timer systemd, puis monte une boîte de demandes dans le conteneur de l’application. Il ne donne **aucun accès au socket Docker** au site. Si `compose.override.yaml` existe déjà, le script s’arrête pour préserver votre configuration : intégrer son bloc `app.environment`/`app.volumes` avant de reprendre l’installation de l’agent avec votre administrateur système.
+Le script installe un agent root et un timer systemd, puis monte une boîte de demandes dans le conteneur de l’application. Il ne donne **aucun accès au socket Docker** au site. Le script peut être relancé pour sa configuration gérée sans multiplier les services ou montages. Il accepte le `compose.override.yaml` généré à l’identique, mais refuse un fichier personnalisé ou un lien symbolique sans l’écraser. Dans ce cas, l’administrateur système doit intégrer manuellement le montage requis et organiser l’installation de l’agent; relancer le script ne contourne pas ce refus. Sans systemd actif, utiliser la procédure manuelle de mise à jour plutôt que compter sur cet agent.
 
 Dans **Serveur**, la carte **Mises à jour du serveur** présente la version installée, la dernière release admissible et l’état de l’agent. Le même parcours reste accessible depuis **Versions et mises à jour** (`/versions`). Un admin d’entreprise sans droit global serveur ne peut pas demander l’opération.
 
@@ -59,7 +63,7 @@ En cas d’échec de sauvegarde, l’ancienne application redémarre. Après le 
 
 Ces captures sont une démonstration contrôlée du parcours administrateur : les demandes, états et versions affichés peuvent être simulés. Elles ne montrent pas une mise à jour réelle de serveur.
 
-Pour désactiver les demandes automatiques : `sudo systemctl disable --now allumi-update.timer`, puis retirer la variable et le montage ajoutés au service app et le recréer. Les mises à jour du client Windows restent indépendantes : [[Client-Windows]].
+Pour désactiver le traitement des demandes web : `sudo systemctl disable --now allumi-update.timer`, puis retirer la variable et le montage ajoutés au service app et le recréer. Les mises à jour du client Windows restent indépendantes : [[Client-Windows]].
 
 ## Transition vers la pile sans SSL intégré
 
