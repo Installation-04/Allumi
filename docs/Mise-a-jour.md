@@ -7,14 +7,14 @@ sudo ./scripts/update.sh
 ```
 Le script : sauvegarde, récupère la nouvelle version (`git pull --ff-only` sur une branche), complète ton `.env` des variables ajoutées depuis (sans toucher aux existantes), reconstruit les images, applique les migrations (service `migrate`) et vérifie le healthcheck. Lis le `CHANGELOG.md` avant, surtout pour les versions majeures.
 
-Options : `--no-backup` (déconseillé) et une version, par exemple `sudo ./scripts/update.sh v0.4.0-alpha.45` (voir ci-dessous).
+Options : `--no-backup` (déconseillé) et une version, par exemple `sudo ./scripts/update.sh v0.4.0-alpha.46` (voir ci-dessous).
 
 ## Épingler une version
 Les numéros et le processus de publication sont décrits dans [[Versions-et-releases]].
 
 Pour la production, utilise une version étiquetée plutôt que `main` :
 ```bash
-sudo ./scripts/update.sh v0.4.0-alpha.45
+sudo ./scripts/update.sh v0.4.0-alpha.46
 ```
 Le script sauvegarde, se place sur l'étiquette, **télécharge les images publiées de cette version** (aucune compilation; repli automatique sur la construction si elles sont introuvables, ou avec `--build`) et vérifie le healthcheck. Sur une version épinglée (HEAD détachée), lancer `update.sh` sans version ne tire rien : il redémarre seulement avec les images de la version courante. Voir [[Installation-Docker]], « Images déjà construites ». La première mise à jour depuis une version antérieure à ce changement construit encore sur place : c’est l’ancien script qui s’exécute.
 
@@ -40,16 +40,24 @@ sudo ./scripts/enable-web-updates.sh
 
 Le script installe un agent root et un timer systemd, puis monte une boîte de demandes dans le conteneur de l’application. Il ne donne **aucun accès au socket Docker** au site. Si `compose.override.yaml` existe déjà, le script s’arrête pour préserver votre configuration : intégrer son bloc `app.environment`/`app.volumes` avant de reprendre l’installation de l’agent avec votre administrateur système.
 
-L’administrateur choisit la nouvelle version et confirme l’interruption. Le timer traite la demande sous environ une minute : il exige un tag officiel publié, plus récent, descendant du commit installé, un dépôt propre et l’origine GitHub officielle. Il arrête l’application, sauvegarde obligatoirement, lance la reconstruction et les migrations, puis vérifie la santé. Les demandes expirent après une heure. La première installation n’aura pas de mise à jour disponible avant la publication suivante.
+Dans **Serveur**, la carte **Mises à jour du serveur** présente la version installée, la dernière release admissible et l’état de l’agent. Le même parcours reste accessible depuis **Versions et mises à jour** (`/versions`). Un admin d’entreprise sans droit global serveur ne peut pas demander l’opération.
 
-Pendant cette opération, l’interface est temporairement indisponible. Après retour du serveur, recharger la page Versions. Ne pas lancer une mise à jour manuelle simultanément. Le journal conserve l’acteur, le tag et les erreurs :
+Ouvrir **Notes de version**, enregistrer son travail, vérifier la configuration des sauvegardes et cocher **J’ai sauvegardé mon travail. La mise à jour créera une sauvegarde et interrompra temporairement le service pour tous les utilisateurs.**, puis **Mettre à jour le serveur**. La cible est la release publiée plus récente proposée par le serveur, pas un tag ou une commande libre. Sans agent activé sur l’hôte, le bouton ne lance aucune mise à jour : suivre d’abord l’activation ci-dessus. Le timer traite la demande sous environ une minute : il exige un tag officiel publié, plus récent, descendant du commit installé, un dépôt propre et l’origine GitHub officielle. Il arrête l’application, sauvegarde obligatoirement, lance la reconstruction et les migrations, puis vérifie la santé. Les demandes expirent après une heure. La première installation n’aura pas de mise à jour disponible avant la publication suivante.
+
+Le suivi distingue la demande en attente et les étapes **Vérification de la demande**, **Sauvegarde avant mise à jour**, **Installation et redémarrage** et **Opération terminée**. Pendant une demande en attente ou en cours, l’écran interroge l’état toutes les cinq secondes, pendant dix minutes au maximum. **Vérifier / Actualiser** permet de reprendre la vérification ensuite. Une impossibilité de joindre GitHub est signalée explicitement; elle ne signifie pas que le serveur est à jour. Pendant le redémarrage, une perte temporaire de connexion est attendue; il réessaie pour retrouver le serveur. Le lien **Rouvrir cette page** permet de revenir après le redémarrage. Si la session expire ou que le droit serveur est retiré, le suivi s’arrête et demande une nouvelle connexion. Après son retour, vérifier la version et le résultat, puis recharger les autres onglets et l’app iOS pour charger l’interface installée. Un état en attente ne prouve pas que le timer fonctionne : consulter son statut sur l’hôte si rien ne progresse. Ne pas lancer une mise à jour manuelle simultanément. Le journal conserve l’acteur, le tag et les erreurs :
 
 ```bash
 sudo journalctl -u allumi-update.service
 sudo systemctl status allumi-update.timer
 ```
 
-En cas d’échec de sauvegarde, l’ancienne application redémarre. Après le début d’une migration, aucun retour arrière automatique n’est tenté : utiliser la sauvegarde et la procédure de restauration. L’agent root installé est une copie contrôlée; pour mettre à jour ce composant lui-même après revue d’une release : `sudo install -m 0755 scripts/update-agent.py /usr/local/sbin/allumi-update-agent`.
+En cas d’échec de sauvegarde, l’ancienne application redémarre. Après le lancement de l’installation, aucun retour arrière automatique n’est tenté : utiliser la sauvegarde et la procédure de restauration. Un ancien agent reste compatible avec les états simples (en attente, en cours, succès ou échec); il ne fournit pas nécessairement les étapes détaillées. Une mise à jour de l’application ne remplace pas automatiquement la copie root de l’agent. Pour obtenir le nouveau suivi sur l’hôte, depuis le clone de la release publiée installée, examiner le script puis actualiser volontairement cette copie : `sudo install -m 0755 scripts/update-agent.py /usr/local/sbin/allumi-update-agent`.
+
+![Mise à jour disponible dans l’administration serveur](images/serveur-mise-a-jour-disponible-desktop.png)
+
+![Suivi en anglais et thème sombre sur téléphone](images/serveur-mise-a-jour-en-dark-mobile.png)
+
+Ces captures sont une démonstration contrôlée du parcours administrateur : les demandes, états et versions affichés peuvent être simulés. Elles ne montrent pas une mise à jour réelle de serveur.
 
 Pour désactiver les demandes automatiques : `sudo systemctl disable --now allumi-update.timer`, puis retirer la variable et le montage ajoutés au service app et le recréer. Les mises à jour du client Windows restent indépendantes : [[Client-Windows]].
 

@@ -4,6 +4,10 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.46] - 2026-11-05
+
+- Mise à jour serveur accessible depuis l’administration et la page Versions : release publiée plus récente, confirmation de sauvegarde et d’interruption, suivi des étapes et reconnexion après redémarrage. Activation de l’agent hôte toujours volontaire; compatibilité avec les anciens états simples et guides illustrés FR/EN/mobile/sombre.
+
 ## [0.4.0-alpha.45] - 2026-11-04
 
 - Remboursement partiel ou complet du disponible d’un encaissement sans avoir, avec écriture de sortie, compensation liée, contrôle du disponible revu et reprises idempotentes; annulation par contre-passation qui rétablit le disponible sans changer les affectations aux factures. Historiques et origines paginés, recherche du numéro d’encaissement source, permissions modulaires et guides illustrés FR/EN/mobile/sombre. Migration `20261110000000_customer_receipt_refunds` : dates, droits, concurrence et écriture exacte des remboursements renforcés en base.
