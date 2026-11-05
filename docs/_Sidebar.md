@@ -60,6 +60,7 @@
 
 - [[Encaissements]]
 - [[Encaissements-au-compte]]
+- [[Remboursements-des-encaissements]]
 
 - [[Integrations]]
 

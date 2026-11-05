@@ -19,11 +19,11 @@ Le remboursement débite les comptes clients et crédite la banque ou l’encais
 
 ![Enregistrer un remboursement](images/remboursement-formulaire-desktop.png)
 
-Les dates futures, antérieures à la validation de l’avoir ou au dernier mouvement d’affectation/libération sont refusées. Les périodes doivent être ouvertes. Cette chronologie vaut aussi pour le retrait du remboursement : il ne peut précéder un mouvement ultérieur d’affectation ou de retrait sur l’avoir, afin de conserver des soldes historiques cohérents. Le parcours de remboursement n’affecte pas automatiquement un avoir à d’autres factures et ne rembourse pas les paiements sans avoir lié. Pour affecter explicitement tout ou partie du disponible à une facture ouverte du même client, voir [[Affectation-des-avoirs-clients]].
+Les dates futures, antérieures à la validation de l’avoir ou au dernier mouvement d’affectation/libération sont refusées. Les périodes doivent être ouvertes. Cette chronologie vaut aussi pour le retrait du remboursement : il ne peut précéder un mouvement ultérieur d’affectation ou de retrait sur l’avoir, afin de conserver des soldes historiques cohérents. Ce parcours rembourse le disponible d’un avoir et n’affecte pas automatiquement celui-ci à d’autres factures. Le disponible d’un encaissement peut aussi être remboursé sans créer d’avoir, depuis sa propre fiche : [[Remboursements-des-encaissements]]. Pour affecter explicitement tout ou partie du disponible à une facture ouverte du même client, voir [[Affectation-des-avoirs-clients]].
 
 ## Consulter et annuler
 
-**Ventes → Remboursements clients** liste les remboursements, avec pagination. La fiche conserve le montant, le compte, les références, l’avoir d’origine et le lien vers l’écriture comptable.
+**Ventes → Remboursements clients** liste les remboursements, avec pagination. La fiche conserve le montant, le compte, les références, les origines et le lien vers l’écriture comptable. La liste rassemble les remboursements provenant d’avoirs et d’encaissements. Les origines sont paginées par 25 et conservent les liens multiples des anciennes pièces.
 
 ![Fiche du remboursement](images/remboursement-detail-desktop.png)
 

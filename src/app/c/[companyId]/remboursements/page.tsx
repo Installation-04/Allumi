@@ -34,6 +34,7 @@ export default async function PaymentsPage({
     filters,
   );
   const t = await getTranslations("customerRefunds");
+  const r = await getTranslations("receiptRefunds");
   const base = `/c/${company.id}/remboursements`;
   const pageHref = (page: number) => `${base}?${new URLSearchParams({ ...paymentHistoryParams(filters), page: String(page) })}`;
   const link = `inline-flex min-h-11 items-center rounded px-3 text-sm underline ${FOCUS}`;
@@ -70,6 +71,8 @@ export default async function PaymentsPage({
                 <p className="tabular-nums">
                   {formatMoney(receipt.amountCents, locale)} · {receipt.date}
                 </p>
+                {receipt.receiptSources.map(source => <p key={source.id} className="break-words text-sm">{r("sourceReceipt", { number: source.number })}</p>)}
+                {receipt.hasMoreOrigins && <p className="text-sm underline">{r("moreOrigins")}</p>}
                 <p className="text-sm">
                   {t(`statuses.${receipt.status}`)} ·{" "}
                   {t(`methods.${receipt.method}`)}

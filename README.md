@@ -444,3 +444,14 @@ Comptabilisez des fonds réellement reçus sans choisir immédiatement une factu
 ![Création d’un encaissement au compte](docs/images/encaissement-au-compte-formulaire-desktop.png)
 
 ![Affectations en anglais et thème sombre sur téléphone](docs/images/encaissement-au-compte-en-dark-mobile.png)
+
+
+### Rembourser le disponible d’un encaissement
+
+Comptabilisez un remboursement déjà effectué au client, sans créer d’avoir, sur tout ou partie du disponible d’un encaissement. Les factures déjà réglées restent inchangées; les origines et annulations conservent leur historique. Allumi ne transmet aucun ordre bancaire.
+
+[Guide des remboursements d’encaissements](docs/Remboursements-des-encaissements.md)
+
+![Formulaire de remboursement d’encaissement](docs/images/remboursement-encaissement-formulaire-desktop.png)
+
+![Remboursement en anglais et thème sombre sur téléphone](docs/images/remboursement-encaissement-en-dark-mobile.png)

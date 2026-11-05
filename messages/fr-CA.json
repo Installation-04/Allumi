@@ -736,6 +736,17 @@
       "exceeds": "Le montant dépasse le solde disponible de l’encaissement ou de la facture.",
       "alreadyApplied": "Cet encaissement est déjà affecté à cette facture. Désaffectez le lien existant avant de changer le montant.",
       "confirm": "Confirmez cette affectation ou son retrait avant de continuer."
+    },
+    "receiptRefunds": {
+      "invalid": "Vérifiez l’encaissement, le montant, la date et les renseignements du remboursement.",
+      "futureDate": "La date du remboursement ne peut pas être dans le futur.",
+      "receiptNotFound": "Cet encaissement client est introuvable.",
+      "idempotency": "Cette soumission correspond déjà à un autre remboursement. Rechargez le formulaire avant de recommencer.",
+      "notPosted": "Seul un encaissement validé peut être remboursé.",
+      "dateBeforeMovement": "La date doit être égale ou postérieure à l’encaissement et à sa dernière affectation, compensation ou désaffectation.",
+      "stale": "Le montant disponible a changé. Actualisez la page avant de confirmer.",
+      "exceeds": "Le montant dépasse le solde disponible de l’encaissement.",
+      "confirm": "Confirmez l’enregistrement du remboursement."
     }
   },
   "settingsPage": {
@@ -2369,10 +2380,10 @@
   },
   "customerRefunds": {
     "title": "Remboursements clients",
-    "intro": "Remboursements comptabilisés sur les avoirs disponibles. Aucun argent n’est envoyé par Allumi.",
+    "intro": "Remboursements comptabilisés sur les avoirs ou les encaissements disponibles. Aucun argent n’est envoyé par Allumi.",
     "back": "Tous les remboursements",
     "empty": "Aucun remboursement",
-    "emptyHint": "Ouvrez un avoir validé disponible pour enregistrer un remboursement.",
+    "emptyHint": "Ouvrez un avoir validé ou un encaissement disponible pour enregistrer un remboursement.",
     "number": "Numéro",
     "date": "Date",
     "customer": "Client",
@@ -2413,11 +2424,11 @@
     "submit": "Comptabiliser le remboursement",
     "detail": "Remboursement {number}",
     "journalEntry": "Écriture au journal",
-    "allocations": "Avoirs remboursés",
+    "allocations": "Origines du remboursement",
     "allocationLine": "{number} · {amount}",
     "released": "retiré le {date}",
     "voidTitle": "Annuler le remboursement",
-    "voidWarning": "Une contre-passation rétablit le montant disponible de l’avoir. Elle ne récupère pas l’argent envoyé.",
+    "voidWarning": "Une contre-passation rétablit les montants disponibles sur les origines concernées (avoirs ou encaissements). Elle ne récupère pas l’argent envoyé.",
     "voidDate": "Date d’annulation",
     "voidReason": "Motif (obligatoire, 500 caractères au plus)",
     "confirmVoid": "Je confirme la contre-passation de ce remboursement.",
@@ -2560,5 +2571,24 @@
     "page": "Page {page} sur {count}",
     "available": "Disponible : {amount}",
     "moreAllocations": "Voir toutes les factures affectées"
+  },
+  "receiptRefunds": {
+    "title": "Remboursements de cet encaissement",
+    "intro": "Remboursez uniquement le montant disponible de cet encaissement. Enregistrez un remboursement déjà effectué ailleurs : Allumi ne transmet aucun ordre bancaire et ne transfère pas de fonds.",
+    "available": "Disponible à rembourser : {amount}",
+    "record": "Enregistrer un remboursement de l’encaissement",
+    "confirm": "Je confirme avoir déjà remboursé ce client séparément, avec le montant, la date et le compte indiqués.",
+    "empty": "Aucun remboursement pour cet encaissement.",
+    "portion": "Part de cet encaissement : {amount}",
+    "total": "Montant total du remboursement : {amount}",
+    "sourceReceipt": "Encaissement {number}",
+    "sourceCredit": "Avoir {number}",
+    "origins": "Origines du remboursement",
+    "moreOrigins": "Voir toutes les origines",
+    "originsEmpty": "Aucune origine disponible.",
+    "originDate": "Affecté le {date}",
+    "refundBlocked": "Cet encaissement a des remboursements actifs. Annulez-les avant d’annuler l’encaissement.",
+    "historyPagination": "Pages des remboursements de l’encaissement",
+    "originPagination": "Pages des origines du remboursement"
   }
 }

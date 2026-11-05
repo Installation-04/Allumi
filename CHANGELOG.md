@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Remboursement partiel ou complet du disponible d’un encaissement sans avoir, avec écriture de sortie, compensation liée, contrôle du disponible revu et reprises idempotentes; annulation par contre-passation qui rétablit le disponible sans changer les affectations aux factures. Historiques et origines paginés, recherche du numéro d’encaissement source, permissions modulaires et guides illustrés FR/EN/mobile/sombre. Migration `20261110000000_customer_receipt_refunds` : dates, droits, concurrence et écriture exacte des remboursements renforcés en base.
+
 ## [0.4.0-alpha.44] - 2026-11-04
 
 - Encaissements au compte client sans facture, comptabilisés une seule fois par soumission, puis affectables partiellement à plusieurs factures du même client sans nouvelle écriture; désaffectations datées, disponible net, recherche bornée, historique paginé et contrôles des deux soldes, dates, périodes et permissions. Guides illustrés FR/EN/mobile/sombre. Migration `20261109000000_customer_account_receipts`.

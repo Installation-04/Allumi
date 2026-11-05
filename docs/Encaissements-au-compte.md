@@ -16,7 +16,7 @@ La création attribue le numéro d’encaissement et enregistre le paiement et s
 
 ## Affecter le disponible à des factures
 
-Sur la fiche d’encaissement, ouvrir **Affectations aux factures** et consulter **Montant disponible**. Il correspond au montant reçu diminué des affectations actives et des compensations déjà enregistrées. Ces compensations sont prises en compte dans le calcul; leur création n’est pas proposée dans ce parcours.
+Sur la fiche d’encaissement, ouvrir **Affectations aux factures** et consulter **Montant disponible**. Il correspond au montant reçu diminué des affectations actives et des compensations déjà enregistrées. Les remboursements du disponible créent une compensation avec le paiement sortant; leur enregistrement est décrit dans [[Remboursements-des-encaissements]].
 
 Utiliser **Rechercher une facture par numéro ou référence**, puis **Rechercher**. Sous **Facture à régler**, choisir une facture et cliquer sur **Réviser l’affectation**. La recherche est littérale, y compris pour les caractères `%`, `_` et `\`, et propose au plus 50 factures. Préciser la recherche si nécessaire. Seules les factures validées, ouvertes et du même client sont admissibles. Une facture ayant déjà une affectation active de cet encaissement est exclue du choix.
 
@@ -33,6 +33,10 @@ L’historique conserve les affectations actives et retirées, avec numéro de f
 Ouvrir **Désaffecter** sur la ligne concernée, saisir la **Date de désaffectation**, cocher **Je confirme la désaffectation de ce montant.**, puis confirmer avec **Désaffecter**. Le montant redevient disponible sur l’encaissement et à payer sur la facture. Le paiement reçu et son écriture restent conservés : **désaffecter ne rembourse pas le client**. L’affectation initiale reste dans l’historique avec son retrait daté. Répéter le même retrait conserve le premier résultat sans changer sa date ni libérer deux fois le montant.
 
 L’affectation et son retrait sont permis même si l’encaissement a déjà été inclus dans un dépôt bancaire. L’**annulation de l’encaissement**, qui contre-passe la réception des fonds, reste distincte et exige d’abord l’annulation de tout dépôt actif : [[Depots-bancaires]] et [[Encaissements]].
+
+## Rembourser un disponible
+
+Un montant non affecté peut être remboursé en partie ou en totalité depuis la fiche de l’encaissement : [[Remboursements-des-encaissements]]. Le paiement au client doit avoir été effectué séparément. Allumi comptabilise la sortie, la compense avec le disponible et conserve les affectations existantes aux factures. Un remboursement actif bloque l’annulation de l’encaissement; sa propre annulation rétablit le disponible sans retirer les affectations aux factures.
 
 ## Dates et droits
 
