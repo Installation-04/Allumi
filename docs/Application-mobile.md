@@ -6,6 +6,10 @@ Lancer ensuite Allumi depuis cette icône et se connecter. Une nouvelle connexio
 
 L’application fonctionne **en ligne**. Elle ne conserve pas de copie hors ligne de la comptabilité. Après une mise à jour du serveur, fermer puis rouvrir l’application pour charger la nouvelle interface. Les versions se consultent depuis le pied de page, lien **Version** : voir [[Mise-a-jour]]. Aucun passage par l’App Store n’est nécessaire.
 
+## Autorité HTTPS locale
+
+Sur une instance par IP utilisant Caddy local, installer le certificat public vérifié puis activer sa confiance complète dans iOS avant d’ajouter l’app : [[HTTPS-local]]. Le profil téléchargé se gère dans Réglages → Général → VPN et gestion de l’appareil; la confiance complète dans Général → Informations → Réglages des certificats. Ne pas ignorer les avertissements de Safari. Une nouvelle IP ou une autorité remplacée peut nécessiter une nouvelle configuration et l’actualisation de l’icône.
+
 ## Références
 
 ![Tableau de bord mobile](images/tableau-de-bord-mobile.png)

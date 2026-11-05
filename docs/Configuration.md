@@ -8,12 +8,14 @@ Toute la configuration passe par des variables d'environnement, lues depuis le f
 
 | Variable | Rôle |
 |---|---|
-| `APP_URL` | Origine utilisée par le navigateur, ex. `http://192.168.1.20:28080`, ou HTTPS fourni par votre proxy externe. |
+| `APP_URL` | Origine utilisée par le navigateur, ex. `https://192.168.1.20:28080` en HTTPS local, HTTP explicite ou HTTPS fourni par un proxy externe. |
 | `ALLUMI_BIND_ADDRESS` | IPv4 d’écoute sur l’hôte, défaut `0.0.0.0`; `127.0.0.1` pour accès local seulement. |
-| `ALLUMI_HTTP_PORT` | Port HTTP publié de l’application, défaut `28080`, vers le port interne 3000. |
-| `ALLUMI_NETWORK_MODE` | Marqueur de migration réseau géré par les scripts; laisser `direct`. |
+| `ALLUMI_HTTP_PORT` | Port d’accès publié, défaut `28080` : TLS vers Caddy en HTTPS local, HTTP vers l’application en mode direct. |
+| `ALLUMI_NETWORK_MODE` | Mode réseau géré par les scripts : `direct` ou `local-https`; ne pas le modifier seul pour changer de protocole. |
+| `ALLUMI_TLS_HOST` | IPv4 locale du certificat en mode HTTPS local, gérée par le helper. |
+| `COMPOSE_FILE` | Fichiers Compose sélectionnés par les scripts, incluant `compose.https.yaml` en HTTPS local; préserver les overlays existants. |
 
-Aucun proxy ni certificat n’est fourni. PostgreSQL reste privé. Les anciennes clés `ALLUMI_DOMAIN`, `ACME_EMAIL`, `ALLUMI_HTTPS_PORT` sont ignorées. Voir [[Installation-Docker]] pour la transition depuis Caddy.
+Le mode [[HTTPS-local]] utilise le proxy optionnel Caddy et une autorité privée persistante. `ALLUMI_TLS_HOST` désigne l’hôte du certificat, géré par les scripts. Seul le port TLS est publié; l’application et PostgreSQL restent privés. En HTTP direct ou avec un proxy externe, conserver la configuration adaptée. Les anciennes clés `ALLUMI_DOMAIN`, `ACME_EMAIL`, `ALLUMI_HTTPS_PORT` sont ignorées. Voir [[Installation-Docker]] pour la transition depuis Caddy.
 
 ## Base de données
 | Variable | Description |
@@ -39,7 +41,7 @@ PostgreSQL n'est **pas** exposé hors du réseau Docker en production. Pourquoi 
 | `LOG_LEVEL` | `silent`, `fatal`, `error`, `warn`, `info` (défaut), `debug`, `trace`. Journaux JSON sur la sortie standard; jamais de secrets ni de renseignements personnels. |
 | `DEFAULT_LOCALE` | `fr-CA` (défaut) ou `en`. |
 | `SETUP_TOKEN` | Jeton privé de première configuration, généré par les scripts. En production, `/setup` reste fermé sans jeton, en HTTP comme en HTTPS. |
-| `TRUSTED_PROXY_HOPS` | De 0 à 5, défaut 0 : accès direct, en-têtes transférés ignorés et budget IP partagé. Avec un proxy externe, renseigner le nombre de proxys de confiance et empêcher tout accès direct contournant ces proxys. |
+| `TRUSTED_PROXY_HOPS` | De 0 à 5, défaut 0 : accès direct, en-têtes transférés ignorés et budget IP partagé. Le helper HTTPS local règle cette valeur à 1 et retire le port HTTP public de l’application. Avec un proxy externe, renseigner le nombre de proxys de confiance et empêcher tout accès direct contournant ces proxys. |
 
 ## Courriel (SMTP)
 `SMTP_HOST`, `SMTP_PORT` (587 par défaut), `SMTP_SECURITY` (`starttls` par défaut, `tls` pour 465; `plain` pour un relais de test), `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`. Voir [[Envoi-des-factures]] pour le parcours et les résultats. Utilise un service transactionnel avec SPF, DKIM et DMARC configurés sur ton domaine, sinon les factures risquent d'aboutir dans les pourriels.
@@ -57,7 +59,7 @@ Détails : [[Sauvegardes]].
 ## Ajouter une variable (contributeurs)
 Toute nouvelle variable consommée par l’application doit être ajoutée à `.env.example`, validée au démarrage (Zod, dans `src/platform/env.ts`), transmise à l'application dans `docker-compose.yml` (liste explicite : le service `app` ne lit pas tout le `.env`) et documentée ici, dans le même commit.
 
-Les variables de publication réseau sont propres à Compose. L’application écoute sur 3000 et PostgreSQL sur 5432 dans le réseau interne; seul le port de l’application est publié.
+Les variables de publication réseau sont propres à Compose. L’application écoute sur 3000 et PostgreSQL sur 5432 dans le réseau interne; seul le port d’accès choisi est publié, par Caddy en mode HTTPS local ou par l’application en HTTP direct.
 
 Au démarrage, une variable manquante ou invalide arrête l'application avec un message qui les nomme toutes (voir [[Depannage]]).
 

@@ -1,0 +1,19 @@
+{
+	admin off
+	auto_https disable_redirects
+	skip_install_trust
+	default_sni {$ALLUMI_TLS_HOST}
+	servers {
+		protocols h1 h2
+	}
+}
+
+https://{$ALLUMI_TLS_HOST}:8443 {
+	tls internal {
+		protocols tls1.2 tls1.3
+	}
+	reverse_proxy app:3000 {
+		header_up X-Forwarded-For {http.request.remote.host}
+		header_up X-Forwarded-Proto https
+	}
+}

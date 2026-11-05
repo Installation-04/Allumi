@@ -32,6 +32,18 @@ else
   die "conteneur app introuvable : sauvegarde des pièces jointes impossible."
 fi
 
+# The local authority is private deployment state. It belongs only in the protected backup,
+# never in application storage or a certificate export.
+if [ "$(env_get ALLUMI_NETWORK_MODE)" = local-https ]; then
+  info "Archive privée de l’autorité HTTPS locale…"
+  CADDY_CID="$(compose ps -aq caddy || true)"
+  [ -n "$CADDY_CID" ] || die "conteneur caddy introuvable : sauvegarde de l’autorité locale impossible."
+  docker run --rm --user 0:0 --network none --read-only --cap-drop ALL --security-opt no-new-privileges \
+    --volumes-from "$CADDY_CID":ro -v "$WORK":/out --entrypoint sh caddy:2.11.8-alpine -eu -c \
+    'test -s /data/caddy/pki/authorities/local/root.crt && test -s /data/caddy/pki/authorities/local/root.key && tar -czf /out/local-tls.tar.gz -C / data config'
+  chmod 600 "$WORK/local-tls.tar.gz"
+fi
+
 ARCHIVE="$BACKUP_DIR/allumi-$TS.tar"
 tar -cf "$ARCHIVE" -C "$WORK" .
 

@@ -1,0 +1,30 @@
+# Optional local HTTPS. Compose >= 2.24.4 is required for !reset.
+# Only Caddy publishes a host port; the application's HTTP listener stays private.
+services:
+  app:
+    ports: !reset []
+  caddy:
+    image: caddy:2.11.8-alpine
+    restart: unless-stopped
+    environment:
+      ALLUMI_TLS_HOST: ${ALLUMI_TLS_HOST:?ALLUMI_TLS_HOST manquant dans .env}
+    ports:
+      - "${ALLUMI_BIND_ADDRESS:-0.0.0.0}:${ALLUMI_HTTP_PORT:-28080}:8443"
+    volumes:
+      - ./deploy/Caddyfile.local:/etc/caddy/Caddyfile:ro
+      - local_https_data:/data
+      - local_https_config:/config
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [internal]
+
+volumes:
+  local_https_data:
+  local_https_config:

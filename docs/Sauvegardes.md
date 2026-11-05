@@ -5,6 +5,7 @@ Règle 3-2-1 : 3 copies, 2 supports différents, 1 copie **hors site**. Une sauv
 ## Ce qui est sauvegardé
 - La base PostgreSQL (`pg_dump` format custom).
 - Les pièces jointes (`/app/storage`).
+- En mode HTTPS local, les données et la configuration Caddy dans `local-tls.tar.gz`, y compris l’autorité et ses clés privées, afin de préserver la confiance des appareils. Cette archive interne est créée avec permissions 600 puis incluse dans la sauvegarde habituelle; le chiffrement `age` reste optionnel mais est recommandé. Aucune clé privée de cette archive ne doit être transférée aux appareils clients ou à l’application web.
 - **Pas** le fichier `.env` : garde-le séparément dans un gestionnaire de mots de passe (surtout `ENCRYPTION_KEY`, sans laquelle les secrets 2FA et les clés des [[Integrations]] contenus dans la sauvegarde sont illisibles).
 
 ## Mettre en place le chiffrement (age)
@@ -38,10 +39,16 @@ Le script demande confirmation, remplace la base et les pièces jointes, puis re
 
 ### Restaurer sur un nouveau serveur (reprise après sinistre)
 1. Cloner le dépôt (même version si possible) et **mettre ta copie de `.env` en place avant tout** (mêmes `ENCRYPTION_KEY` et `AUTH_SECRET`; `POSTGRES_PASSWORD` doit rester cohérent avec `DATABASE_URL`, et `APP_DB_PASSWORD` avec `APP_DATABASE_URL`). PostgreSQL n'applique `POSTGRES_PASSWORD` qu'à la **première** initialisation de son volume : si `install.sh` tournait d'abord avec un autre `.env`, le mot de passe ne correspondrait plus.
-2. Lancer `sudo ./scripts/install.sh --domain <domaine> --email <courriel>` : il garde les secrets existants et ne change que le domaine et le courriel : [[Installation]].
+2. Préparer les services avec la même version et le même mode réseau que la sauvegarde, sans régénérer les secrets : [[Installation-Docker]]. Pour HTTPS local, conserver les réglages et l’overlay de [[HTTPS-local]]. Le fichier `.env` reste une copie séparée, jamais un élément supposé de l’archive.
 3. Copier la sauvegarde sur le serveur et lancer `restore.sh`.
 
 Les sauvegardes **conservent les propriétaires** des objets (pas de `--no-owner`) : la fonction de caviardage de la Loi 25 appartient à un rôle dédié, et la restaurer sous un autre propriétaire la ferait échouer sans bruit. Le service `migrate` remet de toute façon ce propriétaire en place à chaque démarrage.
+
+## Restaurer l’autorité HTTPS locale
+
+En mode `local-https`, la restauration exige une archive `local-tls.tar.gz` complète et valide avant d’arrêter les services ou de remplacer la base. Elle restaure les volumes Caddy et la même autorité. Une sauvegarde ancienne sans données TLS n’est pas silencieusement transformée en nouvelle autorité : restaurer délibérément en HTTP ou choisir une sauvegarde HTTPS complète.
+
+Après restauration, exporter uniquement le certificat public avec `scripts/enable-local-https.sh --export-ca` et comparer l’empreinte attendue. Si l’autorité a été conservée, la confiance déjà installée sur les appareils peut être réutilisée. Si elle a été remplacée volontairement, vérifier puis déployer la nouvelle autorité sur chaque appareil et retirer l’ancienne selon la politique du poste : [[HTTPS-local]]. Les clés privées restent sur le serveur et dans les sauvegardes protégées.
 
 ## Test de restauration
 Tous les trimestres, restaure une sauvegarde récente sur un serveur de test et vérifie que la balance de vérification correspond.

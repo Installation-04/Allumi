@@ -70,6 +70,9 @@ WantedBy=timers.target
 UNIT
 systemctl daemon-reload
 systemctl enable --now allumi-update.timer
+if [ "$(env_get ALLUMI_NETWORK_MODE)" = local-https ]; then
+  env_set COMPOSE_FILE docker-compose.yml:compose.https.yaml:compose.override.yaml
+fi
 cd "$ALLUMI_DIR"
 compose up -d app
 info "Agent activé. Journal : journalctl -u allumi-update.service"

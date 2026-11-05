@@ -36,6 +36,8 @@ jobs:
           python3 scripts/test-enable-web-updates.py
           python3 scripts/test-install-docker.py
           python3 scripts/test-get.py
+          python3 scripts/test-local-https.py
+          python3 scripts/test-tls-backup.py
           shellcheck -x -P SCRIPTDIR -S warning scripts/*.sh
       - uses: actions/setup-node@v4
         with:
@@ -150,6 +152,32 @@ jobs:
           docker compose port app 3000 | grep -Fx '127.0.0.1:28080'
           docker inspect "$(docker compose ps -q db)" --format '{{json .NetworkSettings.Ports}}' | jq -e 'to_entries | all(.value == null or .value == [])'
           docker compose config --format json | jq -e '.services | keys == ["app", "db", "migrate"]'
+      - name: HTTPS local sur IP avec autorité privée (conversion de la pile HTTP)
+        env:
+          EXPECTED_ARCH: ${{ matrix.arch }}
+        run: |
+          sudo ./scripts/install-docker.sh --build --local-https --app-url https://127.0.0.1:28080 --http-port 28080 --bind 127.0.0.1 --timeout 120
+          sudo chown "$(id -u):$(id -g)" .env compose.override.yaml
+          sudo ./scripts/enable-local-https.sh --export-ca
+          test "$(stat -c '%a' local-https-root.crt)" = 644
+          openssl x509 -in local-https-root.crt -noout -checkend 0
+          if grep -q 'PRIVATE KEY' local-https-root.crt; then exit 1; fi
+          # curl checks both the private CA chain and the certificate's IP SAN, without an insecure override.
+          curl --fail --silent --show-error --cacert local-https-root.crt --retry 10 --retry-connrefused --retry-delay 1 https://127.0.0.1:28080/api/health | jq -e '.status == "ok"'
+          curl --fail --silent --show-error --cacert local-https-root.crt --tlsv1.2 --tls-max 1.2 https://127.0.0.1:28080/api/health
+          curl --fail --silent --show-error --cacert local-https-root.crt --tlsv1.3 --tls-max 1.3 https://127.0.0.1:28080/api/health
+          curl --fail --silent --show-error --cacert local-https-root.crt -o /tmp/allumi-setup-https.html https://127.0.0.1:28080/setup
+          grep -q setupToken /tmp/allumi-setup-https.html
+          if curl --fail --silent --show-error --max-time 5 http://127.0.0.1:28080/api/health; then exit 1; fi
+          docker compose port caddy 8443 | grep -Fx '127.0.0.1:28080'
+          for service in app db; do
+            docker inspect "$(docker compose ps -q "$service")" --format '{{json .NetworkSettings.Ports}}' | jq -e 'to_entries | all(.value == null or .value == [])'
+          done
+          docker compose config --format json | jq -e '.services | keys == ["app", "caddy", "db", "migrate"]'
+          test "$(docker image inspect --format '{{.Architecture}}' caddy:2.11.8-alpine)" = "$EXPECTED_ARCH"
+          docker compose exec -T app node -e "if(process.env.TRUSTED_PROXY_HOPS !== '1' || process.env.APP_URL !== 'https://127.0.0.1:28080' || process.env.ALLUMI_UPDATE_DIR !== '/app/storage/update-control') process.exit(1)"
+          systemctl is-enabled --quiet allumi-update.timer
+          systemctl is-active --quiet allumi-update.timer
       - name: Agent serveur et sauvegarde réelle
         run: |
           sudo ./scripts/enable-server-admin.sh
@@ -158,9 +186,13 @@ jobs:
           sudo systemctl start allumi-server-admin.service
           docker compose exec -T app node -e "const s=JSON.parse(require('node:fs').readFileSync('/app/storage/server-control/snapshot.json')); if(!s.backups.length || s.events.at(-1)?.state !== 'success') process.exit(1)"
           sudo systemctl disable allumi-server-admin.timer
+          # Agent setup must preserve the local HTTPS overlay and keep app/database ports private.
+          curl --fail --silent --show-error --cacert local-https-root.crt https://127.0.0.1:28080/api/health | jq -e '.status == "ok"'
+          docker compose exec -T app node -e "if(process.env.TRUSTED_PROXY_HOPS !== '1' || process.env.ALLUMI_UPDATE_DIR !== '/app/storage/update-control') process.exit(1)"
+          docker inspect "$(docker compose ps -q app)" --format '{{json .NetworkSettings.Ports}}' | jq -e 'to_entries | all(.value == null or .value == [])'
       - name: Journaux en cas d'échec
         if: failure()
-        run: docker compose logs migrate app
+        run: docker compose logs --no-color
 
   windows:
     runs-on: windows-latest

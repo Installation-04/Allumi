@@ -7,14 +7,14 @@ sudo ./scripts/update.sh
 ```
 Le script : sauvegarde, récupère la nouvelle version (`git pull --ff-only` sur une branche), complète ton `.env` des variables ajoutées depuis (sans toucher aux existantes), reconstruit les images, applique les migrations (service `migrate`) et vérifie le healthcheck. Lis le `CHANGELOG.md` avant, surtout pour les versions majeures.
 
-Options : `--no-backup` (déconseillé) et une version, par exemple `sudo ./scripts/update.sh v0.4.0-alpha.47` (voir ci-dessous).
+Options : `--no-backup` (déconseillé) et une version, par exemple `sudo ./scripts/update.sh v0.4.0-alpha.48` (voir ci-dessous).
 
 ## Épingler une version
 Les numéros et le processus de publication sont décrits dans [[Versions-et-releases]].
 
 Pour la production, utilise une version étiquetée plutôt que `main` :
 ```bash
-sudo ./scripts/update.sh v0.4.0-alpha.47
+sudo ./scripts/update.sh v0.4.0-alpha.48
 ```
 Le script sauvegarde, se place sur l'étiquette, **télécharge les images publiées de cette version** (aucune compilation; repli automatique sur la construction si elles sont introuvables, ou avec `--build`) et vérifie le healthcheck. Sur une version épinglée (HEAD détachée), lancer `update.sh` sans version ne tire rien : il redémarre seulement avec les images de la version courante. Voir [[Installation-Docker]], « Images déjà construites ». La première mise à jour depuis une version antérieure à ce changement construit encore sur place : c’est l’ancien script qui s’exécute.
 
@@ -65,6 +65,11 @@ Ces captures sont une démonstration contrôlée du parcours administrateur : le
 
 Pour désactiver le traitement des demandes web : `sudo systemctl disable --now allumi-update.timer`, puis retirer la variable et le montage ajoutés au service app et le recréer. Les mises à jour du client Windows restent indépendantes : [[Client-Windows]].
 
-## Transition vers la pile sans SSL intégré
+## Ancienne transition vers HTTP direct
 
-À partir de v0.4.0-alpha.10, Caddy est retiré. Pour passer d’un ancien accès HTTPS intégré à HTTP direct, effectuer la transition manuelle de [[Installation-Docker]] et définir la nouvelle `APP_URL` avant de redémarrer. La mise à jour conserve les URL existantes, les secrets et les volumes; elle ne réécrit pas une URL HTTPS qui peut être servie par un proxy externe.
+La transition introduite en v0.4.0-alpha.10 retirait l’ancien Caddy intégré; elle reste une procédure explicite vers HTTP direct, distincte du nouveau HTTPS local par IP. Pour passer d’un ancien accès HTTPS intégré à HTTP direct, effectuer la transition manuelle de [[Installation-Docker]] et définir la nouvelle `APP_URL` avant de redémarrer. La mise à jour conserve les URL existantes, les secrets et les volumes; elle ne réécrit pas une URL HTTPS qui peut être servie par un proxy externe.
+
+
+## Conserver le protocole et l’autorité locale
+
+Une mise à jour conserve l’URL et le mode réseau existants : le nouveau défaut HTTPS ne convertit pas silencieusement une instance HTTP ou un proxy externe. Pour une conversion volontaire par IP, suivre [[HTTPS-local]]. Conserver les volumes de l’autorité locale et les inclure dans la reprise après sinistre; ne pas recréer cette autorité à chaque mise à jour. Après restauration, vérifier son empreinte avant de réutiliser la confiance des appareils : [[Sauvegardes]].

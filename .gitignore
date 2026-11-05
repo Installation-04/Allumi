@@ -19,5 +19,7 @@ test-results/
 /desktop/dist/
 
 /compose.override.yaml
+/local-https-root.crt
+/.local-https-ca.*
 
 __pycache__/

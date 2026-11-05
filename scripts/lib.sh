@@ -41,7 +41,7 @@ env_set() {
 env_backfill() {
   local pass db url token
   # Removing the bundled proxy changes the trust boundary. Reset old deployments once.
-  if [ "$(env_get ALLUMI_NETWORK_MODE)" != direct ]; then
+  if [ "$(env_get ALLUMI_NETWORK_MODE)" != direct ] && [ "$(env_get ALLUMI_NETWORK_MODE)" != local-https ]; then
     env_set TRUSTED_PROXY_HOPS 0
     env_set ALLUMI_NETWORK_MODE direct
   fi
@@ -62,7 +62,12 @@ env_backfill() {
   fi
 }
 
-compose() { docker compose --project-directory "$ALLUMI_DIR" "$@"; }
+compose() {
+  local -a files=(-f "$ALLUMI_DIR/docker-compose.yml")
+  [ "$(env_get ALLUMI_NETWORK_MODE)" != local-https ] || files+=(-f "$ALLUMI_DIR/compose.https.yaml")
+  [ ! -f "$ALLUMI_DIR/compose.override.yaml" ] || files+=(-f "$ALLUMI_DIR/compose.override.yaml")
+  docker compose --project-directory "$ALLUMI_DIR" "${files[@]}" --env-file "$ENV_FILE" "$@"
+}
 
 # Les identifiants et réglages de déploiement viennent du fichier .env, jamais de l'environnement du shell :
 # Compose donne la priorité aux variables d'environnement sur celles de .env, si bien qu'un shell de développement
@@ -70,7 +75,8 @@ compose() { docker compose --project-directory "$ALLUMI_DIR" "$@"; }
 isolate_deployment_env() {
   unset DATABASE_URL APP_DATABASE_URL POSTGRES_PASSWORD POSTGRES_USER POSTGRES_DB APP_DB_PASSWORD AUTH_SECRET ENCRYPTION_KEY \
     SETUP_TOKEN APP_URL ALLUMI_DOMAIN ACME_EMAIL ALLUMI_HTTP_PORT ALLUMI_HTTPS_PORT ALLUMI_BIND_ADDRESS DEFAULT_LOCALE \
-    ALLUMI_APP_IMAGE ALLUMI_MIGRATE_IMAGE ALLUMI_SERVER_ADMIN_ENABLED
+    ALLUMI_APP_IMAGE ALLUMI_MIGRATE_IMAGE ALLUMI_SERVER_ADMIN_ENABLED ALLUMI_TLS_HOST ALLUMI_NETWORK_MODE \
+    TRUSTED_PROXY_HOPS COMPOSE_FILE
 }
 
 # --- Images : téléchargées (version publiée) ou construites sur place ------------------------------------------
@@ -114,7 +120,7 @@ select_images() {
     env_set ALLUMI_APP_IMAGE "${IMAGE_REPO}:${version}"
     env_set ALLUMI_MIGRATE_IMAGE "${IMAGE_REPO}-migrate:${version}"
     info "Téléchargement des images publiées de ${tag} (aucune compilation sur cette machine)…"
-    if docker compose --project-directory "$ALLUMI_DIR" --env-file "$ENV_FILE" pull --quiet app migrate; then
+    if compose pull --quiet app migrate; then
       IMAGE_MODE=pull
       return 0
     fi
@@ -129,11 +135,12 @@ select_images() {
 # Démarre (ou met à jour) la pile selon IMAGE_MODE : jamais de construction quand les images ont été téléchargées.
 compose_up() {
   local build_flag=--build
-  local -a files=(-f "$ALLUMI_DIR/docker-compose.yml")
-  # Keep the updater's control mount on every later restart and update too.
-  [ ! -f "$ALLUMI_DIR/compose.override.yaml" ] || files+=(-f "$ALLUMI_DIR/compose.override.yaml")
   [ "$IMAGE_MODE" != pull ] || build_flag=--no-build
-  docker compose --project-directory "$ALLUMI_DIR" "${files[@]}" --env-file "$ENV_FILE" up -d "$build_flag" --remove-orphans
+  compose up -d "$build_flag" --remove-orphans
+  if [ "$(env_get ALLUMI_NETWORK_MODE)" = local-https ]; then
+    # Git checkout replaces the bind-mounted Caddyfile inode. Recreate the proxy to load the new file.
+    compose up -d --no-deps --force-recreate caddy
+  fi
 }
 
 require_root() { [ "$(id -u)" -eq 0 ] || die "lance ce script avec sudo."; }
