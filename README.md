@@ -455,3 +455,14 @@ Comptabilisez un remboursement déjà effectué au client, sans créer d’avoir
 ![Formulaire de remboursement d’encaissement](docs/images/remboursement-encaissement-formulaire-desktop.png)
 
 ![Remboursement en anglais et thème sombre sur téléphone](docs/images/remboursement-encaissement-en-dark-mobile.png)
+
+
+### Mise à jour du serveur depuis le web
+
+La carte de l’administration serveur et la page Versions proposent une release publiée plus récente, avec confirmation de la sauvegarde et de l’interruption, suivi des étapes et reconnexion pendant le redémarrage. Réservé au super admin et aux opérateurs serveur autorisés; l’agent hôte doit être activé une fois, séparément. [Guide d’activation et de mise à jour](docs/Mise-a-jour.md).
+
+![Mise à jour disponible dans l’administration](docs/images/serveur-mise-a-jour-disponible-desktop.png)
+
+![Suivi en anglais et thème sombre sur téléphone](docs/images/serveur-mise-a-jour-en-dark-mobile.png)
+
+Captures de démonstration contrôlée : demandes, états et versions peuvent être simulés, sans mise à jour réelle de serveur.

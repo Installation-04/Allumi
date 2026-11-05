@@ -10,6 +10,7 @@ export async function updateServerAction(_previous: FormState, form: FormData): 
     if (form.get("confirm") !== "yes") return { messageKey: "updates.confirm" };
     await requestUpdate(session.userId, String(form.get("target") ?? ""));
     revalidatePath("/versions");
+    revalidatePath("/administration/serveur");
     return undefined;
   });
 }

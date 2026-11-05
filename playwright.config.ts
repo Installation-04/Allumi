@@ -1,8 +1,14 @@
 import { defineConfig, devices } from "@playwright/test";
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { e2eUrls } from "./tests/e2e/db";
 
 const PORT = Number(process.env.E2E_PORT ?? 3100);
 const urls = e2eUrls();
+// This unique hand-off directory is watched by no host agent: only this browser test writes simulated status.
+const updateDirectory = process.env.E2E_UPDATE_DIR || mkdtempSync(join(tmpdir(), "allumi-e2e-updates-"));
+process.env.E2E_UPDATE_DIR = updateDirectory;
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -40,6 +46,8 @@ export default defineConfig({
     reuseExistingServer: false,
     timeout: 60_000,
     env: {
+      ALLUMI_UPDATE_DIR: updateDirectory,
+      NODE_OPTIONS: [process.env.NODE_OPTIONS, `--import=${new URL("./tests/e2e/update-fetch.mjs", import.meta.url).href}`].filter(Boolean).join(" "),
       ATTACHMENTS_DIR: "/tmp/allumi-e2e-attachments",
       HOSTNAME: "127.0.0.1",
       PORT: String(PORT),

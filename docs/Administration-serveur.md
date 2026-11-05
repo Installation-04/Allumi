@@ -8,7 +8,18 @@ L’écran montre la version, l’adresse de l’application, la langue initiale
 
 La rétention des sauvegardes se règle dans l’interface après activation de l’agent (1 à 3650 jours). Le nettoyage prend effet à la prochaine sauvegarde réussie. Les paramètres réseau, ports, langues de démarrage et secrets restent configurés dans `.env` sur l’hôte, puis appliqués avec `docker compose up -d app`. Ne pas modifier les secrets d’une instance existante sans suivre [[Configuration]] et [[Sauvegardes]].
 
-Les mises à jour se trouvent dans [[Mise-a-jour]] et la page **Version**; l’agent de mise à jour doit être activé séparément. Les opérateurs serveur délégués peuvent aussi demander une mise à jour.
+## Mise à jour du serveur
+
+La carte **Mises à jour du serveur** présente la version installée, la release publiée plus récente admissible et l’état de l’agent. Après lecture des notes de version et confirmation de la sauvegarde et de l’interruption pour tous les utilisateurs, **Mettre à jour le serveur** transmet la demande à l’hôte. Le parcours est également disponible dans **Versions et mises à jour**; il ne permet pas de saisir un tag ou une commande arbitraire.
+
+L’agent de mise à jour est optionnel, distinct de l’agent de sauvegardes et désactivé par défaut. Depuis le clone installé sur l’hôte Linux Docker/systemd, l’activer une fois avec `sudo ./scripts/enable-web-updates.sh`, selon [[Mise-a-jour]]. Aucun bouton de l’application n’installe cet agent privilégié. Les opérateurs serveur explicitement délégués peuvent demander une mise à jour, contrairement à un admin d’entreprise seul.
+
+Le suivi montre les vérifications, la sauvegarde, l’installation et le résultat lorsqu’un agent récent les fournit. Il rafraîchit l’état et réessaie la connexion pendant le redémarrage. Les anciens agents restent utilisables avec leurs états simples. La copie root doit être actualisée volontairement après revue de la release pour bénéficier du suivi détaillé : voir [[Mise-a-jour]].
+
+![Mise à jour disponible](images/serveur-mise-a-jour-disponible-desktop.png)
+![Mise à jour en anglais et thème sombre sur téléphone](images/serveur-mise-a-jour-en-dark-mobile.png)
+
+Captures de démonstration contrôlée : demandes, états et versions peuvent être simulés, sans mise à jour réelle du serveur.
 
 ## Activer les sauvegardes depuis le web
 

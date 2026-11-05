@@ -33,6 +33,14 @@ sudo ./scripts/update.sh v0.4.0
 ```
 Le script sauvegarde d'abord, se place sur l'étiquette, complète ton `.env` et reconstruit : voir [[Mise-a-jour]]. Pour la production, utilise toujours une version étiquetée, jamais `main`.
 
+## Demander une mise à jour depuis l’application
+
+Les pages **Serveur** et **Versions et mises à jour** partagent le parcours de demande. La cible est une release GitHub publiée, plus récente que la version installée et admissible au canal : une version stable ignore les préversions; un serveur de préversion les inclut. Le contrôle côté serveur refuse une cible libre ou devenue non admissible.
+
+Seul le super admin ou un opérateur serveur explicitement autorisé peut confirmer la sauvegarde et l’interruption, puis demander l’installation. L’agent hôte doit avoir été activé séparément avec `sudo ./scripts/enable-web-updates.sh`; l’application ne l’active pas elle-même. Le suivi des étapes et la reconnexion après redémarrage sont décrits dans [[Mise-a-jour]]. Une ancienne copie de l’agent peut afficher seulement les états simples; son remplacement privilégié est volontaire après revue de la release.
+
+Le web et l’app iOS suivent la version du serveur. Le client Windows a son propre mécanisme de mise à jour : son installation ne met pas à jour le serveur, et réciproquement.
+
 ## Règles pour les contributeurs
 - Chaque PR utile ajoute une ligne sous **[Non publié]** dans `CHANGELOG.md` (Ajouté, Modifié, Corrigé, Sécurité).
 - Une migration de base de données risquée ou un changement de variable d'environnement doit être signalé en gras dans le changelog.

@@ -1,5 +1,7 @@
 import { smtpReceiver } from "../support/smtp";
 import { mkdirSync, readFileSync } from "node:fs";
+import * as updateFiles from "node:fs/promises";
+import { join } from "node:path";
 import { devices, expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
 import { Secret, TOTP } from "otpauth";
 import pg from "pg";
@@ -7,12 +9,18 @@ import { e2eUrls } from "./db";
 
 const relay=smtpReceiver();
 test.beforeAll(async()=>{await relay.listen(Number(process.env.E2E_PORT??3100)+1);});
-test.afterAll(async()=>{await relay.close();});
+test.afterAll(async()=>{
+ await relay.close();
+ if(process.env.E2E_UPDATE_DIR)await updateFiles.rm(process.env.E2E_UPDATE_DIR,{recursive:true,force:true});
+});
 
 const VERSION = (JSON.parse(readFileSync("package.json", "utf8")) as { version: string }).version;
 
 const EMAIL = "admin@exemple.test";
 const PASSWORD = "une phrase de passe très longue 2026";
+// The administration scenario follows setup and reuses its authenticated browser cookies only.
+test.describe.configure({ mode: "serial" });
+let updateCookies: Awaited<ReturnType<BrowserContext["cookies"]>>;
 
 /** Optional wiki references from the isolated, fictional browser-test company only. */
 async function captureReference(page: Page, name: string, mobileHeading?: string) {
@@ -296,9 +304,82 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await expectNoPageOverflow(page);
   await captureReference(page, "parametres-administration");
   await test.step("membersJourney", () => membersJourney(page, browser));
+  updateCookies = await page.context().cookies();
   // Nothing in the whole journey (both locales, every form, the security pages, a second browser) was blocked.
   expect(cspViolations, "Content-Security-Policy violations").toEqual([]);
 });
+
+test("server update request, automatic progress and completion without a host deployment", async ({ page }) => {
+  test.setTimeout(90_000);
+  cspViolations.length = 0;
+  watchCsp(page.context());
+  await page.context().addCookies(updateCookies);
+  await test.step("serverUpdateJourney", () => serverUpdateJourney(page));
+  expect(cspViolations, "Content-Security-Policy violations").toEqual([]);
+});
+
+/** Browser-only demonstration of the file hand-off: no host agent, Docker process or deployment is started. */
+async function serverUpdateJourney(page: Page) {
+ const directory=process.env.E2E_UPDATE_DIR;
+ expect(directory,"isolated update fixture directory supplied by Playwright").toBeTruthy();
+ const release=(JSON.parse(readFileSync(new URL("./fixtures/update-releases.json",import.meta.url),"utf8")) as {tag_name:string}[])[0]!.tag_name;
+ const file=(name:string)=>join(directory!,name);
+ expect(await updateFiles.readdir(directory!)).toEqual([]);
+ await page.goto("/administration/serveur");
+ const panel=page.getByRole("region",{name:"Mises à jour du serveur",exact:true});
+ await expect(panel.getByText(`Nouvelle version : ${release}`,{exact:true})).toBeVisible();
+ await expect(panel.getByText("Agent configuré. Son service doit être actif sur le serveur.",{exact:true})).toBeVisible();
+ const confirm=panel.getByLabel("J’ai sauvegardé mon travail. La mise à jour créera une sauvegarde et interrompra temporairement le service pour tous les utilisateurs.",{exact:true});
+ await expect(confirm).not.toBeChecked();
+ await expect(confirm).toHaveAttribute("required","");
+ await expect(panel.getByRole("link",{name:"Notes de version",exact:true})).toHaveAttribute("href",`https://github.com/Installation-04/Allumi/releases/tag/${release}`);
+ await expectNoPageOverflow(page);await captureReference(page,"serveur-mise-a-jour-disponible","Mises à jour du serveur");
+ await confirm.check();
+ await panel.getByRole("button",{name:"Mettre à jour le serveur",exact:true}).click();
+ await expect(panel.getByText("Demande en attente de traitement par l’agent du serveur.",{exact:true})).toBeVisible();
+ const raw=await updateFiles.readFile(file("request.json"),"utf8");
+ const request=JSON.parse(raw) as {version:string;actor:string;requestedAt:string;requestId:string};
+ expect(Object.keys(request).sort()).toEqual(["actor","requestId","requestedAt","version"]);
+ expect(request.version).toBe(release);
+ expect(request.requestId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+ expect(Number.isFinite(Date.parse(request.requestedAt))).toBe(true);
+ const db=new pg.Client({connectionString:e2eUrls().owner});await db.connect();
+ try{const user=await db.query("SELECT id FROM app_user WHERE email=$1",[EMAIL]);expect(request.actor).toBe(user.rows[0]?.id);}finally{await db.end();}
+ expect((await updateFiles.stat(file("request.json"))).mode&0o777).toBe(0o600);
+ expect(await updateFiles.readdir(directory!)).toEqual(["request.json"]);
+ await expectNoPageOverflow(page);await captureReference(page,"serveur-mise-a-jour-attente","Mises à jour du serveur");
+ // Publish synthetic status atomically, exactly as a separate agent would. The test never starts that agent.
+ const status=async(state:"running"|"success",stage:"backup"|"complete")=>{
+  await updateFiles.writeFile(file(".status-fixture"),JSON.stringify({state,stage,target:release,fromVersion:VERSION,requestId:request.requestId,requestedAt:request.requestedAt,updatedAt:new Date().toISOString()}),{mode:0o600});
+  await updateFiles.rename(file(".status-fixture"),file("status.json"));
+ };
+ await status("running","backup");
+ await expect(panel.getByText("Mise à jour en cours.",{exact:true})).toBeVisible();
+ await expect(panel.getByText("Sauvegarde avant mise à jour",{exact:true})).toBeVisible();
+ // The automatic status endpoint must remain private and avoid a second GitHub release request.
+ const progress=await page.request.get("/administration/serveur/mises-a-jour/etat");
+ expect(progress.status()).toBe(200);expect(progress.headers()["cache-control"]).toContain("no-store");
+ expect(await progress.json()).toMatchObject({currentVersion:VERSION,status:{state:"running",stage:"backup",target:release,requestId:request.requestId}});
+ expect(await updateFiles.readFile(file("request.json"),"utf8")).toBe(raw);
+ await status("success","complete");
+ // Completion normally consumes the request. Keep the simulated agent's operation limited to these two files.
+ await updateFiles.unlink(file("request.json"));
+ await expect(panel.getByText("La dernière mise à jour a réussi.",{exact:true})).toBeVisible();
+ await expect(panel.getByText("Opération terminée",{exact:true})).toBeVisible();
+ await expect(panel.getByText(`Version serveur : ${VERSION}`,{exact:true})).toBeVisible();
+ expect(await updateFiles.readdir(directory!)).toEqual(["status.json"]);
+ await expectNoPageOverflow(page);await captureReference(page,"serveur-mise-a-jour-terminee","Mises à jour du serveur");
+ await page.getByRole("button",{name:"English",exact:true}).click();
+ const englishPanel=page.getByRole("region",{name:"Server updates",exact:true});
+ await expect(englishPanel.getByText("The last update succeeded.",{exact:true})).toBeVisible();
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");
+ await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
+ await expectNoPageOverflow(page);await captureReference(page,"serveur-mise-a-jour-en-dark","Server updates");
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");
+ await expect(page.locator("html")).toHaveAttribute("data-theme","light");
+ await page.getByRole("button",{name:"Français",exact:true}).click();
+ await expect(panel.getByText("La dernière mise à jour a réussi.",{exact:true})).toBeVisible();
+}
 
 /** Today in the company's time zone (the application uses America/Toronto), as YYYY-MM-DD. */
 const todayInToronto = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
@@ -2246,6 +2327,8 @@ async function membersJourney(page: Page, browser: Browser) {
   await expect(guest.getByText("Ton rôle : Utilisateur")).toBeVisible();
   expect((await guest.goto(`${company}/utilisateurs`))?.status()).toBe(404);
   expect((await guest.goto("/administration/serveur"))?.status()).toBe(404);
+  const deniedUpdate=await guest.request.get("/administration/serveur/mises-a-jour/etat");
+  expect(deniedUpdate.status()).toBe(403);expect(await deniedUpdate.json()).toEqual({error:"forbidden"});
   await guest.goto(`${company}/parametres`);
   const guestSettings = guest.locator(".workspace-content");
   await expect(guestSettings.getByRole("heading", { name: "Paramètres et administration", exact: true })).toBeVisible();
