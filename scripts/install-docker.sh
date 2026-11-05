@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installe Allumi avec Docker Engine et Compose déjà disponibles, sans modifier le système hôte.
+# Installe Allumi avec Docker Engine et Compose; active l’agent web sur un hôte administrateur avec systemd.
 # Usage: ./scripts/install-docker.sh [--app-url http://192.168.1.20:28080] [--http-port 28080] [--prepare-only] [--build]
 set -euo pipefail
 umask 077
@@ -16,7 +16,7 @@ INSTALL_HTTP_PORT="$(env_get ALLUMI_HTTP_PORT)"; INSTALL_HTTP_PORT="${INSTALL_HT
 INSTALL_URL="${INSTALL_URL:-http://localhost:$INSTALL_HTTP_PORT}"
 INSTALL_BIND="$(env_get ALLUMI_BIND_ADDRESS)"; INSTALL_BIND="${INSTALL_BIND:-0.0.0.0}"
 INSTALL_LOCALE="$(env_get DEFAULT_LOCALE)"; INSTALL_LOCALE="${INSTALL_LOCALE:-fr-CA}"
-PREPARE_ONLY=0; WAIT_SECONDS=300; INTERACTIVE=0; FORCE_BUILD=0
+PREPARE_ONLY=0; WAIT_SECONDS=300; INTERACTIVE=0; FORCE_BUILD=0; WEB_UPDATES=1
 if [ "$#" -eq 0 ]; then
   [ -t 0 ] || die "aucun terminal interactif : utilise --interactive ou fournis une option explicite comme --app-url."
   INTERACTIVE=1
@@ -36,6 +36,7 @@ while [ "$#" -gt 0 ]; do
     --interactive) INTERACTIVE=1; shift ;;
     --prepare-only) PREPARE_ONLY=1; shift ;;
     --build) FORCE_BUILD=1; shift ;;
+    --no-web-updates) WEB_UPDATES=0; shift ;;
     -h|--help)
       cat <<'HELP'
 Allumi — installation Docker (Docker Engine et Compose déjà installés).
@@ -47,6 +48,7 @@ Sans argument dans un terminal : assistant interactif.
 --locale fr-CA|en         Langue initiale (défaut : fr-CA)
 --prepare-only            Préparer .env sans lancer Docker
 --build                   Construire les images sur cette machine au lieu de télécharger celles de la version
+--no-web-updates          Ne pas activer l’agent de mise à jour web (activé par défaut avec root et systemd)
 --timeout SECONDES        Attente de santé après Compose (défaut : 300)
 Les réglages existants sont conservés si aucune option ne les remplace.
 HELP
@@ -137,15 +139,31 @@ fi
 # Autre copie, --build ou images introuvables : construction sur place.
 select_images "$FORCE_BUILD"
 compose_up
-info "Attente de l’application (maximum ${WAIT_SECONDS} s après le démarrage Compose)…"
-DEADLINE=$((SECONDS + WAIT_SECONDS))
-while :; do
-  APP_ID="$(docker compose --project-directory "$ALLUMI_DIR" -f "$ALLUMI_DIR/docker-compose.yml" --env-file "$ENV_FILE" ps -q app)"
-  HEALTH="$(docker inspect -f '{{.State.Health.Status}}' "$APP_ID" 2>/dev/null || true)"
-  if [ "$HEALTH" = healthy ]; then break; fi
-  [ "$SECONDS" -lt "$DEADLINE" ] || die "application non saine après ${WAIT_SECONDS} s. Consulte docker compose logs migrate app. Les données et .env sont conservés."
-  sleep 2
-done
+wait_for_application() {
+  info "Attente de l’application (maximum ${WAIT_SECONDS} s après le démarrage Compose)…"
+  local deadline=$((SECONDS + WAIT_SECONDS)) app_id health
+  while :; do
+    app_id="$(docker compose --project-directory "$ALLUMI_DIR" -f "$ALLUMI_DIR/docker-compose.yml" --env-file "$ENV_FILE" ps -q app)"
+    health="$(docker inspect -f '{{.State.Health.Status}}' "$app_id" 2>/dev/null || true)"
+    if [ "$health" = healthy ]; then break; fi
+    [ "$SECONDS" -lt "$deadline" ] || die "application non saine après ${WAIT_SECONDS} s. Consulte docker compose logs migrate app. Les données et .env sont conservés."
+    sleep 2
+  done
+}
+wait_for_application
+WEB_UPDATE_RESULT="activation omise (--no-web-updates); configuration existante conservée."
+if [ "$WEB_UPDATES" -eq 1 ]; then
+  if [ "$(id -u)" = 0 ] && command -v python3 >/dev/null 2>&1 && command -v systemctl >/dev/null 2>&1 && systemctl show --property=Version --value >/dev/null 2>&1; then
+    info "Activation des mises à jour du serveur depuis le web…"
+    bash "$ALLUMI_DIR/scripts/enable-web-updates.sh"
+    # The agent setup recreates app with the control mount; validate that final container too.
+    wait_for_application
+    WEB_UPDATE_RESULT="activées : Serveur → Mises à jour du serveur (confirmation requise)."
+  else
+    WEB_UPDATE_RESULT="activation automatique omise : droits administrateur, Python 3 et systemd actif requis."
+    warn "$WEB_UPDATE_RESULT Aucun agent hôte installé par cette exécution; voir docs/Mise-a-jour.md."
+  fi
+fi
 # Sous install.sh (ALLUMI_REPORT_RESULT=1), c'est lui qui affiche le résumé final, jeton compris : pas de doublon.
 SETUP_LINE=""
 [ "${ALLUMI_REPORT_RESULT:-0}" = 1 ] || SETUP_LINE="$(print_setup_token)"
@@ -158,7 +176,8 @@ Allumi est démarré et l’application est healthy.
 ${SETUP_LINE}
   Données : volumes Docker conservés. Ne lance pas docker compose down -v.
   Sauvegardes : à configurer et tester (docs/Sauvegardes.md); aucune tâche planifiée ajoutée.
-  Mises à jour : scripts/update.sh pour une copie Git, voir docs/Mise-a-jour.md.
+  Mises à jour web : $WEB_UPDATE_RESULT
+  Mise à jour manuelle : scripts/update.sh, voir docs/Mise-a-jour.md.
 EOF_DONE
 
 [ "${ALLUMI_REPORT_RESULT:-0}" != 1 ] || printf 'started\n' >&3

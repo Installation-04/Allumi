@@ -33,6 +33,7 @@ jobs:
           bash -n scripts/*.sh
           python3 scripts/test-server-admin-agent.py
           python3 scripts/test-update-agent.py
+          python3 scripts/test-enable-web-updates.py
           python3 scripts/test-install-docker.py
           python3 scripts/test-get.py
           shellcheck -x -P SCRIPTDIR -S warning scripts/*.sh
@@ -125,7 +126,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build + démarrage de la pile + healthcheck
         run: |
-          ./scripts/install-docker.sh --build --app-url http://127.0.0.1:28080 --http-port 28080 --bind 127.0.0.1 --timeout 120
+          sudo ./scripts/install-docker.sh --build --app-url http://127.0.0.1:28080 --http-port 28080 --bind 127.0.0.1 --timeout 120
+          # Follow-up Compose checks run as the runner; preserve private permissions while handing ownership back.
+          sudo chown "$(id -u):$(id -g)" .env compose.override.yaml
+          systemctl is-enabled --quiet allumi-update.timer
+          systemctl is-active --quiet allumi-update.timer
+          docker compose exec -T app node -e "if(process.env.ALLUMI_UPDATE_DIR !== '/app/storage/update-control') process.exit(1)"
       - name: Architecture native des images
         env:
           EXPECTED_ARCH: ${{ matrix.arch }}

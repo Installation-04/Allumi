@@ -4,6 +4,10 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.47] - 2026-11-05
+
+- Installateur Docker : activation par défaut de l’agent de mise à jour web après démarrage sain sur Linux en root avec Python 3 et systemd actif; option `--no-web-updates`, aucune activation en préparation seule et avertissement sur les hôtes non compatibles. Activation gérée relançable sans écraser les configurations Compose personnalisées; montage de contrôle conservé aux redémarrages et helpers de mise à jour rechargés. Les installations de nouvelles versions restent soumises à la demande et à la confirmation d’un administrateur autorisé.
+
 ## [0.4.0-alpha.46] - 2026-11-05
 
 - Mise à jour serveur accessible depuis l’administration et la page Versions : release publiée plus récente, confirmation de sauvegarde et d’interruption, suivi des étapes et reconnexion après redémarrage. Activation de l’agent hôte toujours volontaire; compatibilité avec les anciens états simples et guides illustrés FR/EN/mobile/sombre.

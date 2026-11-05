@@ -21,11 +21,11 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.46
+git checkout v0.4.0-alpha.47
 ./scripts/install-docker.sh
 ```
 
-Le script génère une configuration privée, conserve les secrets existants et vérifie le démarrage. Option `--prepare-only` pour préparer sans démarrer. [Guide Docker](docs/Installation-Docker.md) · [Proxmox](docs/Proxmox.md). Préversion pour données fictives uniquement.
+Le script génère une configuration privée, conserve les secrets existants et vérifie le démarrage. Sur Linux, après un démarrage sain, il active par défaut l’agent de mise à jour web s’il est exécuté en root avec Python 3 et systemd actif. Cela autorise les demandes des administrateurs, sans installer automatiquement de nouvelle version. Options `--no-web-updates` pour ne pas activer l’agent et `--prepare-only` pour préparer sans démarrer ni activer d’agent. [Guide Docker](docs/Installation-Docker.md) · [Proxmox](docs/Proxmox.md). Préversion pour données fictives uniquement.
 
 ## Fonctions visées (MVP)
 - Plan comptable et journal à partie double
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.46 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.47 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -110,7 +110,7 @@ Les pages des domaines non encore livrés indiquent leur état; elles ne simulen
 
 ![Versions et mises à jour](docs/images/versions-desktop.png)
 
-Capture du serveur de test, agent non activé. Le [guide des mises à jour](docs/Mise-a-jour.md) explique son installation facultative.
+Capture du serveur de test, agent non activé. Le [guide des mises à jour](docs/Mise-a-jour.md) explique son activation sur une installation existante et les conditions de son activation par défaut à l’installation.
 
 ### English and dark mode
 
@@ -459,7 +459,7 @@ Comptabilisez un remboursement déjà effectué au client, sans créer d’avoir
 
 ### Mise à jour du serveur depuis le web
 
-La carte de l’administration serveur et la page Versions proposent une release publiée plus récente, avec confirmation de la sauvegarde et de l’interruption, suivi des étapes et reconnexion pendant le redémarrage. Réservé au super admin et aux opérateurs serveur autorisés; l’agent hôte doit être activé une fois, séparément. [Guide d’activation et de mise à jour](docs/Mise-a-jour.md).
+La carte de l’administration serveur et la page Versions proposent une release publiée plus récente, avec confirmation de la sauvegarde et de l’interruption, suivi des étapes et reconnexion pendant le redémarrage. Réservé au super admin et aux opérateurs serveur autorisés; l’agent hôte est activé par défaut par l’installateur Linux exécuté en root avec Python 3 et systemd actif. Sur une installation ancienne ou sans cette activation, suivre le guide; aucune nouvelle version n’est installée sans demande et confirmation. [Guide d’activation et de mise à jour](docs/Mise-a-jour.md).
 
 ![Mise à jour disponible dans l’administration](docs/images/serveur-mise-a-jour-disponible-desktop.png)
 

@@ -46,9 +46,10 @@ else
   warn "HEAD détachée (version épinglée) : rien à tirer. Pour changer de version : $0 vX.Y.Z"
 fi
 # Un .env créé par une version plus ancienne reçoit les variables ajoutées depuis. On relit lib.sh
-# (celui de la version qui vient d'être récupérée) dans un sous-shell : le lib.sh déjà chargé est l'ancien.
+# (celui de la version qui vient d'être récupérée), y compris les règles de redémarrage de la pile.
 # shellcheck source=lib.sh
-( . "$ALLUMI_DIR/scripts/lib.sh" && env_backfill )
+. "$ALLUMI_DIR/scripts/lib.sh"
+env_backfill
 
 # Version étiquetée : images publiées téléchargées (rien à compiler). Branche, --build ou images introuvables : construction.
 select_images "$FORCE_BUILD"
