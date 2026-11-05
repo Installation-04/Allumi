@@ -11,3 +11,5 @@ coverage
 src/generated
 
 desktop
+local-https-root.crt
+.local-https-ca.*

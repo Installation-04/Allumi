@@ -11,12 +11,13 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCKER = r'''#!/usr/bin/env python3
-import os,sys
+import os,sys,json
 from pathlib import Path
 args=sys.argv[1:]
-if any(os.environ.get(k) for k in ['DATABASE_URL','APP_DATABASE_URL','ALLUMI_HTTP_PORT','ALLUMI_HTTPS_PORT','ALLUMI_BIND_ADDRESS','DEFAULT_LOCALE','ALLUMI_APP_IMAGE','ALLUMI_MIGRATE_IMAGE']): sys.exit(97)
+if any(os.environ.get(k) for k in ['DATABASE_URL','APP_DATABASE_URL','ALLUMI_HTTP_PORT','ALLUMI_HTTPS_PORT','ALLUMI_BIND_ADDRESS','DEFAULT_LOCALE','ALLUMI_APP_IMAGE','ALLUMI_MIGRATE_IMAGE','ALLUMI_TLS_HOST','ALLUMI_NETWORK_MODE','TRUSTED_PROXY_HOPS','COMPOSE_FILE']): sys.exit(97)
 with open(os.environ['DOCKER_TEST_LOG'],'a') as f: f.write(' '.join(args)+'\n')
-if args==['info'] and os.environ.get('DOCKER_TEST_DENY'): sys.exit(1)
+if args==['compose','version','--short']: print(os.environ.get('DOCKER_TEST_COMPOSE_VERSION','2.24.4'))
+elif args==['info'] and os.environ.get('DOCKER_TEST_DENY'): sys.exit(1)
 if args[:2]==['ps','-aq'] or args[:2]==['volume','ls']:
  if os.environ.get('DOCKER_TEST_EXISTING'): print('existing-resource')
 elif args and args[0]=='inspect':
@@ -24,9 +25,14 @@ elif args and args[0]=='inspect':
  else: print(os.environ.get('DOCKER_TEST_HEALTH','healthy'))
 elif 'config' in args:
  if os.environ.get('DOCKER_TEST_BAD_CONFIG'): sys.exit(1)
+ if '--format' in args:
+  path=Path(args[args.index('--env-file')+1]); data=dict(line.split('=',1) for line in path.read_text().splitlines() if line and not line.startswith('#'))
+  print(json.dumps({'services':{'app':{'ports':[], 'environment':{'APP_URL':data.get('APP_URL'),'TRUSTED_PROXY_HOPS':data.get('TRUSTED_PROXY_HOPS')}},'db':{'ports':[]},'caddy':{'image':'caddy:2.11.8-alpine','ports':[{'target':8443,'published':data.get('ALLUMI_HTTP_PORT'),'protocol':'tcp'}]}}}))
 elif 'pull' in args:
  if os.environ.get('DOCKER_TEST_BAD_PULL'): sys.exit(1)
 elif 'exec' in args:
+ if args[-2:]==['cat','/data/caddy/pki/authorities/local/root.crt']:
+  print(Path(os.environ['DOCKER_TEST_CERT']).read_text(),end='');sys.exit(0)
  if os.environ.get('DOCKER_TEST_SETUP_CLOSED'): sys.exit(3)
  if os.environ.get('DOCKER_TEST_EXEC_FAIL'): sys.exit(2)
 elif 'up' in args:
@@ -41,7 +47,8 @@ class Harness(unittest.TestCase):
         self.root = Path(self.temp.name)
         (self.root/'scripts').mkdir()
         (self.root/'bin').mkdir()
-        for path in ['scripts/install-docker.sh','scripts/installer-options.sh','scripts/lib.sh','scripts/up.sh','scripts/update.sh','.env.example','docker-compose.yml']:
+        for path in ['scripts/install-docker.sh','scripts/installer-options.sh','scripts/lib.sh','scripts/up.sh','scripts/update.sh','scripts/enable-local-https.sh','.env.example','docker-compose.yml','compose.https.yaml','deploy/Caddyfile.local']:
+            (self.root/path).parent.mkdir(parents=True,exist_ok=True)
             shutil.copyfile(ROOT/path,self.root/path)
         docker=self.root/'bin/docker';docker.write_text(DOCKER);docker.chmod(0o755)
         # Only the isolated helper is invoked: these tests never install a host service.
@@ -50,6 +57,7 @@ class Harness(unittest.TestCase):
         for name,body in {
             'id':'#!/bin/sh\nprintf "%s\\n" "${DOCKER_TEST_UID:-0}"\n',
             'systemctl':'#!/bin/sh\n[ "${DOCKER_TEST_NO_SYSTEMD:-0}" != 1 ]\n',
+            'curl':'#!/bin/sh\nprintf "%s\\n" "$*" >> "$ALLUMI_DIR/curl.log"\n',
         }.items():
             path=self.root/'bin'/name;path.write_text(body);path.chmod(0o755)
         self.log=self.root/'docker.log'
@@ -64,6 +72,51 @@ class Harness(unittest.TestCase):
         return dict(line.split('=',1) for line in (self.root/'.env').read_text().splitlines() if line and not line.startswith('#'))
 
 class Installer(Harness):
+    def test_new_default_is_local_https_and_preparation_never_calls_docker(self):
+        result=self.run_install('--prepare-only',valid=False)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(self.config()['APP_URL'],'https://127.0.0.1:28080')
+        self.assertEqual(self.config()['ALLUMI_NETWORK_MODE'],'local-https')
+        self.assertEqual(self.config()['TRUSTED_PROXY_HOPS'],'1')
+        self.assertEqual(self.config()['COMPOSE_FILE'],'docker-compose.yml:compose.https.yaml')
+        self.assertFalse(self.log.exists())
+
+    def test_local_https_install_exports_only_ca_and_verifies_it_without_bypass(self):
+        certificate=self.root/'fixture.crt'
+        subprocess.run(['openssl','req','-x509','-newkey','ec','-pkeyopt','ec_paramgen_curve:P-256','-nodes','-keyout',str(self.root/'fixture.key'),'-out',str(certificate),'-subj','/CN=Test CA','-days','1'],check=True,capture_output=True)
+        result=self.run_install('--local-https','--app-url','https://192.168.1.20',DOCKER_TEST_CERT=str(certificate))
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(self.config()['APP_URL'],'https://192.168.1.20:28080')
+        self.assertEqual((self.root/'local-https-root.crt').read_bytes(),certificate.read_bytes())
+        self.assertIn('--cacert', (self.root/'curl.log').read_text())
+        self.assertNotIn('--insecure', (self.root/'curl.log').read_text())
+
+    def test_conversion_and_repeat_keep_secrets_and_proxy_trust(self):
+        self.assertEqual(self.run_install('--prepare-only').returncode,0)
+        secrets={k:self.config()[k] for k in ['POSTGRES_PASSWORD','APP_DB_PASSWORD','AUTH_SECRET','ENCRYPTION_KEY','SETUP_TOKEN']}
+        result=self.run_install('--local-https','--app-url','https://192.168.1.20:28080','--prepare-only')
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(self.run_install('--prepare-only',valid=False).returncode,0)
+        self.assertEqual({k:self.config()[k] for k in secrets},secrets)
+        self.assertEqual(self.config()['TRUSTED_PROXY_HOPS'],'1')
+        self.assertEqual(self.config()['ALLUMI_NETWORK_MODE'],'local-https')
+
+    def test_existing_external_https_ip_is_not_silently_converted(self):
+        self.assertEqual(self.run_install('--prepare-only').returncode,0)
+        path=self.root/'.env';path.write_text(path.read_text().replace('http://allumi.example.test:28080','https://192.168.1.20:28080'))
+        result=self.run_install('--prepare-only',valid=False)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(self.config()['ALLUMI_NETWORK_MODE'],'direct')
+
+    def test_tls_port_mismatch_and_unsupported_compose_do_not_publish_configuration(self):
+        result=self.run_install('--local-https','--app-url','https://192.168.1.20:28080','--http-port','28443')
+        self.assertNotEqual(result.returncode,0)
+        self.assertFalse((self.root/'.env').exists())
+        result=self.run_install('--local-https','--app-url','https://192.168.1.20:28080',DOCKER_TEST_COMPOSE_VERSION='2.24.3')
+        self.assertNotEqual(result.returncode,0)
+        self.assertIn('2.24.4',result.stderr)
+        self.assertFalse((self.root/'.env').exists())
+
     def test_existing_control_override_is_kept_on_later_starts(self):
         self.assertEqual(self.run_install('--prepare-only').returncode,0)
         override=self.root/'compose.override.yaml'

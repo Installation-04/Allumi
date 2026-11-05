@@ -13,10 +13,13 @@ umask 077
 [ ! -L "$ENV_FILE" ] || die ".env ne doit pas être un lien symbolique."
 INSTALL_URL="$(env_get APP_URL)"
 INSTALL_HTTP_PORT="$(env_get ALLUMI_HTTP_PORT)"; INSTALL_HTTP_PORT="${INSTALL_HTTP_PORT:-28080}"
+if [ ! -f "$ENV_FILE" ]; then INSTALL_URL="${INSTALL_URL:-https://127.0.0.1:$INSTALL_HTTP_PORT}"; fi
 INSTALL_URL="${INSTALL_URL:-http://localhost:$INSTALL_HTTP_PORT}"
 INSTALL_BIND="$(env_get ALLUMI_BIND_ADDRESS)"; INSTALL_BIND="${INSTALL_BIND:-0.0.0.0}"
 INSTALL_LOCALE="$(env_get DEFAULT_LOCALE)"; INSTALL_LOCALE="${INSTALL_LOCALE:-fr-CA}"
 PREPARE_ONLY=0; WAIT_SECONDS=300; INTERACTIVE=0; FORCE_BUILD=0; WEB_UPDATES=1
+LOCAL_HTTPS=0; TRANSPORT_EXPLICIT=0; URL_EXPLICIT=0; PORT_EXPLICIT=0; INSTALL_TLS_HOST=""
+if [ "$(env_get ALLUMI_NETWORK_MODE)" = local-https ]; then LOCAL_HTTPS=1; fi
 if [ "$#" -eq 0 ]; then
   [ -t 0 ] || die "aucun terminal interactif : utilise --interactive ou fournis une option explicite comme --app-url."
   INTERACTIVE=1
@@ -26,9 +29,9 @@ while [ "$#" -gt 0 ]; do
     --app-url|--timeout|--http-port|--bind|--locale)
       [ "$#" -ge 2 ] && [[ "$2" != --* ]] || die "valeur manquante pour $1"
       case "$1" in
-        --app-url) INSTALL_URL="$2" ;;
+        --app-url) INSTALL_URL="$2"; URL_EXPLICIT=1 ;;
         --timeout) WAIT_SECONDS="$2" ;;
-        --http-port) INSTALL_HTTP_PORT="$2" ;;
+        --http-port) INSTALL_HTTP_PORT="$2"; PORT_EXPLICIT=1 ;;
         --bind) INSTALL_BIND="$2" ;;
         --locale) INSTALL_LOCALE="$2" ;;
       esac
@@ -37,18 +40,22 @@ while [ "$#" -gt 0 ]; do
     --prepare-only) PREPARE_ONLY=1; shift ;;
     --build) FORCE_BUILD=1; shift ;;
     --no-web-updates) WEB_UPDATES=0; shift ;;
+    --local-https) LOCAL_HTTPS=1; TRANSPORT_EXPLICIT=1; shift ;;
+    --http) LOCAL_HTTPS=0; TRANSPORT_EXPLICIT=1; shift ;;
     -h|--help)
       cat <<'HELP'
 Allumi — installation Docker (Docker Engine et Compose déjà installés).
 Sans argument dans un terminal : assistant interactif.
 --interactive             Assistant avec récapitulatif et confirmation
---app-url URL             Adresse utilisée par le navigateur (HTTP direct ou proxy externe)
---http-port PORT          Port HTTP sur l’hôte (nouvelle installation : 28080)
+--app-url URL             Adresse utilisée par le navigateur (HTTPS local, HTTP ou proxy externe)
+--http-port PORT          Port web sur l’hôte (nouvelle installation : 28080)
 --bind IPV4               Adresse d’écoute (défaut : 0.0.0.0)
 --locale fr-CA|en         Langue initiale (défaut : fr-CA)
 --prepare-only            Préparer .env sans lancer Docker
 --build                   Construire les images sur cette machine au lieu de télécharger celles de la version
 --no-web-updates          Ne pas activer l’agent de mise à jour web (activé par défaut avec root et systemd)
+--local-https             HTTPS local avec CA interne et IPv4 privée (défaut des nouvelles installations)
+--http                    HTTP direct explicite (essais ou proxy externe)
 --timeout SECONDES        Attente de santé après Compose (défaut : 300)
 Les réglages existants sont conservés si aucune option ne les remplace.
 HELP
@@ -56,7 +63,16 @@ HELP
     *) die "option inconnue : $1" ;;
   esac
 done
+if [ "$URL_EXPLICIT" = 0 ] && [ "$TRANSPORT_EXPLICIT" = 1 ]; then
+  if [ "$LOCAL_HTTPS" = 1 ]; then INSTALL_URL="${INSTALL_URL/http:\/\//https:\/\/}";
+  else INSTALL_URL="${INSTALL_URL/https:\/\//http:\/\/}"; fi
+fi
+if [ "$URL_EXPLICIT" = 0 ] && [ "$PORT_EXPLICIT" = 1 ] && { [ ! -f "$ENV_FILE" ] || [ "$LOCAL_HTTPS" = 1 ]; }; then
+  if [[ "$INSTALL_URL" =~ ^(https?://[^/:]+)(:[0-9]+)?$ ]]; then INSTALL_URL="${BASH_REMATCH[1]}:$INSTALL_HTTP_PORT"; fi
+fi
+resolve_install_transport
 [ "$INTERACTIVE" -eq 0 ] || installer_wizard
+resolve_install_transport
 valid_url "$INSTALL_URL" || die "--app-url doit être une origine http:// ou https://, sans chemin ni identifiants."
 valid_timeout "$WAIT_SECONDS" || die "--timeout doit être entre 1 et 3600 secondes."
 valid_port "$INSTALL_HTTP_PORT" || die "le port doit être entre 1 et 65535."
@@ -70,6 +86,7 @@ if [ "$PREPARE_ONLY" -eq 0 ]; then
   command -v docker >/dev/null 2>&1 || die "Docker est absent. Installe Docker Engine + Compose, ou utilise scripts/install.sh sur Ubuntu."
   docker compose version >/dev/null 2>&1 || die "Docker Compose v2 est requis."
   docker info >/dev/null 2>&1 || die "Docker ne répond pas ou ton compte n’a pas accès au moteur."
+  if [ "$LOCAL_HTTPS" = 1 ]; then command -v curl >/dev/null || die "curl est requis pour vérifier HTTPS local."; fi
 fi
 
 # Work on a private copy and publish it atomically; never source .env as shell code.
@@ -121,9 +138,19 @@ env_set APP_URL "$INSTALL_URL"
 env_set ALLUMI_HTTP_PORT "$INSTALL_HTTP_PORT"
 env_set ALLUMI_BIND_ADDRESS "$INSTALL_BIND"
 env_set DEFAULT_LOCALE "$INSTALL_LOCALE"
+if [ "$LOCAL_HTTPS" = 1 ]; then
+  ENV_FILE="$TEMP_ENV" bash "$ALLUMI_DIR/scripts/enable-local-https.sh" --host "$INSTALL_TLS_HOST" --port "$INSTALL_HTTP_PORT" --prepare-only
+else
+  if [ "$(env_get ALLUMI_NETWORK_MODE)" = local-https ]; then env_set TRUSTED_PROXY_HOPS 0; fi
+  env_set ALLUMI_NETWORK_MODE direct
+  env_unset ALLUMI_TLS_HOST
+  case "$(env_get COMPOSE_FILE)" in docker-compose.yml:compose.https.yaml*) env_unset COMPOSE_FILE ;; esac
+fi
 chmod 600 "$TEMP_ENV"
 if [ "$PREPARE_ONLY" -eq 0 ]; then
-  docker compose --project-directory "$ALLUMI_DIR" -f "$ALLUMI_DIR/docker-compose.yml" --env-file "$TEMP_ENV" config --quiet
+  if [ "$LOCAL_HTTPS" = 1 ]; then
+    ENV_FILE="$TEMP_ENV" bash "$ALLUMI_DIR/scripts/enable-local-https.sh" --check
+  else compose config --quiet; fi
 fi
 mv "$TEMP_ENV" "$TARGET_ENV"
 TEMP_ENV=""
@@ -164,6 +191,12 @@ if [ "$WEB_UPDATES" -eq 1 ]; then
     warn "$WEB_UPDATE_RESULT Aucun agent hôte installé par cette exécution; voir docs/Mise-a-jour.md."
   fi
 fi
+NETWORK_RESULT="HTTP direct sur le port $INSTALL_HTTP_PORT. TLS éventuel géré par votre proxy externe."
+if [ "$LOCAL_HTTPS" = 1 ]; then
+  bash "$ALLUMI_DIR/scripts/enable-local-https.sh" --export-ca
+  curl --fail --silent --show-error --retry 10 --retry-connrefused --retry-delay 1 --max-time 10 --cacert "$ALLUMI_DIR/local-https-root.crt" "$INSTALL_URL/api/health" >/dev/null
+  NETWORK_RESULT="HTTPS local sur le port $INSTALL_HTTP_PORT. Certificat public : $ALLUMI_DIR/local-https-root.crt (à approuver sur chaque appareil)."
+fi
 # Sous install.sh (ALLUMI_REPORT_RESULT=1), c'est lui qui affiche le résumé final, jeton compris : pas de doublon.
 SETUP_LINE=""
 [ "${ALLUMI_REPORT_RESULT:-0}" = 1 ] || SETUP_LINE="$(print_setup_token)"
@@ -171,7 +204,7 @@ cat <<EOF_DONE
 
 Allumi est démarré et l’application est healthy.
   Adresse : ${INSTALL_URL}
-  Réseau : HTTP direct sur le port $INSTALL_HTTP_PORT. TLS éventuel géré par votre proxy externe.
+  Réseau : $NETWORK_RESULT
   Début  : ouvre /setup et crée l’entreprise et l’administrateur.
 ${SETUP_LINE}
   Données : volumes Docker conservés. Ne lance pas docker compose down -v.
