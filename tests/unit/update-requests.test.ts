@@ -11,7 +11,7 @@ beforeEach(async () => {
   directory = await mkdtemp(join(tmpdir(), "allumi-request-"));
   vi.stubEnv("ALLUMI_UPDATE_DIR", directory);
   profile.mockResolvedValue({ isInstanceAdmin: true });
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => [{ tag_name: "v0.2.0", draft: false, prerelease: false }] }));
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => [{ tag_name: "v0.2.0", draft: false, prerelease: false, published_at: "2026-01-01T00:00:00Z" }] }));
 });
 afterEach(async () => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); await rm(directory, { recursive: true, force: true }); });
 it("rejects a non-instance administrator before checking releases", async () => {
