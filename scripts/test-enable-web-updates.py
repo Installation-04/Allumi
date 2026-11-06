@@ -43,7 +43,7 @@ class EnableWebUpdates(unittest.TestCase):
         shutil.copyfile(ROOT / "scripts/lib.sh", self.checkout / "scripts/lib.sh")
         (self.checkout / "scripts/update-agent.py").write_text("reviewed agent version one\n")
         (self.checkout / ".env").write_text("APP_URL=http://localhost:28080\n")
-        for utility in ["dirname", "cat", "cmp", "mktemp", "chmod", "ln", "rm"]:
+        for utility in ["dirname", "cat", "cmp", "mktemp", "chmod", "ln", "rm", "awk", "grep", "tail", "cut", "env"]:
             (self.bin / utility).symlink_to(shutil.which(utility))
         (self.bin / "python3").symlink_to(sys.executable)
         self.stub("id", "#!/bin/sh\nprintf '%s\\n' \"${TEST_UID:-0}\"\n")
