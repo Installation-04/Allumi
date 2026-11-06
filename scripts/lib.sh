@@ -63,10 +63,41 @@ env_backfill() {
 }
 
 compose() {
+  # Validation and execution must use the same selected .env, never exported shell credentials.
+  isolate_deployment_env
   local -a files=(-f "$ALLUMI_DIR/docker-compose.yml")
   [ "$(env_get ALLUMI_NETWORK_MODE)" != local-https ] || files+=(-f "$ALLUMI_DIR/compose.https.yaml")
   [ ! -f "$ALLUMI_DIR/compose.override.yaml" ] || files+=(-f "$ALLUMI_DIR/compose.override.yaml")
+  case "${1:-}" in
+    up|start|restart|create) validate_deployment_start || return $? ;;
+  esac
   docker compose --project-directory "$ALLUMI_DIR" "${files[@]}" --env-file "$ENV_FILE" "$@"
+}
+
+validate_deployment_start() {
+  # Reject ambiguous mode declarations rather than interpreting them differently from Compose.
+  if ! LC_ALL=C awk '
+    NR == 1 && substr($0,1,3) == "\357\273\277" { bad=1 }
+    /^[[:space:]]*(export[[:space:]]+)?(ALLUMI_NETWORK_MODE|ALLUMI_TLS_HOST|COMPOSE_FILE)([[:space:]]|=|$)/ {
+      split($0,parts,"=")
+      if (++seen[parts[1]] > 1) bad=1
+      if ($0 !~ /^(ALLUMI_NETWORK_MODE|ALLUMI_TLS_HOST|COMPOSE_FILE)=/) bad=1
+    }
+    END { exit bad }
+  ' "$ENV_FILE"; then
+    warn "Configuration réseau ambiguë : utiliser des déclarations réseau uniques dans .env, sans export ni BOM."
+    return 1
+  fi
+  case "$(env_get ALLUMI_NETWORK_MODE)" in
+    local-https) env ALLUMI_DIR="$ALLUMI_DIR" ENV_FILE="$ENV_FILE" bash "$ALLUMI_DIR/scripts/enable-local-https.sh" --check ;;
+    direct|"")
+      if [ -n "$(env_get ALLUMI_TLS_HOST)" ] || [[ "$(env_get COMPOSE_FILE)" == *compose.https.yaml* ]]; then
+        warn "Configuration HTTPS incomplète : vérifier ALLUMI_NETWORK_MODE et les réglages HTTPS dans .env."
+        return 1
+      fi
+      return 0 ;;
+    *) warn "Mode réseau inconnu : vérifier ALLUMI_NETWORK_MODE dans .env avant de démarrer."; return 1 ;;
+  esac
 }
 
 # Les identifiants et réglages de déploiement viennent du fichier .env, jamais de l'environnement du shell :

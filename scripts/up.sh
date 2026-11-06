@@ -18,5 +18,6 @@ for arg in "$@"; do
 done
 
 command -v docker >/dev/null 2>&1 || die "Docker est absent."
+validate_deployment_start
 select_images "$FORCE_BUILD"
 compose_up

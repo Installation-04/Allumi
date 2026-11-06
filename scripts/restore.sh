@@ -28,7 +28,34 @@ case "$FILE" in
     age -d -i "$KEY" -o "$WORK/backup.tar" "$FILE" ;;
   *) cp "$FILE" "$WORK/backup.tar" ;;
 esac
-tar -xf "$WORK/backup.tar" -C "$WORK"
+# Reject hostile outer members before tar can follow a link or overwrite anything outside
+# this private workspace. Backups contain only the three named payloads and an optional root directory.
+command -v python3 >/dev/null 2>&1 || die "python3 est requis pour vérifier la sauvegarde avant restauration."
+python3 - "$WORK/backup.tar" <<'PYBACKUP' || die "archive de sauvegarde invalide."
+import pathlib
+import sys
+import tarfile
+
+try:
+    with tarfile.open(sys.argv[1], "r:*") as archive:
+        allowed = {"db.dump", "storage.tar.gz", "local-tls.tar.gz"}
+        files = set()
+        for member in archive:
+            path = pathlib.PurePosixPath(member.name)
+            if path.is_absolute() or ".." in path.parts:
+                raise ValueError("path")
+            if str(path) == "." and member.isdir():
+                continue
+            if str(path) not in allowed or not member.isfile() or str(path) in files:
+                raise ValueError("member")
+            files.add(str(path))
+        if "db.dump" not in files:
+            raise ValueError("database")
+except (OSError, ValueError, tarfile.TarError):
+    sys.exit(1)
+PYBACKUP
+# Ignore stored ownership and permissive modes: the workspace and payloads remain private.
+tar --no-same-owner --no-same-permissions -xf "$WORK/backup.tar" -C "$WORK"
 [ -f "$WORK/db.dump" ] || die "db.dump absent de l'archive."
 
 # Validate the complete authority archive before stopping services or replacing the database.
@@ -65,8 +92,12 @@ try:
 except (OSError, ValueError, tarfile.TarError):
     sys.exit(1)
 PYTLS
+  # Validate the merged live Compose configuration before any stop or database mutation.
+  validate_deployment_start
   info "Arrêt du proxy HTTPS local…"
   compose stop caddy
+else
+  validate_deployment_start
 fi
 
 info "Arrêt de l'application…"
@@ -96,7 +127,7 @@ compose exec -T db psql -U "$PGUSER_" -d "$PGDB_" -c "ANALYZE;"
 
 if [ -f "$WORK/storage.tar.gz" ]; then
   info "Restauration des pièces jointes…"
-  docker run --rm -v allumi_app_storage:/app/storage -v "$WORK":/in alpine:3 \
+  docker run --rm -v allumi_app_storage:/app/storage -v "$WORK":/in:ro alpine:3 \
     sh -c 'rm -rf /app/storage/* && tar -xzf /in/storage.tar.gz -C /app'
 fi
 
