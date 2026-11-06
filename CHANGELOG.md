@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- HTTPS local : contrôle de la configuration Compose rendue avant démarrage, changement de version et interruption par l’agent hôte récent; refus des surcharges incompatibles et isolation des variables du shell. Validation des archives avant restauration et protection des destinations `.env`/certificat public contre les liens symboliques ou répertoires. La copie privilégiée de l’agent reste à actualiser explicitement après revue.
+
 ## [0.4.0-alpha.48] - 2026-11-05
 
 - HTTPS local par IP proposé par défaut aux nouvelles installations, via Caddy optionnel et autorité privée persistante, sans domaine public ni publication des ports 80/443. Conversion explicite des instances existantes, export du certificat public avec empreinte SHA-256 et guides de confiance Windows/iOS; mode HTTP explicite conservé.

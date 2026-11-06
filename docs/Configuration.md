@@ -1,6 +1,6 @@
 # Configuration
 
-Toute la configuration passe par des variables d'environnement, lues depuis le fichier `.env` à la racine. Après une modification : `docker compose up -d`.
+Toute la configuration passe par des variables d'environnement, lues depuis le fichier `.env` à la racine. Après une modification : `./scripts/up.sh`. Ce chemin vérifie le mode HTTPS local avant de redémarrer les services.
 
 > Le fichier `.env` contient des secrets : permissions `600`, jamais dans Git, copie dans un gestionnaire de mots de passe. Ne le « source » pas dans un shell (`source .env`) : certaines valeurs, comme `SMTP_FROM`, contiennent des espaces.
 
