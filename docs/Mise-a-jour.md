@@ -7,14 +7,14 @@ sudo ./scripts/update.sh
 ```
 Le script : sauvegarde, récupère la nouvelle version (`git pull --ff-only` sur une branche), complète ton `.env` des variables ajoutées depuis (sans toucher aux existantes), reconstruit les images, applique les migrations (service `migrate`) et vérifie le healthcheck. Lis le `CHANGELOG.md` avant, surtout pour les versions majeures.
 
-Options : `--no-backup` (déconseillé) et une version, par exemple `sudo ./scripts/update.sh v0.4.0-alpha.48` (voir ci-dessous).
+Options : `--no-backup` (déconseillé) et une version, par exemple `sudo ./scripts/update.sh v0.4.0-alpha.49` (voir ci-dessous).
 
 ## Épingler une version
 Les numéros et le processus de publication sont décrits dans [[Versions-et-releases]].
 
 Pour la production, utilise une version étiquetée plutôt que `main` :
 ```bash
-sudo ./scripts/update.sh v0.4.0-alpha.48
+sudo ./scripts/update.sh v0.4.0-alpha.49
 ```
 Le script sauvegarde, se place sur l'étiquette, **télécharge les images publiées de cette version** (aucune compilation; repli automatique sur la construction si elles sont introuvables, ou avec `--build`) et vérifie le healthcheck. Sur une version épinglée (HEAD détachée), lancer `update.sh` sans version ne tire rien : il redémarre seulement avec les images de la version courante. Voir [[Installation-Docker]], « Images déjà construites ». La première mise à jour depuis une version antérieure à ce changement construit encore sur place : c’est l’ancien script qui s’exécute.
 
@@ -55,7 +55,7 @@ sudo journalctl -u allumi-update.service
 sudo systemctl status allumi-update.timer
 ```
 
-En cas d’échec de sauvegarde, l’ancienne application redémarre. Après le lancement de l’installation, aucun retour arrière automatique n’est tenté : utiliser la sauvegarde et la procédure de restauration. Un ancien agent reste compatible avec les états simples (en attente, en cours, succès ou échec); il ne fournit pas nécessairement les étapes détaillées. Une mise à jour de l’application ne remplace pas automatiquement la copie root de l’agent. Pour obtenir le nouveau suivi sur l’hôte, depuis le clone de la release publiée installée, examiner le script puis actualiser volontairement cette copie : `sudo install -m 0755 scripts/update-agent.py /usr/local/sbin/allumi-update-agent`.
+En cas d’échec de sauvegarde, l’ancienne application redémarre. Après le lancement de l’installation, aucun retour arrière automatique n’est tenté : utiliser la sauvegarde et la procédure de restauration. Un ancien agent reste compatible avec les états simples (en attente, en cours, succès ou échec); il ne fournit pas nécessairement les étapes détaillées. Une mise à jour de l’application ne remplace pas automatiquement la copie root de l’agent. Pour obtenir les protections récentes, notamment le contrôle HTTPS avant interruption, examiner les scripts depuis le clone de la release publiée installée puis actualiser volontairement l’agent. Avec le `compose.override.yaml` généré resté intact, relancer `sudo ./scripts/enable-web-updates.sh` actualise la copie root, les unités et le timer. Avec une configuration personnalisée gérée par votre administrateur, l’autre procédure reste la copie explicite après revue : `sudo install -m 0755 scripts/update-agent.py /usr/local/sbin/allumi-update-agent`.
 
 ![Mise à jour disponible dans l’administration serveur](images/serveur-mise-a-jour-disponible-desktop.png)
 
@@ -73,3 +73,10 @@ La transition introduite en v0.4.0-alpha.10 retirait l’ancien Caddy intégré;
 ## Conserver le protocole et l’autorité locale
 
 Une mise à jour conserve l’URL et le mode réseau existants : le nouveau défaut HTTPS ne convertit pas silencieusement une instance HTTP ou un proxy externe. Pour une conversion volontaire par IP, suivre [[HTTPS-local]]. Conserver les volumes de l’autorité locale et les inclure dans la reprise après sinistre; ne pas recréer cette autorité à chaque mise à jour. Après restauration, vérifier son empreinte avant de réutiliser la confiance des appareils : [[Sauvegardes]].
+
+
+## Contrôle HTTPS avant interruption
+
+En mode HTTPS local, les scripts vérifient la configuration Compose rendue avant de changer de version ou d’images et avant les opérations de démarrage. Une surcharge incompatible est refusée avant ces changements. Corriger le fichier concerné puis lancer `sudo ./scripts/enable-local-https.sh --check`, qui reste en lecture seule, avant de relancer : [[HTTPS-local]].
+
+L’agent hôte récent effectue ce contrôle avant d’arrêter l’application ou d’entreprendre la sauvegarde. Un échec est présenté comme une erreur de validation et laisse le service existant fonctionner; il ne remplace ni la version ni l’autorité locale. Une ancienne copie de l’agent ne reçoit pas cette protection simplement parce que le site a été mis à jour : l’actualiser explicitement selon la procédure ci-dessus.

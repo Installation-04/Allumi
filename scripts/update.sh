@@ -24,6 +24,7 @@ for arg in "$@"; do
   esac
 done
 
+validate_deployment_start
 info "Récupération des étiquettes…"
 git fetch --tags origin
 if [ -n "$TARGET" ]; then

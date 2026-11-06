@@ -35,7 +35,7 @@ sudo ./scripts/backup.sh
 ```bash
 sudo ./scripts/restore.sh /var/backups/allumi/allumi-20260101-023000.tar.age ~/allumi-backup.key
 ```
-Le script demande confirmation, remplace la base et les pièces jointes, puis redémarre. Il crée d'abord les rôles PostgreSQL de l'application s'ils manquent (les rôles appartiennent au serveur, pas à la base : ils ne sont pas dans la sauvegarde, alors que leurs droits y sont), restaure en une seule transaction qui s'arrête à la première erreur, recalcule les statistiques (`ANALYZE`), puis le service `migrate` redonne son mot de passe au rôle de l'application.
+Le script demande confirmation, valide l’archive extérieure et sa structure, puis vérifie la configuration HTTPS locale rendue avant tout arrêt de service ou remplacement de la base. Une archive ou une configuration refusée doit être corrigée avant de reprendre; le contrôle ne justifie pas de contourner une erreur. Après ces vérifications, il remplace la base et les pièces jointes, puis redémarre. Il crée d'abord les rôles PostgreSQL de l'application s'ils manquent (les rôles appartiennent au serveur, pas à la base : ils ne sont pas dans la sauvegarde, alors que leurs droits y sont), restaure en une seule transaction qui s'arrête à la première erreur, recalcule les statistiques (`ANALYZE`), puis le service `migrate` redonne son mot de passe au rôle de l'application.
 
 ### Restaurer sur un nouveau serveur (reprise après sinistre)
 1. Cloner le dépôt (même version si possible) et **mettre ta copie de `.env` en place avant tout** (mêmes `ENCRYPTION_KEY` et `AUTH_SECRET`; `POSTGRES_PASSWORD` doit rester cohérent avec `DATABASE_URL`, et `APP_DB_PASSWORD` avec `APP_DATABASE_URL`). PostgreSQL n'applique `POSTGRES_PASSWORD` qu'à la **première** initialisation de son volume : si `install.sh` tournait d'abord avec un autre `.env`, le mot de passe ne correspondrait plus.
@@ -46,7 +46,7 @@ Les sauvegardes **conservent les propriétaires** des objets (pas de `--no-owner
 
 ## Restaurer l’autorité HTTPS locale
 
-En mode `local-https`, la restauration exige une archive `local-tls.tar.gz` complète et valide avant d’arrêter les services ou de remplacer la base. Elle restaure les volumes Caddy et la même autorité. Une sauvegarde ancienne sans données TLS n’est pas silencieusement transformée en nouvelle autorité : restaurer délibérément en HTTP ou choisir une sauvegarde HTTPS complète.
+En mode `local-https`, la restauration exige une archive `local-tls.tar.gz` complète et valide avant d’arrêter les services ou de remplacer la base. Elle restaure les volumes Caddy et la même autorité. Si le contrôle préalable échoue, aucune autorité de remplacement n’est générée. Pour un refus de configuration Compose, corriger la surcharge puis vérifier avec `sudo ./scripts/enable-local-https.sh --check` avant de relancer la restauration : [[HTTPS-local]]. Une sauvegarde ancienne sans données TLS n’est pas silencieusement transformée en nouvelle autorité : restaurer délibérément en HTTP ou choisir une sauvegarde HTTPS complète.
 
 Après restauration, exporter uniquement le certificat public avec `scripts/enable-local-https.sh --export-ca` et comparer l’empreinte attendue. Si l’autorité a été conservée, la confiance déjà installée sur les appareils peut être réutilisée. Si elle a été remplacée volontairement, vérifier puis déployer la nouvelle autorité sur chaque appareil et retirer l’ancienne selon la politique du poste : [[HTTPS-local]]. Les clés privées restent sur le serveur et dans les sauvegardes protégées.
 

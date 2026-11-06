@@ -32,7 +32,7 @@ Après le démarrage de Caddy :
 sudo ./scripts/enable-local-https.sh --export-ca
 ```
 
-Le certificat public est exporté dans `local-https-root.crt`, à la racine du dépôt installé, avec permissions 644. Le script affiche son empreinte **SHA-256**. Ce fichier ne contient pas la clé privée; il peut être transféré aux appareils autorisés.
+Le certificat public est exporté dans le fichier exact `local-https-root.crt`, à la racine du dépôt installé, avec permissions 644. Un répertoire à cet emplacement est refusé. Si un lien symbolique y existe, l’export remplace le lien lui-même sans écrire dans sa cible. Le helper refuse un `.env` non régulier ou symbolique : la configuration ne doit jamais être écrite à travers un lien vers une autre destination. Le script affiche son empreinte **SHA-256**. Ce fichier ne contient pas la clé privée; il peut être transféré aux appareils autorisés.
 
 Le script affiche aussi le SHA-256 du fichier pour vérifier son transfert. Sur Windows, exécuter `Get-FileHash .\local-https-root.crt -Algorithm SHA256` dans PowerShell et comparer la valeur avec celle du fichier affichée sur le serveur. Cette somme du fichier est distincte de l’empreinte du certificat lui-même.
 
@@ -64,3 +64,22 @@ Sur macOS, importer le certificat public vérifié dans **Trousseaux d’accès*
 L’autorité doit être conservée avec les données HTTPS lors d’une migration ou restauration : [[Sauvegardes]]. Une nouvelle autorité nécessite une nouvelle vérification et approbation sur chaque appareil. Si l’adresse IP change, adapter la configuration explicitement et vérifier que le certificat présenté correspond à la nouvelle adresse; ne pas ignorer un avertissement de nom ou de confiance.
 
 HTTPS chiffre la connexion, mais ne rend pas l’instance accessible depuis Internet. Le routage, le pare-feu et les permissions Allumi restent applicables. Pour Proxmox, installer dans une VM dédiée : [[Proxmox]].
+
+
+## Configuration refusée avant démarrage ou mise à jour
+
+Les scripts vérifient le rendu Compose en mode HTTPS local avant de créer, démarrer, redémarrer ou remettre en service les conteneurs. Ils utilisent la configuration du déploiement plutôt que des variables Compose ou réseau injectées par le shell appelant. Une surcharge qui réexpose HTTP ou invalide la publication TLS est refusée; supprimer cette vérification ne constitue pas une réparation.
+
+En cas de refus, conserver la configuration et le message d’erreur, examiner les fichiers Compose et corriger la surcharge concernée. Puis vérifier sans appliquer de changement :
+
+```bash
+sudo ./scripts/enable-local-https.sh --check
+```
+
+Ce contrôle est en lecture seule. Relancer l’opération voulue seulement une fois la configuration acceptée. Lorsqu’un contrôle préalable échoue avant l’opération, aucune nouvelle version ni autorité de certification n’est installée en remplacement. Les scripts `up.sh` et `update.sh` effectuent ce contrôle avant de modifier les choix d’images ou la copie Git.
+
+Conserver une seule déclaration de `ALLUMI_NETWORK_MODE`, `ALLUMI_TLS_HOST` et `COMPOSE_FILE`, sans préfixe `export`, dans un `.env` UTF-8 sans BOM. Supprimer seulement le marqueur HTTPS ne constitue pas une conversion HTTP : des réglages TLS restants sont refusés pour éviter de réexposer l’application. Utiliser l’option explicite `--http` de l’installateur pour cette conversion.
+
+L’agent hôte récent contrôle aussi HTTPS avant d’arrêter l’application ou de lancer la sauvegarde. Une configuration refusée apparaît comme une erreur de validation; l’application déjà en service reste en fonctionnement. Cette protection nécessite une copie récente de l’agent privilégié : une mise à jour du site ne remplace pas automatiquement cette copie. Voir [[Mise-a-jour]] pour son actualisation explicite.
+
+Ces contrôles valident la configuration observée au moment du lancement. Ils ne remplacent pas le contrôle des droits d’écriture sur l’hôte ni la confiance dans son administrateur.

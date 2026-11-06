@@ -29,9 +29,23 @@ class AgentPolicy(unittest.TestCase):
 class AgentExecution(unittest.TestCase):
     def run_request(self, *, changes=None, current="0.1.0", failure=None, raw=None,
                     file_kind="regular", release_changes=None, remote=None,
-                    dirty=False, lock_busy=False, legacy=False):
+                    dirty=False, lock_busy=False, legacy=False, env_content="ALLUMI_NETWORK_MODE=direct\n",
+                    env_kind="regular", helper_present=True):
         with tempfile.TemporaryDirectory() as root:
             directory = pathlib.Path(root)
+            env_path = directory / ".env"
+            if env_kind == "symlink":
+                protected = directory / "configuration"
+                protected.write_text(env_content or "")
+                env_path.symlink_to(protected)
+            elif env_kind == "fifo":
+                os.mkfifo(env_path)
+            elif env_content is not None:
+                env_path.write_text(env_content)
+            if helper_present:
+                scripts = directory / "scripts"
+                scripts.mkdir()
+                (scripts / "enable-local-https.sh").write_text("#!/bin/sh\nexit 0\n")
             request = {
                 "version": "v0.2.0",
                 "requestedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -60,6 +74,13 @@ class AgentExecution(unittest.TestCase):
                 actual_replace(source, destination)
 
             def execute(args, **kwargs):
+                if args[0].endswith("enable-local-https.sh"):
+                    live = json.loads((directory / "status.json").read_text())
+                    self.assertEqual((live["state"], live["stage"]), ("running", "validating"))
+                    self.assertEqual(args[1:], ("--check",))
+                    self.assertTrue(kwargs["capture_output"])
+                    if failure == "tls":
+                        raise subprocess.CalledProcessError(1, args, stderr="AUTH_SECRET=secret-token https://private-host")
                 if args[0].endswith("backup.sh") or args == ("docker", "compose", "stop", "app"):
                     live = json.loads((directory / "status.json").read_text())
                     self.assertEqual((live["state"], live["stage"]), ("running", "backup"))
@@ -143,9 +164,71 @@ class AgentExecution(unittest.TestCase):
     def test_release_origin_and_ancestry_refusals_never_stop_app(self):
         for options in [{"release_changes": {"draft": True}}, {"release_changes": {"tag_name": "v9.0.0"}}, {"release_changes": {"published_at": None}}, {"remote": "https://example.org/other.git"}, {"dirty": True}, {"failure": "ancestor"}]:
             with self.subTest(options=options):
-                state, calls, _, _, _ = self.run_request(**options)
+                state, calls, _, _, _ = self.run_request(env_content="ALLUMI_NETWORK_MODE=local-https\n", **options)
                 self.assertEqual((state["stage"], state["failureCode"]), ("validating", "validation"))
-                self.assertFalse(any(call[0] == "docker" or call[0].endswith("update.sh") for call in calls))
+                self.assertFalse(any(call[0] == "docker" or call[0].endswith(("update.sh", "enable-local-https.sh")) for call in calls))
+
+    def test_local_https_preflight_runs_after_ancestry_before_any_stop_or_backup(self):
+        state, calls, _, _, _ = self.run_request(env_content='ALLUMI_NETWORK_MODE="local-https"\nAUTH_SECRET=not-a-shell-command\n')
+        self.assertEqual(state["state"], "success")
+        preflight = next(index for index, args in enumerate(calls) if args[0].endswith("enable-local-https.sh"))
+        ancestry = next(index for index, args in enumerate(calls) if args[:2] == ("git", "merge-base"))
+        stop = calls.index(("docker", "compose", "stop", "app"))
+        self.assertLess(ancestry, preflight)
+        self.assertLess(preflight, stop)
+        self.assertEqual(calls[preflight][1:], ("--check",))
+
+    def test_tls_failure_or_missing_helper_never_interrupts_the_running_application(self):
+        for options in [{"failure": "tls"}, {"helper_present": False}]:
+            with self.subTest(options=options):
+                state, calls, _, _, _ = self.run_request(env_content="ALLUMI_NETWORK_MODE=local-https\n", **options)
+                self.assertEqual((state["state"], state["stage"], state["failureCode"]), ("failed", "validating", "validation"))
+                self.assertFalse(any(args[0] == "docker" or args[0].endswith(("backup.sh", "update.sh")) for args in calls))
+                self.assertFalse(any("AUTH_SECRET" in line or "secret-token" in line or "private-host" in line for line in self.last_logs))
+
+    def test_http_legacy_deployment_never_invokes_the_https_helper(self):
+        for content in ["ALLUMI_NETWORK_MODE=direct\n", "AUTH_SECRET=$(touch /tmp/not-executed)\n", 'ALLUMI_NETWORK_MODE=direct\nALLUMI_TLS_HOST=""\nCOMPOSE_FILE=docker-compose.yml:compose.override.yaml\n']:
+            with self.subTest(content=content):
+                state, calls, _, _, _ = self.run_request(env_content=content, helper_present=False)
+                self.assertEqual(state["state"], "success")
+                self.assertFalse(any(args[0].endswith("enable-local-https.sh") for args in calls))
+                self.assertFalse(any("touch" in str(args) for args in calls))
+
+    def test_stale_tls_metadata_and_bom_fail_before_any_interruption(self):
+        configurations = [
+            "\ufeffALLUMI_NETWORK_MODE=local-https\n",
+            "\ufeff# deployment config\nALLUMI_NETWORK_MODE=local-https\n",
+            "ALLUMI_TLS_HOST=192.168.1.40\n",
+            "ALLUMI_NETWORK_MODE=direct\nALLUMI_TLS_HOST='192.168.1.40'\n",
+            "COMPOSE_FILE=docker-compose.yml:compose.https.yaml\n",
+            'ALLUMI_NETWORK_MODE=direct\nCOMPOSE_FILE="docker-compose.yml:compose.https.yaml:compose.override.yaml"\n',
+            "ALLUMI_NETWORK_MODE=direct\nALLUMI_TLS_HOST=\nALLUMI_TLS_HOST=192.168.1.40\n",
+            "COMPOSE_FILE=docker-compose.yml\nCOMPOSE_FILE=compose.https.yaml\n",
+            "ALLUMI_TLS_HOST\n", "COMPOSE_FILE='docker-compose.yml\n",
+        ]
+        for content in configurations:
+            with self.subTest(content=content):
+                state, calls, _, _, _ = self.run_request(env_content=content)
+                self.assertEqual((state["state"], state["stage"], state["failureCode"]), ("failed", "validating", "validation"))
+                self.assertFalse(any(args[0] == "docker" or args[0].endswith(("backup.sh", "update.sh", "enable-local-https.sh")) for args in calls))
+                self.assertFalse(any("192.168.1.40" in line or "COMPOSE_FILE" in line for line in self.last_logs))
+
+    def test_unreadable_or_malformed_env_fails_validation_without_printing_values(self):
+        cases = [
+            {"env_content": None}, {"env_content": "ALLUMI_NETWORK_MODE=secret-token\n"},
+            {"env_content": "ALLUMI_NETWORK_MODE=direct\nALLUMI_NETWORK_MODE=local-https\n"},
+            {"env_content": "ALLUMI_NETWORK_MODE='local-https\n"},
+            {"env_content": "export ALLUMI_NETWORK_MODE=local-https\n"},
+            {"env_content": "ALLUMI_NETWORK_MODE\n"}, {"env_content": "AUTH_SECRET=\x00secret-token\n"},
+            {"env_content": "AUTH_SECRET=" + "x" * 65536},
+            {"env_kind": "symlink"}, {"env_kind": "fifo"},
+        ]
+        for options in cases:
+            with self.subTest(options=options):
+                state, calls, _, _, _ = self.run_request(**options)
+                self.assertEqual((state["state"], state["stage"], state["failureCode"]), ("failed", "validating", "validation"))
+                self.assertFalse(any(args[0] == "docker" or args[0].endswith(("backup.sh", "update.sh", "enable-local-https.sh")) for args in calls))
+                self.assertFalse(any("AUTH_SECRET" in line or "secret-token" in line for line in self.last_logs))
 
     def test_backup_failure_resumes_without_update(self):
         state, calls, history, _, _ = self.run_request(failure="backup")

@@ -48,7 +48,8 @@ if [ -z "$port" ]; then port="$(env_get ALLUMI_HTTP_PORT)"; port="${port:-28080}
 port="$((10#$port))"
 
 check_compose() {
-  local version major minor patch
+  local version major minor patch bind_address
+  bind_address="$(env_get ALLUMI_BIND_ADDRESS)"; bind_address="${bind_address:-0.0.0.0}"
   version="$(docker compose version --short)" || die "Docker Compose est requis."
   [[ "$version" =~ ^v?([0-9]+)\.([0-9]+)\.([0-9]+) ]] || die "version de Docker Compose inconnue."
   major="${BASH_REMATCH[1]}"; minor="${BASH_REMATCH[2]}"; patch="${BASH_REMATCH[3]}"
@@ -76,6 +77,10 @@ try:
     published = ports[0]
     if published.get("target") != 8443 or str(published.get("published")) != sys.argv[1] or published.get("protocol", "tcp") != "tcp":
         raise ValueError()
+    if published.get("host_ip", "0.0.0.0") != sys.argv[4]:
+        raise ValueError()
+    if caddy.get("environment", {}).get("ALLUMI_TLS_HOST") != sys.argv[3]:
+        raise ValueError()
     if caddy.get("image") != "caddy:2.11.8-alpine":
         raise ValueError()
     environment = services["app"].get("environment", {})
@@ -83,7 +88,7 @@ try:
         raise ValueError()
 except Exception:
     sys.exit("Configuration HTTPS refusée : seul Caddy doit publier le port TLS attendu; accès HTTP direct ou configuration du proxy incohérente.")
-' "$port" "https://$host:$port"
+' "$port" "https://$host:$port" "$host" "$bind_address"
 }
 
 export_ca() {
@@ -95,7 +100,10 @@ export_ca() {
     if compose exec -T caddy cat /data/caddy/pki/authorities/local/root.crt > "$raw" 2>/dev/null && openssl x509 -in "$raw" -out "$certificate" 2>/dev/null; then
       chmod 0644 "$certificate"
       # Replace the directory entry itself, never a symlink's target.
-      mv -f "$certificate" "$ALLUMI_DIR/local-https-root.crt"
+      if ! mv -Tf "$certificate" "$ALLUMI_DIR/local-https-root.crt"; then
+        rm -f "$raw" "$certificate"
+        die "Le certificat public ne peut pas remplacer ce chemin de destination."
+      fi
       rm -f "$raw"
       info "Certificat racine public : $ALLUMI_DIR/local-https-root.crt"
       openssl x509 -in "$ALLUMI_DIR/local-https-root.crt" -noout -fingerprint -sha256
@@ -142,7 +150,7 @@ if [ "$mode" != prepare-only ]; then
   isolate_deployment_env
   check_compose
 fi
-mv -f "$temporary" "$original_env"
+mv -Tf "$temporary" "$original_env"
 trap - EXIT
 ENV_FILE="$original_env"
 if [ "$mode" = prepare-only ]; then

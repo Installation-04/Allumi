@@ -23,6 +23,57 @@ def version_key(tag):
     return (int(major), int(minor), int(patch), {"alpha": 0, "beta": 1, "rc": 2, None: 3}[channel], int(sequence or 0))
 
 
+def deployment_network_mode(repo):
+    """Read only network flags, never execute deployment configuration or expose its values."""
+    try:
+        descriptor = os.open(repo / ".env", os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+        with os.fdopen(descriptor, "rb") as handle:
+            info = os.fstat(handle.fileno())
+            if not stat.S_ISREG(info.st_mode) or info.st_size > 65536:
+                raise ValueError("Invalid deployment configuration")
+            raw = handle.read(65537)
+        if len(raw) > 65536 or b"\x00" in raw or raw.startswith(b"\xef\xbb\xbf"):
+            raise ValueError("Invalid deployment configuration")
+        text = raw.decode("utf8")
+    except (OSError, UnicodeError):
+        raise ValueError("Deployment configuration is unavailable") from None
+    flags = {}
+    for line in text.splitlines():
+        declaration = re.match(r"^\s*(?:export\s+)?(ALLUMI_NETWORK_MODE|ALLUMI_TLS_HOST|COMPOSE_FILE)\b", line)
+        if not declaration:
+            continue
+        key = declaration.group(1)
+        if key in flags or not line.startswith(key + "="):
+            raise ValueError("Invalid deployment network configuration")
+        value = line.partition("=")[2].strip()
+        if value and (value[0] in ("'", '"') or value[-1] in ("'", '"')):
+            if len(value) < 2 or value[0] != value[-1]:
+                raise ValueError("Invalid deployment network configuration")
+            value = value[1:-1]
+        flags[key] = value
+    # Older HTTP/proxy installations do not yet have the mode flag.
+    mode = flags.get("ALLUMI_NETWORK_MODE", "direct")
+    if mode not in ("direct", "local-https"):
+        raise ValueError("Invalid deployment network mode")
+    if mode != "local-https" and (flags.get("ALLUMI_TLS_HOST") or "compose.https.yaml" in flags.get("COMPOSE_FILE", "")):
+        raise ValueError("Incomplete local HTTPS configuration")
+    return mode
+
+
+def preflight_local_https(repo):
+    if deployment_network_mode(repo) != "local-https":
+        return
+    helper = repo / "scripts" / "enable-local-https.sh"
+    try:
+        if not stat.S_ISREG(helper.lstat().st_mode):
+            raise ValueError("Local HTTPS preflight is unavailable")
+        # This fixed repository helper performs read-only compatibility/configuration checks.
+        # Its diagnostics may contain local configuration; never forward them to agent logs.
+        subprocess.run((str(helper), "--check"), cwd=repo, check=True, timeout=1800, capture_output=True)
+    except (OSError, subprocess.SubprocessError):
+        raise ValueError("Local HTTPS preflight failed") from None
+
+
 def run_agent(repo, directory):
     repo = pathlib.Path(repo).resolve()
     directory = pathlib.Path(directory)
@@ -127,6 +178,7 @@ def run_agent(repo, directory):
                 raise ValueError("Release is not published")
             command("git", "fetch", "origin", "tag", tag)
             command("git", "merge-base", "--is-ancestor", "HEAD", tag)
+            preflight_local_https(repo)
             stage = "backup"
             failure_code = "backup"
             status("running")

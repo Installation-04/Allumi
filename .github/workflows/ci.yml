@@ -37,6 +37,7 @@ jobs:
           python3 scripts/test-install-docker.py
           python3 scripts/test-get.py
           python3 scripts/test-local-https.py
+          python3 scripts/test-tls-startup.py
           python3 scripts/test-tls-backup.py
           shellcheck -x -P SCRIPTDIR -S warning scripts/*.sh
       - uses: actions/setup-node@v4
@@ -178,6 +179,35 @@ jobs:
           docker compose exec -T app node -e "if(process.env.TRUSTED_PROXY_HOPS !== '1' || process.env.APP_URL !== 'https://127.0.0.1:28080' || process.env.ALLUMI_UPDATE_DIR !== '/app/storage/update-control') process.exit(1)"
           systemctl is-enabled --quiet allumi-update.timer
           systemctl is-active --quiet allumi-update.timer
+      - name: Refus HTTPS avant redémarrage et conservation de la CA
+        run: |
+          APP_ID="$(docker compose ps -q app)"
+          CADDY_ID="$(docker compose ps -q caddy)"
+          DB_ID="$(docker compose ps -q db)"
+          ENV_DIGEST="$(sha256sum .env)"
+          CA_DIGEST="$(sha256sum local-https-root.crt)"
+          cp compose.override.yaml /tmp/allumi-safe.override.yaml
+          trap 'cp /tmp/allumi-safe.override.yaml compose.override.yaml' EXIT
+          cat >> compose.override.yaml <<'UNSAFE'
+              ports: !override
+                - "127.0.0.1:28081:3000"
+          UNSAFE
+          if sudo ./scripts/up.sh --build > /tmp/allumi-unsafe-start.log 2>&1; then
+            cat /tmp/allumi-unsafe-start.log
+            exit 1
+          fi
+          grep -q 'Configuration HTTPS refusée' /tmp/allumi-unsafe-start.log
+          test "$(sha256sum .env)" = "$ENV_DIGEST"
+          for container in "$APP_ID" "$CADDY_ID" "$DB_ID"; do
+            test "$(docker inspect -f '{{.State.Running}}' "$container")" = true
+          done
+          curl --fail --silent --show-error --cacert local-https-root.crt https://127.0.0.1:28080/api/health | jq -e '.status == "ok"'
+          cp /tmp/allumi-safe.override.yaml compose.override.yaml
+          trap - EXIT
+          sudo ./scripts/up.sh --build
+          sudo ./scripts/enable-local-https.sh --export-ca
+          test "$(sha256sum local-https-root.crt)" = "$CA_DIGEST"
+          curl --fail --silent --show-error --retry 10 --retry-connrefused --retry-delay 1 --cacert local-https-root.crt https://127.0.0.1:28080/api/health | jq -e '.status == "ok"'
       - name: Agent serveur et sauvegarde réelle
         run: |
           sudo ./scripts/enable-server-admin.sh

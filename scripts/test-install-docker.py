@@ -27,7 +27,7 @@ elif 'config' in args:
  if os.environ.get('DOCKER_TEST_BAD_CONFIG'): sys.exit(1)
  if '--format' in args:
   path=Path(args[args.index('--env-file')+1]); data=dict(line.split('=',1) for line in path.read_text().splitlines() if line and not line.startswith('#'))
-  print(json.dumps({'services':{'app':{'ports':[], 'environment':{'APP_URL':data.get('APP_URL'),'TRUSTED_PROXY_HOPS':data.get('TRUSTED_PROXY_HOPS')}},'db':{'ports':[]},'caddy':{'image':'caddy:2.11.8-alpine','ports':[{'target':8443,'published':data.get('ALLUMI_HTTP_PORT'),'protocol':'tcp'}]}}}))
+  print(json.dumps({'services':{'app':{'ports':[], 'environment':{'APP_URL':data.get('APP_URL'),'TRUSTED_PROXY_HOPS':data.get('TRUSTED_PROXY_HOPS')}},'db':{'ports':[]},'caddy':{'image':'caddy:2.11.8-alpine','environment':{'ALLUMI_TLS_HOST':data.get('ALLUMI_TLS_HOST')},'ports':[{'target':8443,'published':data.get('ALLUMI_HTTP_PORT'),'protocol':'tcp','host_ip':data.get('ALLUMI_BIND_ADDRESS','0.0.0.0')}]}}}))
 elif 'pull' in args:
  if os.environ.get('DOCKER_TEST_BAD_PULL'): sys.exit(1)
 elif 'exec' in args:
