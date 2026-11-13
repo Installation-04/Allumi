@@ -2659,5 +2659,52 @@
     },
     "searchSuppliers": "Rechercher un fournisseur",
     "supplier": "Fournisseur"
+  },
+  "companySearch": {
+    "title": "Recherche dans l’entreprise",
+    "intro": "Retrouvez un contact, un produit ou une pièce comptable dans votre entreprise. Combinez les filtres pour préciser les résultats.",
+    "query": "Terme recherché",
+    "placeholder": "Numéro, nom, référence, montant exact ou AAAA-MM-JJ",
+    "shortPlaceholder": "Rechercher dans l’entreprise…",
+    "advanced": "Filtres avancés",
+    "filters": "Filtres de recherche",
+    "type": "Type",
+    "status": "Statut",
+    "amount": "Montant exact (CAD)",
+    "from": "Du",
+    "to": "Au",
+    "all": "Tous",
+    "submit": "Rechercher",
+    "reset": "Effacer les filtres",
+    "scope": "Seules les pièces autorisées sont visibles. Les dates et montants concernent les documents et paiements. Les montants sont les totaux positifs en CAD; les crédits et remboursements sont identifiés par leur type.",
+    "emptyQuery": "Saisissez un terme ou choisissez un filtre pour commencer.",
+    "noResults": "Aucun résultat. Vérifiez les filtres ou vos permissions.",
+    "pageResults": "{count, plural, one {# résultat} other {# résultats}} à la page {page}",
+    "results": "Résultats de recherche",
+    "pagination": "Pages des résultats",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "capped": "Précisez les filtres pour voir davantage de résultats (limite de 5 000).",
+    "unnumbered": "Brouillon sans numéro",
+    "kinds": {
+      "CONTACT": "Contact",
+      "ITEM": "Produit ou service",
+      "INVOICE": "Facture client",
+      "CREDIT_NOTE": "Avoir client",
+      "BILL": "Facture fournisseur",
+      "SUPPLIER_CREDIT": "Crédit fournisseur",
+      "EXPENSE": "Dépense",
+      "RECEIPT": "Encaissement",
+      "REFUND": "Remboursement client",
+      "DISBURSEMENT": "Décaissement",
+      "SUPPLIER_REFUND": "Remboursement fournisseur"
+    },
+    "statuses": {
+      "DRAFT": "Brouillon",
+      "POSTED": "Validé",
+      "VOID": "Annulé",
+      "ACTIVE": "Actif",
+      "ARCHIVED": "Archivé"
+    }
   }
 }

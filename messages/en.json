@@ -2659,5 +2659,52 @@
     },
     "searchSuppliers": "Find a supplier",
     "supplier": "Supplier"
+  },
+  "companySearch": {
+    "title": "Search company data",
+    "intro": "Find a contact, product or accounting document across your company. Combine the filters to narrow the results.",
+    "query": "Search term",
+    "placeholder": "Number, name, reference, exact amount or YYYY-MM-DD",
+    "shortPlaceholder": "Search company data…",
+    "advanced": "Advanced filters",
+    "filters": "Search filters",
+    "type": "Type",
+    "status": "Status",
+    "amount": "Exact amount (CAD)",
+    "from": "From",
+    "to": "To",
+    "all": "All",
+    "submit": "Search",
+    "reset": "Clear filters",
+    "scope": "Only records you are allowed to read appear. Dates and amounts apply to documents and payments. Amounts are positive document totals in CAD; credits and refunds are identified by their type.",
+    "emptyQuery": "Enter a term or choose a filter to start.",
+    "noResults": "No matching records. Check your filters or access permissions.",
+    "pageResults": "{count, plural, one {# result} other {# results}} on page {page}",
+    "results": "Search results",
+    "pagination": "Search result pages",
+    "previous": "Previous",
+    "next": "Next",
+    "capped": "Refine your filters to see more results (5,000-result limit).",
+    "unnumbered": "Unnumbered draft",
+    "kinds": {
+      "CONTACT": "Contact",
+      "ITEM": "Product or service",
+      "INVOICE": "Invoice",
+      "CREDIT_NOTE": "Customer credit",
+      "BILL": "Supplier bill",
+      "SUPPLIER_CREDIT": "Supplier credit",
+      "EXPENSE": "Expense",
+      "RECEIPT": "Receipt",
+      "REFUND": "Customer refund",
+      "DISBURSEMENT": "Disbursement",
+      "SUPPLIER_REFUND": "Supplier refund"
+    },
+    "statuses": {
+      "DRAFT": "Draft",
+      "POSTED": "Posted",
+      "VOID": "Voided",
+      "ACTIVE": "Active",
+      "ARCHIVED": "Archived"
+    }
   }
 }

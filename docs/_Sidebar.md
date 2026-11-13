@@ -95,6 +95,7 @@
 - [[Releve-de-compte-client]]
 - [[Releve-de-compte-fournisseur]]
 
+- [[Recherche-globale]]
 - [[Recherche-des-paiements-clients]]
 
 - [[HTTPS-local]]

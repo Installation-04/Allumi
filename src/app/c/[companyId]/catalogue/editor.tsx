@@ -10,14 +10,14 @@ import { archiveAction } from "../taxes/actions";
 import { ItemForm } from "./item-form";
 
 export async function ItemEditor({ params, id }: { params: Promise<{ companyId: string }>; id?: string }) {
-  const { company, actor, locale } = await loadCompany(params);
+  const { company, actor, locale } = await loadCompany(params, "catalog.read");
   const t = await getTranslations("catalog");
   const item = id ? await getItem(actor, id) : null;
   if (id && !item) notFound();
-  const manage = can(company, "catalog.manage");
+  const manage = can(company, "catalog.manage") && can(company, "taxes.manage") && can(company, "ledger.read");
   if (!manage && !item) notFound();
-  const accounts = await listAccounts(actor, { includeInactive: true });
-  const { codes } = await getTaxConfiguration(actor);
+  const accounts = manage ? await listAccounts(actor, { includeInactive: true }) : [];
+  const { codes } = manage ? await getTaxConfiguration(actor) : { codes: [] };
   const options = (type: string) => accounts.filter((a) => a.type === type).map((a) => ({ value: a.id, label: `${a.code} — ${accountName(a, locale)}${a.isActive ? "" : ` (${t("archived")})`}` }));
   const initial = item ? Object.fromEntries(["name", "code", "description", "unitPrice", "incomeAccountId", "expenseAccountId", "defaultTaxCodeId"].map((key) => [key, String(item[key as keyof typeof item] ?? "")])) : {};
   return <section className="max-w-4xl space-y-5"><Link className="inline-flex min-h-11 items-center underline" href={`/c/${company.id}/catalogue`}>{t("back")}</Link><h1 className="text-2xl font-semibold">{item?.name ?? t("newItem")}</h1>

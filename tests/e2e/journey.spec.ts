@@ -368,6 +368,50 @@ test("supplier statement, complete CSV and print view in both locales", async ({
   expect(cspViolations,"Content-Security-Policy violations").toEqual([]);
 });
 
+test("global company search, advanced filters and direct document links in both locales", async ({ page }) => {
+  test.setTimeout(90_000);
+  cspViolations.length=0;watchCsp(page.context());
+  await page.context().addCookies(updateCookies);await page.goto("/");
+  if(!/^\/c\/[0-9a-f-]{36}/.test(new URL(page.url()).pathname))await page.getByRole("link",{name:"Atelier Exemple inc.",exact:true}).click();
+  const company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0];expect(company).toBeTruthy();
+  const header=page.getByRole("search",{name:"Recherche dans l’entreprise",exact:true});
+  await header.getByRole("searchbox",{name:"Terme recherché",exact:true}).fill("FOUR-2026-001");
+  await header.getByRole("button",{name:"Recherche dans l’entreprise",exact:true}).click();
+  const content=page.locator(".workspace-content");
+  await expect(content.getByRole("heading",{name:"Recherche dans l’entreprise",exact:true})).toBeVisible();
+  const results=content.getByRole("list",{name:"Résultats de recherche",exact:true});
+  await expect(results.getByRole("link",{name:"A-00001",exact:true})).toBeVisible();
+  await results.getByRole("link",{name:"A-00001",exact:true}).click();
+  await expect(page).toHaveURL(/\/achats\/validees\/[0-9a-f-]{36}$/);
+  await page.goto(`${company}/recherche?type=BILL&du=2026-07-15&au=2026-07-19&statut=VOID`);
+  await expect(content.getByRole("status")).toContainText("1 résultat");
+  await expect(results.getByRole("link",{name:"A-00001",exact:true})).toBeVisible();
+  const amount=await results.locator("p.font-semibold").innerText();
+  const frenchFilters=page.getByRole("form",{name:"Filtres de recherche",exact:true});
+  await frenchFilters.getByText(/Filtres avancés/).click();
+  await frenchFilters.getByLabel("Montant exact (CAD)",{exact:true}).fill(amount);await frenchFilters.getByRole("button",{name:"Rechercher",exact:true}).click();
+  await expect(content.getByRole("status")).toContainText("1 résultat");
+  await expectNoPageOverflow(page);await captureReference(page,"recherche-globale","Recherche dans l’entreprise");
+  await page.getByRole("button",{name:"English",exact:true}).click();
+  await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");
+  await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
+  await expect(content.getByRole("heading",{name:"Search company data",exact:true})).toBeVisible();
+  await expect(content.getByRole("list",{name:"Search results",exact:true}).getByRole("link",{name:"A-00001",exact:true})).toBeVisible();
+  await expectNoPageOverflow(page);await captureReference(page,"recherche-globale-en-dark","Search company data");
+  const filters=page.getByRole("form",{name:"Search filters",exact:true});
+  await filters.getByText(/Advanced filters/).click();
+  await filters.getByLabel("Type",{exact:true}).selectOption("CONTACT");
+  await filters.getByLabel("Status",{exact:true}).selectOption("");
+  await filters.getByLabel("Exact amount (CAD)",{exact:true}).fill("");
+  await filters.getByLabel("From",{exact:true}).fill("");await filters.getByLabel("To",{exact:true}).fill("");
+  await filters.getByLabel("Search term",{exact:true}).fill("Atelier Boréal");
+  await filters.getByRole("button",{name:"Search",exact:true}).click();
+  await expect(content.getByRole("list",{name:"Search results",exact:true}).getByRole("link",{name:"Atelier Boréal",exact:true})).toBeVisible();
+  await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await page.getByRole("button",{name:"Français",exact:true}).click();
+  for(const suffix of ["?type=INVALID","?type=BILL&type=INVOICE","?q=a&q=b","?montant=-1","?du=2026-02-30","?du=2026-08-01&au=2026-07-01","?page=101"])expect((await page.request.get(`${company}/recherche${suffix}`)).status()).toBe(404);
+  expect(cspViolations,"Content-Security-Policy violations").toEqual([]);
+});
+
 /** Browser-only demonstration of the file hand-off: no host agent, Docker process or deployment is started. */
 async function serverUpdateJourney(page: Page) {
  const directory=process.env.E2E_UPDATE_DIR;
