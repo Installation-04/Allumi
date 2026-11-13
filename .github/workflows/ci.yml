@@ -210,6 +210,7 @@ jobs:
           curl --fail --silent --show-error --retry 10 --retry-connrefused --retry-delay 1 --cacert local-https-root.crt https://127.0.0.1:28080/api/health | jq -e '.status == "ok"'
       - name: Agent serveur et sauvegarde réelle
         run: |
+          docker compose exec -T app node -e "require('node:fs').writeFileSync('/app/storage/.restore-reference', 'before-backup')"
           sudo ./scripts/enable-server-admin.sh
           sudo systemctl stop allumi-server-admin.timer
           docker compose exec -T app node -e "require('node:fs').writeFileSync('/app/storage/server-control/request.json', JSON.stringify({operation:'backup',actor:'00000000-0000-4000-8000-000000000001',requestedAt:new Date().toISOString()}), {mode:0o600,flag:'wx'})"
@@ -220,6 +221,21 @@ jobs:
           curl --fail --silent --show-error --cacert local-https-root.crt https://127.0.0.1:28080/api/health | jq -e '.status == "ok"'
           docker compose exec -T app node -e "if(process.env.TRUSTED_PROXY_HOPS !== '1' || process.env.ALLUMI_UPDATE_DIR !== '/app/storage/update-control') process.exit(1)"
           docker inspect "$(docker compose ps -q app)" --format '{{json .NetworkSettings.Ports}}' | jq -e 'to_entries | all(.value == null or .value == [])'
+      - name: Restauration réelle des pièces jointes et de la confiance HTTPS
+        run: |
+          CA_DIGEST="$(sha256sum local-https-root.crt)"
+          ARCHIVE="$(sudo find /var/backups/allumi -maxdepth 1 -type f -name 'allumi-*.tar' | sort | tail -n1)"
+          test -n "$ARCHIVE"
+          docker compose exec -T app node -e "const fs=require('node:fs'); fs.writeFileSync('/app/storage/.restore-reference', 'after-backup'); fs.writeFileSync('/app/storage/.restore-stale', 'must-disappear')"
+          printf 'oui\n' | sudo ./scripts/restore.sh "$ARCHIVE"
+          # A new TLS listener may close its first handshake; retries still verify the CA and IP SAN.
+          curl --fail --silent --show-error --retry 30 --retry-all-errors --retry-delay 2 --retry-max-time 75 --max-time 5 --cacert local-https-root.crt https://127.0.0.1:28080/api/health | jq -e '.status == "ok"'
+          docker compose exec -T app node -e "const fs=require('node:fs'); if(fs.readFileSync('/app/storage/.restore-reference', 'utf8') !== 'before-backup' || fs.existsSync('/app/storage/.restore-stale')) process.exit(1)"
+          sudo ./scripts/enable-local-https.sh --export-ca
+          test "$(sha256sum local-https-root.crt)" = "$CA_DIGEST"
+          for service in app db; do
+            docker inspect "$(docker compose ps -q "$service")" --format '{{json .NetworkSettings.Ports}}' | jq -e 'to_entries | all(.value == null or .value == [])'
+          done
       - name: Journaux en cas d'échec
         if: failure()
         run: docker compose logs --no-color

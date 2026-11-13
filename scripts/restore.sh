@@ -58,6 +58,40 @@ PYBACKUP
 tar --no-same-owner --no-same-permissions -xf "$WORK/backup.tar" -C "$WORK"
 [ -f "$WORK/db.dump" ] || die "db.dump absent de l'archive."
 
+# Validate attachment members before stopping services or replacing the database.
+# Only plain files/directories under storage are restored; host-agent requests are never replayed.
+if [ -f "$WORK/storage.tar.gz" ]; then
+  python3 - "$WORK/storage.tar.gz" <<'PYSTORAGE' || die "archive des pièces jointes invalide."
+import pathlib
+import sys
+import tarfile
+
+try:
+    with tarfile.open(sys.argv[1], "r:gz") as archive:
+        seen = {}
+        parents = set()
+        for member in archive:
+            path = pathlib.PurePosixPath(member.name)
+            if path.is_absolute() or ".." in path.parts or not path.parts or path.parts[0] != "storage":
+                raise ValueError("path")
+            if len(path.parts) > 1 and path.parts[1] in ("update-control", "server-control"):
+                raise ValueError("control")
+            if not (member.isfile() or member.isdir()) or member.issparse() or path in seen:
+                raise ValueError("member")
+            if member.isfile() and path in parents:
+                raise ValueError("parent")
+            for parent in path.parents:
+                if seen.get(parent) is False:
+                    raise ValueError("parent")
+                parents.add(parent)
+            seen[path] = member.isdir()
+        if seen.get(pathlib.PurePosixPath("storage")) is not True:
+            raise ValueError("root")
+except (OSError, ValueError, EOFError, tarfile.TarError):
+    sys.exit(1)
+PYSTORAGE
+fi
+
 # Validate the complete authority archive before stopping services or replacing the database.
 # Restoring an HTTP-only backup into local HTTPS must be deliberate: otherwise Caddy would
 # silently generate a new authority and every trusted client would lose its trust anchor.
@@ -127,14 +161,15 @@ compose exec -T db psql -U "$PGUSER_" -d "$PGDB_" -c "ANALYZE;"
 
 if [ -f "$WORK/storage.tar.gz" ]; then
   info "Restauration des pièces jointes…"
-  docker run --rm -v allumi_app_storage:/app/storage -v "$WORK":/in:ro alpine:3 \
-    sh -c 'rm -rf /app/storage/* && tar -xzf /in/storage.tar.gz -C /app'
+  docker run --rm --network none --read-only --security-opt no-new-privileges \
+    -v allumi_app_storage:/app/storage -v "$WORK":/in:ro alpine:3 \
+    sh -c 'find /app/storage -mindepth 1 -maxdepth 1 -exec rm -rf {} + && tar -xzf /in/storage.tar.gz -C /app'
 fi
 
 if [ "$LOCAL_HTTPS" = 1 ]; then
   info "Restauration privée de l’autorité HTTPS locale…"
   # Create mounts without starting Caddy: it must not mint a replacement authority.
-  compose create --no-deps caddy
+  compose create caddy
   CADDY_CID="$(compose ps -aq caddy || true)"
   [ -n "$CADDY_CID" ] || die "conteneur caddy introuvable : restauration de l’autorité locale impossible."
   docker run --rm --user 0:0 --network none --read-only --cap-drop ALL --security-opt no-new-privileges \

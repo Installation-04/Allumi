@@ -47,7 +47,7 @@ printf '["tls-preflight","%s"]\\n' "$1" >> "$TEST_LOG"
         (self.fixture / "config/autosave.json").write_text('{"test":true}')
         stub = self.bin / "docker"
         stub.write_text(f"#!{sys.executable}\n" + r'''
-import json, os, pathlib, subprocess, sys
+import io, json, os, pathlib, subprocess, sys, tarfile
 args = sys.argv[1:]
 with open(os.environ["TEST_LOG"], "a") as log:
     log.write(json.dumps(args) + "\n")
@@ -79,11 +79,23 @@ elif args[0] == "run":
             subprocess.run(["tar", "-xzpf", work + "/local-tls.tar.gz", "-C", str(destination)], check=True)
     elif any(value.endswith(":/out") for value in mounts):
         work = next(value[:-5] for value in mounts if value.endswith(":/out"))
-        with open(work + "/storage.tar.gz", "wb") as handle:
-            handle.write(b"storage-fixture")
+        with tarfile.open(work + "/storage.tar.gz", "w:gz") as archive:
+            member = tarfile.TarInfo("storage")
+            member.type = tarfile.DIRTYPE
+            member.mode = 0o700
+            archive.addfile(member)
+            content = b"test-only-attachment"
+            member = tarfile.TarInfo("storage/.hidden-attachment")
+            member.size = len(content)
+            archive.addfile(member, io.BytesIO(content))
+    else:
+        work = next(value[:-7] for value in mounts if value.endswith(":/in:ro"))
+        destination = pathlib.Path(os.environ["TEST_STORAGE_RESTORED"])
+        destination.mkdir(exist_ok=True)
+        subprocess.run(["tar", "-xzf", work + "/storage.tar.gz", "-C", str(destination)], check=True)
 ''')
         stub.chmod(0o755)
-        self.env = {**os.environ, "PATH": str(self.bin) + os.pathsep + os.environ["PATH"], "ALLUMI_DIR": str(self.repo), "ENV_FILE": str(self.repo / ".env"), "TEST_LOG": str(self.log), "TEST_FIXTURE": str(self.fixture), "TEST_RESTORED": str(self.restored)}
+        self.env = {**os.environ, "PATH": str(self.bin) + os.pathsep + os.environ["PATH"], "ALLUMI_DIR": str(self.repo), "ENV_FILE": str(self.repo / ".env"), "TEST_LOG": str(self.log), "TEST_FIXTURE": str(self.fixture), "TEST_RESTORED": str(self.restored), "TEST_STORAGE_RESTORED": str(self.root / "attachments")}
 
     def mode(self, network):
         (self.repo / ".env").write_text(f"ALLUMI_NETWORK_MODE={network}\nBACKUP_DIR={self.backups}\nAPP_URL=https://192.0.2.1:28443\n")
@@ -122,6 +134,100 @@ elif args[0] == "run":
                 outer.addfile(info, io.BytesIO(tls.getvalue()))
         return archive
 
+    def storage_archive(self, entries=None, payload=None):
+        archive = self.archive()
+        if payload is None:
+            stream = io.BytesIO()
+            with tarfile.open(fileobj=stream, mode="w:gz") as inner:
+                for name, kind in entries:
+                    member = tarfile.TarInfo(name)
+                    member.type = kind
+                    member.mode = 0o700 if kind == tarfile.DIRTYPE else 0o600
+                    if kind in (tarfile.SYMTYPE, tarfile.LNKTYPE):
+                        member.linkname = "/etc"
+                    if kind == tarfile.REGTYPE:
+                        member.size = 1
+                        inner.addfile(member, io.BytesIO(b"x"))
+                    else:
+                        inner.addfile(member)
+            payload = stream.getvalue()
+        with tarfile.open(archive, "a") as outer:
+            member = tarfile.TarInfo("storage.tar.gz")
+            member.size = len(payload)
+            outer.addfile(member, io.BytesIO(payload))
+        return archive
+
+    def test_storage_archive_rejects_unsafe_members_before_any_service_or_database_command(self):
+        bad_members = [
+            ("../escape", tarfile.REGTYPE), ("/app/storage/file", tarfile.REGTYPE),
+            ("storage/../../escape", tarfile.REGTYPE), ("config/file", tarfile.REGTYPE),
+            ("storage/link", tarfile.SYMTYPE), ("storage/hardlink", tarfile.LNKTYPE),
+            ("storage/pipe", tarfile.FIFOTYPE), ("storage/device", tarfile.CHRTYPE),
+            ("storage/update-control", tarfile.DIRTYPE),
+            ("storage/update-control/request.json", tarfile.REGTYPE),
+            ("storage/server-control/snapshot.json", tarfile.REGTYPE),
+        ]
+        for network in ("direct", "local-https"):
+            self.mode(network)
+            for entry in bad_members:
+                with self.subTest(network=network, entry=entry):
+                    archive = self.storage_archive([("storage", tarfile.DIRTYPE), entry])
+                    self.log.write_text("")
+                    result = self.run_script("restore.sh", archive)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn("archive des pièces jointes invalide", result.stderr)
+                    self.assertEqual(self.calls(), [])
+                    self.assertFalse((self.root / "escape").exists())
+
+    def test_storage_archive_rejects_duplicates_conflicting_parents_and_missing_root(self):
+        self.mode("direct")
+        root = ("storage", tarfile.DIRTYPE)
+        file = ("storage/file", tarfile.REGTYPE)
+        cases = [
+            [root, file, ("./storage/file", tarfile.REGTYPE)],
+            [root, root],
+            [root, ("storage/nested", tarfile.REGTYPE), ("storage/nested/file", tarfile.REGTYPE)],
+            [root, ("storage/nested/file", tarfile.REGTYPE), ("storage/nested", tarfile.REGTYPE)],
+            [("storage", tarfile.REGTYPE)],
+            [file],
+            [],
+        ]
+        for entries in cases:
+            with self.subTest(entries=entries):
+                self.log.write_text("")
+                result = self.run_script("restore.sh", self.storage_archive(entries))
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("archive des pièces jointes invalide", result.stderr)
+                self.assertEqual(self.calls(), [])
+
+    def test_invalid_compressed_storage_does_not_interrupt_the_server(self):
+        self.mode("direct")
+        for payload in (b"not-a-gzip", b"\x1f\x8b\x08\x00"):
+            with self.subTest(payload=payload):
+                self.log.write_text("")
+                result = self.run_script("restore.sh", self.storage_archive(payload=payload))
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("archive des pièces jointes invalide", result.stderr)
+                self.assertEqual(self.calls(), [])
+
+    def test_storage_accepts_hidden_unicode_files_and_empty_directories(self):
+        self.mode("direct")
+        archive = self.storage_archive([
+            ("storage", tarfile.DIRTYPE), ("storage/.hidden", tarfile.REGTYPE),
+            ("storage/pièces", tarfile.DIRTYPE), ("storage/pièces/reçu.pdf", tarfile.REGTYPE),
+            ("storage/empty", tarfile.DIRTYPE),
+        ])
+        result = self.run_script("restore.sh", archive)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        destination = self.root / "attachments/storage"
+        self.assertEqual((destination / ".hidden").read_bytes(), b"x")
+        self.assertEqual((destination / "pièces/reçu.pdf").read_bytes(), b"x")
+        self.assertTrue((destination / "empty").is_dir())
+        helper = next(call for call in self.calls() if call[0] == "run" and "alpine:3" in call)
+        self.assertIn("--read-only", helper)
+        self.assertEqual(helper[helper.index("--network") + 1], "none")
+        self.assertIn("find /app/storage -mindepth 1", helper[-1])
+
     def test_local_backup_is_private_and_round_trip_preserves_the_authority_before_start(self):
         archive = self.backup()
         self.assertEqual(archive.stat().st_mode & 0o777, 0o600)
@@ -142,7 +248,7 @@ elif args[0] == "run":
         commands = self.calls()
         stop = next(i for i, args in enumerate(commands) if args[-2:] == ["stop", "caddy"])
         database = next(i for i, args in enumerate(commands) if "psql" in args)
-        create = next(i for i, args in enumerate(commands) if args[-3:] == ["create", "--no-deps", "caddy"])
+        create = next(i for i, args in enumerate(commands) if args[-2:] == ["create", "caddy"])
         restore = next(i for i, args in enumerate(commands) if "caddy:2.11.8-alpine" in args)
         start = next(i for i, args in enumerate(commands) if args[-2:] == ["up", "-d"])
         check = next(i for i, args in enumerate(commands) if args == ["tls-preflight", "--check"])
