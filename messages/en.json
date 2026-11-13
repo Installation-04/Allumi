@@ -1226,7 +1226,8 @@
       "age-fournisseurs": "Payables aging",
       "sommaire-taxes": "Tax summary",
       "remboursements": "Customer refunds",
-      "releves-clients": "Customer statements"
+      "releves-clients": "Customer statements",
+      "releves-fournisseurs": "Supplier statements"
     }
   },
   "updates": {
@@ -2618,5 +2619,45 @@
     "refundBlocked": "This receipt has active refunds. Void them before voiding the receipt.",
     "historyPagination": "Receipt refund pages",
     "originPagination": "Refund origin pages"
+  },
+  "supplierStatement": {
+    "title": "Supplier account statement",
+    "intro": "Dated accounts payable activity: bills, credits, payments, refunds and reversals.",
+    "search": "Supplier name",
+    "find": "Search",
+    "limit": "Showing the first 100 suppliers. Refine your search.",
+    "choose": "Choose a supplier",
+    "archived": "Archived",
+    "from": "From",
+    "to": "To",
+    "apply": "Show statement",
+    "period": "From {from} to {to}",
+    "rules": "A positive balance is owed to the supplier; a negative balance is a credit in your favour. Credits increase the amount owed and debits reduce it. Settled activity remains visible; internal notes are excluded.",
+    "export": "Export CSV",
+    "printView": "Full print view",
+    "opening": "Opening balance",
+    "closing": "Closing balance",
+    "debit": "Debits",
+    "credit": "Credits",
+    "date": "Date",
+    "document": "Document",
+    "balance": "Balance",
+    "empty": "No activity in this period.",
+    "count": "{count, plural, =0 {No activity} one {# movement} other {# movements}}",
+    "pagination": "Statement pages",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {count}",
+    "chooseHint": "Choose a supplier and period to view their statement.",
+    "kinds": {
+      "BILL": "Bill",
+      "SUPPLIER_CREDIT": "Supplier credit",
+      "PAYMENT": "Payment",
+      "REFUND": "Refund",
+      "REVERSAL": "Reversal",
+      "ADJUSTMENT": "Adjustment"
+    },
+    "searchSuppliers": "Find a supplier",
+    "supplier": "Supplier"
   }
 }

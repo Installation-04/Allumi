@@ -318,6 +318,56 @@ test("server update request, automatic progress and completion without a host de
   expect(cspViolations, "Content-Security-Policy violations").toEqual([]);
 });
 
+test("supplier statement, complete CSV and print view in both locales", async ({ page }) => {
+  test.setTimeout(90_000);
+  cspViolations.length=0;
+  watchCsp(page.context());
+  await page.context().addCookies(updateCookies);
+  await page.goto("/");
+  if(!/^\/c\/[0-9a-f-]{36}/.test(new URL(page.url()).pathname))await page.getByRole("link",{name:"Atelier Exemple inc.",exact:true}).click();
+  const company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0];
+  expect(company).toBeTruthy();
+  await page.goto(`${company}/contacts`);
+  await page.getByRole("link",{name:/Atelier Boréal/}).first().click();
+  await expectNoPageOverflow(page);
+  await page.getByRole("link",{name:"Relevé de compte fournisseur",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Relevé de compte fournisseur",exact:true})).toBeVisible();
+  await page.getByLabel("Du",{exact:true}).fill("2026-07-15");
+  await page.getByLabel("Au",{exact:true}).fill("2026-07-19");
+  await page.getByRole("button",{name:"Afficher le relevé",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Atelier Boréal",exact:true})).toBeVisible();
+  const content=page.locator(".workspace-content"),summary=content.locator("dl").first();
+  await expect(content.getByRole("status")).toContainText("6 mouvements");
+  for(const label of ["Débits","Crédits"])await expect(summary.getByText(label,{exact:true}).locator("..").locator("dd")).toContainText("193,72");
+  await expect(summary.getByText("Solde final",{exact:true}).locator("..").locator("dd")).toContainText("0,00");
+  await expect(content).not.toContainText("Facture fournisseur de référence");
+  await expectNoPageOverflow(page);await captureReference(page,"releve-fournisseur","Atelier Boréal");
+  const statementUrl=page.url(),csvHref=await page.getByRole("link",{name:"Exporter en CSV",exact:true}).getAttribute("href");
+  const csv=await page.request.get(csvHref!);
+  expect(csv.status()).toBe(200);expect(csv.headers()["cache-control"]).toBe("private, no-store");
+  expect(csv.headers()["content-disposition"]).toContain("supplier_statement_2026-07-15_2026-07-19.csv");
+  const text=await csv.text();expect(text).toContain("Facture fournisseur A-00001");
+  expect(text).toContain("FOUR-2026-001");
+  expect(text).not.toMatch(/Facture fournisseur de référence|Retour partiel de fournitures|Correction de la pièce|journalEntryId|[a-f0-9]{8}-[a-f0-9]{4}-/);
+  await page.getByRole("link",{name:"Vue imprimable complète",exact:true}).click();
+  await expect(page.getByRole("button",{name:"Imprimer / PDF",exact:true})).toBeVisible();
+  await expect(content.locator('a[href*="/journal/"]')).toHaveCount(0);
+  await page.emulateMedia({media:"print"});
+  await expect(page.locator(".workspace-header")).toBeHidden();await expect(page.getByRole("table")).toBeVisible();
+  await page.emulateMedia({media:"screen"});await page.goto(statementUrl);
+  await page.getByRole("button",{name:"English",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Supplier account statement",exact:true})).toBeVisible();
+  await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");
+  await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
+  await expectNoPageOverflow(page);await captureReference(page,"releve-fournisseur-en-dark","Atelier Boréal");
+  const english=await page.request.get((await page.getByRole("link",{name:"Export CSV",exact:true}).getAttribute("href"))!);
+  expect(english.status()).toBe(200);expect(await english.text()).toContain("Bill A-00001");
+  await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");
+  await page.getByRole("button",{name:"Français",exact:true}).click();
+  for(const suffix of ["?contact=invalid","?contact=invalid&contact=","/export?contact=invalid","/export?contact=&contact=invalid","?du=2026-02-30&au=2026-03-01","?du=2026-01-01&du=2026-01-02&au=2026-02-01","?imprimer=1&imprimer=1"])expect((await page.request.get(`${company}/releves-fournisseurs${suffix}`)).status()).toBe(404);
+  expect(cspViolations,"Content-Security-Policy violations").toEqual([]);
+});
+
 /** Browser-only demonstration of the file hand-off: no host agent, Docker process or deployment is started. */
 async function serverUpdateJourney(page: Page) {
  const directory=process.env.E2E_UPDATE_DIR;

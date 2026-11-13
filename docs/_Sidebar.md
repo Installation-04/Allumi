@@ -93,6 +93,7 @@
 - [[Avoirs-disponibles-et-remboursements]]
 - [[Affectation-des-avoirs-clients]]
 - [[Releve-de-compte-client]]
+- [[Releve-de-compte-fournisseur]]
 
 - [[Recherche-des-paiements-clients]]
 

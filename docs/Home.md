@@ -62,6 +62,7 @@ Taxes et produits/services : [[Taxes-et-catalogue]].
 - [[Avoirs-disponibles-et-remboursements]] — avoir sur facture payée, remboursement comptabilisé et annulation.
 - [[Affectation-des-avoirs-clients]] — régler une facture du même client avec un avoir disponible et conserver les désaffectations datées.
 - [[Releve-de-compte-client]] — mouvements datés, CSV et impression complète.
+- [[Releve-de-compte-fournisseur]] — historique fournisseur, CSV et impression complète.
 
 - [[Remboursements-des-encaissements]] — remboursement du disponible reçu et annulation avec historique conservé.
 - [[Encaissements-au-compte]] — fonds reçus sans facture, affectations partielles et retraits datés.
