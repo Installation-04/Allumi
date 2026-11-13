@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Restauration : validation des chemins, types, doublons et répertoires de contrôle de l’archive interne des pièces jointes avant arrêt ou modification de la base; remplacement des anciens fichiers cachés et extraction sans réseau avec racine en lecture seule. Régressions et restauration HTTPS réelle en CI native AMD64/ARM64.
+
 ## [0.4.0-alpha.49] - 2026-11-05
 
 - HTTPS local : contrôle de la configuration Compose rendue avant démarrage, changement de version et interruption par l’agent hôte récent; refus des surcharges incompatibles et isolation des variables du shell. Validation des archives avant restauration et protection des destinations `.env`/certificat public contre les liens symboliques ou répertoires. La copie privilégiée de l’agent reste à actualiser explicitement après revue.
