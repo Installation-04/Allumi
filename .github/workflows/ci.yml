@@ -228,7 +228,8 @@ jobs:
           test -n "$ARCHIVE"
           docker compose exec -T app node -e "const fs=require('node:fs'); fs.writeFileSync('/app/storage/.restore-reference', 'after-backup'); fs.writeFileSync('/app/storage/.restore-stale', 'must-disappear')"
           printf 'oui\n' | sudo ./scripts/restore.sh "$ARCHIVE"
-          curl --fail --silent --show-error --retry 30 --retry-connrefused --retry-delay 2 --cacert local-https-root.crt https://127.0.0.1:28080/api/health | jq -e '.status == "ok"'
+          # A new TLS listener may close its first handshake; retries still verify the CA and IP SAN.
+          curl --fail --silent --show-error --retry 30 --retry-all-errors --retry-delay 2 --retry-max-time 75 --max-time 5 --cacert local-https-root.crt https://127.0.0.1:28080/api/health | jq -e '.status == "ok"'
           docker compose exec -T app node -e "const fs=require('node:fs'); if(fs.readFileSync('/app/storage/.restore-reference', 'utf8') !== 'before-backup' || fs.existsSync('/app/storage/.restore-stale')) process.exit(1)"
           sudo ./scripts/enable-local-https.sh --export-ca
           test "$(sha256sum local-https-root.crt)" = "$CA_DIGEST"
