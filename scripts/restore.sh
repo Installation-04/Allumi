@@ -169,7 +169,7 @@ fi
 if [ "$LOCAL_HTTPS" = 1 ]; then
   info "Restauration privée de l’autorité HTTPS locale…"
   # Create mounts without starting Caddy: it must not mint a replacement authority.
-  compose create --no-deps caddy
+  compose create caddy
   CADDY_CID="$(compose ps -aq caddy || true)"
   [ -n "$CADDY_CID" ] || die "conteneur caddy introuvable : restauration de l’autorité locale impossible."
   docker run --rm --user 0:0 --network none --read-only --cap-drop ALL --security-opt no-new-privileges \

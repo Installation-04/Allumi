@@ -248,7 +248,7 @@ elif args[0] == "run":
         commands = self.calls()
         stop = next(i for i, args in enumerate(commands) if args[-2:] == ["stop", "caddy"])
         database = next(i for i, args in enumerate(commands) if "psql" in args)
-        create = next(i for i, args in enumerate(commands) if args[-3:] == ["create", "--no-deps", "caddy"])
+        create = next(i for i, args in enumerate(commands) if args[-2:] == ["create", "caddy"])
         restore = next(i for i, args in enumerate(commands) if "caddy:2.11.8-alpine" in args)
         start = next(i for i, args in enumerate(commands) if args[-2:] == ["up", "-d"])
         check = next(i for i, args in enumerate(commands) if args == ["tls-preflight", "--check"])
