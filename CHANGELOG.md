@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.51] - 2026-11-13
+
 - Outillage : exclusion des résultats et rapports générés par Playwright du lint, pour éviter un parcours concurrent de leurs répertoires temporaires.
 
 - Recherche globale des données de l’entreprise depuis l’en-tête : contacts, catalogue et neuf types de pièces/paiements, références et montants exacts, filtres type/statut/date/montant, pagination bornée et liens directs. Isolation entreprise et permissions modulaires à chaque lecture, catalogue consultable sans droits fiscaux et conservation des montants lors du changement de langue; interfaces FR/EN, mobile et sombre documentées avec captures.
