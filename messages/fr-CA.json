@@ -757,7 +757,7 @@
     "estimates": {
       "invalid": "Vérifiez les dates, les lignes et les conditions du devis. La date du devis ne peut pas être future.",
       "stale": "Ce devis a changé. Rechargez la page avant de continuer.",
-      "immutable": "Un devis remis est figé. Copiez-le pour créer une nouvelle proposition.",
+      "immutable": "Un devis émis est figé. Copiez-le pour créer une nouvelle proposition.",
       "transition": "Cette opération est incompatible avec le statut ou la validité du devis.",
       "confirm": "Confirmez cette opération.",
       "customerLocked": "La facture doit conserver le client de son devis source."
@@ -777,6 +777,13 @@
       "unavailable": "Cette facture n’est plus échue avec un solde à payer. Actualisez la liste des relances.",
       "stale": "Le solde ou la date a changé. Rechargez cet aperçu avant d’envoyer.",
       "confirm": "Confirmez le destinataire, le solde et l’envoi de la relance."
+    },
+    "estimateEmail": {
+      "invalid": "Vérifiez le destinataire et la langue du courriel.",
+      "unavailable": "Ce devis n’est plus émis, non expiré et en attente d’une réponse. Actualisez le devis.",
+      "confirm": "Confirmez le destinataire, le contenu public et l’envoi du devis.",
+      "confirmResend": "Confirmez le nouvel envoi; ce devis possède déjà une tentative.",
+      "rate": "Patientez une minute entre les tentatives, ou cinq minutes si un envoi est en cours. Maximum : 20 tentatives par devis sur 24 heures."
     }
   },
   "settingsPage": {
@@ -2744,7 +2751,7 @@
       "VOID": "Annulé",
       "ACTIVE": "Actif",
       "ARCHIVED": "Archivé",
-      "SENT": "Remis",
+      "SENT": "Émis",
       "ACCEPTED": "Accepté",
       "DECLINED": "Refusé",
       "CANCELLED": "Devis annulé",
@@ -2802,7 +2809,7 @@
     "new": "Nouveau devis",
     "edit": "Modifier le devis",
     "copy": "Copier en nouveau devis",
-    "intro": "Préparez une proposition commerciale, consignez sa remise et la réponse du client, puis convertissez le devis accepté en facture brouillon. Un devis ne modifie pas la comptabilité.",
+    "intro": "Préparez et finalisez un devis, remettez-le par le moyen choisi, consignez la réponse du client puis convertissez le devis accepté en facture brouillon. Un devis ne modifie pas la comptabilité.",
     "date": "Date du devis",
     "validUntil": "Valide jusqu’au",
     "saveHint": "Les taxes sont calculées à la date du devis. Après remise, les lignes, montants et coordonnées sont figés.",
@@ -2821,8 +2828,8 @@
     "expiredHint": "La validité est dépassée. Copiez le devis pour proposer de nouvelles dates et conditions.",
     "decisionNote": "Note interne sur la réponse",
     "confirm": "Je confirme cette opération.",
-    "send": "Marquer comme remis",
-    "sendHint": "Consignez une remise effectuée par vos soins. Un numéro définitif sera attribué et le devis sera figé. Cette action n’envoie aucun courriel.",
+    "send": "Finaliser et numéroter",
+    "sendHint": "Attribuez un numéro permanent et figez les données du devis. Ceci n’envoie aucun courriel et ne prouve aucune livraison. Vous pourrez ensuite préparer un courriel ou remettre le devis imprimé vous-même.",
     "accept": "Consigner une acceptation",
     "decline": "Consigner un refus",
     "responseHint": "Consignez la réponse reçue du client. Cette opération interne ne constitue pas une signature électronique.",
@@ -2838,7 +2845,7 @@
     "customerLocked": "Le client reste celui du devis source.",
     "statuses": {
       "DRAFT": "Brouillon",
-      "SENT": "Remis",
+      "SENT": "Émis",
       "ACCEPTED": "Accepté",
       "DECLINED": "Refusé",
       "CANCELLED": "Annulé",
@@ -2931,5 +2938,19 @@
     "send": "Envoyer la relance",
     "confirm": "Je confirme le destinataire, le solde et l’envoi de cette relance.",
     "historyHint": "Le résultat et le solde rappelé sont conservés dans l’historique d’envoi de la facture."
+  },
+  "estimateEmail": {
+    "title": "Historique des courriels du devis",
+    "intro": "Envoyez un devis finalisé à un destinataire confirmé. L’acceptation SMTP ne prouve ni la livraison ni l’acceptation du client.",
+    "prepare": "Prévisualiser le courriel du devis",
+    "ineligible": "Seuls les devis émis non expirés en attente d’une réponse peuvent être envoyés. Les tentatives antérieures sont conservées.",
+    "back": "Retour au devis",
+    "detail": "Envoyer le devis {number}",
+    "refresh": "Actualiser l’aperçu",
+    "preview": "Aperçu du courriel du devis",
+    "subject": "Objet",
+    "publicContent": "Uniquement les données figées et conditions publiques. Notes internes, notes de réponse, pièces jointes et liens privés exclus. Aucun paiement n’est demandé.",
+    "send": "Envoyer le devis par courriel",
+    "confirm": "Je confirme le destinataire, le contenu public et l’envoi de ce devis."
   }
 }

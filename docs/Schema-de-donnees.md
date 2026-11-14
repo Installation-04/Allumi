@@ -15,7 +15,7 @@ Voir aussi [[Architecture]], [[Regles-comptables]], [[Plan-de-tests]].
 - Les `CHECK` qui comparent une colonne d'enum à un littéral s'écrivent sur `::text` (voir [la recette de changement d'enum](#changer-un-enum)).
 
 ## Vue d'ensemble
-50 tables : 7 sans `company_id` (`instance` et `rate_limit` sans RLS; les 5 tables d'identité sous RLS par utilisateur) et 43 par entreprise (RLS par entreprise).
+57 tables : 7 tables d’identité ou techniques (`instance` et `rate_limit` sans RLS; 5 tables d’identité sous RLS par utilisateur), et 50 tables métier sous RLS d’entreprise, entreprise elle-même incluse.
 
 | Domaine | Tables |
 |---|---|
@@ -25,7 +25,7 @@ Voir aussi [[Architecture]], [[Regles-comptables]], [[Plan-de-tests]].
 | Grand livre | `account`, `journal_entry`, `journal_line` |
 | Contacts | `contact`, `item` |
 | Taxes | `tax`, `tax_rate`, `tax_code`, `tax_code_component`, `tax_return` |
-| Ventes | `sales_document`, `sales_document_line`, `sales_document_tax`, `sales_credit_application`, `invoice_email`, `sales_estimate`, `sales_estimate_line`, `sales_estimate_counter`, `sales_recurring_plan`, `sales_recurring_occurrence` |
+| Ventes | `sales_document`, `sales_document_line`, `sales_document_tax`, `sales_credit_application`, `invoice_email`, `estimate_email`, `sales_estimate`, `sales_estimate_line`, `sales_estimate_counter`, `sales_recurring_plan`, `sales_recurring_occurrence` |
 | Achats | `purchase_document`, `purchase_document_line`, `purchase_document_tax`, `purchase_credit_application` |
 | Paiements | `payment`, `payment_allocation`, `payment_offset`, `bank_deposit`, `bank_deposit_item` |
 | Banque | `bank_account_profile`, `bank_import`, `bank_transaction`, `bank_rule`, `bank_match`, `bank_reconciliation`, `reconciled_line` |
@@ -158,7 +158,7 @@ Ajouter une valeur à la fin d'un enum n'a pas ces effets.
 - `prisma validate` et `prisma format` (Prisma 7.10) : schéma valide.
 - SQL généré + SQL complémentaire appliqués sur PostgreSQL 16 sans erreur.
 - `prisma migrate diff` (base → schéma) : **vide**. Prisma ne tente pas de supprimer les `CHECK`, `EXCLUDE`, triggers ni politiques.
-- Catalogue : 43 tables sous RLS forcée (toutes sauf `instance` et `rate_limit`); aucun `TRUNCATE` ni `UPDATE`/`DELETE` sur le journal et l'audit pour `allumi_app`; `allumi_app` n'est ni superuser ni `BYPASSRLS`.
+- Catalogue : 55 tables sous RLS forcée (toutes sauf `instance` et `rate_limit`); aucun `TRUNCATE` ni `UPDATE`/`DELETE` sur le journal et l'audit pour `allumi_app`; `allumi_app` n'est ni superuser ni `BYPASSRLS`.
 - 58 cas SQL exécutés **connecté en `allumi_app`**, plus 4 cas propriétaire (`UPDATE`, `DELETE` et `TRUNCATE` refusés par les triggers) : tous réussis. Liste dans [[Plan-de-tests]].
 - Concurrence, avec deux connexions : verrouillage d'une période pendant une écriture, deux affectations simultanées sur une même facture, deux rétrogradations simultanées de propriétaires, suppression d'une ligne de brouillon pendant la validation.
 - La revue adversariale (4 angles, ~30 constats) a produit les correctifs ci-dessus; les constats de sécurité et de comptabilité confirmés par reproduction sont tous intégrés.
@@ -171,6 +171,8 @@ Ajouter une valeur à la fin d'un enum n'a pas ces effets.
 La même table distingue `purpose=INVOICE` (sans montant/date de relance) et `REMINDER` (montant positif et date obligatoires). Les lignes existantes deviennent INVOICE. Pour une relance, le guard vérifie aussi la lecture Comptabilité, une échéance passée, la date comptable non future, le jour courant à Toronto et le solde courant exact sous verrou facture. Montant, date et type deviennent immuables avec la tentative. Les limites d’envoi restent communes aux deux types. Aucune nouvelle table ni écriture comptable : [[Relances-clients]].
 
 ## Schéma Prisma
+`estimate_email` référence un devis par clé composite entreprise/devis. RLS Ventes, audit et UUID de soumission idempotent; seuls résultat et date de fin sont modifiables. Le guard verrouille un devis `SENT` non expiré selon le jour à Toronto, impose l’auteur courant et les limites de fréquence (y compris les tentatives en attente). Aucun DELETE/TRUNCATE, aucun effet comptable. SMTP hors transaction; les réponses et expirations postérieures ne suppriment pas l’historique. Voir [[Envoi-des-devis]].
+
 ```prisma
 // Allumi — schéma de données (conception, phase 1).
 // Les objets que Prisma ne modélise pas (CHECK, EXCLUDE, triggers, RLS, GRANT)
@@ -618,6 +620,8 @@ model Company {
   taxCodes               TaxCode[]
   salesDocuments         SalesDocument[]
   invoiceEmails          InvoiceEmail[]
+  estimateEmails         EstimateEmail[]
+  bankRules              BankRule[]
   purchaseDocuments      PurchaseDocument[]
   payments               Payment[]
   bankDeposits           BankDeposit[]
@@ -627,6 +631,9 @@ model Company {
   taxReturns             TaxReturn[]
   attachments            Attachment[]
   auditLogs              AuditLog[]
+  recurringPlans         SalesRecurringPlan[]
+  salesEstimates         SalesEstimate[]
+  estimateCounter        SalesEstimateCounter?
 
   @@map("company")
 }
@@ -759,9 +766,12 @@ model Account {
   bankProfile            BankAccountProfile?
   bankImports            BankImport[]
   bankTransactions       BankTransaction[]
+  sourceBankRules        BankRule[]              @relation("RuleSource")
+  targetBankRules        BankRule[]              @relation("RuleTarget")
   integrationConnections IntegrationConnection[] @relation("ConnectionAccount")
   feeConnections         IntegrationConnection[] @relation("ConnectionFeeAccount")
   reconciliations        BankReconciliation[]
+  estimateLines          SalesEstimateLine[]
 
   @@unique([companyId, id])
   @@unique([companyId, code])
@@ -888,6 +898,7 @@ model Contact {
   purchaseDocuments PurchaseDocument[]
   payments          Payment[]
   attachmentLinks   AttachmentLink[]
+  salesEstimates    SalesEstimate[]
 
   @@unique([companyId, id])
   @@index([companyId, displayName])
@@ -915,6 +926,7 @@ model Item {
 
   salesLines    SalesDocumentLine[]
   purchaseLines PurchaseDocumentLine[]
+  estimateLines SalesEstimateLine[]
 
   @@unique([companyId, id])
   @@unique([companyId, code])
@@ -989,6 +1001,7 @@ model TaxCode {
   items         Item[]                 @relation("ItemDefaultTaxCode")
   salesLines    SalesDocumentLine[]
   purchaseLines PurchaseDocumentLine[]
+  estimateLines SalesEstimateLine[]
 
   @@unique([companyId, id])
   @@unique([companyId, code])
@@ -1066,7 +1079,11 @@ model SalesDocument {
   creditsReceived SalesCreditApplication[] @relation("InvoiceCredited")
   attachmentLinks AttachmentLink[]
 
-  emails InvoiceEmail[]
+  emails         InvoiceEmail[]
+  recurringPlans SalesRecurringPlan[] @relation("RecurringSource")
+  recurringOccurrence SalesRecurringOccurrence? @relation("RecurringInvoice")
+  sourceEstimate SalesEstimate? @relation("EstimateInvoice")
+
   @@unique([companyId, id])
   @@unique([companyId, kind, number])
   @@unique([companyId, journalEntryId])
@@ -1399,6 +1416,8 @@ model BankDeposit {
   id             String        @id @default(uuid(7)) @db.Uuid
   companyId      String        @map("company_id") @db.Uuid
   number         String?
+  reference      String?
+  voidReason     String?       @map("void_reason")
   /// Compte de banque ou d'encaisse qui reçoit le dépôt.
   accountId      String        @map("account_id") @db.Uuid
   depositDate    DateTime      @map("deposit_date") @db.Date
@@ -1822,6 +1841,168 @@ model AuditLog {
   @@index([actorUserId, occurredAt])
   @@index([subjectUserId, occurredAt])
   @@map("audit_log")
+}
+
+/// Règles suggérées seulement : chaque écriture demande une validation explicite.
+model BankRule {
+  id String @id @default(uuid(7)) @db.Uuid
+  companyId String @map("company_id") @db.Uuid
+  name String
+  enabled Boolean @default(true)
+  priority Int @default(100)
+  field String
+  text String
+  direction String
+  sourceAccountId String? @map("source_account_id") @db.Uuid
+  targetAccountId String @map("target_account_id") @db.Uuid
+  minCents BigInt? @map("min_cents")
+  maxCents BigInt? @map("max_cents")
+  revision Int @default(1)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  company Company @relation(fields:[companyId],references:[id],onDelete:Restrict)
+  sourceAccount Account? @relation("RuleSource",fields:[companyId,sourceAccountId],references:[companyId,id],onDelete:Restrict)
+  targetAccount Account @relation("RuleTarget",fields:[companyId,targetAccountId],references:[companyId,id],onDelete:Restrict)
+  @@index([companyId,enabled,priority,id])
+  @@map("bank_rule")
+}
+
+// Commercial proposals; accounting starts only when their converted invoice is posted.
+model SalesEstimateCounter {
+  companyId String  @id @map("company_id") @db.Uuid
+  nextValue BigInt  @default(1) @map("next_value")
+  prefix    String  @default("DEV-")
+  padding   Int     @default(5)
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict)
+
+  @@map("sales_estimate_counter")
+}
+
+model SalesEstimate {
+  id                 String              @id @default(uuid(7)) @db.Uuid
+  companyId          String              @map("company_id") @db.Uuid
+  contactId          String              @map("contact_id") @db.Uuid
+  status             String              @default("DRAFT")
+  number             String?
+  issueDate          DateTime            @map("issue_date") @db.Date
+  validUntil         DateTime            @map("valid_until") @db.Date
+  reference          String?
+  memo               String?
+  terms              String?
+  locale             AppLocale           @default(fr_CA)
+  taxRounding        TaxRounding         @map("tax_rounding")
+  subtotalCents      BigInt              @map("subtotal_cents")
+  taxTotalCents      BigInt              @map("tax_total_cents")
+  totalCents         BigInt              @map("total_cents")
+  taxSummary         Json                @map("tax_summary")
+  customerSnapshot   Json?               @map("customer_snapshot")
+  issuerSnapshot     Json?               @map("issuer_snapshot")
+  issuedAt           DateTime?           @map("issued_at") @db.Timestamptz(6)
+  respondedAt        DateTime?           @map("responded_at") @db.Timestamptz(6)
+  decisionNote       String?             @map("decision_note")
+  convertedInvoiceId String?             @map("converted_invoice_id") @db.Uuid
+  convertedAt        DateTime?           @map("converted_at") @db.Timestamptz(6)
+  createdById        String              @map("created_by_id") @db.Uuid
+  createdAt          DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+  company            Company             @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  contact            Contact             @relation(fields: [companyId, contactId], references: [companyId, id], onDelete: Restrict, map: "sales_estimate_contact_fkey")
+  convertedInvoice   SalesDocument?      @relation("EstimateInvoice", fields: [companyId, convertedInvoiceId], references: [companyId, id], onDelete: Restrict, map: "sales_estimate_invoice_fkey")
+  lines              SalesEstimateLine[]
+  emails             EstimateEmail[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, number])
+  @@unique([companyId, convertedInvoiceId])
+  @@index([companyId, status, issueDate])
+  @@index([companyId, contactId])
+  @@map("sales_estimate")
+}
+
+/// Tentative SMTP d'un devis finalisé, distincte de sa remise et de la réponse du client.
+model EstimateEmail {
+  id          String @id @db.Uuid
+  companyId   String @map("company_id") @db.Uuid
+  estimateId  String @map("estimate_id") @db.Uuid
+  recipient   String
+  locale      String
+  status      String @default("PENDING")
+  createdById String @map("created_by_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  completedAt DateTime? @map("completed_at") @db.Timestamptz(6)
+  company     Company @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  estimate    SalesEstimate @relation(fields: [companyId, estimateId], references: [companyId, id], onDelete: Restrict)
+
+  @@index([companyId, estimateId, createdAt])
+  @@map("estimate_email")
+}
+
+model SalesEstimateLine {
+  id          String        @id @default(uuid(7)) @db.Uuid
+  companyId   String        @map("company_id") @db.Uuid
+  estimateId  String        @map("estimate_id") @db.Uuid
+  position    Int           @db.SmallInt
+  itemId      String?       @map("item_id") @db.Uuid
+  description String
+  quantity    Decimal       @db.Decimal(19, 4)
+  unitPrice   Decimal       @map("unit_price") @db.Decimal(19, 6)
+  amountCents BigInt        @map("amount_cents")
+  accountId   String        @map("account_id") @db.Uuid
+  taxCodeId   String        @map("tax_code_id") @db.Uuid
+  taxes       Json
+  estimate    SalesEstimate @relation(fields: [companyId, estimateId], references: [companyId, id], onDelete: Cascade, map: "sales_estimate_line_estimate_fkey")
+  item        Item?         @relation(fields: [companyId, itemId], references: [companyId, id], onDelete: Restrict, map: "sales_estimate_line_item_fkey")
+  account     Account       @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict, map: "sales_estimate_line_account_fkey")
+  taxCode     TaxCode       @relation(fields: [companyId, taxCodeId], references: [companyId, id], onDelete: Restrict, map: "sales_estimate_line_tax_code_fkey")
+
+  @@unique([companyId, estimateId, position])
+  @@index([companyId, accountId])
+  @@map("sales_estimate_line")
+}
+
+
+model SalesRecurringPlan {
+  id String @id @default(uuid(7)) @db.Uuid
+  companyId String @map("company_id") @db.Uuid
+  sourceInvoiceId String @map("source_invoice_id") @db.Uuid
+  creationKey String @map("creation_key") @db.Uuid
+  name String
+  status String @default("ACTIVE")
+  startDate DateTime @map("start_date") @db.Date
+  endDate DateTime? @map("end_date") @db.Date
+  intervalMonths Int @map("interval_months") @db.SmallInt
+  anchorDay Int @map("anchor_day") @db.SmallInt
+  termDays Int @map("term_days") @db.SmallInt
+  nextIndex Int @default(0) @map("next_index")
+  createdById String @map("created_by_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  company Company @relation(fields:[companyId],references:[id],onDelete:Restrict)
+  sourceInvoice SalesDocument @relation("RecurringSource",fields:[companyId,sourceInvoiceId],references:[companyId,id],onDelete:Restrict,map:"sales_recurring_plan_source_fkey")
+  occurrences SalesRecurringOccurrence[]
+  @@unique([companyId,id])
+  @@unique([companyId,creationKey])
+  @@index([companyId,status,createdAt])
+  @@map("sales_recurring_plan")
+}
+
+model SalesRecurringOccurrence {
+  id String @id @default(uuid(7)) @db.Uuid
+  companyId String @map("company_id") @db.Uuid
+  planId String @map("plan_id") @db.Uuid
+  occurrenceIndex Int @map("occurrence_index")
+  scheduledDate DateTime @map("scheduled_date") @db.Date
+  invoiceId String? @map("invoice_id") @db.Uuid
+  status String @default("GENERATED")
+  createdById String @map("created_by_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  plan SalesRecurringPlan @relation(fields:[companyId,planId],references:[companyId,id],onDelete:Restrict,map:"sales_recurring_occurrence_plan_fkey")
+  invoice SalesDocument? @relation("RecurringInvoice",fields:[companyId,invoiceId],references:[companyId,id],onDelete:Restrict,map:"sales_recurring_occurrence_invoice_fkey")
+  @@unique([companyId,planId,occurrenceIndex],map:"recurring_occurrence_index_key")
+  @@unique([companyId,planId,scheduledDate],map:"recurring_occurrence_date_key")
+  @@unique([companyId,invoiceId],map:"recurring_occurrence_invoice_key")
+  @@map("sales_recurring_occurrence")
 }
 ```
 
@@ -4560,11 +4741,11 @@ La migration n’analyse ni ne réécrit les paiements historiques. Les contrôl
 
 La migration `20261114000000_sales_estimates` ajoute trois tables auditées avec RLS forcée et politiques restrictives du module Ventes :
 
-- `sales_estimate` : identité UUID, client de la même entreprise, dates de proposition/validité, statut texte contrôlé, référence, note interne, conditions publiques, locale, arrondi, totaux BIGINT, résumé fiscal JSON, instantanés émetteur/client et dates de remise/réponse/conversion. Unicités `(company_id, id)`, `(company_id, number)` et `(company_id, converted_invoice_id)`.
+- `sales_estimate` : identité UUID, client de la même entreprise, dates de proposition/validité, statut texte contrôlé, référence, note interne, conditions publiques, locale, arrondi, totaux BIGINT, résumé fiscal JSON, instantanés émetteur/client et dates d’émission/réponse/conversion. Unicités `(company_id, id)`, `(company_id, number)` et `(company_id, converted_invoice_id)`.
 - `sales_estimate_line` : lignes numérotées 1–50, quantité NUMERIC(19,4), prix NUMERIC(19,6), montant BIGINT, références composites au devis, à l’article optionnel, au compte REVENUE et au code fiscal. Les taux par ligne sont conservés dans un JSON contrôlé.
 - `sales_estimate_counter` : compteur dédié à Ventes, initialisé paresseusement à 1, préfixe `DEV-`, cinq positions minimales. Une opération l’avance exactement d’une unité; suppression et remise à zéro interdites à l’application.
 
-`sales_estimate_guard` impose le départ en brouillon, la date non future, les transitions, la validité à la remise/acceptation, les instantanés à la remise et l’immutabilité du contenu remis. `sales_estimate_line_guard` interdit toute modification des lignes remises. Les triggers différés `sales_estimate_totals` et `sales_estimate_line_totals` valident les références actives, les taux datés et les montants selon l’arrondi; les transitions d’une pièce figée conservent ses montants historiques. Toutes les fonctions opèrent sous les droits de l’appelant, avec recherche SQL fixée et sans EXECUTE public.
+`sales_estimate_guard` impose le départ en brouillon, la date non future, les transitions, la validité à l’émission/acceptation, les instantanés à l’émission et l’immutabilité du contenu émis. `sales_estimate_line_guard` interdit toute modification des lignes émises. Les triggers différés `sales_estimate_totals` et `sales_estimate_line_totals` valident les références actives, les taux datés et les montants selon l’arrondi; les transitions d’une pièce figée conservent ses montants historiques. Toutes les fonctions opèrent sous les droits de l’appelant, avec recherche SQL fixée et sans EXECUTE public.
 
 La conversion verrouille le devis et crée un `sales_document` de type INVOICE et statut DRAFT. Une clé composite unique conserve le lien. Le contrôle de conversion compare le client, l’arrondi et chaque ligne; la date de facture ne précède pas celle du devis. `estimate_invoice_contact_guard` protège le client de la facture liée. Le service de suppression d’une facture brouillon délie atomiquement le devis en le rendant accepté, avant de supprimer la facture; le contrôle différé refuse une simple dissociation laissant la facture en place. Aucun devis n’a de lien direct vers le journal et aucune écriture n’est créée avant la validation normale de la facture.
 

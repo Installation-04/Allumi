@@ -8,6 +8,7 @@ import { ActionForm, Field } from "@/app/_components/ui";
 import { loadCompany } from "../../_lib";
 import { validId } from "../../factures/editor";
 import { transitionEstimateAction, convertEstimateAction, deleteEstimateAction } from "../actions";
+import { EstimateEmailPanel } from "../email-panel";
 export default async function Page({ params }: { params: Promise<{ companyId: string; estimateId: string }> }) {
   const { company, actor, locale } = await loadCompany(params, "sales.read");
   const { estimateId } = await params;
@@ -24,5 +25,6 @@ export default async function Page({ params }: { params: Promise<{ companyId: st
     {edit && quote.status === "ACCEPTED" && <details className="rounded-lg border p-4"><summary className="min-h-11 cursor-pointer py-2 font-semibold">{t("convert")}</summary><ActionForm action={convertEstimateAction.bind(null, company.id, quote.id, quote.revision)} label={t("convert")} variant="primary"><p>{t("convertHint")}</p><div className="grid gap-4 sm:grid-cols-2"><Field name="issueDate" label={s("date")} type="date" defaultValue={todayIso()} /><Field name="dueDate" label={s("due")} type="date" defaultValue={todayIso()} /></div><label className="inline-flex min-h-11 items-center gap-3"><input type="checkbox" name="confirm" value="yes" required />{t("confirm")}</label></ActionForm></details>}
     {manage && ["DRAFT", "SENT", "ACCEPTED"].includes(quote.status) && transition("CANCELLED", t("cancel"), t("cancelHint"))}
     {manage && quote.status === "DRAFT" && <details className="rounded-lg border p-4"><summary className="min-h-11 cursor-pointer py-2">{s("delete")}</summary><ActionForm action={deleteEstimateAction.bind(null, company.id, quote.id, quote.revision)} label={s("delete")}><label className="inline-flex min-h-11 items-center gap-3"><input type="checkbox" name="confirm" value="yes" required />{s("confirmDelete")}</label></ActionForm></details>}
+    {quote.status !== "DRAFT" && <EstimateEmailPanel actor={actor} estimateId={quote.id} eligible={quote.status === "SENT" && !quote.expired} />}
   </section>;
 }

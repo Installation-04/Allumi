@@ -10,13 +10,13 @@ L’enregistrement recalcule les montants en cents avec les taux applicables à 
 
 Un brouillon reste modifiable et peut être supprimé. Deux modifications simultanées ne s’écrasent pas : rechargez la page si la version a changé.
 
-## Remise et réponse du client
+## Finalisation et réponse du client
 
-**Marquer comme remis** consigne une remise que vous avez effectuée vous-même. Cette action n’envoie aucun courriel. Elle attribue un numéro `DEV-00001`, puis fige les lignes, les montants et les coordonnées du client et de l’émetteur. Le numéro est propre à l’entreprise, distinct de la séquence des factures.
+**Finaliser et numéroter** fige le document avant sa remise. Cette action n’envoie aucun courriel et ne prouve aucune livraison. Elle attribue un numéro `DEV-00001`, puis fige les lignes, les montants et les coordonnées du client et de l’émetteur. Le numéro est propre à l’entreprise, distinct de la séquence des factures.
 
-Consignez ensuite l’acceptation ou le refus reçu du client. Ces opérations internes ne constituent ni un portail client ni une signature électronique. Un devis expiré ne peut plus être remis ou accepté. Un devis accepté pendant sa validité reste convertible après cette date.
+Consignez ensuite l’acceptation ou le refus reçu du client. Ces opérations internes ne constituent ni un portail client ni une signature électronique. Un devis expiré ne peut plus être émis ou accepté. Un devis accepté pendant sa validité reste convertible après cette date.
 
-Un devis brouillon, remis ou accepté peut être annulé sans écriture comptable. Les devis remis et leurs réponses restent dans l’historique; ils ne sont plus supprimables. Utilisez **Copier en nouveau devis** pour préparer une autre proposition, avec des dates et des références actives vérifiées à l’enregistrement.
+Un devis brouillon, émis ou accepté peut être annulé sans écriture comptable. Les devis émis et leurs réponses restent dans l’historique; ils ne sont plus supprimables. Utilisez **Copier en nouveau devis** pour préparer une autre proposition, avec des dates et des références actives vérifiées à l’enregistrement.
 
 ![Devis accepté sur ordinateur](images/devis-accepte-desktop.png)
 
@@ -32,7 +32,7 @@ Deux tentatives concurrentes ouvrent la même facture. Si vous supprimez la fact
 
 ## Retrouver et imprimer
 
-La liste filtre par numéro, référence ou client, avec les statuts Brouillon, Remis, Accepté, Refusé, Annulé, Converti ou Expiré. Elle affiche 50 résultats par page. Les devis sont aussi inclus dans la [[Recherche-globale]], avec type, statut, dates et montant exact. Les notes internes et les conditions ne sont pas recherchées.
+La liste filtre par numéro, référence ou client, avec les statuts Brouillon, Émis, Accepté, Refusé, Annulé, Converti ou Expiré. Elle affiche 50 résultats par page. Les devis sont aussi inclus dans la [[Recherche-globale]], avec type, statut, dates et montant exact. Les notes internes et les conditions ne sont pas recherchées.
 
 **Imprimer / PDF** ouvre une page privée. Dans la boîte de dialogue du navigateur, choisissez une imprimante ou l’enregistrement PDF; désactivez les en-têtes/pieds de page pour masquer l’adresse du serveur. Les notes internes, motifs de réponse et identifiants techniques sont exclus du document. Le statut et la mention **Ceci n’est pas une facture** restent visibles.
 
@@ -42,8 +42,8 @@ La liste filtre par numéro, référence ou client, avec les statuts Brouillon, 
 
 ## Permissions et limites
 
-La consultation exige Ventes en lecture. La création, la modification, la remise et la conversion exigent Ventes en écriture, ainsi que Contacts, Comptabilité et Taxes en lecture pour valider les références. Un article utilisé exige aussi sa lecture dans Catalogue. La réponse, l’annulation et la suppression d’un brouillon exigent Ventes en écriture. Une restriction supplémentaire peut empêcher la validation comptable de la facture; voir [[Utilisateurs-et-permissions]].
+La consultation exige Ventes en lecture. La création, la modification, la finalisation et la conversion exigent Ventes en écriture, ainsi que Contacts, Comptabilité et Taxes en lecture pour valider les références. Un article utilisé exige aussi sa lecture dans Catalogue. La réponse, l’annulation et la suppression d’un brouillon exigent Ventes en écriture. Une restriction supplémentaire peut empêcher la validation comptable de la facture; voir [[Utilisateurs-et-permissions]].
 
-Les coordonnées figées d’un devis remis restent lisibles avec le droit Ventes, même sans lecture du répertoire Contacts. Les coordonnées actuelles d’un brouillon ne sont pas révélées sans ce droit. Les politiques PostgreSQL, clés étrangères composites, transitions et contrôles différés des totaux appliquent aussi ces limites en base; les changements sont audités.
+Les coordonnées figées d’un devis émis restent lisibles avec le droit Ventes, même sans lecture du répertoire Contacts. Les coordonnées actuelles d’un brouillon ne sont pas révélées sans ce droit. Les politiques PostgreSQL, clés étrangères composites, transitions et contrôles différés des totaux appliquent aussi ces limites en base; les changements sont audités.
 
-Ce lot ne fournit pas l’envoi SMTP du devis, l’acceptation par lien public, la signature électronique, les acomptes, les révisions d’un devis remis ou la facturation progressive. Les devis ne constituent pas une validation complète de tous les parcours QuickBooks.
+L’[[Envoi-des-devis]] manuel SMTP est disponible avec aperçu et historique. L’acceptation par lien public, la signature électronique, les acomptes, les révisions d’un devis émis ou la facturation progressive ne sont pas disponibles. Les devis ne constituent pas une validation complète de tous les parcours QuickBooks.

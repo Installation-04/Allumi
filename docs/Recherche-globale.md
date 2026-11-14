@@ -17,7 +17,7 @@ Le lien d’un résultat ouvre sa fiche ou sa pièce, en conservant la distincti
 Dépliez **Filtres avancés** pour choisir le type, le statut, les dates et le montant. Après une recherche, ces champs sont repliés pour laisser les résultats visibles sur téléphone; le nombre de critères avancés actifs reste indiqué. Dépliez-les à nouveau pour les modifier.
 
 - **Type** : limiter les résultats à une catégorie.
-- **Statut** : Brouillon, Remis, Accepté, Refusé, Annulé, Converti, Validé, Actif ou Archivé, selon le type d’enregistrement.
+- **Statut** : Brouillon, Émis, Accepté, Refusé, Annulé, Converti, Validé, Actif ou Archivé, selon le type d’enregistrement.
 - **Du / Au** : bornes inclusives sur la date du document ou du paiement; chaque borne est facultative.
 - **Montant exact (CAD)** : total du document ou montant du paiement, calculé en cents exacts. Les formats canadiens français et anglais sont acceptés (`123,45` ou `123.45`, avec groupements valides). Changer de langue conserve le montant exact. Zéro est accepté. Les montants sont positifs; le type précise s’il s’agit d’un crédit ou d’un remboursement.
 
