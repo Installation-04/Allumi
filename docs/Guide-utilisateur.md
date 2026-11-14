@@ -122,3 +122,5 @@ Dans **Rapports → Relevés clients**, sélectionner le client et la période. 
 La recherche, les filtres de dates/état et la pagination des paiements sont décrits dans [[Recherche-des-paiements-clients]]. La consultation exige Ventes et Comptabilité en lecture; Contacts peut rester désactivé.
 
 - [[Devis]] — propositions, remise manuelle, réponse, impression et conversion en facture brouillon.
+
+- [[Factures-recurrentes]] — calendrier, préparation contrôlée de brouillons et historique des échéances.

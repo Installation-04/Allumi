@@ -28,6 +28,7 @@
 - [[Taxes-et-catalogue]]
 - [[Sources-fiscales-officielles]]
 - [[Devis]]
+- [[Factures-recurrentes]]
 - [[Brouillons-de-factures]]
 - [[Envoi-des-factures]]
 - [[Plan-comptable]]

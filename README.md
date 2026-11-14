@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.54
+git checkout v0.4.0-alpha.55
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.54 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.55 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -499,3 +499,11 @@ Préparez les devis, consignez leur remise et la réponse du client, puis créez
 ![Devis accepté sur ordinateur](docs/images/devis-accepte-desktop.png)
 
 ![Devis en anglais sombre sur téléphone](docs/images/devis-en-dark-mobile.png)
+
+### Factures récurrentes
+
+Planifiez les factures mensuelles, trimestrielles ou annuelles depuis une facture validée. Les échéances dues créent un brouillon sur confirmation, avec taxes recalculées, protection contre les doublons et historique conservé. [Guide des récurrences](docs/Factures-recurrentes.md).
+
+![Modèle récurrent](docs/images/recurrences-modele-desktop.png)
+
+![Récurrences en anglais sombre sur téléphone](docs/images/recurrences-en-dark-mobile.png)

@@ -331,3 +331,12 @@ it("guards commercial estimates with deferred totals, tenant Sales policies, imm
   expect((await q<{del:boolean}>("SELECT has_table_privilege('allumi_app','sales_estimate_counter','DELETE') AS del"))[0]?.del).toBe(false);
   expect((await q<{definer:boolean}>("SELECT prosecdef AS definer FROM pg_proc WHERE proname='sales_estimate_exact'"))[0]?.definer).toBe(false);
 });
+
+it("protects recurring plans and occurrences with Sales RLS, immutable history and deferred advancement",async()=>{
+ const rows=await q<{tgname:string}>("SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('sales_recurring_plan_guard','sales_recurring_occurrence_guard','sales_recurring_complete','recurring_invoice_contact_guard')");expect(rows).toHaveLength(4);
+ expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='sales_recurring_complete' AND tgdeferrable AND tginitdeferred")).toHaveLength(1);
+ for(const table of ['sales_recurring_plan','sales_recurring_occurrence']){
+  const [grants]=await q<{del:boolean;trunc:boolean}>("SELECT has_table_privilege('allumi_app',$1,'DELETE') AS del,has_table_privilege('allumi_app',$1,'TRUNCATE') AS trunc",[table]);expect(grants).toEqual({del:false,trunc:false});
+  expect((await q<{qual:string}>("SELECT qual FROM pg_policies WHERE tablename=$1 AND policyname='module_read' AND permissive='RESTRICTIVE'",[table]))[0]?.qual).toContain('sales');
+ }
+});

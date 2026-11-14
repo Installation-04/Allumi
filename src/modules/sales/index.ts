@@ -9,3 +9,5 @@ export { applyCustomerCredit, unapplyCustomerCredit, listCreditApplicationTarget
 export { customerCreditApplicationSchema, customerCreditUnapplicationSchema, type CustomerCreditApplicationInput, type CustomerCreditUnapplicationInput } from "./domain/application";
 export { saveEstimate, getEstimate, listEstimates, transitionEstimate, convertEstimate, deleteEstimate } from "./service/estimates";
 export { ESTIMATE_STATUSES, type EstimateStatus } from "./domain/estimate";
+export { recurringSources, createRecurringPlan, getRecurringPlan, listRecurringPlans, changeRecurringStatus, generateRecurringDraft } from "./service/recurring";
+export { recurringDate, recurringDueDate, RECURRING_INTERVALS } from "./domain/recurring";

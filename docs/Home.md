@@ -72,3 +72,5 @@ Taxes et produits/services : [[Taxes-et-catalogue]]. Consultation et import : [[
 - [[HTTPS-local]] — accès chiffré par IP, autorité privée et confiance Windows/iOS.
 
 - [[Devis]] — propositions, remise manuelle, réponse, impression et conversion en facture brouillon.
+
+- [[Factures-recurrentes]] — calendrier, préparation contrôlée de brouillons et historique des échéances.

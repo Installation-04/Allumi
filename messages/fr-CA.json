@@ -761,6 +761,16 @@
       "transition": "Cette opération est incompatible avec le statut ou la validité du devis.",
       "confirm": "Confirmez cette opération.",
       "customerLocked": "La facture doit conserver le client de son devis source."
+    },
+    "recurring": {
+      "invalid": "Vérifiez les dates, le jour choisi, la fréquence et le délai. La première date doit suivre la facture source.",
+      "source": "Choisissez une facture client validée de cette entreprise.",
+      "stale": "Le modèle a changé. Rechargez la page avant de continuer.",
+      "state": "Cette échéance ou ce statut n’est plus disponible.",
+      "future": "Une date de facture future ne peut pas être générée.",
+      "deleted": "Ce brouillon a été supprimé; son échéance reste traitée et ne sera pas recréée.",
+      "confirm": "Confirmez cette opération.",
+      "customerLocked": "Le client d’une facture récurrente reste celui de la facture source."
     }
   },
   "settingsPage": {
@@ -1243,7 +1253,8 @@
       "remboursements": "Remboursements clients",
       "releves-clients": "Relevés clients",
       "releves-fournisseurs": "Relevés fournisseurs",
-      "devis": "Devis"
+      "devis": "Devis",
+      "recurrences": "Factures récurrentes"
     }
   },
   "updates": {
@@ -2823,6 +2834,66 @@
       "CANCELLED": "Annulé",
       "CONVERTED": "Converti en facture",
       "EXPIRED": "Expiré"
+    }
+  },
+  "recurring": {
+    "title": "Factures récurrentes",
+    "new": "Nouvelle récurrence",
+    "create": "Créer la récurrence",
+    "intro": "Planifiez les prochaines factures depuis une facture validée. Les échéances dues créent des brouillons sur confirmation; aucun envoi ni aucune validation comptable automatique.",
+    "sourceHint": "Les lignes, prix, référence et note imprimable de la facture source sont repris. Les taxes sont recalculées à chaque date de facture. Les articles, comptes, codes fiscaux et client doivent rester actifs.",
+    "sourcesLimit": "Les 100 dernières factures validées sont proposées. Le bouton d’une facture plus ancienne permet de la sélectionner directement.",
+    "noSources": "Validez d’abord une facture pour disposer d’un modèle figé.",
+    "source": "Facture source",
+    "choose": "Choisir",
+    "name": "Nom du modèle (interne)",
+    "start": "Première date de facture",
+    "end": "Dernière date incluse (facultatif)",
+    "interval": "Fréquence",
+    "anchor": "Jour du mois (1 à 31)",
+    "anchorHint": "Si ce jour n’existe pas, le dernier jour du mois est utilisé. Le jour choisi est conservé pour les mois suivants. La première date doit correspondre à ce jour et suivre la facture source.",
+    "term": "Délai de paiement en jours (0 à 365)",
+    "immutableHint": "Le calendrier et la facture source restent fixes. Pour les changer, annulez le modèle puis créez-en un autre. La date de fin limite les dates de facture, pas leurs dates d’échéance.",
+    "confirm": "Je confirme cette opération.",
+    "search": "Modèle, client ou numéro source",
+    "dueOnly": "Échéances dues seulement",
+    "filter": "Filtrer",
+    "empty": "Aucune récurrence trouvée.",
+    "next": "Prochaine date de facture",
+    "completed": "Aucune autre échéance",
+    "pagination": "Pages des récurrences",
+    "previous": "Précédente",
+    "nextPage": "Suivante",
+    "saved": "Statut du modèle enregistré.",
+    "cancelHint": "L’annulation est définitive. Les brouillons et l’historique existants sont conservés.",
+    "pauseHint": "La pause n’avance pas le calendrier. À la reprise, les échéances en retard restent à traiter une par une.",
+    "pause": "Mettre en pause",
+    "resume": "Reprendre",
+    "cancel": "Annuler la récurrence",
+    "due": "Échéance à préparer",
+    "generate": "Générer le prochain brouillon",
+    "generateHint": "Une seule échéance est créée à la fois. Vérifiez le brouillon et ses taxes avant de le valider. Les tentatives répétées pour cette même date ouvrent le même brouillon.",
+    "history": "Historique des échéances",
+    "historyLimit": "Les 50 dernières échéances sont affichées.",
+    "noHistory": "Aucune échéance générée.",
+    "deleted": "Brouillon supprimé — échéance conservée",
+    "generated": "Facture créée",
+    "draft": "Ouvrir le brouillon",
+    "noEnd": "Sans date de fin",
+    "sourceUnavailable": "La facture source est annulée ou inaccessible. Aucune nouvelle génération n’est possible; annulez ce modèle si nécessaire.",
+    "customerLocked": "Le client reste celui de la facture source du modèle.",
+    "origin": "Modèle récurrent source",
+    "deleteHint": "Supprimer ce brouillon conserve son échéance dans l’historique. Cette date ne sera pas régénérée.",
+    "intervals": {
+      "1": "Mensuelle",
+      "3": "Trimestrielle",
+      "12": "Annuelle"
+    },
+    "statuses": {
+      "ACTIVE": "Active",
+      "PAUSED": "En pause",
+      "CANCELLED": "Annulée",
+      "COMPLETED": "Terminée"
     }
   }
 }

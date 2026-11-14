@@ -454,6 +454,7 @@ model Company {
   taxReturns             TaxReturn[]
   attachments            Attachment[]
   auditLogs              AuditLog[]
+  recurringPlans         SalesRecurringPlan[]
   salesEstimates         SalesEstimate[]
   estimateCounter        SalesEstimateCounter?
 
@@ -902,6 +903,8 @@ model SalesDocument {
   attachmentLinks AttachmentLink[]
 
   emails         InvoiceEmail[]
+  recurringPlans SalesRecurringPlan[] @relation("RecurringSource")
+  recurringOccurrence SalesRecurringOccurrence? @relation("RecurringInvoice")
   sourceEstimate SalesEstimate? @relation("EstimateInvoice")
 
   @@unique([companyId, id])
@@ -1756,4 +1759,49 @@ model SalesEstimateLine {
   @@unique([companyId, estimateId, position])
   @@index([companyId, accountId])
   @@map("sales_estimate_line")
+}
+
+
+model SalesRecurringPlan {
+  id String @id @default(uuid(7)) @db.Uuid
+  companyId String @map("company_id") @db.Uuid
+  sourceInvoiceId String @map("source_invoice_id") @db.Uuid
+  creationKey String @map("creation_key") @db.Uuid
+  name String
+  status String @default("ACTIVE")
+  startDate DateTime @map("start_date") @db.Date
+  endDate DateTime? @map("end_date") @db.Date
+  intervalMonths Int @map("interval_months") @db.SmallInt
+  anchorDay Int @map("anchor_day") @db.SmallInt
+  termDays Int @map("term_days") @db.SmallInt
+  nextIndex Int @default(0) @map("next_index")
+  createdById String @map("created_by_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  company Company @relation(fields:[companyId],references:[id],onDelete:Restrict)
+  sourceInvoice SalesDocument @relation("RecurringSource",fields:[companyId,sourceInvoiceId],references:[companyId,id],onDelete:Restrict,map:"sales_recurring_plan_source_fkey")
+  occurrences SalesRecurringOccurrence[]
+  @@unique([companyId,id])
+  @@unique([companyId,creationKey])
+  @@index([companyId,status,createdAt])
+  @@map("sales_recurring_plan")
+}
+
+model SalesRecurringOccurrence {
+  id String @id @default(uuid(7)) @db.Uuid
+  companyId String @map("company_id") @db.Uuid
+  planId String @map("plan_id") @db.Uuid
+  occurrenceIndex Int @map("occurrence_index")
+  scheduledDate DateTime @map("scheduled_date") @db.Date
+  invoiceId String? @map("invoice_id") @db.Uuid
+  status String @default("GENERATED")
+  createdById String @map("created_by_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  plan SalesRecurringPlan @relation(fields:[companyId,planId],references:[companyId,id],onDelete:Restrict,map:"sales_recurring_occurrence_plan_fkey")
+  invoice SalesDocument? @relation("RecurringInvoice",fields:[companyId,invoiceId],references:[companyId,id],onDelete:Restrict,map:"sales_recurring_occurrence_invoice_fkey")
+  @@unique([companyId,planId,occurrenceIndex],map:"recurring_occurrence_index_key")
+  @@unique([companyId,planId,scheduledDate],map:"recurring_occurrence_date_key")
+  @@unique([companyId,invoiceId],map:"recurring_occurrence_invoice_key")
+  @@map("sales_recurring_occurrence")
 }

@@ -25,7 +25,7 @@ Voir aussi [[Architecture]], [[Regles-comptables]], [[Plan-de-tests]].
 | Grand livre | `account`, `journal_entry`, `journal_line` |
 | Contacts | `contact`, `item` |
 | Taxes | `tax`, `tax_rate`, `tax_code`, `tax_code_component`, `tax_return` |
-| Ventes | `sales_document`, `sales_document_line`, `sales_document_tax`, `sales_credit_application`, `invoice_email`, `sales_estimate`, `sales_estimate_line`, `sales_estimate_counter` |
+| Ventes | `sales_document`, `sales_document_line`, `sales_document_tax`, `sales_credit_application`, `invoice_email`, `sales_estimate`, `sales_estimate_line`, `sales_estimate_counter`, `sales_recurring_plan`, `sales_recurring_occurrence` |
 | Achats | `purchase_document`, `purchase_document_line`, `purchase_document_tax`, `purchase_credit_application` |
 | Paiements | `payment`, `payment_allocation`, `payment_offset`, `bank_deposit`, `bank_deposit_item` |
 | Banque | `bank_account_profile`, `bank_import`, `bank_transaction`, `bank_rule`, `bank_match`, `bank_reconciliation`, `reconciled_line` |
@@ -4562,3 +4562,13 @@ La migration `20261114000000_sales_estimates` ajoute trois tables auditées avec
 `sales_estimate_guard` impose le départ en brouillon, la date non future, les transitions, la validité à la remise/acceptation, les instantanés à la remise et l’immutabilité du contenu remis. `sales_estimate_line_guard` interdit toute modification des lignes remises. Les triggers différés `sales_estimate_totals` et `sales_estimate_line_totals` valident les références actives, les taux datés et les montants selon l’arrondi; les transitions d’une pièce figée conservent ses montants historiques. Toutes les fonctions opèrent sous les droits de l’appelant, avec recherche SQL fixée et sans EXECUTE public.
 
 La conversion verrouille le devis et crée un `sales_document` de type INVOICE et statut DRAFT. Une clé composite unique conserve le lien. Le contrôle de conversion compare le client, l’arrondi et chaque ligne; la date de facture ne précède pas celle du devis. `estimate_invoice_contact_guard` protège le client de la facture liée. Le service de suppression d’une facture brouillon délie atomiquement le devis en le rendant accepté, avant de supprimer la facture; le contrôle différé refuse une simple dissociation laissant la facture en place. Aucun devis n’a de lien direct vers le journal et aucune écriture n’est créée avant la validation normale de la facture.
+
+
+## Récurrences des factures
+
+La migration `20261115000000_sales_recurring` ajoute deux tables auditées, sous RLS forcée et politiques restrictives du module Ventes :
+
+- `sales_recurring_plan` conserve une source INVOICE validée de la même entreprise, une clé UUID de création idempotente, un nom interne, un statut ACTIVE/PAUSED/CANCELLED, la première/dernière date, l’intervalle en mois (1/3/12), le jour d’ancrage et le délai de paiement. `next_index` avance d’une seule unité avec une occurrence réelle. Calendrier, identité, source et auteur restent immuables; annulation définitive, aucune suppression applicative.
+- `sales_recurring_occurrence` conserve l’indice et la date prévus, l’auteur et une facture générée. Les unicités par entreprise/modèle/indice, entreprise/modèle/date et entreprise/facture empêchent les doublons. L’état GENERATED devient uniquement DRAFT_DELETED lors de la suppression effective d’un brouillon dans la même transaction. Aucune occurrence n’est supprimable ni réutilisable.
+
+`sales_recurring_date` calcule une date depuis le mois initial et le jour d’ancrage, sans dérive après un mois court. Les guards refusent source non validée, échéance future, modèle inactif, mauvais client/arrondi/lignes/référence/note ou progression sans occurrence. Le contrôle différé `sales_recurring_complete` impose la progression du modèle à l’insertion et la disparition effective de la facture lors d’une dissociation. `recurring_invoice_contact_guard` protège le client d’un brouillon lié. Les taxes de la nouvelle facture suivent la validation existante à sa propre date. Aucune écriture n’est créée par le modèle lui-même.
