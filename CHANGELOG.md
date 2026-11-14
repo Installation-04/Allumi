@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.56] - 2026-11-14
+
 - Relances clients manuelles : file paginée des factures échues, recherche sur coordonnées figées, aperçu FR/EN et confirmation SMTP avec solde revérifié sous verrou. Historique distinguant facture et relance, montant/date conservés, idempotence et limites communes, droits modulaires et contrôles SQL; interface mobile/sombre, guide et captures. Aucun envoi planifié ni écriture comptable.
 
 ## [0.4.0-alpha.55] - 2026-11-14
