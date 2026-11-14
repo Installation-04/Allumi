@@ -41,12 +41,12 @@ export async function getDraft(actor: CompanyContext, id: string) {
     for (let attempt = 0; attempt < 3; attempt++) {
     const revision = await lock(tx, actor, id, false);
     if (!revision) return null;
-    const row = await tx.salesDocument.findFirst({ where: { companyId: actor.companyId, id }, include: { sourceEstimate: { select: { id: true, number: true } }, lines: { orderBy: { position: "asc" } }, taxes: { orderBy: { taxId: "asc" } } } });
+    const row = await tx.salesDocument.findFirst({ where: { companyId: actor.companyId, id }, include: { sourceEstimate: { select: { id: true, number: true } }, recurringOccurrence: { select: { planId: true, scheduledDate: true } }, lines: { orderBy: { position: "asc" } }, taxes: { orderBy: { taxId: "asc" } } } });
     if (!row) return null;
     const customer = await tx.contact.findFirst({ where: { companyId: actor.companyId, id: row.contactId }, select: { displayName: true } });
     const taxes = await tx.tax.findMany({ where: { companyId: actor.companyId, id: { in: row.taxes.map(t => t.taxId) } }, select: { id: true, code: true } });
     if (await lock(tx, actor, id, false) !== revision) continue;
-    return { id: row.id, sourceEstimate: row.sourceEstimate, revision, customer: customer?.displayName ?? "", contactId: row.contactId, issueDate: iso(row.issueDate), dueDate: row.dueDate ? iso(row.dueDate) : "", reference: row.reference ?? "", memo: row.memo ?? "", taxRounding: row.taxRounding, locale: row.locale, subtotalCents: row.subtotalCents, taxTotalCents: row.taxTotalCents, totalCents: row.totalCents, lines: row.lines.map(l => ({ itemId: l.itemId ?? "", description: l.description, quantity: l.quantity.toString(), unitPrice: l.unitPrice.toString(), accountId: l.accountId, taxCodeId: l.taxCodeId ?? "", amountCents: l.amountCents })), taxes: row.taxes.map(t => ({ id: t.taxId, code: taxes.find(tax => tax.id === t.taxId)?.code ?? "", amountCents: t.amountCents })) };
+    return { id: row.id, sourceEstimate: row.sourceEstimate, recurringOccurrence: row.recurringOccurrence ? {planId:row.recurringOccurrence.planId,scheduledDate:iso(row.recurringOccurrence.scheduledDate)} : null, revision, customer: customer?.displayName ?? "", contactId: row.contactId, issueDate: iso(row.issueDate), dueDate: row.dueDate ? iso(row.dueDate) : "", reference: row.reference ?? "", memo: row.memo ?? "", taxRounding: row.taxRounding, locale: row.locale, subtotalCents: row.subtotalCents, taxTotalCents: row.taxTotalCents, totalCents: row.totalCents, lines: row.lines.map(l => ({ itemId: l.itemId ?? "", description: l.description, quantity: l.quantity.toString(), unitPrice: l.unitPrice.toString(), accountId: l.accountId, taxCodeId: l.taxCodeId ?? "", amountCents: l.amountCents })), taxes: row.taxes.map(t => ({ id: t.taxId, code: taxes.find(tax => tax.id === t.taxId)?.code ?? "", amountCents: t.amountCents })) };
     }
     throw new AppError("sales.stale");
   });
@@ -64,6 +64,8 @@ export async function saveDraftWithin(tx: Tx, actor: CompanyContext, input: unkn
     if(previous) {
       const source = await tx.salesEstimate.findFirst({where:{companyId:actor.companyId,convertedInvoiceId:id}});
       if(source && data.contactId !== source.contactId)throw new AppError("estimates.customerLocked");
+      const occurrence=await tx.salesRecurringOccurrence.findFirst({where:{companyId:actor.companyId,invoiceId:id},include:{plan:{select:{sourceInvoice:{select:{contactId:true}}}}}});
+      if(occurrence&&data.contactId!==occurrence.plan.sourceInvoice.contactId)throw new AppError("recurring.customerLocked");
     }
     const { company, rounding, amounts, total } = await prepareSalesDraft(tx, actor, data, previous?.taxRounding ?? roundingOverride);
     const values = { contactId: data.contactId, issueDate: new Date(`${data.issueDate}T00:00:00Z`), postingDate: new Date(`${data.issueDate}T00:00:00Z`), dueDate: new Date(`${data.dueDate}T00:00:00Z`), reference: data.reference || null, memo: data.memo || null, subtotalCents: total.subtotalCents, taxTotalCents: total.taxCents, totalCents: total.totalCents };
@@ -110,6 +112,8 @@ export async function deleteDraft(actor: CompanyContext, id: string, revision: s
     if (!revision || await lock(tx, actor, id, true) !== revision) throw new AppError("sales.stale");
     const quotes=await tx.$queryRaw<{id:string}[]>`SELECT id FROM sales_estimate WHERE company_id=${actor.companyId}::uuid AND converted_invoice_id=${id}::uuid FOR UPDATE`;
     if(quotes[0])await tx.salesEstimate.update({where:{companyId:actor.companyId,id:quotes[0].id},data:{status:"ACCEPTED",convertedInvoiceId:null,convertedAt:null}});
+    const occurrences=await tx.$queryRaw<{id:string}[]>`SELECT id FROM sales_recurring_occurrence WHERE company_id=${actor.companyId}::uuid AND invoice_id=${id}::uuid FOR UPDATE`;
+    if(occurrences[0])await tx.salesRecurringOccurrence.update({where:{companyId:actor.companyId,id:occurrences[0].id},data:{status:"DRAFT_DELETED",invoiceId:null}});
     await tx.salesDocument.delete({ where: { id, companyId: actor.companyId } });
   });
 }

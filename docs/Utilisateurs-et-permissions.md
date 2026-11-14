@@ -68,3 +68,7 @@ Après un changement de permissions, recharger la page actualise les menus. Un e
 Ventes en lecture permet le suivi et l’impression des [[Devis]], y compris les coordonnées figées à leur remise. Préparer, modifier, remettre ou convertir exige Ventes en écriture, Contacts/Comptabilité/Taxes en lecture et Catalogue en lecture si un article est utilisé. L’écriture Comptabilité n’est pas requise pour le seul devis ou la création de sa facture brouillon. Réponses et annulations exigent Ventes en écriture. Le client d’une facture liée reste protégé en service et en SQL.
 
 La lecture des factures avec Ventes reste possible si les répertoires Contacts ou Taxes sont masqués : les données actuelles du contact ne sont pas complétées, et les libellés fiscaux non accessibles sont remplacés par « Taxe ». Les montants portés par la pièce restent visibles selon son droit financier.
+
+## Récurrences
+
+Le suivi des [[Factures-recurrentes]] relève de Ventes en lecture. Création et génération exigent Ventes en écriture et Contacts/Comptabilité/Taxes en lecture, plus Catalogue en lecture si des articles sont repris. Pause et annulation exigent Ventes en écriture. Aucune délégation Comptabilité en écriture n’est nécessaire pour préparer un brouillon; sa validation reste une action distincte.

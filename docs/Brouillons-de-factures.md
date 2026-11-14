@@ -44,3 +44,7 @@ Données fictives issues du parcours Chromium; vues mobiles émulées, sans remp
 ## Facture provenant d’un devis
 
 Un [[Devis]] accepté peut créer un brouillon avec ses lignes et son client. Les taxes sont recalculées à la date choisie; vérifiez les totaux avant validation. Le client reste celui du devis source. Supprimer ce brouillon rend le devis accepté et permet une nouvelle conversion; une facture validée suit les règles habituelles d’annulation.
+
+## Récurrences
+
+Un modèle de [[Factures-recurrentes]] crée des brouillons sur confirmation pour ses échéances dues. Le brouillon conserve son client source et un lien vers le calendrier. Sa suppression conserve l’échéance comme traitée, sans régénération automatique.

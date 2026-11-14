@@ -4,6 +4,10 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.55] - 2026-11-14
+
+- Factures récurrentes : calendrier mensuel/trimestriel/annuel à jour fixe, préparation confirmée d’un brouillon par échéance due, taxes datées et arrondi source conservé. Pause/annulation, idempotence, historique après suppression et client protégé; droits modulaires, audit et guards SQL. Interface FR/EN/mobile/sombre et guide illustré; aucun envoi ni comptabilisation automatique.
+
 - Documentation : correction du lien du guide Devis vers la validation des factures dans le wiki.
 
 ## [0.4.0-alpha.54] - 2026-11-14

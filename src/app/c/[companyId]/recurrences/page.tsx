@@ -1,0 +1,14 @@
+import Link from "next/link";
+import {notFound} from "next/navigation";
+import {getTranslations} from "next-intl/server";
+import {can} from "@/modules/companies";
+import {listRecurringPlans} from "@/modules/sales";
+import {loadCompany} from "../_lib";
+export default async function Page({params,searchParams}:{params:Promise<{companyId:string}>;searchParams:Promise<Record<string,string|string[]|undefined>>}) {
+ const {company,actor}=await loadCompany(params,"sales.read"),query=await searchParams;
+ if(["q","page","dues"].some(k=>Array.isArray(query[k])))notFound();const q=query.q as string??"",page=query.page as string??"1",dues=query.dues as string??"";
+ if(q.length>120||/[\u0000-\u001f\u007f]/.test(q)||!/^[1-9]\d{0,3}$/.test(page)||Number(page)>1000||!["","1"].includes(dues))notFound();
+ const result=await listRecurringPlans(actor,{q,page:Number(page),dueOnly:dues==="1"});const t=await getTranslations("recurring"),base=`/c/${company.id}/recurrences`;
+ const pagination=(n:number)=>`${base}?${new URLSearchParams({q,page:String(n),...(dues?{dues}: {})})}`;
+ return <section className="space-y-5 [overflow-wrap:anywhere]"><div className="flex flex-wrap items-center justify-between gap-3"><h1 className="text-2xl font-semibold">{t("title")}</h1>{can(company,"sales.manage")&&(["contact.read","ledger.read","taxes.read"] as const).every(a=>can(company,a))&&<Link className="inline-flex min-h-11 items-center rounded-full bg-brand-700 px-5 text-white" href={`${base}/nouvelle`}>{t("new")}</Link>}</div><p>{t("intro")}</p><form className="flex flex-wrap items-end gap-3"><label className="min-w-0 flex-1">{t("search")}<input name="q" maxLength={120} defaultValue={q} className="mt-1 block min-h-11 w-full rounded border bg-white px-3 dark:bg-stone-900" /></label><label className="inline-flex min-h-11 items-center gap-2"><input type="checkbox" name="dues" value="1" defaultChecked={dues==="1"} />{t("dueOnly")}</label><button className="min-h-11 rounded border px-4">{t("filter")}</button></form>{!result.plans.length&&<p>{t("empty")}</p>}<ul className="grid min-w-0 gap-3 lg:grid-cols-2">{result.plans.map(p=><li key={p.id} className="min-w-0"><Link className="block space-y-2 rounded-lg border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-900" href={`${base}/${p.id}`}><h2 className="font-semibold text-brand-700 dark:text-brand-500">{p.name}</h2><p>{p.customer}</p><p>{p.sourceNumber} · {t(`statuses.${!p.nextDate&&p.status!=="CANCELLED"?"COMPLETED":p.status}`)}</p><p>{t("next")}: {p.nextDate??t("completed")}</p></Link></li>)}</ul><nav className="flex flex-wrap gap-4" aria-label={t("pagination")}>{result.page>1&&<Link className="inline-flex min-h-11 items-center underline" href={pagination(result.page-1)}>{t("previous")}</Link>}{result.hasMore&&<Link className="inline-flex min-h-11 items-center underline" href={pagination(result.page+1)}>{t("nextPage")}</Link>}</nav></section>;
+}

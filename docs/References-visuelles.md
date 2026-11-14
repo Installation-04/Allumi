@@ -401,3 +401,15 @@ Cycle commercial sur données fictives : [[Devis]]. Remise et réponse manuelles
 ![PDF du devis](images/devis-impression-desktop.png)
 
 ![PDF en anglais sombre sur téléphone](images/devis-en-dark-mobile.png)
+
+## Factures récurrentes
+
+Parcours sur données fictives : [[Factures-recurrentes]], génération confirmée puis suppression du brouillon avec échéance conservée.
+
+![Modèle récurrent](images/recurrences-modele-desktop.png)
+
+![Modèle récurrent sur téléphone](images/recurrences-modele-mobile.png)
+
+![Historique des échéances](images/recurrences-historique-desktop.png)
+
+![Modèle en anglais sombre](images/recurrences-en-dark-mobile.png)

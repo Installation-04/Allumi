@@ -761,6 +761,16 @@
       "transition": "This operation is incompatible with the estimate’s status or validity.",
       "confirm": "Confirm this operation.",
       "customerLocked": "The invoice must retain its source estimate’s customer."
+    },
+    "recurring": {
+      "invalid": "Check the dates, chosen day, frequency and payment terms. The first date must follow the source invoice.",
+      "source": "Choose a posted customer invoice in this company.",
+      "stale": "This schedule has changed. Reload the page before continuing.",
+      "state": "This occurrence or status is no longer available.",
+      "future": "Future invoice dates cannot be generated.",
+      "deleted": "This draft was deleted. Its occurrence remains processed and will not be recreated.",
+      "confirm": "Confirm this operation.",
+      "customerLocked": "A recurring invoice must retain the source invoice’s customer."
     }
   },
   "settingsPage": {
@@ -1243,7 +1253,8 @@
       "remboursements": "Customer refunds",
       "releves-clients": "Customer statements",
       "releves-fournisseurs": "Supplier statements",
-      "devis": "Estimates"
+      "devis": "Estimates",
+      "recurrences": "Recurring invoices"
     }
   },
   "updates": {
@@ -2823,6 +2834,66 @@
       "CANCELLED": "Cancelled",
       "CONVERTED": "Converted to invoice",
       "EXPIRED": "Expired"
+    }
+  },
+  "recurring": {
+    "title": "Recurring invoices",
+    "new": "New recurring schedule",
+    "create": "Create schedule",
+    "intro": "Schedule future invoices from a posted invoice. Due occurrences create drafts on confirmation; nothing is emailed or posted automatically.",
+    "sourceHint": "Lines, prices, reference and the printed note are copied from the source invoice. Taxes are recalculated for each invoice date. Items, accounts, tax codes and the customer must remain active.",
+    "sourcesLimit": "The 100 most recent posted invoices are offered. Use an older invoice’s button to select it directly.",
+    "noSources": "Post an invoice first to provide an immutable template.",
+    "source": "Source invoice",
+    "choose": "Choose",
+    "name": "Schedule name (internal)",
+    "start": "First invoice date",
+    "end": "Last invoice date included (optional)",
+    "interval": "Frequency",
+    "anchor": "Day of month (1 to 31)",
+    "anchorHint": "Months without this day use their last day. The chosen day is preserved for later months. The first date must match this day and follow the source invoice.",
+    "term": "Payment terms in days (0 to 365)",
+    "immutableHint": "The calendar and source invoice are fixed. Cancel this schedule and create another to change them. The end date limits invoice dates, not payment due dates.",
+    "confirm": "I confirm this operation.",
+    "search": "Schedule, customer or source number",
+    "dueOnly": "Due occurrences only",
+    "filter": "Filter",
+    "empty": "No recurring schedules found.",
+    "next": "Next invoice date",
+    "completed": "No further occurrences",
+    "pagination": "Recurring schedule pages",
+    "previous": "Previous",
+    "nextPage": "Next",
+    "saved": "Schedule status saved.",
+    "cancelHint": "Cancellation is permanent. Existing drafts and occurrence history are retained.",
+    "pauseHint": "Pausing does not advance the calendar. Overdue occurrences must still be processed one at a time after resuming.",
+    "pause": "Pause schedule",
+    "resume": "Resume schedule",
+    "cancel": "Cancel schedule",
+    "due": "Occurrence ready to prepare",
+    "generate": "Generate next draft",
+    "generateHint": "One occurrence is created at a time. Review the draft and its taxes before posting. Repeated attempts for this date open the same draft.",
+    "history": "Occurrence history",
+    "historyLimit": "The 50 most recent occurrences are shown.",
+    "noHistory": "No occurrences generated.",
+    "deleted": "Draft deleted — occurrence retained",
+    "generated": "Invoice created",
+    "draft": "Open draft",
+    "noEnd": "No end date",
+    "sourceUnavailable": "The source invoice is voided or unavailable. No further drafts can be generated; cancel this schedule if appropriate.",
+    "customerLocked": "The customer must remain the source invoice’s customer.",
+    "origin": "Source recurring schedule",
+    "deleteHint": "Deleting this draft preserves its occurrence in the history. This date will not be regenerated.",
+    "intervals": {
+      "1": "Monthly",
+      "3": "Quarterly",
+      "12": "Yearly"
+    },
+    "statuses": {
+      "ACTIVE": "Active",
+      "PAUSED": "Paused",
+      "CANCELLED": "Cancelled",
+      "COMPLETED": "Completed"
     }
   }
 }
