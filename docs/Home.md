@@ -1,3 +1,5 @@
+![Allumi — Votre comptabilité. Vos données.](images/allumi-banner.png)
+
 # Allumi — Wiki
 
 Allumi est un logiciel de comptabilité **open source** (MIT) et **auto-hébergeable** pour les PME et travailleurs autonomes du Québec et du Canada. Français par défaut, anglais disponible.
