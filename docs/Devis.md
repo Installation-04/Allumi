@@ -26,7 +26,7 @@ Un devis brouillon, remis ou accepté peut être annulé sans écriture comptabl
 
 Sur un devis accepté, ouvrez **Créer la facture brouillon**, choisissez la date de facture et son échéance, puis confirmez. Les lignes, prix et client sont repris; les taxes sont recalculées à la date de facture choisie. Une modification de taux entre les deux dates peut donc changer le total. L’arrondi du devis est conservé même si le réglage de l’entreprise a changé.
 
-Vérifiez le brouillon obtenu avant de le [[Validation-des-factures|valider]]. La conversion seule ne comptabilise rien. Les notes internes restent sur le devis et ne sont pas copiées dans la note imprimable de la facture. Les conditions commerciales restent consultables sur le devis source; elles ne deviennent pas automatiquement une note de facture. La facture conserve le client du devis; le brouillon propose un lien **Devis source**.
+Vérifiez le brouillon obtenu avant de valider la facture; consultez [[Validation-des-factures]]. La conversion seule ne comptabilise rien. Les notes internes restent sur le devis et ne sont pas copiées dans la note imprimable de la facture. Les conditions commerciales restent consultables sur le devis source; elles ne deviennent pas automatiquement une note de facture. La facture conserve le client du devis; le brouillon propose un lien **Devis source**.
 
 Deux tentatives concurrentes ouvrent la même facture. Si vous supprimez la facture tant qu’elle est brouillon, le devis redevient accepté et peut être converti à nouveau. Une facture validée reste liée au devis, même si elle est ensuite contre-passée : les corrections suivent les règles habituelles de [[Annulation-des-factures]].
 
