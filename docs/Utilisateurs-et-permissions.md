@@ -62,3 +62,9 @@ Après un changement de permissions, recharger la page actualise les menus. Un e
 **Catalogue en écriture** permet de créer, modifier et archiver les produits/services. Les champs de base restent modifiables sans accès à la Comptabilité ou aux Taxes; leurs références existantes sont conservées. Changer ou retirer un compte exige **Comptabilité en lecture**; changer ou retirer un code fiscal exige **Taxes en lecture**. Un droit d’écriture fiscale n’est pas requis pour gérer un produit.
 
 [[Sources-fiscales-officielles]] exige **Taxes en lecture** pour consulter les taux. La création de nouvelles taxes et d’un code importé exige **Taxes en écriture** et **Comptabilité en lecture**, avec choix des comptes et confirmation. Elle ne donne aucun droit supplémentaire sur les ventes, le catalogue ou le serveur.
+
+## Devis
+
+Ventes en lecture permet le suivi et l’impression des [[Devis]], y compris les coordonnées figées à leur remise. Préparer, modifier, remettre ou convertir exige Ventes en écriture, Contacts/Comptabilité/Taxes en lecture et Catalogue en lecture si un article est utilisé. L’écriture Comptabilité n’est pas requise pour le seul devis ou la création de sa facture brouillon. Réponses et annulations exigent Ventes en écriture. Le client d’une facture liée reste protégé en service et en SQL.
+
+La lecture des factures avec Ventes reste possible si les répertoires Contacts ou Taxes sont masqués : les données actuelles du contact ne sont pas complétées, et les libellés fiscaux non accessibles sont remplacés par « Taxe ». Les montants portés par la pièce restent visibles selon son droit financier.

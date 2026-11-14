@@ -389,3 +389,15 @@ Voir [[Avoirs-disponibles-et-remboursements]] et [[Releve-de-compte-client]]. Ce
 ![Remboursements en anglais sombre](images/historique-remboursements-en-dark-desktop.png)
 
 ![Filtres sur téléphone](images/historique-encaissements-mobile.png)
+
+## Devis
+
+Cycle commercial sur données fictives : [[Devis]]. Remise et réponse manuelles, impression sans notes internes, conversion en facture brouillon.
+
+![Devis accepté](images/devis-accepte-desktop.png)
+
+![Devis sur téléphone](images/devis-accepte-mobile.png)
+
+![PDF du devis](images/devis-impression-desktop.png)
+
+![PDF en anglais sombre sur téléphone](images/devis-en-dark-mobile.png)

@@ -25,10 +25,10 @@ Voir aussi [[Architecture]], [[Regles-comptables]], [[Plan-de-tests]].
 | Grand livre | `account`, `journal_entry`, `journal_line` |
 | Contacts | `contact`, `item` |
 | Taxes | `tax`, `tax_rate`, `tax_code`, `tax_code_component`, `tax_return` |
-| Ventes | `sales_document`, `sales_document_line`, `sales_document_tax`, `sales_credit_application`, `invoice_email` |
+| Ventes | `sales_document`, `sales_document_line`, `sales_document_tax`, `sales_credit_application`, `invoice_email`, `sales_estimate`, `sales_estimate_line`, `sales_estimate_counter` |
 | Achats | `purchase_document`, `purchase_document_line`, `purchase_document_tax`, `purchase_credit_application` |
 | Paiements | `payment`, `payment_allocation`, `payment_offset`, `bank_deposit`, `bank_deposit_item` |
-| Banque | `bank_account_profile`, `bank_import`, `bank_transaction`, `bank_match`, `bank_reconciliation`, `reconciled_line` |
+| Banque | `bank_account_profile`, `bank_import`, `bank_transaction`, `bank_rule`, `bank_match`, `bank_reconciliation`, `reconciled_line` |
 | Intégrations | `integration_connection`, `integration_credential`, `payment_link`, `online_payment` |
 | Pièces jointes | `attachment`, `attachment_link` |
 | Audit | `audit_log` |
@@ -4549,3 +4549,16 @@ La nouvelle fonction `customer_refund_posting_exact()` est `SECURITY INVOKER` et
 Pour une écriture originale de paiement SENT/RECEIVABLE, le contrôle exige un compte de paiement BANK ou CASH et exactement deux lignes : crédit du compte de paiement égal au montant du remboursement, sans contact ni taxe; débit du compte système ACCOUNTS_RECEIVABLE du même montant, associé au contact du paiement, sans taxe. Toute ligne supplémentaire ou répartition différente est refusée avec AL006. Le trigger sur les lignes couvre aussi l’ajout d’une ligne après une exécution anticipée des contraintes avec `SET CONSTRAINTS ... IMMEDIATE`. Ce contrôle concerne les remboursements clients sur encaissement comme ceux sur avoir.
 
 La migration n’analyse ni ne réécrit les paiements historiques. Les contrôles exacts sont déclenchés par de nouvelles insertions de paiements ou de lignes, pas par la modification d’un en-tête lors de son annulation : une ancienne écriture originale n’est donc pas soumise rétroactivement au nouveau format à deux lignes pour être annulée. Les écritures de contre-passation restent soumises aux règles existantes de miroir exact de l’écriture originale; elles ne sont pas traitées comme de nouveaux remboursements par ces triggers.
+
+
+## Devis commerciaux
+
+La migration `20261114000000_sales_estimates` ajoute trois tables auditées avec RLS forcée et politiques restrictives du module Ventes :
+
+- `sales_estimate` : identité UUID, client de la même entreprise, dates de proposition/validité, statut texte contrôlé, référence, note interne, conditions publiques, locale, arrondi, totaux BIGINT, résumé fiscal JSON, instantanés émetteur/client et dates de remise/réponse/conversion. Unicités `(company_id, id)`, `(company_id, number)` et `(company_id, converted_invoice_id)`.
+- `sales_estimate_line` : lignes numérotées 1–50, quantité NUMERIC(19,4), prix NUMERIC(19,6), montant BIGINT, références composites au devis, à l’article optionnel, au compte REVENUE et au code fiscal. Les taux par ligne sont conservés dans un JSON contrôlé.
+- `sales_estimate_counter` : compteur dédié à Ventes, initialisé paresseusement à 1, préfixe `DEV-`, cinq positions minimales. Une opération l’avance exactement d’une unité; suppression et remise à zéro interdites à l’application.
+
+`sales_estimate_guard` impose le départ en brouillon, la date non future, les transitions, la validité à la remise/acceptation, les instantanés à la remise et l’immutabilité du contenu remis. `sales_estimate_line_guard` interdit toute modification des lignes remises. Les triggers différés `sales_estimate_totals` et `sales_estimate_line_totals` valident les références actives, les taux datés et les montants selon l’arrondi; les transitions d’une pièce figée conservent ses montants historiques. Toutes les fonctions opèrent sous les droits de l’appelant, avec recherche SQL fixée et sans EXECUTE public.
+
+La conversion verrouille le devis et crée un `sales_document` de type INVOICE et statut DRAFT. Une clé composite unique conserve le lien. Le contrôle de conversion compare le client, l’arrondi et chaque ligne; la date de facture ne précède pas celle du devis. `estimate_invoice_contact_guard` protège le client de la facture liée. Le service de suppression d’une facture brouillon délie atomiquement le devis en le rendant accepté, avant de supprimer la facture; le contrôle différé refuse une simple dissociation laissant la facture en place. Aucun devis n’a de lien direct vers le journal et aucune écriture n’est créée avant la validation normale de la facture.

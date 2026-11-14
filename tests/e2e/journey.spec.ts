@@ -3200,3 +3200,40 @@ async function paymentHistoryJourney(page: Page) {
  await page.getByRole("button",{name:"English",exact:true}).click();await expect(page.getByRole("heading",{name:"Customer refunds",exact:true})).toBeVisible();await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");await expect(page.locator("html")).toHaveAttribute("data-theme","dark");await expectNoPageOverflow(page);await captureReference(page,"historique-remboursements-en-dark","Customer refunds");
  await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await expect(page.locator("html")).toHaveAttribute("data-theme","light");await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.getByRole("heading",{name:"Remboursements clients",exact:true})).toBeVisible();
 }
+
+test("estimate delivery, acceptance, private PDF and idempotent draft invoice conversion", async ({ page }) => {
+ test.setTimeout(120_000);cspViolations.length=0;watchCsp(page.context());await page.context().addCookies(updateCookies);await page.goto("/");
+ if(!/^\/c\/[0-9a-f-]{36}/.test(new URL(page.url()).pathname))await page.getByRole("link",{name:"Atelier Exemple inc.",exact:true}).click();
+ const company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0];expect(company).toBeTruthy();
+ await page.goto(`${company}/devis`);await page.getByRole("link",{name:"Nouveau devis",exact:true}).click();
+ await page.getByLabel("Client",{exact:true}).selectOption({label:"Atelier Boréal"});
+ await page.getByLabel("Référence",{exact:true}).fill("EST-E2E");
+ await page.getByLabel("Valide jusqu’au",{exact:true}).fill("2999-01-01");
+ await page.getByLabel("Description",{exact:true}).fill("Entretien annuel");await page.getByLabel("Prix unitaire (CAD)",{exact:true}).fill("100");
+ for(const [label,code] of [["Compte de revenus","4000"],["Code de taxe","TPS+TVQ"]]) {
+  const field=page.getByLabel(label!);await expect(field).toBeVisible();const options=await field.locator("option").allTextContents();const option=options.find(text=>text.startsWith(code!));expect(option,`Estimate ${label}`).toBeTruthy();await field.selectOption({label:option!});
+ }
+ await page.getByLabel("Note interne — non imprimée",{exact:true}).fill("EST-PRIVATE-NOTE");await page.getByLabel("Conditions — imprimées sur le devis",{exact:true}).fill("Paiement à la livraison");
+ await expectNoPageOverflow(page);await page.getByRole("button",{name:"Enregistrer le brouillon",exact:true}).click();await expect(page).toHaveURL(/\/devis\/[0-9a-f-]{36}$/);
+ const quoteUrl=page.url();
+ await page.locator("summary").filter({hasText:"Marquer comme remis"}).click();const delivery=page.locator("details").filter({has:page.getByText("Marquer comme remis",{exact:true})});await delivery.getByRole("checkbox").check();await delivery.getByRole("button",{name:"Marquer comme remis",exact:true}).click();
+ await expect(page.getByRole("heading",{name:"DEV-00001",exact:true})).toBeVisible();
+ await page.locator("summary").filter({hasText:"Consigner une acceptation"}).click();const acceptance=page.locator("details").filter({has:page.getByRole("button",{name:"Consigner une acceptation",exact:true})});await acceptance.getByLabel("Note interne sur la réponse",{exact:true}).fill("EST-PRIVATE-RESPONSE");await acceptance.getByRole("checkbox").check();await acceptance.getByRole("button",{name:"Consigner une acceptation",exact:true}).click();
+ await expect(page.getByText("Accepté",{exact:true})).toBeVisible();await page.getByRole("link",{name:"Copier en nouveau devis",exact:true}).click();await expect(page.getByLabel("Conditions — imprimées sur le devis",{exact:true})).toHaveValue("Paiement à la livraison");await expect(page.getByLabel("Description",{exact:true})).toHaveValue("Entretien annuel");await page.goto(quoteUrl);await expectNoPageOverflow(page);await captureReference(page,"devis-accepte","DEV-00001");
+ await page.getByRole("link",{name:"Imprimer / PDF",exact:true}).click();const paper=page.locator(".invoice-paper");await expect(paper).toContainText("Paiement à la livraison");await expect(paper).not.toContainText("EST-PRIVATE");const printResponse=await page.request.get(page.url());expect((await printResponse.text()).includes("EST-PRIVATE")).toBe(false);await expectNoPageOverflow(page);await captureReference(page,"devis-impression","Devis DEV-00001");
+ await page.getByRole("button",{name:"English",exact:true}).click();await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");await expect(paper.getByRole("heading",{name:"Estimate DEV-00001",exact:true})).toBeVisible();await expect(paper).not.toContainText("EST-PRIVATE");
+ const headerContrast=()=>paper.locator("thead").evaluate(element=>{
+  const style=getComputedStyle(element),canvas=document.createElement("canvas");canvas.width=canvas.height=1;const context=canvas.getContext("2d")!;
+  const luminance=(color:string)=>{context.fillStyle=color;context.fillRect(0,0,1,1);const rgb=context.getImageData(0,0,1,1).data;return [0.2126,0.7152,0.0722].reduce((sum,weight,index)=>{const channel=rgb[index]!/255;return sum+weight*(channel<=0.04045?channel/12.92:((channel+0.055)/1.055)**2.4);},0);};
+  const a=luminance(style.color),b=luminance(style.backgroundColor);return (Math.max(a,b)+0.05)/(Math.min(a,b)+0.05);
+ });
+ await expect.poll(headerContrast).toBeGreaterThanOrEqual(4.5);await expectNoPageOverflow(page);await captureReference(page,"devis-en-dark","Estimate DEV-00001");
+ await page.emulateMedia({media:"print"});await expect(page.locator(".print-controls")).toBeHidden();await expect(page.locator(".workspace-header")).toBeHidden();await expect(paper).toBeVisible();await expect.poll(headerContrast).toBeGreaterThanOrEqual(4.5);await page.emulateMedia({media:"screen"});
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await page.getByRole("button",{name:"Français",exact:true}).click();await page.goto(quoteUrl);
+ await page.locator("summary").filter({hasText:"Créer la facture brouillon"}).click();const conversion=page.locator("details").filter({has:page.getByRole("button",{name:"Créer la facture brouillon",exact:true})});await conversion.getByRole("checkbox").check();await conversion.getByRole("button",{name:"Créer la facture brouillon",exact:true}).click();await expect(page).toHaveURL(/\/factures\/[0-9a-f-]{36}$/);await expect(page.getByRole("link",{name:/Devis source.*DEV-00001/})).toBeVisible();
+ const invoiceUrl=page.url();await page.goto(quoteUrl);await page.getByRole("link",{name:"Voir la facture liée",exact:true}).click();await expect(page).toHaveURL(invoiceUrl);
+ const db=new pg.Client({connectionString:e2eUrls().owner});await db.connect();try{const id=quoteUrl.split("/").pop();const rows=await db.query("SELECT e.status,e.converted_invoice_id,d.status AS invoice_status,d.journal_entry_id FROM sales_estimate e JOIN sales_document d ON d.company_id=e.company_id AND d.id=e.converted_invoice_id WHERE e.company_id=$1 AND e.id=$2",[company!.split("/")[2],id]);expect(rows.rows).toHaveLength(1);expect(rows.rows[0]).toMatchObject({status:"CONVERTED",invoice_status:"DRAFT",journal_entry_id:null});}finally{await db.end();}
+ await page.goto(`${company}/recherche?type=ESTIMATE&q=EST-E2E`);await expect(page.locator(".workspace-content").getByRole("link",{name:"DEV-00001",exact:true})).toBeVisible();
+ for(const suffix of ["?statut=BAD","?q=a&q=b","?q=%00","?page=0","?page=1001"])expect((await page.request.get(`${company}/devis${suffix}`)).status()).toBe(404);
+ expect(cspViolations).toEqual([]);
+});

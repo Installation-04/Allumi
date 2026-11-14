@@ -1,8 +1,8 @@
 import { isValidIsoDate, parseMoney, type Locale } from "@/modules/ledger/client";
 
-export const SEARCH_KINDS = ["CONTACT", "ITEM", "INVOICE", "CREDIT_NOTE", "BILL", "SUPPLIER_CREDIT", "EXPENSE", "RECEIPT", "REFUND", "DISBURSEMENT", "SUPPLIER_REFUND"] as const;
+export const SEARCH_KINDS = ["CONTACT", "ITEM", "ESTIMATE", "INVOICE", "CREDIT_NOTE", "BILL", "SUPPLIER_CREDIT", "EXPENSE", "RECEIPT", "REFUND", "DISBURSEMENT", "SUPPLIER_REFUND"] as const;
 export type SearchKind = (typeof SEARCH_KINDS)[number];
-export const SEARCH_STATUSES = ["DRAFT", "POSTED", "VOID", "ACTIVE", "ARCHIVED"] as const;
+export const SEARCH_STATUSES = ["DRAFT", "SENT", "ACCEPTED", "DECLINED", "CANCELLED", "CONVERTED", "POSTED", "VOID", "ACTIVE", "ARCHIVED"] as const;
 export type SearchStatus = (typeof SEARCH_STATUSES)[number];
 export const SEARCH_PAGE_SIZE = 50;
 export const SEARCH_MAX_PAGE = 100;

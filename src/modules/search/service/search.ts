@@ -37,6 +37,12 @@ export async function searchCompany(actor: CompanyContext, params: Record<string
         LEFT JOIN contact c ON a.contacts AND c.company_id=d.company_id AND c.id=d.contact_id
         WHERE d.company_id=${actor.companyId}::uuid AND a.sales
         UNION ALL
+        SELECT e.id,'ESTIMATE',e.number,coalesce(e.customer_snapshot->>'name',CASE WHEN a.contacts THEN c.display_name END),e.issue_date,e.total_cents,e.status,
+          concat_ws(' ',e.number,e.reference,e.customer_snapshot->>'name',CASE WHEN a.contacts THEN c.display_name END),NULL::uuid
+        FROM sales_estimate e CROSS JOIN access a
+        LEFT JOIN contact c ON a.contacts AND c.company_id=e.company_id AND c.id=e.contact_id
+        WHERE e.company_id=${actor.companyId}::uuid AND a.sales
+        UNION ALL
         SELECT d.id,d.kind::text,d.number,
           coalesce(d.supplier_snapshot->>'name',d.payee_name,CASE WHEN a.contacts THEN c.display_name END),d.document_date,d.total_cents,d.status::text,
           concat_ws(' ',d.number,d.supplier_reference,d.supplier_snapshot->>'name',d.payee_name,CASE WHEN a.contacts THEN c.display_name END),d.journal_entry_id
@@ -63,6 +69,7 @@ export async function searchCompany(actor: CompanyContext, params: Record<string
     const mapped = rows.slice(0, SEARCH_PAGE_SIZE).map((row): SearchRow => {
       const draft = row.status === "DRAFT";
       const route = row.kind === "CONTACT" ? `contacts/${row.id}` : row.kind === "ITEM" ? `catalogue/${row.id}`
+        : row.kind === "ESTIMATE" ? `devis/${row.id}`
         : row.kind === "INVOICE" ? `factures/${draft ? "" : "validees/"}${row.id}`
         : row.kind === "CREDIT_NOTE" ? `avoirs/${draft ? "" : "valides/"}${row.id}`
         : row.kind === "BILL" ? `achats/${draft ? "" : "validees/"}${row.id}`

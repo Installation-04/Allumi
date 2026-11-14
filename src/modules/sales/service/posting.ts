@@ -58,6 +58,9 @@ export async function listInvoices(actor: CompanyContext) {
 export async function getInvoice(actor: CompanyContext, id: string) {
   return withCompany(actor, async tx => {
     await requireRole(tx, "sales.read");
-    return tx.salesDocument.findFirst({ where: { companyId: actor.companyId, id, kind: "INVOICE", status: { in: ["POSTED", "VOID"] } }, include: { voidEntry: { select: { entryDate: true } }, lines: { orderBy: { position: "asc" } }, taxes: { include: { tax: { select: { code: true } } } } } });
+    const invoice = await tx.salesDocument.findFirst({ where: { companyId: actor.companyId, id, kind: "INVOICE", status: { in: ["POSTED", "VOID"] } }, include: { voidEntry: { select: { entryDate: true } }, lines: { orderBy: { position: "asc" } }, taxes: true } });
+    if (!invoice) return null;
+    const taxes = await tx.tax.findMany({ where: { companyId: actor.companyId, id: { in: invoice.taxes.map(t => t.taxId) } }, select: { id: true, code: true } });
+    return { ...invoice, taxes: invoice.taxes.map(t => ({ ...t, tax: { code: taxes.find(tax => tax.id === t.taxId)?.code ?? "" } })) };
   });
 }
