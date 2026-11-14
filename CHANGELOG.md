@@ -4,6 +4,14 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.51] - 2026-11-13
+
+- Outillage : exclusion des résultats et rapports générés par Playwright du lint, pour éviter un parcours concurrent de leurs répertoires temporaires.
+
+- Recherche globale des données de l’entreprise depuis l’en-tête : contacts, catalogue et neuf types de pièces/paiements, références et montants exacts, filtres type/statut/date/montant, pagination bornée et liens directs. Isolation entreprise et permissions modulaires à chaque lecture, catalogue consultable sans droits fiscaux et conservation des montants lors du changement de langue; interfaces FR/EN, mobile et sombre documentées avec captures.
+
+- Relevé de compte fournisseur daté : soldes créditeurs exacts, factures/crédits/paiements et contre-passations, recherche bornée, pagination, CSV complet et impression/PDF navigateur. Permissions Comptabilité/Contacts, exclusion des comptes clients et notes internes, parcours FR/EN/mobile/sombre illustrés; aucune nouvelle écriture ni migration.
+
 ## [0.4.0-alpha.50] - 2026-11-13
 
 - Restauration : validation des chemins, types, doublons et répertoires de contrôle de l’archive interne des pièces jointes avant arrêt ou modification de la base; remplacement des anciens fichiers cachés et extraction sans réseau avec racine en lecture seule. Correction de l’appel Compose de création du proxy avant restauration de l’autorité; régressions et restauration HTTPS réelle en CI native AMD64/ARM64.

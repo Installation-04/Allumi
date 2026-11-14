@@ -22,7 +22,9 @@ Créez un article avec son nom, son code facultatif, son prix en dollars canadie
 
 La recherche porte sur le nom et le code. Jusqu’à 100 résultats sont affichés; précisez la recherche au besoin. Une fiche peut être modifiée, archivée ou restaurée. Cochez **Inclure les articles archivés** pour retrouver les fiches archivées.
 
-Les propriétaires et comptables peuvent modifier la configuration. Les lecteurs peuvent la consulter. Les accès sont isolés par entreprise et les mutations sont journalisées dans la [[Piste-d-audit]].
+La consultation du catalogue exige **Catalogue** en lecture, sans accès obligatoire aux taxes ou à la comptabilité. Les codes fiscaux associés sont détaillés uniquement avec **Taxes** en lecture. Les formulaires actuels de modification, qui associent aussi comptes et codes fiscaux, exigent **Catalogue** en écriture, **Taxes** en écriture et **Comptabilité** en lecture; les autres membres autorisés consultent la fiche en lecture seule.
+
+Les accès sont isolés par entreprise et les mutations sont journalisées dans la [[Piste-d-audit]]. Voir [[Utilisateurs-et-permissions]] et [[Recherche-globale]].
 
 ## Limites
 
@@ -41,3 +43,11 @@ Voir aussi [[Contacts]], [[Plan-comptable]] et [[Appearance-and-language]].
 ## Montants comptabilisés
 
 Le [[Sommaire-des-taxes]] présente les taxes des écritures validées sur une période, indépendamment des taux actuels, avec contrôle et détail. Ce rapport ne dépose pas de déclaration.
+
+## Sources fiscales externes
+
+La configuration des taxes et des codes reste manuelle dans cette version. Aucun taux ni catalogue de règles externes n’est synchronisé automatiquement.
+
+Les références publiques sont le [calculateur et les taux de l’ARC](https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html), le [jeu de données TPS/TVH de l’ARC](https://open.canada.ca/data/en/dataset/5584a2cf-12af-4b2d-aff5-418410cf5375) et les [règles de calcul de Revenu Québec](https://www.revenuquebec.ca/fr/entreprises/taxes/tpstvh-et-tvq/perception-de-la-tps-et-de-la-tvq/calcul-des-taxes/). Ces liens ouvrent les sources officielles; ils ne connectent pas votre entreprise à un fournisseur.
+
+Un taux provincial ne suffit pas à déterminer la taxation de chaque produit ou service. Les codes internes Allumi et les codes d’un catalogue externe sont des identifiants distincts; aucun rapprochement automatique n’est appliqué aux pièces existantes.

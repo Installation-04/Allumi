@@ -20,3 +20,6 @@ export * from "./domain/cash-movements";
 export { getCashMovements,CASH_PAGE_SIZE,CASH_EXPORT_LIMIT } from "./service/cash-movements";
 export * from "./domain/customer-statement";
 export { getCustomerStatement, getCustomerStatementExport, listStatementCustomers, CUSTOMER_STATEMENT_PAGE_SIZE, CUSTOMER_STATEMENT_EXPORT_LIMIT } from "./service/customer-statement";
+
+export * from "./domain/supplier-statement";
+export { getSupplierStatement, getSupplierStatementExport, listStatementSuppliers, SUPPLIER_STATEMENT_PAGE_SIZE, SUPPLIER_STATEMENT_EXPORT_LIMIT } from "./service/supplier-statement";

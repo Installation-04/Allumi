@@ -5,7 +5,7 @@ export const NAVIGATION_GROUPS = {
   banque: ["transactions", "depots", "rapprochement", "integrations"],
   comptabilite: ["comptes", "journal", "balance", "exercices"],
   tresorerie: ["flux-tresorerie"],
-  rapports: ["resultats", "bilan", "grand-livre", "releves-clients", "age-clients", "age-fournisseurs", "sommaire-taxes"],
+  rapports: ["resultats", "bilan", "grand-livre", "releves-clients", "releves-fournisseurs", "age-clients", "age-fournisseurs", "sommaire-taxes"],
 } as const;
 
 export function matchesNavigationPath(pathname: string, href: string): boolean {

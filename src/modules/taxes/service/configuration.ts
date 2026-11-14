@@ -6,8 +6,8 @@ import { todayIso } from "@/modules/ledger";
 import { codeSchema, itemSchema, rateSchema, taxSchema } from "../domain/schemas";
 import { percentageRate } from "../domain/calculation";
 
-async function transaction<T>(actor: CompanyContext, write: boolean, fn: (tx: Tx) => Promise<T>) {
-  try { return await withCompany(actor, async (tx) => { await requireRole(tx, write ? "taxes.manage" : "taxes.read"); return fn(tx); }); }
+async function transaction<T>(actor: CompanyContext, write: boolean, fn: (tx: Tx) => Promise<T>, catalogRead = false) {
+  try { return await withCompany(actor, async (tx) => { await requireRole(tx, catalogRead ? "catalog.read" : write ? "taxes.manage" : "taxes.read"); return fn(tx); }); }
   catch (error) { if (isConflict(error)) throw new AppError("catalog.conflict"); throw toAppError(error); }
 }
 export async function getTaxConfiguration(actor: CompanyContext) {
@@ -70,13 +70,13 @@ export async function listItems(actor: CompanyContext, q = "", includeInactive =
     const term = q.replace(/[\\%_]/g, "\\$&");
     const rows = await tx.item.findMany({ where: { companyId: actor.companyId, ...(includeInactive ? {} : { isActive: true }), ...(term ? { OR: [{ name: { contains: term, mode: "insensitive" as const } }, { code: { contains: term, mode: "insensitive" as const } }] } : {}) }, orderBy: [{ name: "asc" }, { id: "asc" }], take: 101 });
     return { truncated: rows.length > 100, items: rows.slice(0, 100).map((row) => ({ ...row, unitPrice: row.unitPrice?.toString() ?? "" })) };
-  });
+  }, true);
 }
 export async function getItem(actor: CompanyContext, id: string) {
   return transaction(actor, false, async (tx) => {
     const row = await tx.item.findFirst({ where: { id, companyId: actor.companyId } });
     return row ? { ...row, unitPrice: row.unitPrice?.toString() ?? "" } : null;
-  });
+  }, true);
 }
 export async function saveItem(actor: CompanyContext, input: unknown, id?: string) {
   const parsed = itemSchema.safeParse(input);

@@ -55,7 +55,7 @@ export default async function CompanyLayout({ children, params }: { children: Re
         <Link href="/compte/securite" className="hidden min-h-11 items-center gap-2 border-t border-white/15 px-5 py-4 text-sm text-stone-200 hover:bg-black/20 focus-visible:outline-2 focus-visible:outline-white lg:mt-auto lg:flex"><Icon name="audit" />{td("security")}</Link>
       </aside>
       <div className="min-w-0">
-        <Header companyName={company.name} />
+        <Header companyName={company.name} companyId={company.id} />
         <CompanyNav links={allLinks} groups={groups} label={t("sections")} tabs />
         <div className="workspace-content min-w-0 px-4 py-6 sm:px-6 lg:px-7">{children}</div>
       </div>

@@ -5,6 +5,18 @@ import { AREAS } from "@/app/c/[companyId]/sections";
 import type { AccessContext } from "@/modules/companies";
 
 describe("company navigation authorization", () => {
+  it("allows company search for directory-only members without granting financial routes",()=>{
+    const member:AccessContext={role:"USER",moduleAccess:{contacts:"read",sales:"none",accounting:"none",catalog:"none"}};
+    expect(canAccessRoute(member,"recherche")).toBe(true);expect(canAccessRoute(member,"factures")).toBe(false);expect(canAccessRoute(member,"journal")).toBe(false);
+  });
+  it("requires accounting and contacts, but not sales, for supplier statements", () => {
+    expect(canAccessRoute({role:"READ_ONLY",moduleAccess:{sales:"none"}},"releves-fournisseurs")).toBe(true);
+    for (const moduleAccess of [{accounting:"none"},{contacts:"none"}] as const) {
+      const member:AccessContext={role:"READ_ONLY",moduleAccess};
+      expect(canAccessRoute(member,"releves-fournisseurs")).toBe(false);
+      expect(visibleAreaRoutes(member,"rapports")).not.toContain("releves-fournisseurs");
+    }
+  });
   it("does not expose administrator shortcuts to accountants or readers", () => {
     for (const role of ["ACCOUNTANT", "READ_ONLY", "USER"] as const) {
       expect(visibleAreaRoutes({ role }, "banque")).toContain("transactions");

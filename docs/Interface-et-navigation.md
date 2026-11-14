@@ -60,3 +60,7 @@ Sur téléphone, les raccourcis du bas et le panneau Menu donnent accès à ces 
 ![Navigation contextuelle sur ordinateur](images/navigation-contextuelle-desktop.png)
 
 ![Navigation sur téléphone](images/navigation-contextuelle-mobile.png)
+
+## Rechercher dans les données
+
+Le champ de l’en-tête recherche les contacts, produits et pièces de l’entreprise avec des filtres par type, statut, date et montant. Il est distinct du filtre des sections dans le menu. Voir [[Recherche-globale]] pour le périmètre et les permissions.
