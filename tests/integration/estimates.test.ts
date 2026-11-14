@@ -74,6 +74,8 @@ it("converts once under concurrency into a reviewed draft, keeps customer and re
   expect(retry).toBe(id);
   const draft = (await getDraft(actor, id!))!;
   expect(draft.totalCents).toBe(q.totalCents);
+  expect(draft.memo).toBe("");
+  expect((await getEstimate(actor, q.id))?.memo).toBe("Privé");
   expect((await getEstimate(reader, q.id))?.convertedInvoiceId).toBe(id);
   expect((await db.query("SELECT count(*) AS n FROM journal_entry")).rows).toEqual(before);
   await expect(saveDraft(actor, { ...input, contactId: W.otherCustomer, revision: draft.revision }, id)).rejects.toThrow("estimates.customerLocked");

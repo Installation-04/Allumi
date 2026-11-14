@@ -110,7 +110,7 @@ export async function convertEstimate(actor: CompanyContext, id: string, revisio
     current(actual, revision);
     if (row.status !== "ACCEPTED" || issueDate < iso(row.issueDate)) throw new AppError("estimates.transition");
     await references(tx);
-    const invoiceId = await saveDraftWithin(tx, actor, { contactId: row.contactId, issueDate, dueDate, reference: row.reference ?? row.number ?? "", memo: row.memo ?? "", lines: row.lines.map(l => ({ itemId: l.itemId ?? "", description: l.description, quantity: l.quantity.toString(), unitPrice: l.unitPrice.toString(), accountId: l.accountId, taxCodeId: l.taxCodeId })) }, undefined, row.taxRounding);
+    const invoiceId = await saveDraftWithin(tx, actor, { contactId: row.contactId, issueDate, dueDate, reference: row.reference ?? row.number ?? "", memo: "", lines: row.lines.map(l => ({ itemId: l.itemId ?? "", description: l.description, quantity: l.quantity.toString(), unitPrice: l.unitPrice.toString(), accountId: l.accountId, taxCodeId: l.taxCodeId })) }, undefined, row.taxRounding);
     await tx.salesEstimate.update({ where: { companyId: actor.companyId, id }, data: { status: "CONVERTED", convertedInvoiceId: invoiceId, convertedAt: new Date() } });
     await tx.$executeRaw`SET CONSTRAINTS ALL IMMEDIATE`;
     return invoiceId;
