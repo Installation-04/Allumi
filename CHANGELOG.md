@@ -4,6 +4,10 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.54] - 2026-11-14
+
+- Devis commerciaux : brouillons, remise manuelle numérotée, acceptation/refus, annulation, copie et impression privée sans notes internes. Conversion concurrente vers une facture brouillon avec recalcul fiscal daté, client protégé et reprise après suppression du brouillon. Droits modulaires, audit et invariants SQL; recherche globale, écrans FR/EN/mobile/sombre et guide illustré. Les notes internes du devis ne sont pas copiées dans la facture. Contraste des tableaux imprimables corrigé en thème sombre. Consultation des factures conservée avec les droits Ventes lorsque les répertoires Contacts ou Taxes sont masqués.
+
 ## [0.4.0-alpha.52] - 2026-11-14
 
 - Connexions officielles ARC et Revenu Québec : consultation TPS/TVH par province et date, TVQ historique, création confirmée d’un code fiscal et de ses taux avec comptes choisis, provenance et empreintes en audit. Contrôle du schéma, des changements depuis l’aperçu, des droits et de l’atomicité; aucune modification des pièces validées. Parcours FR/EN/mobile/sombre documentés.

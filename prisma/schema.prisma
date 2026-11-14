@@ -454,6 +454,8 @@ model Company {
   taxReturns             TaxReturn[]
   attachments            Attachment[]
   auditLogs              AuditLog[]
+  salesEstimates         SalesEstimate[]
+  estimateCounter        SalesEstimateCounter?
 
   @@map("company")
 }
@@ -586,11 +588,12 @@ model Account {
   bankProfile            BankAccountProfile?
   bankImports            BankImport[]
   bankTransactions       BankTransaction[]
-  sourceBankRules        BankRule[] @relation("RuleSource")
-  targetBankRules        BankRule[] @relation("RuleTarget")
+  sourceBankRules        BankRule[]              @relation("RuleSource")
+  targetBankRules        BankRule[]              @relation("RuleTarget")
   integrationConnections IntegrationConnection[] @relation("ConnectionAccount")
   feeConnections         IntegrationConnection[] @relation("ConnectionFeeAccount")
   reconciliations        BankReconciliation[]
+  estimateLines          SalesEstimateLine[]
 
   @@unique([companyId, id])
   @@unique([companyId, code])
@@ -717,6 +720,7 @@ model Contact {
   purchaseDocuments PurchaseDocument[]
   payments          Payment[]
   attachmentLinks   AttachmentLink[]
+  salesEstimates    SalesEstimate[]
 
   @@unique([companyId, id])
   @@index([companyId, displayName])
@@ -744,6 +748,7 @@ model Item {
 
   salesLines    SalesDocumentLine[]
   purchaseLines PurchaseDocumentLine[]
+  estimateLines SalesEstimateLine[]
 
   @@unique([companyId, id])
   @@unique([companyId, code])
@@ -818,6 +823,7 @@ model TaxCode {
   items         Item[]                 @relation("ItemDefaultTaxCode")
   salesLines    SalesDocumentLine[]
   purchaseLines PurchaseDocumentLine[]
+  estimateLines SalesEstimateLine[]
 
   @@unique([companyId, id])
   @@unique([companyId, code])
@@ -895,7 +901,9 @@ model SalesDocument {
   creditsReceived SalesCreditApplication[] @relation("InvoiceCredited")
   attachmentLinks AttachmentLink[]
 
-  emails InvoiceEmail[]
+  emails         InvoiceEmail[]
+  sourceEstimate SalesEstimate? @relation("EstimateInvoice")
+
   @@unique([companyId, id])
   @@unique([companyId, kind, number])
   @@unique([companyId, journalEntryId])
@@ -1674,4 +1682,78 @@ model BankRule {
   targetAccount Account @relation("RuleTarget",fields:[companyId,targetAccountId],references:[companyId,id],onDelete:Restrict)
   @@index([companyId,enabled,priority,id])
   @@map("bank_rule")
+}
+
+// Commercial proposals; accounting starts only when their converted invoice is posted.
+model SalesEstimateCounter {
+  companyId String  @id @map("company_id") @db.Uuid
+  nextValue BigInt  @default(1) @map("next_value")
+  prefix    String  @default("DEV-")
+  padding   Int     @default(5)
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict)
+
+  @@map("sales_estimate_counter")
+}
+
+model SalesEstimate {
+  id                 String              @id @default(uuid(7)) @db.Uuid
+  companyId          String              @map("company_id") @db.Uuid
+  contactId          String              @map("contact_id") @db.Uuid
+  status             String              @default("DRAFT")
+  number             String?
+  issueDate          DateTime            @map("issue_date") @db.Date
+  validUntil         DateTime            @map("valid_until") @db.Date
+  reference          String?
+  memo               String?
+  terms              String?
+  locale             AppLocale           @default(fr_CA)
+  taxRounding        TaxRounding         @map("tax_rounding")
+  subtotalCents      BigInt              @map("subtotal_cents")
+  taxTotalCents      BigInt              @map("tax_total_cents")
+  totalCents         BigInt              @map("total_cents")
+  taxSummary         Json                @map("tax_summary")
+  customerSnapshot   Json?               @map("customer_snapshot")
+  issuerSnapshot     Json?               @map("issuer_snapshot")
+  issuedAt           DateTime?           @map("issued_at") @db.Timestamptz(6)
+  respondedAt        DateTime?           @map("responded_at") @db.Timestamptz(6)
+  decisionNote       String?             @map("decision_note")
+  convertedInvoiceId String?             @map("converted_invoice_id") @db.Uuid
+  convertedAt        DateTime?           @map("converted_at") @db.Timestamptz(6)
+  createdById        String              @map("created_by_id") @db.Uuid
+  createdAt          DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+  company            Company             @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  contact            Contact             @relation(fields: [companyId, contactId], references: [companyId, id], onDelete: Restrict, map: "sales_estimate_contact_fkey")
+  convertedInvoice   SalesDocument?      @relation("EstimateInvoice", fields: [companyId, convertedInvoiceId], references: [companyId, id], onDelete: Restrict, map: "sales_estimate_invoice_fkey")
+  lines              SalesEstimateLine[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, number])
+  @@unique([companyId, convertedInvoiceId])
+  @@index([companyId, status, issueDate])
+  @@index([companyId, contactId])
+  @@map("sales_estimate")
+}
+
+model SalesEstimateLine {
+  id          String        @id @default(uuid(7)) @db.Uuid
+  companyId   String        @map("company_id") @db.Uuid
+  estimateId  String        @map("estimate_id") @db.Uuid
+  position    Int           @db.SmallInt
+  itemId      String?       @map("item_id") @db.Uuid
+  description String
+  quantity    Decimal       @db.Decimal(19, 4)
+  unitPrice   Decimal       @map("unit_price") @db.Decimal(19, 6)
+  amountCents BigInt        @map("amount_cents")
+  accountId   String        @map("account_id") @db.Uuid
+  taxCodeId   String        @map("tax_code_id") @db.Uuid
+  taxes       Json
+  estimate    SalesEstimate @relation(fields: [companyId, estimateId], references: [companyId, id], onDelete: Cascade, map: "sales_estimate_line_estimate_fkey")
+  item        Item?         @relation(fields: [companyId, itemId], references: [companyId, id], onDelete: Restrict, map: "sales_estimate_line_item_fkey")
+  account     Account       @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict, map: "sales_estimate_line_account_fkey")
+  taxCode     TaxCode       @relation(fields: [companyId, taxCodeId], references: [companyId, id], onDelete: Restrict, map: "sales_estimate_line_tax_code_fkey")
+
+  @@unique([companyId, estimateId, position])
+  @@index([companyId, accountId])
+  @@map("sales_estimate_line")
 }

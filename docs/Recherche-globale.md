@@ -4,7 +4,7 @@ Le champ **Rechercher dans l’entreprise** de l’en-tête ouvre une recherche 
 
 ## Retrouver une pièce
 
-Saisissez un numéro Allumi, une référence, un nom, un montant exact ou une date au format **AAAA-MM-JJ**, puis **Rechercher**. Les résultats couvrent les contacts, les produits et services, les factures et avoirs clients, les factures et crédits fournisseurs, les dépenses, les encaissements, les décaissements et les remboursements.
+Saisissez un numéro Allumi, une référence, un nom, un montant exact ou une date au format **AAAA-MM-JJ**, puis **Rechercher**. Les résultats couvrent les contacts, les produits et services, les devis, les factures et avoirs clients, les factures et crédits fournisseurs, les dépenses, les encaissements, les décaissements et les remboursements.
 
 Exemples : `F-00001`, une référence fournisseur comme `FOUR-2026-001`, `Atelier Boréal`, `123,45` ou `2026-07-15`. Un terme numérique recherche à la fois son texte et le montant exact correspondant; les dates recherchent la date du document ou du paiement. Les caractères `%`, `_` et `\` sont recherchés littéralement.
 
@@ -17,11 +17,11 @@ Le lien d’un résultat ouvre sa fiche ou sa pièce, en conservant la distincti
 Dépliez **Filtres avancés** pour choisir le type, le statut, les dates et le montant. Après une recherche, ces champs sont repliés pour laisser les résultats visibles sur téléphone; le nombre de critères avancés actifs reste indiqué. Dépliez-les à nouveau pour les modifier.
 
 - **Type** : limiter les résultats à une catégorie.
-- **Statut** : Brouillon, Validé, Annulé, Actif ou Archivé, selon le type d’enregistrement.
+- **Statut** : Brouillon, Remis, Accepté, Refusé, Annulé, Converti, Validé, Actif ou Archivé, selon le type d’enregistrement.
 - **Du / Au** : bornes inclusives sur la date du document ou du paiement; chaque borne est facultative.
 - **Montant exact (CAD)** : total du document ou montant du paiement, calculé en cents exacts. Les formats canadiens français et anglais sont acceptés (`123,45` ou `123.45`, avec groupements valides). Changer de langue conserve le montant exact. Zéro est accepté. Les montants sont positifs; le type précise s’il s’agit d’un crédit ou d’un remboursement.
 
-Les filtres se combinent entre eux et avec le terme recherché. Les dates et montants excluent les contacts et produits, qui n’ont pas de date de pièce ou de total comparable. Le filtre « Annulé » décrit un document contre-passé; il ne signifie pas « impayé ».
+Les filtres se combinent entre eux et avec le terme recherché. Les dates et montants excluent les contacts et produits, qui n’ont pas de date de pièce ou de total comparable. Le statut d’un devis annulé reste distinct d’une facture contre-passée. Aucun de ces statuts ne signifie « impayé ».
 
 Les résultats sont classés par date décroissante, puis type et identifiant stable. Chaque page contient jusqu’à 50 résultats; les liens **Précédent / Suivant** conservent les filtres. Au-delà de 5 000 résultats, précisez les critères. Une recherche sans terme et sans filtre n’énumère pas toutes les données. **Effacer les filtres** revient à cet état initial.
 

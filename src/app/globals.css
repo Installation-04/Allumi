@@ -108,10 +108,22 @@ main:has(> .company-workspace) { max-width: none; padding: 0; }
   .company-workspace { @variant dark { background: linear-gradient(to right, #34373b 208px, var(--color-stone-950) 208px); } }
 }
 
+/* Printable sales documents keep a light sheet even inside the dark workspace. */
+.workspace-content .invoice-print .invoice-paper thead {
+  background: var(--color-stone-100);
+  color: var(--color-stone-900);
+}
+.workspace-content .invoice-print .invoice-paper tbody tr:hover {
+  background: var(--color-brand-50);
+  color: var(--color-stone-900);
+}
+
 @media print {
+  html:has(.invoice-print) { color-scheme: light !important; }
   body:has(.invoice-print) { background: white !important; color: black !important; padding: 0 !important; }
   body:has(.invoice-print) .workspace-sidebar,
   body:has(.invoice-print) .workspace-header,
+  body:has(.invoice-print) .global-header,
   body:has(.invoice-print) nav,
   body:has(.invoice-print) footer,
   .print-controls { display: none !important; }

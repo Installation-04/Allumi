@@ -379,7 +379,12 @@
     "create": "Create"
   },
   "errors": {
-    "officialTaxes": {"invalid": "Check the filters, code and confirmation. The date must be between April 1, 2013 and today.", "unavailable": "The official source is unavailable. Try again; no local rates were changed.", "schema": "The source format or periods have changed. Import has stopped for review.", "changed": "Rates have changed since the preview. Look up the sources again before confirming."},
+    "officialTaxes": {
+      "invalid": "Check the filters, code and confirmation. The date must be between April 1, 2013 and today.",
+      "unavailable": "The official source is unavailable. Try again; no local rates were changed.",
+      "schema": "The source format or periods have changed. Import has stopped for review.",
+      "changed": "Rates have changed since the preview. Look up the sources again before confirming."
+    },
     "invoiceEmail": {
       "config": "SMTP configuration is missing or invalid. Contact the server administrator.",
       "invalid": "Check the recipient and email language.",
@@ -524,17 +529,17 @@
       }
     },
     "invoicePrint": {
-  "title": "Invoice",
-  "open": "Print view",
-  "print": "Print or save as PDF",
-  "back": "Back to invoice",
-  "hint": "In the print dialog, choose your printer or Save as PDF. Disable browser headers and footers to hide the server address.",
-  "description": "Description",
-  "quantity": "Quantity",
-  "unitPrice": "Unit price",
-  "amount": "Amount"
-},
-  "sales": {
+      "title": "Invoice",
+      "open": "Print view",
+      "print": "Print or save as PDF",
+      "back": "Back to invoice",
+      "hint": "In the print dialog, choose your printer or Save as PDF. Disable browser headers and footers to hide the server address.",
+      "description": "Description",
+      "quantity": "Quantity",
+      "unitPrice": "Unit price",
+      "amount": "Amount"
+    },
+    "sales": {
       "invalid": "Check dates, lines and amounts. The total must be positive; at most 50 lines.",
       "reference": "Choose active customers, items, income accounts and tax codes belonging to this company.",
       "rate": "A tax rate is missing on this date, or calculations do not agree. Check tax settings.",
@@ -748,55 +753,63 @@
       "stale": "The available amount has changed. Refresh the page before confirming.",
       "exceeds": "The amount exceeds the available receipt balance.",
       "confirm": "Confirm that you want to record this refund."
+    },
+    "estimates": {
+      "invalid": "Check the estimate dates, lines and terms. The estimate date cannot be in the future.",
+      "stale": "This estimate has changed. Reload the page before continuing.",
+      "immutable": "Delivered estimates are locked. Copy it to create a new quote.",
+      "transition": "This operation is incompatible with the estimate’s status or validity.",
+      "confirm": "Confirm this operation.",
+      "customerLocked": "The invoice must retain its source estimate’s customer."
     }
   },
   "settingsPage": {
-  "title": "Settings and administration",
-  "intro": "Company, account and application settings, organized according to your permissions.",
-  "company": {
-    "title": "Company",
-    "description": "Legal identity, contact details, province, document language and tax preferences."
+    "title": "Settings and administration",
+    "intro": "Company, account and application settings, organized according to your permissions.",
+    "company": {
+      "title": "Company",
+      "description": "Legal identity, contact details, province, document language and tax preferences."
+    },
+    "accounting": {
+      "title": "Accounting and taxes",
+      "description": "Chart of accounts, fiscal years, period locks and tax configuration."
+    },
+    "access": {
+      "title": "Users and security",
+      "description": "Roles, modular access, audit trail, password, two-factor authentication and sessions."
+    },
+    "connections": {
+      "title": "Integrations",
+      "description": "Banking and payment connections: configure and revoke providers."
+    },
+    "server": {
+      "title": "Server administration",
+      "description": "Server health, backups, retention and operation logs. Restricted to server administrators."
+    },
+    "application": {
+      "title": "Application and support",
+      "description": "Installed version, updates and documentation."
+    },
+    "preferences": {
+      "title": "Appearance and language",
+      "description": "Choose a light, dark or system theme for this browser.",
+      "language": "Choose the interface language in the header. Set the default document language in Company."
+    },
+    "links": {
+      "identity": "Identity and contact details",
+      "taxSettings": "Tax and document preferences",
+      "accounts": "Chart of accounts",
+      "periods": "Fiscal years and locks",
+      "taxes": "Tax codes and rates",
+      "members": "Users and permissions",
+      "audit": "Audit trail",
+      "security": "My account security",
+      "integrations": "Manage integrations",
+      "serverAdmin": "Server, backups and logs",
+      "updates": "Versions and updates",
+      "help": "User guide"
+    }
   },
-  "accounting": {
-    "title": "Accounting and taxes",
-    "description": "Chart of accounts, fiscal years, period locks and tax configuration."
-  },
-  "access": {
-    "title": "Users and security",
-    "description": "Roles, modular access, audit trail, password, two-factor authentication and sessions."
-  },
-  "connections": {
-    "title": "Integrations",
-    "description": "Banking and payment connections: configure and revoke providers."
-  },
-  "server": {
-    "title": "Server administration",
-    "description": "Server health, backups, retention and operation logs. Restricted to server administrators."
-  },
-  "application": {
-    "title": "Application and support",
-    "description": "Installed version, updates and documentation."
-  },
-  "preferences": {
-    "title": "Appearance and language",
-    "description": "Choose a light, dark or system theme for this browser.",
-    "language": "Choose the interface language in the header. Set the default document language in Company."
-  },
-  "links": {
-    "identity": "Identity and contact details",
-    "taxSettings": "Tax and document preferences",
-    "accounts": "Chart of accounts",
-    "periods": "Fiscal years and locks",
-    "taxes": "Tax codes and rates",
-    "members": "Users and permissions",
-    "audit": "Audit trail",
-    "security": "My account security",
-    "integrations": "Manage integrations",
-    "serverAdmin": "Server, backups and logs",
-    "updates": "Versions and updates",
-    "help": "User guide"
-  }
-},
   "nav": {
     "settings": "Settings and administration",
     "overview": "Dashboard",
@@ -1229,7 +1242,8 @@
       "sommaire-taxes": "Tax summary",
       "remboursements": "Customer refunds",
       "releves-clients": "Customer statements",
-      "releves-fournisseurs": "Supplier statements"
+      "releves-fournisseurs": "Supplier statements",
+      "devis": "Estimates"
     }
   },
   "updates": {
@@ -1380,16 +1394,16 @@
     "save": "Save"
   },
   "invoicePrint": {
-  "title": "Invoice",
-  "open": "Print view",
-  "print": "Print or save as PDF",
-  "back": "Back to invoice",
-  "hint": "In the print dialog, choose your printer or Save as PDF. Disable browser headers and footers to hide the server address.",
-  "description": "Description",
-  "quantity": "Quantity",
-  "unitPrice": "Unit price",
-  "amount": "Amount"
-},
+    "title": "Invoice",
+    "open": "Print view",
+    "print": "Print or save as PDF",
+    "back": "Back to invoice",
+    "hint": "In the print dialog, choose your printer or Save as PDF. Disable browser headers and footers to hide the server address.",
+    "description": "Description",
+    "quantity": "Quantity",
+    "unitPrice": "Unit price",
+    "amount": "Amount"
+  },
   "sales": {
     "title": "Invoice drafts",
     "draft": "Draft — not posted",
@@ -1446,7 +1460,8 @@
     "voidWarning": "Voiding keeps the invoice and creates a reversal in an open period. Linked payments and credit notes prevent this operation.",
     "voidHint": "The amounts below belong to the original invoice. Its accounting effect has been reversed.",
     "reversal": "View reversal",
-    "postedLimit": "The 100 most recently posted invoices are shown, including voided invoices."
+    "postedLimit": "The 100 most recently posted invoices are shown, including voided invoices.",
+    "taxLine": "Tax"
   },
   "credits": {
     "title": "Credit note drafts",
@@ -2678,7 +2693,7 @@
     "all": "All",
     "submit": "Search",
     "reset": "Clear filters",
-    "scope": "Only records you are allowed to read appear. Dates and amounts apply to documents and payments. Amounts are positive document totals in CAD; credits and refunds are identified by their type.",
+    "scope": "Only records you are allowed to read appear. Dates and amounts apply to documents and payments. Amounts are positive document totals in CAD; credits and refunds are identified by their type. Estimates are included according to your sales permissions.",
     "emptyQuery": "Enter a term or choose a filter to start.",
     "noResults": "No matching records. Check your filters or access permissions.",
     "pageResults": "{count, plural, one {# result} other {# results}} on page {page}",
@@ -2699,14 +2714,20 @@
       "RECEIPT": "Receipt",
       "REFUND": "Customer refund",
       "DISBURSEMENT": "Disbursement",
-      "SUPPLIER_REFUND": "Supplier refund"
+      "SUPPLIER_REFUND": "Supplier refund",
+      "ESTIMATE": "Estimate"
     },
     "statuses": {
       "DRAFT": "Draft",
       "POSTED": "Posted",
       "VOID": "Voided",
       "ACTIVE": "Active",
-      "ARCHIVED": "Archived"
+      "ARCHIVED": "Archived",
+      "SENT": "Delivered",
+      "ACCEPTED": "Accepted",
+      "DECLINED": "Declined",
+      "CANCELLED": "Cancelled estimate",
+      "CONVERTED": "Converted to invoice"
     }
   },
   "officialTaxes": {
@@ -2753,6 +2774,55 @@
       "QC": "Quebec",
       "SK": "Saskatchewan",
       "YT": "Yukon"
+    }
+  },
+  "estimates": {
+    "title": "Estimates",
+    "new": "New estimate",
+    "edit": "Edit estimate",
+    "copy": "Copy to a new estimate",
+    "intro": "Prepare a quote, record delivery and the customer’s response, then convert an accepted estimate into a draft invoice. Estimates have no accounting effect.",
+    "date": "Estimate date",
+    "validUntil": "Valid until",
+    "saveHint": "Taxes are calculated on the estimate date. After delivery, lines, amounts and contact details are frozen.",
+    "memo": "Internal note — not printed",
+    "terms": "Terms — printed on the estimate",
+    "status": "Status",
+    "all": "All statuses",
+    "search": "Number, reference or customer",
+    "empty": "No estimates found.",
+    "restrictedCustomer": "Customer details unavailable",
+    "pagination": "Estimate pages",
+    "previous": "Previous",
+    "next": "Next",
+    "print": "Print / PDF",
+    "invoice": "View linked invoice",
+    "expiredHint": "This estimate has expired. Copy it to propose new dates and terms.",
+    "decisionNote": "Internal response note",
+    "confirm": "I confirm this operation.",
+    "send": "Mark as delivered",
+    "sendHint": "Record delivery you performed yourself. A permanent number will be assigned and the estimate will be locked. This action does not send an email.",
+    "accept": "Record acceptance",
+    "decline": "Record a decline",
+    "responseHint": "Record the response received from the customer. This internal operation is not an electronic signature.",
+    "convert": "Create draft invoice",
+    "convertHint": "Lines and prices will be copied and taxes recalculated on the chosen invoice date. Review the draft before posting it. Retrying opens the same invoice. Deleting that draft returns the estimate to Accepted.",
+    "cancel": "Cancel estimate",
+    "cancelHint": "The estimate remains in the history. This action creates no accounting entry.",
+    "saved": "Estimate status saved.",
+    "back": "Back to estimate",
+    "document": "Estimate",
+    "notInvoice": "This is not an invoice",
+    "source": "Source estimate",
+    "customerLocked": "The customer must remain the source estimate’s customer.",
+    "statuses": {
+      "DRAFT": "Draft",
+      "SENT": "Delivered",
+      "ACCEPTED": "Accepted",
+      "DECLINED": "Declined",
+      "CANCELLED": "Cancelled",
+      "CONVERTED": "Converted to invoice",
+      "EXPIRED": "Expired"
     }
   }
 }

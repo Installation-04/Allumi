@@ -379,7 +379,12 @@
     "create": "Créer"
   },
   "errors": {
-    "officialTaxes": {"invalid": "Vérifiez les critères, le code et la confirmation. La date doit être comprise entre le 1er avril 2013 et aujourd’hui.", "unavailable": "La source officielle est indisponible. Réessayez; aucun taux local n’a été modifié.", "schema": "Le format ou les périodes de la source ont changé. L’import est arrêté pour vérification.", "changed": "Les taux ont changé depuis l’aperçu. Consultez à nouveau les sources avant de confirmer."},
+    "officialTaxes": {
+      "invalid": "Vérifiez les critères, le code et la confirmation. La date doit être comprise entre le 1er avril 2013 et aujourd’hui.",
+      "unavailable": "La source officielle est indisponible. Réessayez; aucun taux local n’a été modifié.",
+      "schema": "Le format ou les périodes de la source ont changé. L’import est arrêté pour vérification.",
+      "changed": "Les taux ont changé depuis l’aperçu. Consultez à nouveau les sources avant de confirmer."
+    },
     "invoiceEmail": {
       "config": "Configuration SMTP absente ou invalide. Contactez l’administrateur du serveur.",
       "invalid": "Vérifiez le destinataire et la langue du courriel.",
@@ -524,17 +529,17 @@
       }
     },
     "invoicePrint": {
-  "title": "Facture",
-  "open": "Version imprimable",
-  "print": "Imprimer ou enregistrer en PDF",
-  "back": "Retour à la facture",
-  "hint": "Dans la fenêtre d’impression, choisissez votre imprimante ou Enregistrer au format PDF. Désactivez les en-têtes et pieds de page du navigateur pour masquer l’adresse du serveur.",
-  "description": "Description",
-  "quantity": "Quantité",
-  "unitPrice": "Prix unitaire",
-  "amount": "Montant"
-},
-  "sales": {
+      "title": "Facture",
+      "open": "Version imprimable",
+      "print": "Imprimer ou enregistrer en PDF",
+      "back": "Retour à la facture",
+      "hint": "Dans la fenêtre d’impression, choisissez votre imprimante ou Enregistrer au format PDF. Désactivez les en-têtes et pieds de page du navigateur pour masquer l’adresse du serveur.",
+      "description": "Description",
+      "quantity": "Quantité",
+      "unitPrice": "Prix unitaire",
+      "amount": "Montant"
+    },
+    "sales": {
       "invalid": "Vérifiez les dates, les lignes et les montants. Le total doit être positif; 50 lignes au maximum.",
       "reference": "Choisissez des clients, articles, comptes de revenus et codes fiscaux actifs de cette entreprise.",
       "rate": "Un taux fiscal manque à cette date, ou les calculs ne concordent pas. Vérifiez les taxes.",
@@ -748,55 +753,63 @@
       "stale": "Le montant disponible a changé. Actualisez la page avant de confirmer.",
       "exceeds": "Le montant dépasse le solde disponible de l’encaissement.",
       "confirm": "Confirmez l’enregistrement du remboursement."
+    },
+    "estimates": {
+      "invalid": "Vérifiez les dates, les lignes et les conditions du devis. La date du devis ne peut pas être future.",
+      "stale": "Ce devis a changé. Rechargez la page avant de continuer.",
+      "immutable": "Un devis remis est figé. Copiez-le pour créer une nouvelle proposition.",
+      "transition": "Cette opération est incompatible avec le statut ou la validité du devis.",
+      "confirm": "Confirmez cette opération.",
+      "customerLocked": "La facture doit conserver le client de son devis source."
     }
   },
   "settingsPage": {
-  "title": "Paramètres et administration",
-  "intro": "Les réglages de votre entreprise, de votre compte et de votre application, regroupés selon vos permissions.",
-  "company": {
-    "title": "Entreprise",
-    "description": "Identité légale, coordonnées, province, langue des documents et préférences fiscales."
+    "title": "Paramètres et administration",
+    "intro": "Les réglages de votre entreprise, de votre compte et de votre application, regroupés selon vos permissions.",
+    "company": {
+      "title": "Entreprise",
+      "description": "Identité légale, coordonnées, province, langue des documents et préférences fiscales."
+    },
+    "accounting": {
+      "title": "Comptabilité et taxes",
+      "description": "Plan comptable, exercices, verrouillage des périodes et configuration des taxes."
+    },
+    "access": {
+      "title": "Utilisateurs et sécurité",
+      "description": "Rôles, accès modulaires, piste d’audit, mot de passe, double authentification et sessions."
+    },
+    "connections": {
+      "title": "Intégrations",
+      "description": "Connexions bancaires et paiements : configuration et révocation des fournisseurs."
+    },
+    "server": {
+      "title": "Administration du serveur",
+      "description": "État du serveur, sauvegardes, rétention et journal des opérations. Accès réservé aux administrateurs du serveur."
+    },
+    "application": {
+      "title": "Application et assistance",
+      "description": "Version installée, mises à jour et documentation."
+    },
+    "preferences": {
+      "title": "Apparence et langue",
+      "description": "Choisissez un thème clair, sombre ou celui du système pour ce navigateur.",
+      "language": "La langue de l’interface se choisit dans l’en-tête. La langue par défaut des documents se règle dans Entreprise."
+    },
+    "links": {
+      "identity": "Identité et coordonnées",
+      "taxSettings": "Préférences fiscales et documents",
+      "accounts": "Plan comptable",
+      "periods": "Exercices et verrouillage",
+      "taxes": "Codes et taux de taxes",
+      "members": "Utilisateurs et permissions",
+      "audit": "Piste d’audit",
+      "security": "Sécurité de mon compte",
+      "integrations": "Gérer les intégrations",
+      "serverAdmin": "Serveur, sauvegardes et journaux",
+      "updates": "Versions et mises à jour",
+      "help": "Guide utilisateur"
+    }
   },
-  "accounting": {
-    "title": "Comptabilité et taxes",
-    "description": "Plan comptable, exercices, verrouillage des périodes et configuration des taxes."
-  },
-  "access": {
-    "title": "Utilisateurs et sécurité",
-    "description": "Rôles, accès modulaires, piste d’audit, mot de passe, double authentification et sessions."
-  },
-  "connections": {
-    "title": "Intégrations",
-    "description": "Connexions bancaires et paiements : configuration et révocation des fournisseurs."
-  },
-  "server": {
-    "title": "Administration du serveur",
-    "description": "État du serveur, sauvegardes, rétention et journal des opérations. Accès réservé aux administrateurs du serveur."
-  },
-  "application": {
-    "title": "Application et assistance",
-    "description": "Version installée, mises à jour et documentation."
-  },
-  "preferences": {
-    "title": "Apparence et langue",
-    "description": "Choisissez un thème clair, sombre ou celui du système pour ce navigateur.",
-    "language": "La langue de l’interface se choisit dans l’en-tête. La langue par défaut des documents se règle dans Entreprise."
-  },
-  "links": {
-    "identity": "Identité et coordonnées",
-    "taxSettings": "Préférences fiscales et documents",
-    "accounts": "Plan comptable",
-    "periods": "Exercices et verrouillage",
-    "taxes": "Codes et taux de taxes",
-    "members": "Utilisateurs et permissions",
-    "audit": "Piste d’audit",
-    "security": "Sécurité de mon compte",
-    "integrations": "Gérer les intégrations",
-    "serverAdmin": "Serveur, sauvegardes et journaux",
-    "updates": "Versions et mises à jour",
-    "help": "Guide utilisateur"
-  }
-},
   "nav": {
     "settings": "Paramètres et administration",
     "overview": "Tableau de bord",
@@ -1229,7 +1242,8 @@
       "sommaire-taxes": "Sommaire TPS/TVQ",
       "remboursements": "Remboursements clients",
       "releves-clients": "Relevés clients",
-      "releves-fournisseurs": "Relevés fournisseurs"
+      "releves-fournisseurs": "Relevés fournisseurs",
+      "devis": "Devis"
     }
   },
   "updates": {
@@ -1380,16 +1394,16 @@
     "save": "Enregistrer"
   },
   "invoicePrint": {
-  "title": "Facture",
-  "open": "Version imprimable",
-  "print": "Imprimer ou enregistrer en PDF",
-  "back": "Retour à la facture",
-  "hint": "Dans la fenêtre d’impression, choisissez votre imprimante ou Enregistrer au format PDF. Désactivez les en-têtes et pieds de page du navigateur pour masquer l’adresse du serveur.",
-  "description": "Description",
-  "quantity": "Quantité",
-  "unitPrice": "Prix unitaire",
-  "amount": "Montant"
-},
+    "title": "Facture",
+    "open": "Version imprimable",
+    "print": "Imprimer ou enregistrer en PDF",
+    "back": "Retour à la facture",
+    "hint": "Dans la fenêtre d’impression, choisissez votre imprimante ou Enregistrer au format PDF. Désactivez les en-têtes et pieds de page du navigateur pour masquer l’adresse du serveur.",
+    "description": "Description",
+    "quantity": "Quantité",
+    "unitPrice": "Prix unitaire",
+    "amount": "Montant"
+  },
   "sales": {
     "title": "Brouillons de factures",
     "draft": "Brouillon — non comptabilisé",
@@ -1446,7 +1460,8 @@
     "voidWarning": "L’annulation conserve la facture et crée une écriture inverse dans une période ouverte. Les paiements et avoirs liés empêchent cette opération.",
     "voidHint": "Les montants ci-dessous sont ceux de la facture originale. Son effet comptable a été annulé par la contre-passation.",
     "reversal": "Voir la contre-passation",
-    "postedLimit": "Les 100 factures les plus récemment validées sont affichées, y compris celles annulées."
+    "postedLimit": "Les 100 factures les plus récemment validées sont affichées, y compris celles annulées.",
+    "taxLine": "Taxe"
   },
   "credits": {
     "title": "Brouillons d’avoirs",
@@ -2678,7 +2693,7 @@
     "all": "Tous",
     "submit": "Rechercher",
     "reset": "Effacer les filtres",
-    "scope": "Seules les pièces autorisées sont visibles. Les dates et montants concernent les documents et paiements. Les montants sont les totaux positifs en CAD; les crédits et remboursements sont identifiés par leur type.",
+    "scope": "Seules les pièces autorisées sont visibles. Les dates et montants concernent les documents et paiements. Les montants sont les totaux positifs en CAD; les crédits et remboursements sont identifiés par leur type. Les devis sont inclus selon vos droits de vente.",
     "emptyQuery": "Saisissez un terme ou choisissez un filtre pour commencer.",
     "noResults": "Aucun résultat. Vérifiez les filtres ou vos permissions.",
     "pageResults": "{count, plural, one {# résultat} other {# résultats}} à la page {page}",
@@ -2699,14 +2714,20 @@
       "RECEIPT": "Encaissement",
       "REFUND": "Remboursement client",
       "DISBURSEMENT": "Décaissement",
-      "SUPPLIER_REFUND": "Remboursement fournisseur"
+      "SUPPLIER_REFUND": "Remboursement fournisseur",
+      "ESTIMATE": "Devis"
     },
     "statuses": {
       "DRAFT": "Brouillon",
       "POSTED": "Validé",
       "VOID": "Annulé",
       "ACTIVE": "Actif",
-      "ARCHIVED": "Archivé"
+      "ARCHIVED": "Archivé",
+      "SENT": "Remis",
+      "ACCEPTED": "Accepté",
+      "DECLINED": "Refusé",
+      "CANCELLED": "Devis annulé",
+      "CONVERTED": "Converti en facture"
     }
   },
   "officialTaxes": {
@@ -2753,6 +2774,55 @@
       "QC": "Québec",
       "SK": "Saskatchewan",
       "YT": "Yukon"
+    }
+  },
+  "estimates": {
+    "title": "Devis",
+    "new": "Nouveau devis",
+    "edit": "Modifier le devis",
+    "copy": "Copier en nouveau devis",
+    "intro": "Préparez une proposition commerciale, consignez sa remise et la réponse du client, puis convertissez le devis accepté en facture brouillon. Un devis ne modifie pas la comptabilité.",
+    "date": "Date du devis",
+    "validUntil": "Valide jusqu’au",
+    "saveHint": "Les taxes sont calculées à la date du devis. Après remise, les lignes, montants et coordonnées sont figés.",
+    "memo": "Note interne — non imprimée",
+    "terms": "Conditions — imprimées sur le devis",
+    "status": "Statut",
+    "all": "Tous les statuts",
+    "search": "Numéro, référence ou client",
+    "empty": "Aucun devis trouvé.",
+    "restrictedCustomer": "Coordonnées client non accessibles",
+    "pagination": "Pages des devis",
+    "previous": "Précédente",
+    "next": "Suivante",
+    "print": "Imprimer / PDF",
+    "invoice": "Voir la facture liée",
+    "expiredHint": "La validité est dépassée. Copiez le devis pour proposer de nouvelles dates et conditions.",
+    "decisionNote": "Note interne sur la réponse",
+    "confirm": "Je confirme cette opération.",
+    "send": "Marquer comme remis",
+    "sendHint": "Consignez une remise effectuée par vos soins. Un numéro définitif sera attribué et le devis sera figé. Cette action n’envoie aucun courriel.",
+    "accept": "Consigner une acceptation",
+    "decline": "Consigner un refus",
+    "responseHint": "Consignez la réponse reçue du client. Cette opération interne ne constitue pas une signature électronique.",
+    "convert": "Créer la facture brouillon",
+    "convertHint": "Les prix et lignes seront repris et les taxes recalculées à la date de facture choisie. Vérifiez le brouillon avant sa validation comptable. Une nouvelle tentative ouvre la même facture. Si ce brouillon est supprimé, le devis redevient accepté.",
+    "cancel": "Annuler le devis",
+    "cancelHint": "Le devis est conservé dans l’historique. Cette action ne crée aucune écriture comptable.",
+    "saved": "Statut du devis enregistré.",
+    "back": "Retour au devis",
+    "document": "Devis",
+    "notInvoice": "Ceci n’est pas une facture",
+    "source": "Devis source",
+    "customerLocked": "Le client reste celui du devis source.",
+    "statuses": {
+      "DRAFT": "Brouillon",
+      "SENT": "Remis",
+      "ACCEPTED": "Accepté",
+      "DECLINED": "Refusé",
+      "CANCELLED": "Annulé",
+      "CONVERTED": "Converti en facture",
+      "EXPIRED": "Expiré"
     }
   }
 }

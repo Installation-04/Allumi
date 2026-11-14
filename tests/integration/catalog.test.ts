@@ -319,3 +319,15 @@ it("keeps exact customer refund checks volatile under caller privileges", async 
     { definer: false, volatility: "v", config: ["search_path=public, pg_temp"], public_execute: false },
   ]);
 });
+
+it("guards commercial estimates with deferred totals, tenant Sales policies, immutable issued lines and a protected counter", async () => {
+  const triggers = await q<{ tgname: string; deferred: boolean }>("SELECT tgname,tgdeferrable AS deferred FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('sales_estimate_totals','sales_estimate_line_totals','sales_estimate_guard','sales_estimate_line_guard','sales_estimate_counter_guard','estimate_invoice_contact_guard') ORDER BY tgname");
+  expect(triggers).toHaveLength(6);
+  expect(triggers.filter(t=>t.deferred).map(t=>t.tgname)).toEqual(['sales_estimate_line_totals','sales_estimate_totals']);
+  for (const table of ['sales_estimate','sales_estimate_line','sales_estimate_counter']) {
+    const policies = await q<{ qual: string }>("SELECT qual FROM pg_policies WHERE tablename=$1 AND policyname='module_read' AND permissive='RESTRICTIVE'",[table]);
+    expect(policies[0]?.qual).toContain("sales");
+  }
+  expect((await q<{del:boolean}>("SELECT has_table_privilege('allumi_app','sales_estimate_counter','DELETE') AS del"))[0]?.del).toBe(false);
+  expect((await q<{definer:boolean}>("SELECT prosecdef AS definer FROM pg_proc WHERE proname='sales_estimate_exact'"))[0]?.definer).toBe(false);
+});

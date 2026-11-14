@@ -70,3 +70,5 @@ Taxes et produits/services : [[Taxes-et-catalogue]]. Consultation et import : [[
 - [[Recherche-des-paiements-clients]] — client, numéro, référence, état et période.
 
 - [[HTTPS-local]] — accès chiffré par IP, autorité privée et confiance Windows/iOS.
+
+- [[Devis]] — propositions, remise manuelle, réponse, impression et conversion en facture brouillon.
