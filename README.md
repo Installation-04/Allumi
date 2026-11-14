@@ -72,7 +72,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --docker-only
 ```
 
-Ce dernier mode configure la pile existante sans installer de paquets, configurer le pare-feu ou planifier des sauvegardes. Voir les [options d’installation](docs/Installation-Docker.md).
+Ce mode utilise Docker et Compose déjà installés, sans configurer le pare-feu ni planifier de sauvegardes. Le lanceur peut installer Git s’il manque sur un système Debian/Ubuntu avec les droits requis. Voir les [options d’installation](docs/Installation-Docker.md).
 
 </details>
 
