@@ -379,6 +379,7 @@
     "create": "Create"
   },
   "errors": {
+    "officialTaxes": {"invalid": "Check the filters, code and confirmation. The date must be between April 1, 2013 and today.", "unavailable": "The official source is unavailable. Try again; no local rates were changed.", "schema": "The source format or periods have changed. Import has stopped for review.", "changed": "Rates have changed since the preview. Look up the sources again before confirming."},
     "invoiceEmail": {
       "config": "SMTP configuration is missing or invalid. Contact the server administrator.",
       "invalid": "Check the recipient and email language.",
@@ -1200,6 +1201,7 @@
     "planned": "Planned — not available",
     "progress": "Features and limitations",
     "links": {
+      "sources-fiscales": "Official tax sources",
       "flux-tresorerie": "Cash account movements",
       "depenses": "Paid expenses",
       "credits-fournisseurs": "Supplier credits",
@@ -2705,6 +2707,52 @@
       "VOID": "Voided",
       "ACTIVE": "Active",
       "ARCHIVED": "Archived"
+    }
+  },
+  "officialTaxes": {
+    "audit": "View import provenance",
+    "title": "Official tax sources",
+    "back": "Taxes and tax codes",
+    "intro": "Look up official standard rates by province and date, then create a tax code in your company.",
+    "province": "Province or territory",
+    "date": "Reference date",
+    "consult": "Look up rates",
+    "none": "Choose an account",
+    "results": "Standard rates · {province} · {date}",
+    "coverage": "GST/HST: CRA data from April 1, 2013. Quebec: historical QST rates from Revenu Québec. Separate PST, exemptions and product-specific rules are not included.",
+    "collected": "Source retrieved on {date}",
+    "officialSource": "View official source",
+    "history": "Rate history and source fingerprint",
+    "ongoing": "ongoing according to source",
+    "create": "Create tax code and taxes",
+    "importHelp": "Creates a new taxable code with all available rate history. Selected accounts are used for posting; existing taxes and posted documents are preserved. HST already includes its federal GST component.",
+    "code": "Local code",
+    "codeHint": "1–10 uppercase letters, digits or hyphens. Use a new code.",
+    "federalPayable": "GST/HST payable",
+    "federalRecoverable": "GST/HST recoverable (optional)",
+    "qstPayable": "QST payable",
+    "qstRecoverable": "QST recoverable (optional)",
+    "confirm": "I have checked the province, rates and accounts. I confirm creation of this new standard tax code.",
+    "readOnly": "Creation requires write access to Taxes and read access to Accounting.",
+    "success": "Tax code {code} and its official rates have been created.",
+    "providers": {
+      "CRA_GST_HST": "CRA · GST/HST",
+      "RQ_QST": "Revenu Québec · QST"
+    },
+    "provinces": {
+      "AB": "Alberta",
+      "BC": "British Columbia",
+      "MB": "Manitoba",
+      "NB": "New Brunswick",
+      "NL": "Newfoundland and Labrador",
+      "NS": "Nova Scotia",
+      "NT": "Northwest Territories",
+      "NU": "Nunavut",
+      "ON": "Ontario",
+      "PE": "Prince Edward Island",
+      "QC": "Quebec",
+      "SK": "Saskatchewan",
+      "YT": "Yukon"
     }
   }
 }

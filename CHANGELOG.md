@@ -4,6 +4,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.52] - 2026-11-14
+
+- Connexions officielles ARC et Revenu Québec : consultation TPS/TVH par province et date, TVQ historique, création confirmée d’un code fiscal et de ses taux avec comptes choisis, provenance et empreintes en audit. Contrôle du schéma, des changements depuis l’aperçu, des droits et de l’atomicité; aucune modification des pièces validées. Parcours FR/EN/mobile/sombre documentés.
+- Catalogue : les droits de gestion des produits sont indépendants de l’écriture fiscale; les références comptables/fiscales existantes sont conservées sans droit de lecture, leurs changements exigent les droits correspondants. Consultation des taxes sans accès obligatoire au plan comptable.
+
 ## [0.4.0-alpha.51] - 2026-11-13
 
 - Outillage : exclusion des résultats et rapports générés par Playwright du lint, pour éviter un parcours concurrent de leurs répertoires temporaires.

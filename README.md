@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.51
+git checkout v0.4.0-alpha.52
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.51 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.52 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -483,3 +483,11 @@ Consultez les factures, crédits, paiements et contre-passations d’un fourniss
 ![Relevé fournisseur sur ordinateur](docs/images/releve-fournisseur-desktop.png)
 
 ![Relevé fournisseur en anglais sombre sur téléphone](docs/images/releve-fournisseur-en-dark-mobile.png)
+
+### Sources fiscales officielles
+
+Consultez la TPS/TVH de l’ARC et la TVQ de Revenu Québec, à une date et pour une province, puis créez un code avec ses comptes et son historique. L’import conserve la provenance et protège les pièces validées. [Guide des sources fiscales](docs/Sources-fiscales-officielles.md).
+
+![Sources fiscales officielles](docs/images/sources-fiscales-desktop.png)
+
+![Sources fiscales sur téléphone](docs/images/sources-fiscales-mobile.png)

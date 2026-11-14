@@ -23,6 +23,7 @@ export const ROUTE_ACCESS: Record<string, readonly Action[]> = {
   balance: ["ledger.read"],
   exercices: ["ledger.read"],
   taxes: ["taxes.read"],
+  "sources-fiscales": ["taxes.read"],
   entreprise: ["company.read"],
   utilisateurs: ["members.manage"],
   audit: ["audit.read"],

@@ -1,0 +1,270 @@
+{
+  "success": true,
+  "result": {
+    "resource_id": "e8f2d0c6-ca67-43d3-862b-6267603dacf6",
+    "total": 13,
+    "fields": [
+      {
+        "id": "_id",
+        "type": "int"
+      },
+      {
+        "id": "JRSD_CD",
+        "type": "text",
+        "info": {
+          "label_en": "",
+          "label_fr": "",
+          "notes_en": "Province/Territory",
+          "notes_fr": "Province/territoire",
+          "type_override": "text"
+        }
+      },
+      {
+        "id": "VPR1_HST",
+        "type": "text",
+        "info": {
+          "label_en": "",
+          "label_fr": "",
+          "notes_en": "(HST) On or after April 1, 2025",
+          "notes_fr": "(TVH) 1er avril 2025 ou après",
+          "type_override": "text"
+        }
+      },
+      {
+        "id": "VPR1_PST",
+        "type": "text",
+        "info": {
+          "label_en": "",
+          "label_fr": "",
+          "notes_en": "(PST) On or after April 1, 2025",
+          "notes_fr": "(TVP) 1er avril 2025 ou après",
+          "type_override": "text"
+        }
+      },
+      {
+        "id": "VPR2_HST",
+        "type": "text",
+        "info": {
+          "label_en": "",
+          "label_fr": "",
+          "notes_en": "(HST) October 1, 2016 to March 31, 2025",
+          "notes_fr": "(TVH) 1er octobre 2016 au 31 mars 2025",
+          "type_override": "text"
+        }
+      },
+      {
+        "id": "VPR2_PST",
+        "type": "text",
+        "info": {
+          "label_en": "",
+          "label_fr": "",
+          "notes_en": "(PST) October 1, 2016 to March 31, 2025",
+          "notes_fr": "(TVP) 1er octobre 2016 au 31 mars 2025",
+          "type_override": "text"
+        }
+      },
+      {
+        "id": "VPR3_HST",
+        "type": "text",
+        "info": {
+          "label_en": "",
+          "label_fr": "",
+          "notes_en": "(HST) July 1, 2016 to September 30, 2016",
+          "notes_fr": "(TVH) 1er juillet 2016 au 30 septembre 2016",
+          "type_override": "text"
+        }
+      },
+      {
+        "id": "VPR3_PST",
+        "type": "text",
+        "info": {
+          "label_en": "",
+          "label_fr": "",
+          "notes_en": "(PST) July 1, 2016 to September 30, 2016",
+          "notes_fr": "(TVP) 1er juillet 2016 au 30 septembre 2016",
+          "type_override": "text"
+        }
+      },
+      {
+        "id": "VPR4_HST",
+        "type": "text",
+        "info": {
+          "label_en": "",
+          "label_fr": "",
+          "notes_en": "(HST) April 1, 2013 to June 30, 2016",
+          "notes_fr": "(TVH) 1er avril 2013 ou 30 juin 2016",
+          "type_override": "text"
+        }
+      },
+      {
+        "id": "VPR4_PST",
+        "type": "text",
+        "info": {
+          "label_en": "",
+          "label_fr": "",
+          "notes_en": "(PST) April 1, 2013 to June 30, 2016",
+          "notes_fr": "(TVP) 1er avril 2013 ou 30 juin 2016",
+          "type_override": "text"
+        }
+      }
+    ],
+    "records": [
+      {
+        "_id": 1,
+        "JRSD_CD": "AB",
+        "VPR1_HST": "5%",
+        "VPR1_PST": "0%",
+        "VPR2_HST": "5%",
+        "VPR2_PST": "0%",
+        "VPR3_HST": "5%",
+        "VPR3_PST": "0%",
+        "VPR4_HST": "5%",
+        "VPR4_PST": "0%"
+      },
+      {
+        "_id": 2,
+        "JRSD_CD": "BC",
+        "VPR1_HST": "5%",
+        "VPR1_PST": "0%",
+        "VPR2_HST": "5%",
+        "VPR2_PST": "0%",
+        "VPR3_HST": "5%",
+        "VPR3_PST": "0%",
+        "VPR4_HST": "5%",
+        "VPR4_PST": "0%"
+      },
+      {
+        "_id": 3,
+        "JRSD_CD": "MB",
+        "VPR1_HST": "5%",
+        "VPR1_PST": "0%",
+        "VPR2_HST": "5%",
+        "VPR2_PST": "0%",
+        "VPR3_HST": "5%",
+        "VPR3_PST": "0%",
+        "VPR4_HST": "5%",
+        "VPR4_PST": "0%"
+      },
+      {
+        "_id": 4,
+        "JRSD_CD": "NB",
+        "VPR1_HST": "15%",
+        "VPR1_PST": "10%",
+        "VPR2_HST": "15%",
+        "VPR2_PST": "10%",
+        "VPR3_HST": "15%",
+        "VPR3_PST": "10%",
+        "VPR4_HST": "13%",
+        "VPR4_PST": "8%"
+      },
+      {
+        "_id": 5,
+        "JRSD_CD": "NL",
+        "VPR1_HST": "15%",
+        "VPR1_PST": "10%",
+        "VPR2_HST": "15%",
+        "VPR2_PST": "10%",
+        "VPR3_HST": "15%",
+        "VPR3_PST": "10%",
+        "VPR4_HST": "13%",
+        "VPR4_PST": "8%"
+      },
+      {
+        "_id": 6,
+        "JRSD_CD": "NS",
+        "VPR1_HST": "14%",
+        "VPR1_PST": "9%",
+        "VPR2_HST": "15%",
+        "VPR2_PST": "10%",
+        "VPR3_HST": "15%",
+        "VPR3_PST": "10%",
+        "VPR4_HST": "15%",
+        "VPR4_PST": "10%"
+      },
+      {
+        "_id": 7,
+        "JRSD_CD": "NT",
+        "VPR1_HST": "5%",
+        "VPR1_PST": "0%",
+        "VPR2_HST": "5%",
+        "VPR2_PST": "0%",
+        "VPR3_HST": "5%",
+        "VPR3_PST": "0%",
+        "VPR4_HST": "5%",
+        "VPR4_PST": "0%"
+      },
+      {
+        "_id": 8,
+        "JRSD_CD": "NU",
+        "VPR1_HST": "5%",
+        "VPR1_PST": "0%",
+        "VPR2_HST": "5%",
+        "VPR2_PST": "0%",
+        "VPR3_HST": "5%",
+        "VPR3_PST": "0%",
+        "VPR4_HST": "5%",
+        "VPR4_PST": "0%"
+      },
+      {
+        "_id": 9,
+        "JRSD_CD": "ON",
+        "VPR1_HST": "13%",
+        "VPR1_PST": "8%",
+        "VPR2_HST": "13%",
+        "VPR2_PST": "8%",
+        "VPR3_HST": "13%",
+        "VPR3_PST": "8%",
+        "VPR4_HST": "13%",
+        "VPR4_PST": "8%"
+      },
+      {
+        "_id": 10,
+        "JRSD_CD": "PE",
+        "VPR1_HST": "15%",
+        "VPR1_PST": "10%",
+        "VPR2_HST": "15%",
+        "VPR2_PST": "10%",
+        "VPR3_HST": "14%",
+        "VPR3_PST": "9%",
+        "VPR4_HST": "14%",
+        "VPR4_PST": "9%"
+      },
+      {
+        "_id": 11,
+        "JRSD_CD": "QC",
+        "VPR1_HST": "5%",
+        "VPR1_PST": "0%",
+        "VPR2_HST": "5%",
+        "VPR2_PST": "0%",
+        "VPR3_HST": "5%",
+        "VPR3_PST": "0%",
+        "VPR4_HST": "5%",
+        "VPR4_PST": "0%"
+      },
+      {
+        "_id": 12,
+        "JRSD_CD": "SK",
+        "VPR1_HST": "5%",
+        "VPR1_PST": "0%",
+        "VPR2_HST": "5%",
+        "VPR2_PST": "0%",
+        "VPR3_HST": "5%",
+        "VPR3_PST": "0%",
+        "VPR4_HST": "5%",
+        "VPR4_PST": "0%"
+      },
+      {
+        "_id": 13,
+        "JRSD_CD": "YT",
+        "VPR1_HST": "5%",
+        "VPR1_PST": "0%",
+        "VPR2_HST": "5%",
+        "VPR2_PST": "0%",
+        "VPR3_HST": "5%",
+        "VPR3_PST": "0%",
+        "VPR4_HST": "5%",
+        "VPR4_PST": "0%"
+      }
+    ]
+  }
+}

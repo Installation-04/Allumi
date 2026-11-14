@@ -412,6 +412,30 @@ test("global company search, advanced filters and direct document links in both 
   expect(cspViolations,"Content-Security-Policy violations").toEqual([]);
 });
 
+test("official GST/HST and QST sources, reviewed import and local tax code",async({page})=>{
+ test.setTimeout(90_000);cspViolations.length=0;watchCsp(page.context());await page.context().addCookies(updateCookies);await page.goto("/");
+ if(!/^\/c\/[0-9a-f-]{36}/.test(new URL(page.url()).pathname))await page.getByRole("link",{name:"Atelier Exemple inc.",exact:true}).click();
+ const company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0];expect(company).toBeTruthy();
+ await page.goto(`${company}/taxes`);await page.getByRole("link",{name:"Sources fiscales officielles",exact:true}).click();
+ await page.getByLabel("Province ou territoire",{exact:true}).selectOption("QC");await page.getByLabel("Date de référence",{exact:true}).fill("2026-07-15");await page.getByRole("button",{name:"Consulter les taux",exact:true}).click();
+ const content=page.locator(".workspace-content");await expect(content.getByRole("heading",{name:"ARC · TPS/TVH",exact:true})).toBeVisible();await expect(content.getByRole("heading",{name:"Revenu Québec · TVQ",exact:true})).toBeVisible();
+ await expect(content.getByText("9,975 %",{exact:true}).first()).toBeVisible();await expectNoPageOverflow(page);await captureReference(page,"sources-fiscales","Taux standards · Québec · 2026-07-15");
+ await page.getByRole("button",{name:"English",exact:true}).click();await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
+ await expect(content.getByRole("heading",{name:"CRA · GST/HST",exact:true})).toBeVisible();await expectNoPageOverflow(page);await captureReference(page,"sources-fiscales-en-dark","Standard rates · Quebec · 2026-07-15");
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await page.getByRole("button",{name:"Français",exact:true}).click();
+ await page.getByLabel("Code local",{exact:true}).fill("QC-EXT");
+ for(const [label,code] of [["TPS/TVH à remettre","2100"],["TPS/TVH récupérable (facultatif)","1200"],["TVQ à remettre","2110"],["TVQ récupérable (facultatif)","1210"]]) {
+   const field=page.getByLabel(label!,{exact:true});const options=await field.locator("option").allTextContents();
+   const match=options.find(text=>text.startsWith(code!+" "));expect(match,`Account ${code}`).toBeTruthy();await field.selectOption({label:match!});
+ }
+ const confirmation=page.getByRole("checkbox",{name:/J’ai vérifié la province/});await expect(confirmation).not.toBeChecked();await expect(confirmation).toHaveAttribute("required","");await confirmation.check();await page.getByRole("button",{name:"Créer le code et ses taxes",exact:true}).click();
+ await expect(content.getByRole("status").filter({hasText:"Le code fiscal QC-EXT et ses taux officiels ont été créés."})).toHaveText("Le code fiscal QC-EXT et ses taux officiels ont été créés.");await expect(content.getByRole("heading",{name:/^QC-EXT —/})).toBeVisible();
+ await expectNoPageOverflow(page);await captureReference(page,"code-fiscal-importe","QC-EXT — TPS et TVQ · QC");
+ const db=new pg.Client({connectionString:e2eUrls().owner});await db.connect();try {const result=await db.query("SELECT after FROM audit_log WHERE company_id=$1 AND action='tax.official_import' ORDER BY id DESC LIMIT 1",[company!.split("/")[2]]);expect(result.rows[0]?.after.province).toBe("QC");expect(result.rows[0]?.after.sources).toHaveLength(2);}finally{await db.end();}
+ for(const suffix of ["?province=XX","?province=QC&province=ON","?date=2012-01-01","?date=2026-02-30","?charger=2"])expect((await page.request.get(`${company}/sources-fiscales${suffix}`)).status()).toBe(404);
+ expect(cspViolations).toEqual([]);
+});
+
 /** Browser-only demonstration of the file hand-off: no host agent, Docker process or deployment is started. */
 async function serverUpdateJourney(page: Page) {
  const directory=process.env.E2E_UPDATE_DIR;

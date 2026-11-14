@@ -22,7 +22,7 @@ Créez un article avec son nom, son code facultatif, son prix en dollars canadie
 
 La recherche porte sur le nom et le code. Jusqu’à 100 résultats sont affichés; précisez la recherche au besoin. Une fiche peut être modifiée, archivée ou restaurée. Cochez **Inclure les articles archivés** pour retrouver les fiches archivées.
 
-La consultation du catalogue exige **Catalogue** en lecture, sans accès obligatoire aux taxes ou à la comptabilité. Les codes fiscaux associés sont détaillés uniquement avec **Taxes** en lecture. Les formulaires actuels de modification, qui associent aussi comptes et codes fiscaux, exigent **Catalogue** en écriture, **Taxes** en écriture et **Comptabilité** en lecture; les autres membres autorisés consultent la fiche en lecture seule.
+La consultation exige **Catalogue en lecture** et la modification **Catalogue en écriture**. Associer, changer ou retirer un compte demande **Comptabilité en lecture**; changer le code fiscal demande **Taxes en lecture**. Sans ces lectures, les références financières déjà configurées restent conservées pendant la modification du nom, du prix et des autres champs du produit. Les droits du catalogue ne permettent pas de modifier la définition d’une taxe.
 
 Les accès sont isolés par entreprise et les mutations sont journalisées dans la [[Piste-d-audit]]. Voir [[Utilisateurs-et-permissions]] et [[Recherche-globale]].
 
@@ -46,7 +46,7 @@ Le [[Sommaire-des-taxes]] présente les taxes des écritures validées sur une p
 
 ## Sources fiscales externes
 
-La configuration des taxes et des codes reste manuelle dans cette version. Aucun taux ni catalogue de règles externes n’est synchronisé automatiquement.
+Le parcours [[Sources-fiscales-officielles]] consulte l’ARC et Revenu Québec et crée un code aux taux standards après choix des comptes et confirmation. La synchronisation planifiée et les catalogues de règles propres aux produits/services restent à implémenter.
 
 Les références publiques sont le [calculateur et les taux de l’ARC](https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html), le [jeu de données TPS/TVH de l’ARC](https://open.canada.ca/data/en/dataset/5584a2cf-12af-4b2d-aff5-418410cf5375) et les [règles de calcul de Revenu Québec](https://www.revenuquebec.ca/fr/entreprises/taxes/tpstvh-et-tvq/perception-de-la-tps-et-de-la-tvq/calcul-des-taxes/). Ces liens ouvrent les sources officielles; ils ne connectent pas votre entreprise à un fournisseur.
 

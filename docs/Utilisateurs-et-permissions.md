@@ -56,3 +56,9 @@ Après un changement de permissions, recharger la page actualise les menus. Un e
 
 ![Navigation avec accès limité aux contacts — ordinateur](images/navigation-restreinte-desktop.png)
 ![Navigation avec accès limité aux contacts — téléphone](images/navigation-restreinte-mobile.png)
+
+## Catalogue et sources fiscales
+
+**Catalogue en écriture** permet de créer, modifier et archiver les produits/services. Les champs de base restent modifiables sans accès à la Comptabilité ou aux Taxes; leurs références existantes sont conservées. Changer ou retirer un compte exige **Comptabilité en lecture**; changer ou retirer un code fiscal exige **Taxes en lecture**. Un droit d’écriture fiscale n’est pas requis pour gérer un produit.
+
+[[Sources-fiscales-officielles]] exige **Taxes en lecture** pour consulter les taux. La création de nouvelles taxes et d’un code importé exige **Taxes en écriture** et **Comptabilité en lecture**, avec choix des comptes et confirmation. Elle ne donne aucun droit supplémentaire sur les ventes, le catalogue ou le serveur.
