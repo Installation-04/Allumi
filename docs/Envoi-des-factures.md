@@ -58,3 +58,5 @@ Voir [[Configuration]], [[Validation-des-factures]], [[Justificatifs]] et [[Depa
 ![Courriel de facture — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/courriel-facture-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/courriel-facture-mobile.png" alt="Courriel de facture — téléphone" width="412">
+
+Les [[Relances-clients]] proposent un message de rappel distinct, avec aperçu et contrôle du solde actuel. Leur historique partage ce panneau et les mêmes limites de fréquence; le montant rappelé est conservé.

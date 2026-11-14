@@ -1,7 +1,7 @@
 /** One canonical home per tool keeps global navigation distinct from contextual tabs. */
 export const NAVIGATION_GROUPS = {
   depenses: ["achats", "depenses", "credits-fournisseurs", "decaissements"],
-  ventes: ["devis", "factures", "recurrences", "avoirs", "encaissements", "remboursements", "contacts", "catalogue"],
+  ventes: ["devis", "factures", "recurrences", "relances", "avoirs", "encaissements", "remboursements", "contacts", "catalogue"],
   banque: ["transactions", "depots", "rapprochement", "integrations"],
   comptabilite: ["comptes", "journal", "balance", "exercices"],
   tresorerie: ["flux-tresorerie"],

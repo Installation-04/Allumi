@@ -771,6 +771,12 @@
       "deleted": "Ce brouillon a été supprimé; son échéance reste traitée et ne sera pas recréée.",
       "confirm": "Confirmez cette opération.",
       "customerLocked": "Le client d’une facture récurrente reste celui de la facture source."
+    },
+    "reminders": {
+      "invalid": "Vérifiez les données de relance et les filtres de recherche.",
+      "unavailable": "Cette facture n’est plus échue avec un solde à payer. Actualisez la liste des relances.",
+      "stale": "Le solde ou la date a changé. Rechargez cet aperçu avant d’envoyer.",
+      "confirm": "Confirmez le destinataire, le solde et l’envoi de la relance."
     }
   },
   "settingsPage": {
@@ -1254,7 +1260,8 @@
       "releves-clients": "Relevés clients",
       "releves-fournisseurs": "Relevés fournisseurs",
       "devis": "Devis",
-      "recurrences": "Factures récurrentes"
+      "recurrences": "Factures récurrentes",
+      "relances": "Relances clients"
     }
   },
   "updates": {
@@ -2150,7 +2157,10 @@
       "ACCEPTED": "Accepté par le serveur SMTP — livraison non confirmée",
       "FAILED": "Refusé par le serveur SMTP",
       "UNKNOWN": "Résultat incertain — le message peut avoir été accepté"
-    }
+    },
+    "reminderKind": "Relance de paiement",
+    "invoiceKind": "Facture",
+    "reminded": "Solde rappelé : {amount} · {date}"
   },
   "payablesAging": {
     "title": "Âge des comptes fournisseurs",
@@ -2895,5 +2905,31 @@
       "CANCELLED": "Annulée",
       "COMPLETED": "Terminée"
     }
+  },
+  "reminders": {
+    "title": "Relances clients",
+    "intro": "Factures échues avec un solde à payer. Préparez et confirmez chaque rappel individuellement.",
+    "checked": "Solde courant vérifié le {date} (heure de l’Est).",
+    "search": "Client ou numéro de facture",
+    "filter": "Filtrer les relances",
+    "empty": "Aucune facture échue à relancer pour cette recherche.",
+    "due": "Échéance",
+    "outstanding": "Solde à payer",
+    "last": "Dernière tentative de relance : {date}",
+    "never": "Aucune tentative de relance.",
+    "prepare": "Préparer une relance",
+    "pagination": "Pages des relances",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "detail": "Relance de la facture {number}",
+    "review": "Vérifiez les paiements récents et les crédits non affectés du client avant de relancer. Le solde affiché ne déduit que les paiements et avoirs affectés à cette facture.",
+    "invoice": "Consulter la facture et son historique d’envoi",
+    "refresh": "Actualiser l’aperçu",
+    "preview": "Aperçu du message",
+    "subject": "Objet",
+    "manual": "Envoi manuel uniquement. L’acceptation du relais SMTP ne prouve pas la livraison au destinataire. Aucun fichier joint ni lien privé n’est envoyé.",
+    "send": "Envoyer la relance",
+    "confirm": "Je confirme le destinataire, le solde et l’envoi de cette relance.",
+    "historyHint": "Le résultat et le solde rappelé sont conservés dans l’historique d’envoi de la facture."
   }
 }

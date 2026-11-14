@@ -4,6 +4,10 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.56] - 2026-11-14
+
+- Relances clients manuelles : file paginée des factures échues, recherche sur coordonnées figées, aperçu FR/EN et confirmation SMTP avec solde revérifié sous verrou. Historique distinguant facture et relance, montant/date conservés, idempotence et limites communes, droits modulaires et contrôles SQL; interface mobile/sombre, guide et captures. Aucun envoi planifié ni écriture comptable.
+
 ## [0.4.0-alpha.55] - 2026-11-14
 
 - Factures récurrentes : calendrier mensuel/trimestriel/annuel à jour fixe, préparation confirmée d’un brouillon par échéance due, taxes datées et arrondi source conservé. Pause/annulation, idempotence, historique après suppression et client protégé; droits modulaires, audit et guards SQL. Interface FR/EN/mobile/sombre et guide illustré; aucun envoi ni comptabilisation automatique.

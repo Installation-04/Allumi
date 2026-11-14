@@ -168,6 +168,8 @@ Ajouter une valeur à la fin d'un enum n'a pas ces effets.
 
 `invoice_email` référence une facture par clé composite entreprise/document. L’identifiant UUID fourni par la soumission assure l’idempotence. Destinataire, langue, auteur et création sont immuables; seul le résultat passe de PENDING à ACCEPTED, FAILED ou UNKNOWN avec date de fin. Aucune suppression accordée à l’application. La RLS exige Ventes en lecture/écriture selon l’opération. Le trigger impose une facture INVOICE/POSTED, l’auteur courant et l’heure de la base; il sérialise les insertions par facture et impose les limites de fréquence. Les changements sont audités. SMTP s’exécute hors transaction; interruption ou révocation peut laisser PENDING. Aucun renvoi automatique ni preuve de livraison. Voir [[Envoi-des-factures]].
 
+La même table distingue `purpose=INVOICE` (sans montant/date de relance) et `REMINDER` (montant positif et date obligatoires). Les lignes existantes deviennent INVOICE. Pour une relance, le guard vérifie aussi la lecture Comptabilité, une échéance passée, la date comptable non future, le jour courant à Toronto et le solde courant exact sous verrou facture. Montant, date et type deviennent immuables avec la tentative. Les limites d’envoi restent communes aux deux types. Aucune nouvelle table ni écriture comptable : [[Relances-clients]].
+
 ## Schéma Prisma
 ```prisma
 // Allumi — schéma de données (conception, phase 1).
@@ -1082,6 +1084,9 @@ model InvoiceEmail {
   recipient    String
   locale       String
   status       String @default("PENDING")
+  purpose      String @default("INVOICE")
+  reminderCents BigInt? @map("reminder_cents")
+  reminderDate DateTime? @map("reminder_date") @db.Date
   createdById  String @map("created_by_id") @db.Uuid
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   completedAt  DateTime? @map("completed_at") @db.Timestamptz(6)

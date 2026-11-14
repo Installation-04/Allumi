@@ -59,7 +59,7 @@ Le propriétaire renseigne les coordonnées et numéros fiscaux dans **Entrepris
 
 ## Préparer une facture
 
-Ouvrir **Brouillons de factures** pour saisir un client et des lignes, puis consulter le calcul enregistré. Voir [[Brouillons-de-factures]]. Les brouillons ne sont pas comptabilisés. Voir [[Validation-des-factures]] pour leur attribuer un numéro et créer leur écriture. L’envoi n’est pas encore disponible.
+Ouvrir **Brouillons de factures** pour saisir un client et des lignes, puis consulter le calcul enregistré. Voir [[Brouillons-de-factures]]. Les brouillons ne sont pas comptabilisés. Voir [[Validation-des-factures]] pour leur attribuer un numéro et créer leur écriture. L’envoi SMTP manuel est disponible : [[Envoi-des-factures]].
 
 Pour corriger entièrement une facture validée, voir [[Annulation-des-factures]]. Le document et son numéro sont conservés.
 
@@ -124,3 +124,4 @@ La recherche, les filtres de dates/état et la pagination des paiements sont dé
 - [[Devis]] — propositions, remise manuelle, réponse, impression et conversion en facture brouillon.
 
 - [[Factures-recurrentes]] — calendrier, préparation contrôlée de brouillons et historique des échéances.
+- [[Relances-clients]] — factures échues, aperçu bilingue et envoi SMTP manuel confirmé.

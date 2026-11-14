@@ -6,6 +6,20 @@ export type InvoiceMailData = {
 };
 const escape = (text: string) => text.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
+/** A balance reminder deliberately excludes invoice notes, private links and line details. */
+export function reminderMail(data: { number: string; issuer: string; customer: string; dueDate: string; asOf: string; outstanding: string }, locale: "fr-CA" | "en") {
+  const en = locale === "en";
+  const subject = `${en ? "Payment reminder" : "Rappel de paiement"} · ${data.number}`.replace(/[\r\n\x00-\x1f\x7f]/g, " ").slice(0, 200);
+  const lines = [data.issuer, "", `${en ? "Hello" : "Bonjour"} ${data.customer},`, "",
+    en ? `Our records show an outstanding balance for invoice ${data.number}.` : `Nos dossiers indiquent un solde à payer pour la facture ${data.number}.`,
+    `${en ? "Due date" : "Échéance"}: ${data.dueDate}`,
+    `${en ? "Outstanding balance (CAD)" : "Solde à payer (CAD)"}: ${data.outstanding}`,
+    `${en ? "Balance checked on" : "Solde vérifié le"}: ${data.asOf}`, "",
+    en ? "If you have already paid or have a question, please contact us so we can review your account." : "Si vous avez déjà payé ou avez une question, veuillez communiquer avec nous afin de vérifier votre compte.",
+    "", en ? "Thank you." : "Merci."];
+  return { subject, text: lines.join("\n"), html: `<!doctype html><html lang="${locale}"><meta charset="utf-8"><body style="font-family:Arial,sans-serif;color:#292524;max-width:680px;margin:auto;padding:20px">${lines.map(l => `<p style="white-space:pre-wrap;overflow-wrap:anywhere">${escape(l)}</p>`).join("")}</body></html>` };
+}
+
 /** Standalone invoice: no external resources, private app links or uploaded evidence. */
 export function invoiceMail(data: InvoiceMailData, locale: "fr-CA" | "en") {
   const l = locale === "en" ? { invoice: "Invoice", date: "Date", due: "Due date", customer: "Bill to", reference: "Reference", subtotal: "Subtotal", total: "Total (CAD)", description: "Description", quantity: "Quantity", price: "Unit price (CAD)", amount: "Amount" }

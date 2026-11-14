@@ -771,6 +771,12 @@
       "deleted": "This draft was deleted. Its occurrence remains processed and will not be recreated.",
       "confirm": "Confirm this operation.",
       "customerLocked": "A recurring invoice must retain the source invoice’s customer."
+    },
+    "reminders": {
+      "invalid": "Check the reminder details and search filters.",
+      "unavailable": "This invoice is no longer overdue with an outstanding balance. Refresh the reminder list.",
+      "stale": "The balance or date has changed. Reload this preview before sending.",
+      "confirm": "Confirm the recipient, balance and sending of the reminder."
     }
   },
   "settingsPage": {
@@ -1254,7 +1260,8 @@
       "releves-clients": "Customer statements",
       "releves-fournisseurs": "Supplier statements",
       "devis": "Estimates",
-      "recurrences": "Recurring invoices"
+      "recurrences": "Recurring invoices",
+      "relances": "Customer reminders"
     }
   },
   "updates": {
@@ -2150,7 +2157,10 @@
       "ACCEPTED": "Accepted by SMTP server — delivery unconfirmed",
       "FAILED": "Rejected by SMTP server",
       "UNKNOWN": "Uncertain result — the message may have been accepted"
-    }
+    },
+    "reminderKind": "Payment reminder",
+    "invoiceKind": "Invoice",
+    "reminded": "Balance reminded: {amount} · {date}"
   },
   "payablesAging": {
     "title": "Payables aging",
@@ -2895,5 +2905,31 @@
       "CANCELLED": "Cancelled",
       "COMPLETED": "Completed"
     }
+  },
+  "reminders": {
+    "title": "Customer reminders",
+    "intro": "Overdue invoices with an outstanding balance. Prepare and confirm each reminder individually.",
+    "checked": "Current balance checked on {date} (Eastern time).",
+    "search": "Customer or invoice number",
+    "filter": "Filter reminders",
+    "empty": "No overdue invoices to remind for this search.",
+    "due": "Due date",
+    "outstanding": "Outstanding balance",
+    "last": "Last reminder attempt: {date}",
+    "never": "No reminder attempts.",
+    "prepare": "Prepare a reminder",
+    "pagination": "Reminder pages",
+    "previous": "Previous",
+    "next": "Next",
+    "detail": "Reminder for invoice {number}",
+    "review": "Review recent payments and unapplied customer credits before sending a reminder. The balance only deducts payments and credits applied to this invoice.",
+    "invoice": "View invoice and email history",
+    "refresh": "Refresh preview",
+    "preview": "Message preview",
+    "subject": "Subject",
+    "manual": "Manual sending only. SMTP relay acceptance does not prove delivery to the recipient. No attachments or private links are sent.",
+    "send": "Send reminder",
+    "confirm": "I confirm the recipient, balance and sending of this reminder.",
+    "historyHint": "The result and reminded balance are kept in the invoice email history."
   }
 }
