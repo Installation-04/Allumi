@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.57] - 2026-11-14
+
 - Envoi manuel des devis : finalisation/numérotation clarifiée, aperçu FR/EN des données figées et conditions publiques, destinataire confirmé et historique SMTP immuable. Notes internes exclues du parcours, idempotence, limites de fréquence, RLS et audit; refus des nouveaux envois après expiration ou réponse. Interface mobile/sombre, guides et captures, sans signature ni envoi planifié.
 
 ## [0.4.0-alpha.56] - 2026-11-14
