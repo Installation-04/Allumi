@@ -6,8 +6,8 @@ import { todayIso } from "@/modules/ledger";
 import { codeSchema, itemSchema, rateSchema, taxSchema } from "../domain/schemas";
 import { percentageRate } from "../domain/calculation";
 
-async function transaction<T>(actor: CompanyContext, write: boolean, fn: (tx: Tx) => Promise<T>, catalogRead = false) {
-  try { return await withCompany(actor, async (tx) => { await requireRole(tx, catalogRead ? "catalog.read" : write ? "taxes.manage" : "taxes.read"); return fn(tx); }); }
+async function transaction<T>(actor: CompanyContext, write: boolean, fn: (tx: Tx) => Promise<T>, module: "taxes" | "catalog" = "taxes") {
+  try { return await withCompany(actor, async (tx) => { await requireRole(tx, module === "catalog" ? write ? "catalog.manage" : "catalog.read" : write ? "taxes.manage" : "taxes.read"); return fn(tx); }); }
   catch (error) { if (isConflict(error)) throw new AppError("catalog.conflict"); throw toAppError(error); }
 }
 export async function getTaxConfiguration(actor: CompanyContext) {
@@ -70,33 +70,49 @@ export async function listItems(actor: CompanyContext, q = "", includeInactive =
     const term = q.replace(/[\\%_]/g, "\\$&");
     const rows = await tx.item.findMany({ where: { companyId: actor.companyId, ...(includeInactive ? {} : { isActive: true }), ...(term ? { OR: [{ name: { contains: term, mode: "insensitive" as const } }, { code: { contains: term, mode: "insensitive" as const } }] } : {}) }, orderBy: [{ name: "asc" }, { id: "asc" }], take: 101 });
     return { truncated: rows.length > 100, items: rows.slice(0, 100).map((row) => ({ ...row, unitPrice: row.unitPrice?.toString() ?? "" })) };
-  }, true);
+  }, "catalog");
 }
 export async function getItem(actor: CompanyContext, id: string) {
   return transaction(actor, false, async (tx) => {
     const row = await tx.item.findFirst({ where: { id, companyId: actor.companyId } });
     return row ? { ...row, unitPrice: row.unitPrice?.toString() ?? "" } : null;
-  }, true);
+  }, "catalog");
 }
 export async function saveItem(actor: CompanyContext, input: unknown, id?: string) {
   const parsed = itemSchema.safeParse(input);
   if (!parsed.success) throw new AppError("catalog.invalid");
   const data = parsed.data;
   return transaction(actor, true, async (tx) => {
-    for (const [accountId, type] of [[data.incomeAccountId, "REVENUE"], [data.expenseAccountId, "EXPENSE"]] as const) {
-      if (accountId && !await tx.account.findFirst({ where: { id: accountId, companyId: actor.companyId, isActive: true, type } })) throw new AppError("catalog.reference");
+    const previous = id ? await tx.item.findFirst({where:{companyId:actor.companyId,id}}) : null;
+    if(id && !previous)throw new AppError("catalog.notFound");
+    // Catalogue writers can maintain basic fields without access to financial defaults.
+    // Changing or clearing a reference requires read access to its own module.
+    for (const [field, type] of [["incomeAccountId", "REVENUE"], ["expenseAccountId", "EXPENSE"]] as const) {
+      if(data[field] !== (previous?.[field] ?? null)) {
+        await requireRole(tx,"ledger.read");
+        const accountId=data[field];
+        if(accountId && !await tx.account.findFirst({where:{companyId:actor.companyId,id:accountId,isActive:true,type}}))throw new AppError("catalog.reference");
+      }
     }
-    if (data.defaultTaxCodeId && !await tx.taxCode.findFirst({ where: { companyId: actor.companyId, id: data.defaultTaxCodeId, isActive: true } })) throw new AppError("catalog.reference");
+    if(data.defaultTaxCodeId !== (previous?.defaultTaxCodeId ?? null)) {
+      await requireRole(tx,"taxes.read");
+      if(data.defaultTaxCodeId && !await tx.taxCode.findFirst({where:{companyId:actor.companyId,id:data.defaultTaxCodeId,isActive:true}}))throw new AppError("catalog.reference");
+    }
     if (!id) return (await tx.item.create({ data: { companyId: actor.companyId, ...data } })).id;
-    const result = await tx.item.updateMany({ where: { companyId: actor.companyId, id }, data });
+    const update: Partial<typeof data> = { ...data };
+    for (const field of ["incomeAccountId", "expenseAccountId", "defaultTaxCodeId"] as const) {
+      if (data[field] === previous?.[field]) delete update[field];
+    }
+    // Omit unchanged references: their database UPDATE OF guards require the referenced module's visibility.
+    const result = await tx.item.updateMany({ where: { companyId: actor.companyId, id }, data: update });
     if (result.count !== 1) throw new AppError("catalog.notFound");
     return id;
-  });
+  }, "catalog");
 }
 export async function archiveCatalog(actor: CompanyContext, kind: "item" | "taxCode", id: string, active: boolean) {
   return transaction(actor, true, async (tx) => {
     const args = { where: { companyId: actor.companyId, id }, data: { isActive: active } };
     const result = kind === "item" ? await tx.item.updateMany(args) : await tx.taxCode.updateMany(args);
     if (result.count !== 1) throw new AppError("catalog.notFound");
-  });
+  }, kind === "item" ? "catalog" : "taxes");
 }

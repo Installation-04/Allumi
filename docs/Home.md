@@ -48,7 +48,7 @@ Allumi ne remplace pas un comptable. Vérifie les taux et règles de taxes aupr�
 
 Le répertoire clients et fournisseurs (lot 4.1 livré) est décrit dans [[Contacts]].
 
-Taxes et produits/services : [[Taxes-et-catalogue]].
+Taxes et produits/services : [[Taxes-et-catalogue]]. Consultation et import : [[Sources-fiscales-officielles]].
 
 - [[Entreprise]]
 

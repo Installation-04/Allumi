@@ -5,6 +5,10 @@ import { AREAS } from "@/app/c/[companyId]/sections";
 import type { AccessContext } from "@/modules/companies";
 
 describe("company navigation authorization", () => {
+  it("offers official tax sources with Taxes read access independently of Accounting",()=>{
+    expect(canAccessRoute({role:"USER",moduleAccess:{taxes:"read",accounting:"none"}},"sources-fiscales")).toBe(true);
+    expect(canAccessRoute({role:"USER",moduleAccess:{taxes:"none",accounting:"read"}},"sources-fiscales")).toBe(false);
+  });
   it("allows company search for directory-only members without granting financial routes",()=>{
     const member:AccessContext={role:"USER",moduleAccess:{contacts:"read",sales:"none",accounting:"none",catalog:"none"}};
     expect(canAccessRoute(member,"recherche")).toBe(true);expect(canAccessRoute(member,"factures")).toBe(false);expect(canAccessRoute(member,"journal")).toBe(false);

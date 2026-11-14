@@ -379,6 +379,7 @@
     "create": "Créer"
   },
   "errors": {
+    "officialTaxes": {"invalid": "Vérifiez les critères, le code et la confirmation. La date doit être comprise entre le 1er avril 2013 et aujourd’hui.", "unavailable": "La source officielle est indisponible. Réessayez; aucun taux local n’a été modifié.", "schema": "Le format ou les périodes de la source ont changé. L’import est arrêté pour vérification.", "changed": "Les taux ont changé depuis l’aperçu. Consultez à nouveau les sources avant de confirmer."},
     "invoiceEmail": {
       "config": "Configuration SMTP absente ou invalide. Contactez l’administrateur du serveur.",
       "invalid": "Vérifiez le destinataire et la langue du courriel.",
@@ -1200,6 +1201,7 @@
     "planned": "À venir — non disponible",
     "progress": "Fonctionnalités et limites",
     "links": {
+      "sources-fiscales": "Sources fiscales officielles",
       "flux-tresorerie": "Suivi de trésorerie",
       "depenses": "Dépenses payées",
       "credits-fournisseurs": "Crédits fournisseurs",
@@ -2705,6 +2707,52 @@
       "VOID": "Annulé",
       "ACTIVE": "Actif",
       "ARCHIVED": "Archivé"
+    }
+  },
+  "officialTaxes": {
+    "audit": "Voir la provenance des imports",
+    "title": "Sources fiscales officielles",
+    "back": "Taxes et codes fiscaux",
+    "intro": "Consultez les taux standards officiels par province et à une date donnée, puis créez un code fiscal dans votre entreprise.",
+    "province": "Province ou territoire",
+    "date": "Date de référence",
+    "consult": "Consulter les taux",
+    "none": "Choisir un compte",
+    "results": "Taux standards · {province} · {date}",
+    "coverage": "TPS/TVH : données ARC depuis le 1er avril 2013. Québec : TVQ historique de Revenu Québec. Les TVP distinctes, exemptions et règles propres aux produits ne sont pas incluses.",
+    "collected": "Source consultée le {date}",
+    "officialSource": "Voir la source officielle",
+    "history": "Historique et empreinte de la source",
+    "ongoing": "en cours selon la source",
+    "create": "Créer le code et ses taxes",
+    "importHelp": "Crée un nouveau code taxable avec tout l’historique disponible des taux. Les comptes choisis servent à la comptabilisation; les taxes existantes et les pièces validées sont conservées. La TPS est déjà incluse dans un taux de TVH.",
+    "code": "Code local",
+    "codeHint": "1 à 10 caractères : lettres majuscules, chiffres ou tirets. Utilisez un nouveau code.",
+    "federalPayable": "TPS/TVH à remettre",
+    "federalRecoverable": "TPS/TVH récupérable (facultatif)",
+    "qstPayable": "TVQ à remettre",
+    "qstRecoverable": "TVQ récupérable (facultatif)",
+    "confirm": "J’ai vérifié la province, les taux et les comptes. Je confirme la création de ce nouveau code fiscal standard.",
+    "readOnly": "La création exige Taxes en écriture et Comptabilité en lecture.",
+    "success": "Le code fiscal {code} et ses taux officiels ont été créés.",
+    "providers": {
+      "CRA_GST_HST": "ARC · TPS/TVH",
+      "RQ_QST": "Revenu Québec · TVQ"
+    },
+    "provinces": {
+      "AB": "Alberta",
+      "BC": "Colombie-Britannique",
+      "MB": "Manitoba",
+      "NB": "Nouveau-Brunswick",
+      "NL": "Terre-Neuve-et-Labrador",
+      "NS": "Nouvelle-Écosse",
+      "NT": "Territoires du Nord-Ouest",
+      "NU": "Nunavut",
+      "ON": "Ontario",
+      "PE": "Île-du-Prince-Édouard",
+      "QC": "Québec",
+      "SK": "Saskatchewan",
+      "YT": "Yukon"
     }
   }
 }
