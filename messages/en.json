@@ -757,7 +757,7 @@
     "estimates": {
       "invalid": "Check the estimate dates, lines and terms. The estimate date cannot be in the future.",
       "stale": "This estimate has changed. Reload the page before continuing.",
-      "immutable": "Delivered estimates are locked. Copy it to create a new quote.",
+      "immutable": "Issued estimates are locked. Copy it to create a new quote.",
       "transition": "This operation is incompatible with the estimate’s status or validity.",
       "confirm": "Confirm this operation.",
       "customerLocked": "The invoice must retain its source estimate’s customer."
@@ -777,6 +777,13 @@
       "unavailable": "This invoice is no longer overdue with an outstanding balance. Refresh the reminder list.",
       "stale": "The balance or date has changed. Reload this preview before sending.",
       "confirm": "Confirm the recipient, balance and sending of the reminder."
+    },
+    "estimateEmail": {
+      "invalid": "Check the email recipient and language.",
+      "unavailable": "This estimate is no longer issued, unexpired and awaiting a response. Refresh the estimate.",
+      "confirm": "Confirm the recipient, public content and sending of the estimate.",
+      "confirmResend": "Confirm sending again; this estimate already has an email attempt.",
+      "rate": "Wait one minute between attempts, or five minutes while a send is pending. Maximum: 20 attempts per estimate in 24 hours."
     }
   },
   "settingsPage": {
@@ -2744,7 +2751,7 @@
       "VOID": "Voided",
       "ACTIVE": "Active",
       "ARCHIVED": "Archived",
-      "SENT": "Delivered",
+      "SENT": "Issued",
       "ACCEPTED": "Accepted",
       "DECLINED": "Declined",
       "CANCELLED": "Cancelled estimate",
@@ -2802,7 +2809,7 @@
     "new": "New estimate",
     "edit": "Edit estimate",
     "copy": "Copy to a new estimate",
-    "intro": "Prepare a quote, record delivery and the customer’s response, then convert an accepted estimate into a draft invoice. Estimates have no accounting effect.",
+    "intro": "Prepare and finalize an estimate, deliver it by your chosen method, record the customer’s response, then convert an accepted estimate into a draft invoice. Estimates have no accounting effect.",
     "date": "Estimate date",
     "validUntil": "Valid until",
     "saveHint": "Taxes are calculated on the estimate date. After delivery, lines, amounts and contact details are frozen.",
@@ -2821,8 +2828,8 @@
     "expiredHint": "This estimate has expired. Copy it to propose new dates and terms.",
     "decisionNote": "Internal response note",
     "confirm": "I confirm this operation.",
-    "send": "Mark as delivered",
-    "sendHint": "Record delivery you performed yourself. A permanent number will be assigned and the estimate will be locked. This action does not send an email.",
+    "send": "Finalize and number",
+    "sendHint": "Assign a permanent number and freeze the estimate details. This does not send or prove delivery of an email. You can then prepare an email or deliver the printed estimate yourself.",
     "accept": "Record acceptance",
     "decline": "Record a decline",
     "responseHint": "Record the response received from the customer. This internal operation is not an electronic signature.",
@@ -2838,7 +2845,7 @@
     "customerLocked": "The customer must remain the source estimate’s customer.",
     "statuses": {
       "DRAFT": "Draft",
-      "SENT": "Delivered",
+      "SENT": "Issued",
       "ACCEPTED": "Accepted",
       "DECLINED": "Declined",
       "CANCELLED": "Cancelled",
@@ -2931,5 +2938,19 @@
     "send": "Send reminder",
     "confirm": "I confirm the recipient, balance and sending of this reminder.",
     "historyHint": "The result and reminded balance are kept in the invoice email history."
+  },
+  "estimateEmail": {
+    "title": "Estimate email history",
+    "intro": "Send a finalized estimate to a confirmed recipient. SMTP acceptance does not prove delivery or customer acceptance.",
+    "prepare": "Preview estimate email",
+    "ineligible": "Only issued, unexpired estimates awaiting a response can be emailed. Previous attempts remain on record.",
+    "back": "Back to estimate",
+    "detail": "Email estimate {number}",
+    "refresh": "Refresh preview",
+    "preview": "Estimate email preview",
+    "subject": "Subject",
+    "publicContent": "Frozen public details and terms only. Internal and decision notes, supporting documents and private links are excluded. No payment is requested.",
+    "send": "Send estimate email",
+    "confirm": "I confirm the recipient, public content and sending of this estimate."
   }
 }

@@ -32,7 +32,7 @@ Les [[Justificatifs]] sont disponibles sur les documents de ventes et d’achats
 
 ## Devis
 
-Cycle commercial livré : [[Devis]]. Remise et réponse consignées manuellement, facture créée en brouillon et validation séparée. Envoi du devis, signature électronique et facturation progressive restent à venir. Les récurrences sont décrites ci-dessous.
+Cycle commercial livré : [[Devis]]. Finalisation et réponse consignées manuellement, [[Envoi-des-devis]] SMTP confirmé avec aperçu, facture créée en brouillon et validation séparée. Signature électronique et facturation progressive restent à venir. Les récurrences sont décrites ci-dessous.
 
 ## Factures récurrentes
 

@@ -79,7 +79,7 @@ export async function listEstimates(actor: CompanyContext, options: { q?: string
     return { page, hasMore: rows.length > 50, estimates: rows.slice(0, 50).map(r => ({ id: r.id, number: r.number, reference: r.reference, customer: r.customerSnapshot ? snapshotSchema.parse(r.customerSnapshot).name : contacts.find(c => c.id === r.contactId)?.displayName ?? null, status: r.status as EstimateStatus, expired: r.status === "SENT" && iso(r.validUntil) < todayIso(), issueDate: iso(r.issueDate), validUntil: iso(r.validUntil), totalCents: r.totalCents })) };
   });
 }
-/** Records manual delivery/response only; this does not send email or authenticate a customer signature. */
+/** Finalizes the numbered estimate or records a manual response; neither sends email nor authenticates a signature. */
 export async function transitionEstimate(actor: CompanyContext, id: string, revision: string, status: "SENT" | "ACCEPTED" | "DECLINED" | "CANCELLED", note = "") {
   if (note.length > 500 || (!["ACCEPTED", "DECLINED"].includes(status) && note.trim())) throw new AppError("estimates.invalid");
   return run(actor, true, async tx => {

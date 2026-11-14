@@ -208,6 +208,15 @@ it("preserves invoice email attempts and grants only outcome transitions",async(
  expect(reminderColumns.map(c=>c.column_name)).toEqual(['purpose','reminder_cents','reminder_date']);
 });
 
+it("preserves estimate email attempts with tenant Sales policies, audit and outcome-only grants", async () => {
+ const [grants] = await q<{ del: boolean; trunc: boolean }>("SELECT has_table_privilege('allumi_app','estimate_email','DELETE') AS del, has_table_privilege('allumi_app','estimate_email','TRUNCATE') AS trunc");
+ expect(grants).toEqual({ del: false, trunc: false });
+ const columns = await q<{ column_name: string }>("SELECT column_name FROM information_schema.column_privileges WHERE grantee='allumi_app' AND table_name='estimate_email' AND privilege_type='UPDATE' ORDER BY column_name");
+ expect(columns.map(c => c.column_name)).toEqual(['completed_at','status']);
+ expect(await q("SELECT tgname FROM pg_trigger WHERE tgname IN ('estimate_email_guard','estimate_email_audit') AND NOT tgisinternal")).toHaveLength(2);
+ expect((await q<{qual:string}>("SELECT qual FROM pg_policies WHERE tablename='estimate_email' AND policyname='module_read' AND permissive='RESTRICTIVE'"))[0]?.qual).toContain('sales');
+});
+
 it("protects bank rule identity, revisions and audit history in the database", async()=>{
  const [grants]=await q<{del:boolean;trunc:boolean}>("SELECT has_table_privilege('allumi_app','bank_rule','DELETE') AS del,has_table_privilege('allumi_app','bank_rule','TRUNCATE') AS trunc");
  expect(grants).toEqual({del:false,trunc:false});

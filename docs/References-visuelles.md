@@ -421,3 +421,11 @@ Factures échues, aperçu bilingue et envoi confirmé avec contrôle du solde. V
 ![File des relances](images/relances-file-desktop.png)
 
 ![Aperçu anglais sombre sur téléphone](images/relances-apercu-en-dark-mobile.png)
+
+## Courriels de devis
+
+Aperçu bilingue et envoi SMTP individuel confirmé, avec conditions publiques et historique. Voir [[Envoi-des-devis]].
+
+![Aperçu du devis en anglais sombre](images/devis-courriel-apercu-en-dark-desktop.png)
+
+![Historique sur téléphone](images/devis-courriel-historique-en-dark-mobile.png)

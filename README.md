@@ -21,7 +21,7 @@ Ou à la main, avec Docker Engine, Compose v2, Bash, OpenSSL et Git déjà insta
 ```bash
 git clone https://github.com/Installation-04/Allumi.git allumi
 cd allumi
-git checkout v0.4.0-alpha.56
+git checkout v0.4.0-alpha.57
 ./scripts/install-docker.sh
 ```
 
@@ -50,7 +50,7 @@ Le script installe Docker, configure le pare-feu, génère les secrets, démarre
 
 ## Windows, iPhone et Proxmox
 
-Le client Windows de la préversion v0.4.0-alpha.56 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
+Le client Windows de la préversion v0.4.0-alpha.57 est distribué via les [Releases](https://github.com/Installation-04/Allumi/releases), avec leur version et leurs sommes de contrôle. Voir le [client Windows](docs/Client-Windows.md). Sur iPhone : **Safari → Partager → Sur l’écran d’accueil**, puis ouvrir Allumi depuis son icône ([guide iOS](docs/Application-mobile.md)). Une connexion au serveur est nécessaire.
 
 Pour tester sur Proxmox, utiliser une **VM Ubuntu dédiée** et des données fictives : [guide Proxmox](docs/Proxmox.md). La page **Versions** distingue les mises à jour du serveur et du client.
 
@@ -515,3 +515,11 @@ Factures échues, aperçu bilingue et envoi confirmé avec contrôle du solde. [
 ![File des relances](docs/images/relances-file-desktop.png)
 
 ![Aperçu anglais sombre sur téléphone](docs/images/relances-apercu-en-dark-mobile.png)
+
+## Courriels de devis
+
+Aperçu bilingue et envoi SMTP individuel confirmé, avec conditions publiques et historique. [Guide illustré](docs/Envoi-des-devis.md).
+
+![Aperçu du devis en anglais sombre](docs/images/devis-courriel-apercu-en-dark-desktop.png)
+
+![Historique sur téléphone](docs/images/devis-courriel-historique-en-dark-mobile.png)

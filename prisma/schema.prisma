@@ -444,6 +444,7 @@ model Company {
   taxCodes               TaxCode[]
   salesDocuments         SalesDocument[]
   invoiceEmails          InvoiceEmail[]
+  estimateEmails         EstimateEmail[]
   bankRules              BankRule[]
   purchaseDocuments      PurchaseDocument[]
   payments               Payment[]
@@ -1732,6 +1733,7 @@ model SalesEstimate {
   contact            Contact             @relation(fields: [companyId, contactId], references: [companyId, id], onDelete: Restrict, map: "sales_estimate_contact_fkey")
   convertedInvoice   SalesDocument?      @relation("EstimateInvoice", fields: [companyId, convertedInvoiceId], references: [companyId, id], onDelete: Restrict, map: "sales_estimate_invoice_fkey")
   lines              SalesEstimateLine[]
+  emails             EstimateEmail[]
 
   @@unique([companyId, id])
   @@unique([companyId, number])
@@ -1739,6 +1741,24 @@ model SalesEstimate {
   @@index([companyId, status, issueDate])
   @@index([companyId, contactId])
   @@map("sales_estimate")
+}
+
+/// Tentative SMTP d'un devis finalisé, distincte de sa remise et de la réponse du client.
+model EstimateEmail {
+  id          String @id @db.Uuid
+  companyId   String @map("company_id") @db.Uuid
+  estimateId  String @map("estimate_id") @db.Uuid
+  recipient   String
+  locale      String
+  status      String @default("PENDING")
+  createdById String @map("created_by_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  completedAt DateTime? @map("completed_at") @db.Timestamptz(6)
+  company     Company @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  estimate    SalesEstimate @relation(fields: [companyId, estimateId], references: [companyId, id], onDelete: Restrict)
+
+  @@index([companyId, estimateId, createdAt])
+  @@map("estimate_email")
 }
 
 model SalesEstimateLine {
