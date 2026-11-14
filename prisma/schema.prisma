@@ -924,6 +924,9 @@ model InvoiceEmail {
   recipient    String
   locale       String
   status       String @default("PENDING")
+  purpose      String @default("INVOICE")
+  reminderCents BigInt? @map("reminder_cents")
+  reminderDate DateTime? @map("reminder_date") @db.Date
   createdById  String @map("created_by_id") @db.Uuid
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   completedAt  DateTime? @map("completed_at") @db.Timestamptz(6)

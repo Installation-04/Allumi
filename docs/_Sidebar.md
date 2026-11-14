@@ -29,6 +29,7 @@
 - [[Sources-fiscales-officielles]]
 - [[Devis]]
 - [[Factures-recurrentes]]
+- [[Relances-clients]]
 - [[Brouillons-de-factures]]
 - [[Envoi-des-factures]]
 - [[Plan-comptable]]

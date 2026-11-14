@@ -32,8 +32,8 @@ Les [[Justificatifs]] sont disponibles sur les documents de ventes et d’achats
 
 ## Devis
 
-Cycle commercial livré : [[Devis]]. Remise et réponse consignées manuellement, facture créée en brouillon et validation séparée. Envoi du devis, signature électronique, facturation progressive et récurrences restent à venir.
+Cycle commercial livré : [[Devis]]. Remise et réponse consignées manuellement, facture créée en brouillon et validation séparée. Envoi du devis, signature électronique et facturation progressive restent à venir. Les récurrences sont décrites ci-dessous.
 
 ## Factures récurrentes
 
-[[Factures-recurrentes]] : modèles mensuels/trimestriels/annuels issus de factures validées, génération confirmée de brouillons dus, recalcul fiscal daté, pause/annulation et historique conservé. Exécution de fond, envoi automatique et relances restent à venir.
+[[Factures-recurrentes]] : modèles mensuels/trimestriels/annuels issus de factures validées, génération confirmée de brouillons dus, recalcul fiscal daté, pause/annulation et historique conservé. Exécution de fond et envoi automatique restent à venir. Les [[Relances-clients]] permettent un aperçu et un envoi individuel confirmé sur les factures échues; aucun échéancier ni traitement groupé.

@@ -74,3 +74,4 @@ Taxes et produits/services : [[Taxes-et-catalogue]]. Consultation et import : [[
 - [[Devis]] — propositions, remise manuelle, réponse, impression et conversion en facture brouillon.
 
 - [[Factures-recurrentes]] — calendrier, préparation contrôlée de brouillons et historique des échéances.
+- [[Relances-clients]] — factures échues, aperçu bilingue et envoi SMTP manuel confirmé.

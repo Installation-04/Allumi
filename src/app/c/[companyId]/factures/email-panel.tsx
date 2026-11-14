@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { getTranslations } from "next-intl/server";
 import { can } from "@/modules/companies";
+import { formatMoney } from "@/modules/ledger";
 import { getInvoiceEmails } from "@/modules/sales";
 import { ActionForm, Field, SelectField } from "@/app/_components/ui";
 import { sendInvoiceEmailAction } from "./email-actions";
@@ -15,7 +16,7 @@ export async function InvoiceEmailPanel({actor,access,documentId,billingSnapshot
     <h2 id="invoice-email-title" className="font-semibold">{t("title")}</h2>
     <p className="text-sm text-stone-600 dark:text-stone-400">{t("intro")}</p>
     {!configured && canSend && <p role="status" className="rounded border border-amber-600 p-3 text-sm">{t("notConfigured")}</p>}
-    {attempts.length>0 ? <ul className="space-y-2">{attempts.slice(0,20).map(a=><li key={a.id} className="space-y-1 rounded border p-3 text-sm break-words"><p className="font-medium">{a.recipient}</p><p>{a.createdAt.toISOString().replace("T"," ").slice(0,16)} UTC · {t(a.locale==="en"?"english":"french")}</p><p>{t(`statuses.${a.status}` as "statuses.PENDING")}</p>{(a.status==="UNKNOWN" || a.status==="PENDING") && <p className="text-amber-800 dark:text-amber-300">{t("uncertainHint")}</p>}</li>)}</ul>:<p className="text-sm">{t("empty")}</p>}
+    {attempts.length>0 ? <ul className="space-y-2">{attempts.slice(0,20).map(a=><li key={a.id} className="space-y-1 rounded border p-3 text-sm break-words"><p className="font-medium">{t(a.purpose === "REMINDER" ? "reminderKind" : "invoiceKind")} · {a.recipient}</p><p>{a.createdAt.toISOString().replace("T"," ").slice(0,16)} UTC · {t(a.locale==="en"?"english":"french")}</p>{a.purpose === "REMINDER" && a.reminderCents !== null && a.reminderDate && <p>{t("reminded", { amount: formatMoney(a.reminderCents, locale), date: a.reminderDate.toISOString().slice(0,10) })}</p>}<p>{t(`statuses.${a.status}` as "statuses.PENDING")}</p>{(a.status==="UNKNOWN" || a.status==="PENDING") && <p className="text-amber-800 dark:text-amber-300">{t("uncertainHint")}</p>}</li>)}</ul>:<p className="text-sm">{t("empty")}</p>}
     {attempts.length>20 && <p className="text-sm">{t("limit")}</p>}
     {canSend && configured && <details className="rounded border p-3"><summary className="min-h-11 cursor-pointer">{t(attempts.length?"resend":"send")}</summary><ActionForm action={sendInvoiceEmailAction.bind(null,actor.companyId,documentId,randomUUID())} label={t("submit")}>
       <Field name="recipient" label={t("recipient")} type="email" defaultValue={email} autoComplete="email" />

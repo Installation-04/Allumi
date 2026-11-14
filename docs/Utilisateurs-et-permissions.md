@@ -72,3 +72,5 @@ La lecture des factures avec Ventes reste possible si les répertoires Contacts 
 ## Récurrences
 
 Le suivi des [[Factures-recurrentes]] relève de Ventes en lecture. Création et génération exigent Ventes en écriture et Contacts/Comptabilité/Taxes en lecture, plus Catalogue en lecture si des articles sont repris. Pause et annulation exigent Ventes en écriture. Aucune délégation Comptabilité en écriture n’est nécessaire pour préparer un brouillon; sa validation reste une action distincte.
+
+Les [[Relances-clients]] exigent Ventes et Comptabilité en lecture pour la file et l’aperçu, puis Ventes en écriture et Comptabilité en lecture pour envoyer. L’historique des courriels, y compris le solde rappelé, est visible avec Ventes en lecture; aucune validation comptable n’est réalisée.

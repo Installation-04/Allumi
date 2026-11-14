@@ -203,6 +203,9 @@ it("preserves invoice email attempts and grants only outcome transitions",async(
  const columns=await q<{column_name:string}>("SELECT column_name FROM information_schema.column_privileges WHERE grantee='allumi_app' AND table_name='invoice_email' AND privilege_type='UPDATE' ORDER BY column_name");
  expect(columns.map(c=>c.column_name)).toEqual(["completed_at","status"]);
  expect(await q("SELECT tgname FROM pg_trigger WHERE tgname='invoice_email_guard' AND NOT tgisinternal")).toHaveLength(1);
+ expect(await q("SELECT conname FROM pg_constraint WHERE conname='invoice_email_purpose_check'")).toHaveLength(1);
+ const reminderColumns=await q<{column_name:string}>("SELECT column_name FROM information_schema.columns WHERE table_name='invoice_email' AND column_name IN ('purpose','reminder_cents','reminder_date') ORDER BY column_name");
+ expect(reminderColumns.map(c=>c.column_name)).toEqual(['purpose','reminder_cents','reminder_date']);
 });
 
 it("protects bank rule identity, revisions and audit history in the database", async()=>{

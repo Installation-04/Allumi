@@ -15,6 +15,7 @@ export const ROUTE_ACCESS: Record<string, readonly Action[]> = {
   factures: ["sales.read"],
   devis: ["sales.read"],
   recurrences: ["sales.read"],
+  relances: ["sales.read", "ledger.read"],
   avoirs: ["sales.read"],
   remboursements: ["sales.read", "ledger.read"],
   "releves-clients": ["sales.read", "ledger.read", "contact.read"],

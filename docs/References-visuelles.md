@@ -413,3 +413,11 @@ Parcours sur données fictives : [[Factures-recurrentes]], génération confirm�
 ![Historique des échéances](images/recurrences-historique-desktop.png)
 
 ![Modèle en anglais sombre](images/recurrences-en-dark-mobile.png)
+
+## Relances clients manuelles
+
+Factures échues, aperçu bilingue et envoi confirmé avec contrôle du solde. Voir [[Relances-clients]].
+
+![File des relances](images/relances-file-desktop.png)
+
+![Aperçu anglais sombre sur téléphone](images/relances-apercu-en-dark-mobile.png)

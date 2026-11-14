@@ -35,7 +35,7 @@ export async function sendInvoiceEmail(actor: CompanyContext, documentId: string
       if (!locks[0]) throw new AppError("invoiceEmail.unavailable");
       const existing = await tx.invoiceEmail.findFirst({where:{companyId:actor.companyId,id:input.attemptId}});
       if (existing) {
-        if (existing.documentId !== documentId || existing.recipient !== input.recipient || existing.locale !== input.locale) throw new AppError("invoiceEmail.invalid");
+        if (existing.purpose !== "INVOICE" || existing.documentId !== documentId || existing.recipient !== input.recipient || existing.locale !== input.locale) throw new AppError("invoiceEmail.invalid");
         return {existing};
       }
       requireMailConfigured();
