@@ -1,168 +1,159 @@
 <p align="center">
-  <img src="docs/images/allumi-banner.png" alt="Allumi — Votre comptabilité. Vos données." width="1200">
+  <img src="docs/images/allumi-banner-en.png" alt="Allumi — Your accounting. Your data." width="1200">
 </p>
 
 <h1 align="center">Allumi</h1>
 
 <p align="center">
-  <strong>La comptabilité auto-hébergée pour les PME du Québec et du Canada.</strong><br>
-  Devis, factures, paiements, taxes et rapports, depuis votre propre serveur.
+  <strong>Self-hosted accounting for small businesses in Quebec and Canada.</strong><br>
+  Estimates, invoices, payments, taxes and reports, on your own server.
 </p>
 
 <p align="center">
-  <a href="https://github.com/Installation-04/Allumi/actions/workflows/ci.yml"><img src="https://github.com/Installation-04/Allumi/actions/workflows/ci.yml/badge.svg?branch=main" alt="État de la CI"></a>
-  <a href="https://github.com/Installation-04/Allumi/releases"><img src="https://img.shields.io/github/v/release/Installation-04/Allumi?include_prereleases&amp;label=version&amp;color=087f5b" alt="Dernière version, préversions comprises"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-087f5b" alt="Licence MIT"></a>
-  <a href="docs/Installation-Docker.md"><img src="https://img.shields.io/badge/Docker-AMD64%20%7C%20ARM64-2496ed" alt="Docker AMD64 et ARM64"></a>
+  <a href="https://github.com/Installation-04/Allumi/actions/workflows/ci.yml"><img src="https://github.com/Installation-04/Allumi/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI status"></a>
+  <a href="https://github.com/Installation-04/Allumi/releases"><img src="https://img.shields.io/github/v/release/Installation-04/Allumi?include_prereleases&amp;label=version&amp;color=087f5b" alt="Latest version, including prereleases"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-087f5b" alt="MIT license"></a>
+  <a href="docs/Installation-Docker.md"><img src="https://img.shields.io/badge/Docker-AMD64%20%7C%20ARM64-2496ed" alt="Docker AMD64 and ARM64"></a>
 </p>
 
+<p align="center"><strong>English</strong> · <a href="README.fr.md" lang="fr">Français</a></p>
+
 <p align="center">
-  <a href="#installer-allumi"><strong>Installer Allumi</strong></a> ·
-  <a href="#en-images">Voir l’application</a> ·
+  <a href="#install-allumi"><strong>Install Allumi</strong></a> ·
+  <a href="#screenshots">Explore the app</a> ·
   <a href="https://github.com/Installation-04/Allumi/wiki">Documentation</a> ·
-  <a href="https://github.com/Installation-04/Allumi/releases">Téléchargements</a>
+  <a href="https://github.com/Installation-04/Allumi/releases">Downloads</a>
 </p>
 
-Allumi réunit le suivi commercial et la comptabilité dans une application web destinée aux petites entreprises et aux travailleurs autonomes. Préparez un devis, transformez-le en facture, enregistrez un paiement, rapprochez vos transactions et retrouvez vos chiffres dans les rapports. L’application fonctionne en **français ou en anglais**, avec les **thèmes clair et sombre**, sur ordinateur et téléphone.
+Allumi brings sales workflows and accounting together in a web application for small businesses and self-employed professionals. Prepare an estimate, turn it into an invoice, record a payment, reconcile transactions and review your financial reports. The app supports **English and French**, **light and dark themes**, and layouts for desktop and mobile.
 
-Vous choisissez où héberger l’instance et ses données. Le code est ouvert sous licence **MIT**, et les clients web, Windows et iPhone se connectent au même serveur.
+You choose where to host your instance and its data. The source code is available under the **MIT license**, and the web, Windows and iPhone clients connect to the same server.
 
 > [!NOTE]
-> **Projet en pré-alpha.** Les fonctionnalités présentées sont disponibles dans les préversions, destinées aux essais avec des données fictives. Consultez les [fonctionnalités et limites](docs/Fonctionnalites-et-limites.md) avant d’évaluer Allumi pour votre activité.
+> **Pre-alpha software.** The features below are available in prereleases intended for testing with fictional data. Review the [features and limitations](docs/Fonctionnalites-et-limites.md) before evaluating Allumi for your business.
 
-## Installer Allumi
+## Install Allumi
 
-Sur une **VM Ubuntu 22.04/24.04 dédiée**, ouvrez un terminal avec `curl` et un compte disposant de droits root ou `sudo`, puis lancez :
+In a **dedicated Ubuntu 22.04/24.04 VM**, open a terminal with `curl` and an account with root or `sudo` privileges, then run:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh
 ```
 
-Le lanceur est récupéré directement depuis ce dépôt GitHub. Il détecte le système et le processeur, présente un récapitulatif, demande confirmation et récupère la dernière version étiquetée, **préversions comprises**. Il lance ensuite l’installateur adapté.
+The launcher is downloaded directly from this GitHub repository. It detects your operating system and CPU, displays a summary, asks for confirmation and retrieves the latest tagged version, **including prereleases**. It then starts the appropriate installer.
 
-L’assistant vous guide pour choisir l’adresse de l’instance, le port et la langue. Sur Ubuntu, l’installation complète peut installer Docker, préparer l’application et PostgreSQL privé, configurer le pare-feu et planifier des sauvegardes chiffrées. Les images sont disponibles pour **AMD64 et ARM64**. Prévoyez au moins **2 Go de RAM et 5 Go d’espace libre** pour les images et la base.
+The wizard guides you through the instance address, port and language settings. On Ubuntu, the full installer can install Docker, set up the app and a private PostgreSQL database, configure the firewall and schedule encrypted backups. Images are available for **AMD64 and ARM64**. Allow at least **2 GB of RAM and 5 GB of free disk space** for the images and database.
 
-- **Port proposé : `28080`.** Vous pouvez le changer dans l’assistant.
-- **HTTPS local sur IP :** le certificat interne doit être approuvé sur vos appareils. [Configurer la confiance HTTPS](docs/HTTPS-local.md).
-- **Premier accès :** utilisez l’URL et le jeton affichés à la fin pour créer l’administrateur et la première entreprise.
-- **Sur Proxmox :** exécutez la commande **dans une VM Ubuntu**, pas sur l’hôte Proxmox. [Guide Proxmox](docs/Proxmox.md).
+- **Default port: `28080`.** You can change it in the wizard.
+- **Local HTTPS over an IP address:** approve the internal certificate on your devices. [Set up HTTPS trust](docs/HTTPS-local.md).
+- **First sign-in:** use the URL and setup token shown at the end to create the administrator and first company.
+- **On Proxmox:** run the command **inside an Ubuntu VM**, not on the Proxmox host. [Proxmox guide](docs/Proxmox.md).
 
-[Guide d’installation complet](docs/Installation-Docker.md) · [Lire le script avant de l’exécuter](scripts/get.sh) · [Premier démarrage](docs/Premier-demarrage.md)
+[Full installation guide](docs/Installation-Docker.md) · [Read the script before running it](scripts/get.sh) · [First-time setup](docs/Premier-demarrage.md)
 
 <details>
-<summary>Vérifier la compatibilité, choisir une version ou utiliser Docker déjà installé</summary>
+<summary>Check compatibility, select a version or use an existing Docker installation</summary>
 
 <br>
 
-**Diagnostic uniquement**, sans installation ni modification :
+**Diagnostics only**, without installing or changing anything:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --check
 ```
 
-**Installer une version précise :**
+**Install a specific version:**
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.57
 ```
 
-**Docker Engine et Compose v2 déjà disponibles :**
+**Docker Engine and Compose v2 already installed:**
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --docker-only
 ```
 
-Ce mode utilise Docker et Compose déjà installés, sans configurer le pare-feu ni planifier de sauvegardes. Le lanceur peut installer Git s’il manque sur un système Debian/Ubuntu avec les droits requis. Voir les [options d’installation](docs/Installation-Docker.md).
+This mode uses your existing Docker and Compose installation without configuring the firewall or scheduling backups. The launcher may install Git if it is missing on Debian/Ubuntu and the required privileges are available. See the [installation options](docs/Installation-Docker.md).
 
 </details>
 
-## Ce que vous pouvez faire
+## What you can do
 
-| Pour votre activité | Dans Allumi |
+| For your business | In Allumi |
 | --- | --- |
-| **Vendre et facturer** | [Devis](docs/Devis.md), conversion en facture brouillon, factures validées, avoirs, encaissements et remboursements clients. |
-| **Communiquer avec vos clients** | Envoi manuel des [devis](docs/Envoi-des-devis.md) et [factures](docs/Envoi-des-factures.md) par SMTP, aperçus, confirmations et historiques; [relances individuelles](docs/Relances-clients.md) sur les factures échues. |
-| **Préparer les factures récurrentes** | [Calendriers mensuels, trimestriels ou annuels](docs/Factures-recurrentes.md), génération confirmée de brouillons, pause et historique des échéances. |
-| **Suivre les achats** | Factures et crédits fournisseurs, dépenses et paiements partiels ou complets; clients, fournisseurs et catalogue de produits/services. |
-| **Organiser les transactions** | Imports CSV/OFX et de transactions Stripe/PayPal, appariement aux écritures, règles de catégorisation avec aperçu, dépôts groupés et rapprochement bancaire. |
-| **Gérer les taxes** | Codes et taux datés, calculs TPS/TVQ/TVH, consultation et import confirmé des [taux officiels ARC et Revenu Québec](docs/Sources-fiscales-officielles.md), avec provenance. |
-| **Consulter vos chiffres** | Bilan, état des résultats, grand livre, balance, âge des comptes, relevés clients/fournisseurs, sommaire des taxes, comparatifs et exports CSV; impression/PDF depuis le navigateur. |
-| **Travailler à plusieurs** | Plusieurs entreprises, invitations, rôles et [permissions modulaires](docs/Utilisateurs-et-permissions.md), authentification à deux facteurs et piste d’audit. |
+| **Manage sales and invoices** | [Estimates](docs/Devis.md), conversion to draft invoices, posted invoices, credit notes, customer payments and refunds. |
+| **Stay in touch with customers** | Manually email [estimates](docs/Envoi-des-devis.md) and [invoices](docs/Envoi-des-factures.md) through SMTP, with previews, confirmations and history; prepare [individual reminders](docs/Relances-clients.md) for overdue invoices. |
+| **Prepare recurring invoices** | [Monthly, quarterly or annual schedules](docs/Factures-recurrentes.md), confirmed draft generation, pause controls and occurrence history. |
+| **Track purchases** | Supplier bills and credits, expenses and partial or full payments; customers, suppliers and a products/services catalog. |
+| **Organize transactions** | Import CSV/OFX statements and Stripe/PayPal transactions, match them to journal entries, preview categorization rules, group deposits and reconcile bank accounts. |
+| **Manage taxes** | Dated tax codes and rates, GST/QST/HST calculations, consultation and confirmed import of [official CRA and Revenu Québec rates](docs/Sources-fiscales-officielles.md), with provenance. |
+| **Understand your finances** | Balance sheet, income statement, general ledger, trial balance, aging reports, customer/supplier statements, tax summary, comparisons and CSV exports; browser printing and PDF output. |
+| **Work with your team** | Multiple companies, invitations, roles and [modular permissions](docs/Utilisateurs-et-permissions.md), two-factor authentication and an audit trail. |
 
-La comptabilité utilise la **partie double**, des montants exacts en cents ou Decimal, et des écritures validées immuables corrigées par contre-passation. Les accès sont contrôlés côté application et en base, avec isolation par entreprise.
+The accounting system uses **double-entry bookkeeping**, exact amounts in cents or Decimal, and immutable posted entries corrected through reversals. Access is enforced in the application and database, with isolation between companies.
 
-Les flux bancaires directs, le suivi des stocks, la paie, la multidevise, la signature électronique et l’exécution planifiée des récurrences/relances restent à développer. Les fonctionnalités fiscales ne constituent pas un dépôt de déclaration. [Disponibilités et limites détaillées](docs/Fonctionnalites-et-limites.md).
+Direct bank feeds, inventory tracking, payroll, multiple currencies, electronic signatures and scheduled execution of recurring invoices/reminders remain under development. Tax features do not file returns. [Detailed availability and limitations](docs/Fonctionnalites-et-limites.md).
 
-## En images
+## Screenshots
 
-### Votre activité en un coup d’œil
+### Your business at a glance
 
-Le tableau de bord rassemble les indicateurs de l’entreprise. La navigation par activité donne accès aux ventes, dépenses, transactions et rapports.
+The dashboard brings your company’s indicators together. Activity-based navigation gives you access to sales, expenses, transactions and reports. Shown here in English with the dark theme.
 
-![Tableau de bord Allumi sur ordinateur](docs/images/tableau-de-bord-desktop.png)
+![Allumi desktop dashboard in English with the dark theme](docs/images/dashboard-en-dark-desktop.png)
 
-### Français, anglais, clair ou sombre
+### Two languages, two themes
 
-La langue et l’apparence se choisissent dans l’en-tête. Les préférences sont conservées dans votre navigateur.
+Choose your language and appearance in the header. Your preferences are saved in your browser. The same dashboard is shown below in French with the light theme.
 
-![Tableau de bord Allumi en anglais et thème sombre](docs/images/dashboard-en-dark-desktop.png)
+![Allumi desktop dashboard in French with the light theme](docs/images/tableau-de-bord-desktop.png)
 
-### Sur téléphone aussi
+### On your phone, too
 
 <table>
   <tr>
-    <td align="center"><strong>Tableau de bord</strong></td>
-    <td align="center"><strong>Contacts en anglais sombre</strong></td>
+    <td align="center"><strong>Dashboard · French, light</strong></td>
+    <td align="center"><strong>Contacts · English, dark</strong></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/images/tableau-de-bord-mobile.png" alt="Tableau de bord Allumi sur téléphone" width="280"></td>
-    <td align="center"><img src="docs/images/contacts-en-dark-mobile.png" alt="Répertoire des contacts en anglais sombre sur téléphone" width="280"></td>
+    <td align="center"><img src="docs/images/tableau-de-bord-mobile.png" alt="Allumi mobile dashboard in French with the light theme" width="280"></td>
+    <td align="center"><img src="docs/images/contacts-en-dark-mobile.png" alt="Allumi mobile contacts in English with the dark theme" width="280"></td>
   </tr>
 </table>
 
-Captures réelles de l’application avec des données fictives; les vues mobiles sont émulées avec Chromium. [Explorer la galerie complète dans le wiki](https://github.com/Installation-04/Allumi/wiki/References-visuelles).
+Real application screenshots using fictional data; mobile views are emulated in Chromium. [Explore the full screenshot gallery in the wiki](https://github.com/Installation-04/Allumi/wiki/References-visuelles).
 
-## Choisissez votre accès
+## Choose how you connect
 
-| Accès | Comment l’utiliser |
+| Access | How to use it |
 | --- | --- |
-| **Navigateur** | Ouvrez l’URL de votre serveur sur ordinateur, tablette ou téléphone. |
-| **Windows x64** | Téléchargez l’installateur `.exe` dans les [Releases](https://github.com/Installation-04/Allumi/releases), puis connectez le client à votre serveur. [Guide Windows](docs/Client-Windows.md). |
-| **iPhone / iPad** | Dans Safari : **Partager → Sur l’écran d’accueil**, puis ouvrez Allumi depuis son icône. [Guide iOS](docs/Application-mobile.md). |
-| **Serveur Docker** | Déployez les images Linux AMD64/ARM64 sur votre infrastructure. [Guide Docker](docs/Installation-Docker.md). |
+| **Web browser** | Open your server URL on a desktop, tablet or phone. |
+| **Windows x64** | Download the `.exe` installer from [Releases](https://github.com/Installation-04/Allumi/releases), then connect the client to your server. [Windows guide](docs/Client-Windows.md). |
+| **iPhone / iPad** | In Safari, choose **Share → Add to Home Screen**, then open Allumi from its icon. [iOS guide](docs/Application-mobile.md). |
+| **Docker server** | Deploy the Linux AMD64/ARM64 images on your own infrastructure. [Docker guide](docs/Installation-Docker.md). |
 
-Le client Windows et l’app web ajoutée à l’écran d’accueil nécessitent une connexion au serveur; ils ne constituent pas une version de comptabilité hors ligne.
+The Windows client and home-screen web app require a connection to the server; they are not offline accounting applications.
 
-## Exploiter votre instance
+## Run your instance
 
-Depuis l’administration, les opérateurs autorisés peuvent consulter la version et demander une mise à jour du serveur, avec confirmation de la sauvegarde et de l’interruption. L’installateur active par défaut l’agent de mise à jour web sur les hôtes Linux compatibles exécutés en root avec Python 3 et systemd actif. Pour une installation existante, suivez le [guide des mises à jour](docs/Mise-a-jour.md).
+Authorized operators can view the installed version and request a server update from the administration pages, confirming the backup and service interruption first. The installer enables the web update agent by default on compatible Linux hosts when run as root with Python 3 and active systemd. For existing installations, follow the [update guide](docs/Mise-a-jour.md).
 
-Les sauvegardes chiffrées, la restauration, les journaux d’opérations et les rôles d’administration sont décrits dans le wiki. Les mises à jour du serveur et du client Windows sont distinctes; le web et l’app iOS suivent la version du serveur.
+Encrypted backups, restoration, operation logs and administration roles are covered in the wiki. Server and Windows client updates are separate; the browser and iOS web app follow the server version.
 
-[Administration serveur](docs/Administration-serveur.md) · [Sauvegardes et restauration](docs/Sauvegardes.md) · [Sécurité](SECURITY.md)
+[Server administration](docs/Administration-serveur.md) · [Backup and restore](docs/Sauvegardes.md) · [Security](SECURITY.md)
 
-## Documentation et contribution
+## Documentation and contributing
 
-- **Prendre en main l’application :** [guide utilisateur](docs/Guide-utilisateur.md), [wiki GitHub](https://github.com/Installation-04/Allumi/wiki) et [FAQ](docs/FAQ.md).
-- **Installer et configurer :** [Docker](docs/Installation-Docker.md), [Proxmox](docs/Proxmox.md), [configuration](docs/Configuration.md) et [dépannage](docs/Depannage.md).
-- **Développer et contribuer :** [développement local](docs/Developpement-local.md), [environnement cloud](docs/Developpement-cloud.md), [architecture](docs/Architecture.md) et [contributions](CONTRIBUTING.md).
-- **Suivre le projet :** [versions et changelog](CHANGELOG.md), [feuille de route publique](docs/Feuille-de-route.md) et [signalement d’un problème](https://github.com/Installation-04/Allumi/issues).
+Most detailed guides are currently in French; the app interface supports both English and French. A [French version of this page](README.fr.md) is also available.
 
-Les guides sources et les captures sont conservés dans [`docs/`](docs/). Les propositions, corrections, traductions et retours d’essai sont les bienvenus.
+- **Get started:** [user guide](docs/Guide-utilisateur.md), [GitHub wiki](https://github.com/Installation-04/Allumi/wiki), [FAQ](docs/FAQ.md) and [English language and appearance guide](docs/Appearance-and-language.md).
+- **Install and configure:** [Docker](docs/Installation-Docker.md), [Proxmox](docs/Proxmox.md), [configuration](docs/Configuration.md) and [troubleshooting](docs/Depannage.md).
+- **Develop and contribute:** [local development](docs/Developpement-local.md), [cloud environment](docs/Developpement-cloud.md), [architecture](docs/Architecture.md) and [contribution guide](CONTRIBUTING.md).
+- **Follow the project:** [versions and changelog](CHANGELOG.md), [public roadmap](docs/Feuille-de-route.md) and [issue tracker](https://github.com/Installation-04/Allumi/issues).
 
-<details>
-<summary>English overview</summary>
+Source documentation and screenshots live in [`docs/`](docs/). Suggestions, fixes, translations and testing feedback are welcome.
 
-<br>
+## License
 
-**Allumi is an open-source, self-hosted accounting application for small businesses in Quebec and Canada.** It combines estimates, invoices, payments, purchases, bank transaction imports, Canadian tax configuration and financial reports in a bilingual web interface with light/dark themes and a mobile layout.
-
-Deploy the server on Linux with Docker for AMD64 or ARM64. Access it through your browser, the Windows x64 client, or Safari’s **Add to Home Screen** on iOS. All clients require a connection to your server. Run the GitHub installation command above in a dedicated Ubuntu VM to start the guided setup.
-
-**Pre-alpha:** use fictional data for evaluation. Stock tracking, payroll, multiple currencies, electronic signatures and scheduled recurring billing/reminders are not yet available. See [features and limits](docs/Fonctionnalites-et-limites.md), [English appearance guide](docs/Appearance-and-language.md) and [Releases](https://github.com/Installation-04/Allumi/releases).
-
-</details>
-
-## Licence
-
-Allumi est distribué sous [licence MIT](LICENSE). Il ne remplace pas l’accompagnement d’un professionnel comptable ou fiscal; les règles et taux applicables restent à vérifier pour votre situation.
+Allumi is released under the [MIT license](LICENSE). It does not replace professional accounting or tax advice; check the rules and rates that apply to your situation.
