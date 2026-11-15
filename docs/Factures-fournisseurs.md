@@ -52,11 +52,11 @@ Le brouillon se consulte dans **Dépenses → Crédits fournisseurs**. Les droit
 
 ![Brouillon sur téléphone](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/credit-fournisseur-brouillon-mobile.png)
 
-## Valider et appliquer un crédit fournisseur
+## Valider un crédit fournisseur
 
-Ouvrez **Valider et affecter l’avoir**, choisissez une date comptable au moins égale à sa date de document et dans une période ouverte, puis confirmez. La validation attribue un numéro de la séquence d’achats `A-…`, débite les comptes fournisseurs et crédite les charges et taxes récupérables correspondantes. Les coordonnées du fournisseur proviennent de la facture figée. Le crédit est appliqué intégralement à sa facture d’origine dans la même transaction.
+Ouvrez **Valider le crédit fournisseur**, choisissez une date comptable au moins égale à sa date de document et dans une période ouverte, puis choisissez d’affecter à la facture source ou de garder le crédit disponible avant de confirmer. La validation attribue un numéro de la séquence d’achats `A-…`, débite les comptes fournisseurs et crédite les charges et taxes récupérables correspondantes. Les coordonnées du fournisseur proviennent de la facture figée. Le choix initial affecte intégralement le crédit à sa facture d’origine dans la même transaction. **Garder le crédit disponible** conserve son montant non affecté, y compris après paiement complet de la facture; voir [[Credits-fournisseurs-disponibles]].
 
-Les contrôles de l’application et de la base limitent les crédits validés cumulés aux montants originaux de chaque ligne, de chaque taxe et de la facture. Le solde encore à payer doit couvrir le crédit : un paiement ou un autre crédit concurrent peut empêcher la validation. Un nouvel essai d’une validation déjà réussie retourne le crédit existant sans écriture ni numéro supplémentaire.
+Les contrôles de l’application et de la base limitent les crédits validés cumulés aux montants originaux de chaque ligne, de chaque taxe et de la facture. Pour affecter à la source, le solde encore à payer doit couvrir le crédit : un paiement ou un autre crédit concurrent peut empêcher cette affectation. Le mode disponible ne modifie pas le solde de la facture, tout en conservant les mêmes plafonds cumulés. Un nouvel essai d’une validation déjà réussie retourne le crédit existant sans écriture ni numéro supplémentaire.
 
 Depuis la facture, consultez son nouveau solde et ses crédits. **Crédits fournisseurs → Avoirs validés** donne accès aux pièces et à l’historique daté des affectations.
 
@@ -66,7 +66,7 @@ Depuis la facture, consultez son nouveau solde et ses crédits. **Crédits fourn
 
 ## Annuler un crédit validé
 
-**Annuler l’avoir** demande un motif et une date dans une période ouverte, au moins égale à sa validation et à tous les événements d’affectation/retrait. L’application à la facture est retirée à cette date et une écriture inverse rétablit son solde. Le crédit original, son numéro et l’historique sont conservés. Un remboursement actif ou une affectation active à une autre facture bloque cette annulation. Les remboursements et la gestion manuelle d’affectations à d’autres factures ne sont pas proposés par cette interface.
+**Annuler l’avoir** demande un motif et une date dans une période ouverte, au moins égale à sa validation et à tous les événements d’affectation/retrait. Si le crédit était affecté, l’application à la facture est retirée à cette date et une écriture inverse rétablit son solde. S’il était disponible sans affectation, sa contre-passation annule le disponible sans modifier la facture payée. Le crédit original, son numéro et l’historique sont conservés. Un remboursement actif ou une affectation active à une autre facture bloque cette annulation. Les remboursements et la gestion manuelle d’affectations à d’autres factures ne sont pas proposés par cette interface.
 
 Les crédits restent limités aux factures avec taxes entièrement récupérables ou sans taxe. La récupération partielle et les ajustements manuels de taxes restent indisponibles.
 

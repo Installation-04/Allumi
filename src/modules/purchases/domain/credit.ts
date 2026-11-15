@@ -1,3 +1,10 @@
+import { z } from "zod";
+
+export const supplierCreditPostingOptionsSchema = z.object({
+  applicationMode: z.enum(["SOURCE_BILL", "UNAPPLIED"]).default("SOURCE_BILL"),
+}).strict();
+export type SupplierCreditPostingOptions = z.input<typeof supplierCreditPostingOptionsSchema>;
+
 type Line = { position: number; accountId: string; taxCodeId: string | null; amountCents: bigint };
 type Tax = { taxId: string; amountCents: bigint };
 type Document = { totalCents: bigint; lines: Line[]; taxes: Tax[] };

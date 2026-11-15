@@ -4,6 +4,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.60] - 2026-11-15
+
+- Rapports de taxes de vente : raccourcis mensuels, trimestriels et annuels calendaires, période personnalisée conservée, bornes bissextiles exactes et sélection commune à la page, la pagination et au CSV. Refus des paramètres invalides, répétés ou contradictoires sans repli silencieux, indication des périodes non terminées; FR/EN/mobile/sombre, guide et captures.
+- Crédits fournisseurs : validation avec affectation à la source ou conservation disponible, y compris sur facture déjà payée; disponible sur fiche/liste, mêmes plafonds et taux d’origine, numérotation/journal atomiques et annulation datée. Rapports fournisseurs et taxes rapprochés, permissions/concurrence/idempotence testées, guide illustré. Aucune migration ni opération bancaire; remboursements et affectations ultérieures restent distincts.
+
 ## [0.4.0-alpha.59] - 2026-11-15
 
 - Copies comptables des factures et crédits fournisseurs : impression/PDF navigateur FR/EN, mobile et thèmes clair/sombre, coordonnées figées et montants exacts, annulations datées. Notes, motifs privés et justificatifs exclus du HTML imprimable. Consultation des copies et fiches indépendante des répertoires Contacts/Taxes, avec libellés fiscaux facultatifs; guide et captures. Aucune migration ni nouvelle écriture.

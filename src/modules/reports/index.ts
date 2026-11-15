@@ -25,3 +25,5 @@ export * from "./domain/supplier-statement";
 export { getSupplierStatement, getSupplierStatementExport, listStatementSuppliers, SUPPLIER_STATEMENT_PAGE_SIZE, SUPPLIER_STATEMENT_EXPORT_LIMIT } from "./service/supplier-statement";
 
 export { toCsv, csvFormatFor, type CsvCell } from "./domain/csv";
+
+export { taxCalendarPeriod, resolveTaxReportPeriod, taxReportPeriodParams, type TaxFrequency, type TaxReportPeriod } from "./domain/tax-period";

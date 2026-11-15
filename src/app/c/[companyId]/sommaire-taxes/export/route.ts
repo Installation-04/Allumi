@@ -4,14 +4,14 @@ import { can } from "@/modules/companies";
 import { listFiscalYears,todayIso } from "@/modules/ledger";
 import { getTaxSummary,taxSummaryCsv } from "@/modules/reports";
 import { AppError } from "@/platform/errors";
-import { statementPeriod } from "@/app/_lib/report-period";
+import { taxPeriod,taxPeriodQuery } from "../../_tax-period";
 import { loadCompany } from "../../_lib";
 import { taxSummaryLabels } from "../../_tax-summary";
 export const dynamic="force-dynamic";
 export async function GET(request:Request,{params}:{params:Promise<{companyId:string}>}){
  const {company,actor,locale}=await loadCompany(params,"ledger.read");if(!can(company,"taxes.read"))notFound();
  const t=await getTranslations("taxSummary");
- const period=statementPeriod(Object.fromEntries(new URL(request.url).searchParams),await listFiscalYears(actor),todayIso());
+ const period=taxPeriod(taxPeriodQuery(new URL(request.url).searchParams),await listFiscalYears(actor),todayIso());
  try{
   const report=await getTaxSummary(actor,period,{exportAll:true});
   return new Response(`\uFEFF${taxSummaryCsv(report,t("title"),taxSummaryLabels(t),locale)}`,{headers:{"Content-Type":"text/csv; charset=utf-8","Content-Disposition":`attachment; filename="${t("file")}_${period.from}_${period.to}.csv"`,"Cache-Control":"private, no-store"}});

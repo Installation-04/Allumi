@@ -4,12 +4,13 @@ import { requireRole } from "@/modules/companies";
 import { createPurchaseEntry, formatNumber, isValidIsoDate, type EntryLine } from "@/modules/ledger";
 import { AppError, toAppError } from "@/platform/errors";
 import { withCompany, type CompanyContext } from "@/platform/tenant";
-import { creditFitsBill } from "../domain/credit";
+import { supplierCreditPostingOptionsSchema, type SupplierCreditPostingOptions, creditFitsBill } from "../domain/credit";
 import type { Prisma } from "@/platform/db";
 
-/** Post and fully apply to the source bill in one transaction; retries do not allocate new numbers. */
-export async function postCreditNote(actor: CompanyContext, id: string, revision: string, postingDate: string) {
-  if (!revision || !isValidIsoDate(postingDate)) throw new AppError("purchases.invalidCredit");
+/** Post an exact source-linked credit, either applied in full or retained without changing the bill balance. */
+export async function postCreditNote(actor: CompanyContext, id: string, revision: string, postingDate: string, options: SupplierCreditPostingOptions = {}) {
+  const parsed = supplierCreditPostingOptionsSchema.safeParse(options);
+  if (!parsed.success || !revision || !isValidIsoDate(postingDate)) throw new AppError("purchases.invalidCredit");
   try { return await withCompany(actor, async tx => {
     await requireRole(tx, "entry.post");
     const reference = await tx.purchaseDocument.findFirst({ where: { companyId: actor.companyId, id, kind: "SUPPLIER_CREDIT" }, select: { creditedDocumentId: true } });
@@ -24,7 +25,7 @@ export async function postCreditNote(actor: CompanyContext, id: string, revision
     const previous = await tx.purchaseDocument.findMany({ where: { companyId: actor.companyId, creditedDocumentId: bill.id, status: "POSTED" }, include: { lines: true, taxes: true } });
     if (!creditFitsBill(bill, draft, previous)) throw new AppError("purchases.creditLimit");
     const open = await tx.$queryRaw<{ amount: bigint }[]>`SELECT purchase_document_open_cents(${actor.companyId}::uuid,${bill.id}::uuid) AS amount`;
-    if (!open[0] || open[0].amount < draft.totalCents) throw new AppError("purchases.creditBalance");
+    if (parsed.data.applicationMode === "SOURCE_BILL" && (!open[0] || open[0].amount < draft.totalCents)) throw new AppError("purchases.creditBalance");
     await tx.$queryRaw`SELECT id FROM tax WHERE company_id=${actor.companyId}::uuid ORDER BY id FOR SHARE`;
     const exact = await tx.$queryRaw<{ valid: boolean }[]>`SELECT purchase_document_taxes_are_exact(d) AS valid FROM purchase_document d WHERE company_id=${actor.companyId}::uuid AND id=${id}::uuid`;
     if (!exact[0]?.valid) throw new AppError("purchases.rate");
@@ -40,7 +41,7 @@ export async function postCreditNote(actor: CompanyContext, id: string, revision
     ];
     const entry = await createPurchaseEntry(tx, actor, { documentId: id, date: postingDate, memo: number, lines });
     await tx.purchaseDocument.update({ where: { companyId: actor.companyId, id }, data: { status:"POSTED",number,postingDate:new Date(`${postingDate}T00:00:00Z`),journalEntryId:entry.id,postedAt:new Date(),postedById:actor.userId,supplierSnapshot:bill.supplierSnapshot as Prisma.InputJsonObject } });
-    await tx.purchaseCreditApplication.create({ data: { companyId:actor.companyId,supplierCreditId:id,billId:bill.id,amountCents:draft.totalCents,appliedDate:new Date(`${postingDate}T00:00:00Z`),createdById:actor.userId } });
+    if (parsed.data.applicationMode === "SOURCE_BILL") await tx.purchaseCreditApplication.create({ data: { companyId:actor.companyId,supplierCreditId:id,billId:bill.id,amountCents:draft.totalCents,appliedDate:new Date(`${postingDate}T00:00:00Z`),createdById:actor.userId } });
     await tx.$executeRaw`SET CONSTRAINTS ALL IMMEDIATE`;
     return id;
   }); } catch(error) { throw toAppError(error); }
@@ -55,6 +56,24 @@ export async function getPostedCredit(actor: CompanyContext, id: string) {
 export async function listPostedCredits(actor: CompanyContext, billId?: string) {
   return withCompany(actor, async tx => {
     await requireRole(tx,"ledger.read");
-    return tx.purchaseDocument.findMany({where:{companyId:actor.companyId,kind:"SUPPLIER_CREDIT",status:{in:["POSTED","VOID"]},...(billId?{creditedDocumentId:billId}:{})},select:{id:true,number:true,status:true,totalCents:true,postingDate:true},orderBy:[{postedAt:"desc"},{id:"desc"}],take:101});
+    const rows = await tx.purchaseDocument.findMany({where:{companyId:actor.companyId,kind:"SUPPLIER_CREDIT",status:{in:["POSTED","VOID"]},...(billId?{creditedDocumentId:billId}:{})},select:{id:true,number:true,status:true,totalCents:true,postingDate:true},orderBy:[{postedAt:"desc"},{id:"desc"}],take:101});
+    if (!rows.length) return [];
+    const balances = await tx.$queryRaw<{ id: string; cents: bigint }[]>`
+      SELECT id,purchase_document_open_cents(company_id,id) AS cents FROM purchase_document
+       WHERE company_id=${actor.companyId}::uuid AND id=ANY(${rows.map(row => row.id)}::uuid[])
+         AND kind='SUPPLIER_CREDIT' AND status='POSTED'`;
+    const open = new Map(balances.map(row => [row.id, row.cents]));
+    return rows.map(row => ({ ...row, availableCents: open.get(row.id) ?? 0n }));
+  });
+}
+
+/** Only posted supplier credits have an available balance; voids retain their original amounts elsewhere. */
+export async function getSupplierCreditOpenCents(actor: CompanyContext, id: string): Promise<bigint> {
+  return withCompany(actor, async tx => {
+    await requireRole(tx, "ledger.read");
+    const rows = await tx.$queryRaw<{ cents: bigint }[]>`
+      SELECT purchase_document_open_cents(company_id,id) AS cents FROM purchase_document
+       WHERE company_id=${actor.companyId}::uuid AND id=${id}::uuid AND kind='SUPPLIER_CREDIT' AND status='POSTED'`;
+    return rows[0]?.cents ?? 0n;
   });
 }

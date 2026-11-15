@@ -5,7 +5,7 @@ import { requireSession } from "@/app/_lib/session";
 import { safeAction } from "@/app/_lib/safe-action";
 import { textValues, type FormState } from "@/app/_lib/form-state";
 import { AppError } from "@/platform/errors";
-import { saveCreditDraft, deleteCreditDraft } from "@/modules/purchases";
+import { supplierCreditPostingOptionsSchema, saveCreditDraft, deleteCreditDraft } from "@/modules/purchases";
 export async function saveCreditAction(companyId: string, billId: string, id: string | null, _previous: FormState, form: FormData): Promise<FormState> {
   const amountNames = [...form.keys()].filter(key => key.startsWith("amount-"));
   const values = textValues(form, ["documentDate", "memo", "revision", ...amountNames]);
@@ -27,12 +27,15 @@ export async function deleteCreditAction(companyId: string, id: string, revision
   });
 }
 export async function postCreditAction(companyId: string, id: string, revision: string, _previous: FormState, form: FormData): Promise<FormState> {
-  const values=textValues(form,["postingDate"]);
+  const values=textValues(form,["postingDate","applicationMode"]);
   return safeAction(async()=>{
     if(form.get("confirm")!=="yes") throw new AppError("purchases.confirmCreditPost");
+    const modes = form.getAll("applicationMode");
+    const options = supplierCreditPostingOptionsSchema.safeParse({ applicationMode: modes.length === 0 ? "SOURCE_BILL" : modes.length === 1 ? modes[0] : modes });
+    if (!options.success) throw new AppError("purchases.invalidCredit");
     const session=await requireSession();
     const {postCreditNote}=await import("@/modules/purchases");
-    await postCreditNote({userId:session.userId,companyId},id,revision,values.postingDate??"");
+    await postCreditNote({userId:session.userId,companyId},id,revision,values.postingDate??"",options.data);
     revalidatePath(`/c/${companyId}`,"layout");
     redirect(`/c/${companyId}/credits-fournisseurs/valides/${id}`);
   },values);

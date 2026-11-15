@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.59
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.60
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -85,10 +85,10 @@ Ce mode utilise Docker et Compose déjà installés, sans configurer le pare-feu
 | **Vendre et facturer** | [Devis](docs/Devis.md), conversion en facture brouillon, factures validées, avoirs, encaissements et remboursements clients. |
 | **Communiquer avec vos clients** | Envoi manuel des [devis](docs/Envoi-des-devis.md) et [factures](docs/Envoi-des-factures.md) par SMTP, aperçus, confirmations et historiques; [relances individuelles](docs/Relances-clients.md) sur les factures échues. |
 | **Préparer les factures récurrentes** | [Calendriers mensuels, trimestriels ou annuels](docs/Factures-recurrentes.md), génération confirmée de brouillons, pause et historique des échéances. |
-| **Suivre les achats** | Factures et crédits fournisseurs, dépenses, paiements partiels ou complets et [historique filtrable avec export CSV](docs/Recherche-des-paiements-fournisseurs.md); clients, fournisseurs et catalogue de produits/services. |
+| **Suivre les achats** | Factures, [crédits fournisseurs disponibles](docs/Credits-fournisseurs-disponibles.md), dépenses, paiements partiels ou complets et [historique filtrable avec export CSV](docs/Recherche-des-paiements-fournisseurs.md); clients, fournisseurs et catalogue de produits/services. |
 | **Organiser les transactions** | Imports CSV/OFX et de transactions Stripe/PayPal, appariement aux écritures, règles de catégorisation avec aperçu, dépôts groupés et rapprochement bancaire. |
 | **Gérer les taxes** | Codes et taux datés, calculs TPS/TVQ/TVH, consultation et import confirmé des [taux officiels ARC et Revenu Québec](docs/Sources-fiscales-officielles.md), avec provenance. |
-| **Consulter vos chiffres** | Bilan, état des résultats, grand livre, balance, âge des comptes, relevés clients/fournisseurs, sommaire des taxes, comparatifs et exports CSV; impression/PDF depuis le navigateur. |
+| **Consulter vos chiffres** | Bilan, état des résultats, grand livre, balance, âge des comptes, relevés clients/fournisseurs, sommaires des taxes mensuels/trimestriels/annuels ou personnalisés, comparatifs et exports CSV; impression/PDF depuis le navigateur. |
 | **Travailler à plusieurs** | Plusieurs entreprises, invitations, rôles et [permissions modulaires](docs/Utilisateurs-et-permissions.md), authentification à deux facteurs et piste d’audit. |
 
 La comptabilité utilise la **partie double**, des montants exacts en cents ou Decimal, et des écritures validées immuables corrigées par contre-passation. Les accès sont contrôlés côté application et en base, avec isolation par entreprise.
@@ -108,6 +108,12 @@ Le tableau de bord rassemble les indicateurs de l’entreprise. La navigation pa
 La langue et l’apparence se choisissent dans l’en-tête. Les préférences sont conservées dans votre navigateur.
 
 ![Tableau de bord Allumi en anglais et thème sombre](docs/images/dashboard-en-dark-desktop.png)
+
+### Rapports de taxes selon votre période
+
+Choisissez un mois, un trimestre ou une année civile, ou saisissez les dates de votre calendrier de déclaration. L’écran et le CSV utilisent les mêmes dates inclusives et montants comptabilisés. [Guide fiscal](docs/Sommaire-des-taxes.md).
+
+![Rapport trimestriel en anglais sombre](docs/images/taxes-periodes-trimestre-en-dark-desktop.png)
 
 ### Imprimer les pièces fournisseurs
 
