@@ -3046,5 +3046,19 @@
     "reviewHint": "Vérifiez la facture, le montant et la date avant de confirmer. Si un solde change entre-temps, rechargez la page.",
     "targetUnavailable": "Cette facture n’est plus proposée. Recherchez et choisissez une facture ouverte avant de confirmer.",
     "bill": "Facture à régler"
+  },
+  "whatsNew": {
+    "title": "Nouveautés de la version {version}",
+    "intro": "Changements inclus dans la version serveur installée. Ces notes sont intégrées à Allumi; ouvrir un guide nécessite une connexion à GitHub.",
+    "added": "Nouveautés",
+    "improved": "Améliorations",
+    "fixed": "Corrections",
+    "installation": "Installation",
+    "guide": "Ouvrir le guide",
+    "release": "Notes complètes de la release sur GitHub",
+    "earlier": "Versions précédentes documentées",
+    "version": "Version {version}",
+    "unavailable": "Aucune note intégrée n’est disponible pour cette version. Consultez les notes de release sur GitHub.",
+    "link": "Nouveautés de cette version"
   }
 }

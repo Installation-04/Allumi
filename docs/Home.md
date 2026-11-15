@@ -82,3 +82,5 @@ Taxes et produits/services : [[Taxes-et-catalogue]]. Consultation et import : [[
 
 - [[Factures-recurrentes]] — calendrier, préparation contrôlée de brouillons et historique des échéances.
 - [[Relances-clients]] — factures échues, aperçu bilingue et envoi SMTP manuel confirmé.
+
+- [[Nouveautes-des-versions]] — changements de la version installée, historique et guides.

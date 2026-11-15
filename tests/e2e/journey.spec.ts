@@ -238,6 +238,15 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await expect(page.getByRole('heading', { name: 'Versions et mises à jour' })).toBeVisible();
   await expectNoPageOverflow(page);
   await captureReference(page, 'versions');
+  const news=page.getByRole("region",{name:`Nouveautés de la version ${VERSION}`,exact:true});
+  await expect(news.getByRole("heading",{name:"Nouveautés",exact:true})).toBeVisible();await expect(news.getByRole("heading",{name:"Installation",exact:true})).toBeVisible();await expect(news.getByRole("heading",{name:"Corrections",exact:true})).toHaveCount(0);
+  await expect(news.getByRole("link",{name:"Notes complètes de la release sur GitHub",exact:true})).toHaveAttribute("href",`https://github.com/Installation-04/Allumi/releases/tag/v${VERSION}`);
+  await expectNoPageOverflow(page);await captureReference(page,"nouveautes-versions",`Nouveautés de la version ${VERSION}`);
+  await page.getByRole("button",{name:"English",exact:true}).click();await expect(page.locator("html")).toHaveAttribute("lang","en");await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
+  const englishNews=page.getByRole("region",{name:`What’s new in version ${VERSION}`,exact:true});await expect(englishNews.getByRole("heading",{name:"New features",exact:true})).toBeVisible();await expect(englishNews.getByRole("heading",{name:"Installation",exact:true})).toBeVisible();
+  if(VERSION==="0.4.0-alpha.62"){await englishNews.locator("summary",{hasText:"Earlier documented versions"}).click();await expect(englishNews.getByText("Version 0.4.0-alpha.61",{exact:true})).toBeVisible();}
+  await expectNoPageOverflow(page);await captureReference(page,"nouveautes-versions-en-dark",`What’s new in version ${VERSION}`);
+  await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await expect(page.locator("html")).toHaveAttribute("data-theme","light");await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.locator("html")).toHaveAttribute("lang","fr-CA");
   await page.goto('/');
   await openSection(page, "Ventes");
   await expect(page.getByRole("heading", { name: "Ventes", exact: true })).toBeVisible();
@@ -2445,6 +2454,8 @@ async function membersJourney(page: Page, browser: Browser) {
   await expect(guest.getByText("Ton rôle : Utilisateur")).toBeVisible();
   expect((await guest.goto(`${company}/utilisateurs`))?.status()).toBe(404);
   expect((await guest.goto("/administration/serveur"))?.status()).toBe(404);
+  await guest.goto("/versions");await expect(guest.getByRole("region",{name:`Nouveautés de la version ${VERSION}`,exact:true})).toBeVisible();await expect(guest.getByRole("heading",{name:"Mises à jour du serveur",exact:true})).toHaveCount(0);await expectNoPageOverflow(guest);
+
   const deniedUpdate=await guest.request.get("/administration/serveur/mises-a-jour/etat");
   expect(deniedUpdate.status()).toBe(403);expect(await deniedUpdate.json()).toEqual({error:"forbidden"});
   await guest.goto(`${company}/parametres`);

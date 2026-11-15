@@ -469,3 +469,11 @@ Révision des soldes, affectation et retrait daté : [[Affectation-des-credits-f
 ![Affectation en anglais sombre sur téléphone](images/affectation-credit-fournisseur-en-dark-mobile.png)
 
 ![Historique du retrait](images/affectation-credit-fournisseur-retiree-desktop.png)
+
+## Nouveautés intégrées aux versions
+
+Listes bilingues des changements de la version installée et historique : [[Nouveautes-des-versions]].
+
+![Nouveautés en français](images/nouveautes-versions-desktop.png)
+
+![Nouveautés en anglais sombre sur téléphone](images/nouveautes-versions-en-dark-mobile.png)

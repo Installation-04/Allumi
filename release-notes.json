@@ -1,0 +1,114 @@
+{
+  "0.4.0-alpha.61": {
+    "fr-CA": {
+      "title": "Crédits fournisseurs : affecter et retirer un montant",
+      "added": [
+        {
+          "text": "Depuis Dépenses → Crédits fournisseurs, affectez un crédit disponible à une facture ouverte du même fournisseur, après révision des soldes.",
+          "guide": "Affectation-des-credits-fournisseurs"
+        },
+        {
+          "text": "Désaffectez un montant à une date choisie et retrouvez les affectations actives ou retirées dans l’historique paginé.",
+          "guide": "Affectation-des-credits-fournisseurs"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Les paiements concurrents, les périodes fermées et les dates de mouvements sont contrôlés pour protéger les soldes et les rapports historiques."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Une migration ajoute des gardes SQL sans nouvelle table ni colonne. Le processus habituel de mise à jour applique cette migration.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Supplier credits: apply and release an amount",
+      "added": [
+        {
+          "text": "From Expenses → Supplier credits, apply an available credit to an open bill for the same supplier after reviewing both balances.",
+          "guide": "Affectation-des-credits-fournisseurs"
+        },
+        {
+          "text": "Release an amount on a chosen date and review active or released applications in paginated history.",
+          "guide": "Affectation-des-credits-fournisseurs"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Concurrent payments, closed periods and movement dates are checked to protect balances and historical reports."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "A migration adds SQL guards without new tables or columns. The usual update process applies this migration.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
+  },
+  "0.4.0-alpha.62": {
+    "fr-CA": {
+      "title": "Les nouveautés de chaque version dans l’application",
+      "added": [
+        {
+          "text": "Ouvrez Versions et mises à jour pour consulter les nouveautés, améliorations, corrections et consignes d’installation de la version installée.",
+          "guide": "Nouveautes-des-versions"
+        },
+        {
+          "text": "Retrouvez les versions précédentes documentées et ouvrez les guides associés à chaque changement.",
+          "guide": "Nouveautes-des-versions"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Les notes suivent la langue de l’interface, fonctionnent sur mobile et en thème sombre, et restent consultables sans connexion à GitHub."
+        },
+        {
+          "text": "La préparation et la publication d’une release vérifient la présence de notes françaises et anglaises et de guides existants avant de modifier la version ou de créer le tag.",
+          "guide": "Versions-et-releases"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration de base de données ni nouvelle variable de configuration. Installer la version serveur par le processus habituel, puis recharger l’application.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "What’s new in each version, inside the app",
+      "added": [
+        {
+          "text": "Open Versions and updates to see new features, improvements, fixes and installation instructions for the installed version.",
+          "guide": "Nouveautes-des-versions"
+        },
+        {
+          "text": "Browse documented earlier releases and open the guides linked to each change.",
+          "guide": "Nouveautes-des-versions"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Notes follow the interface language, support mobile and dark mode, and remain readable without a connection to GitHub."
+        },
+        {
+          "text": "Release preparation and publication check for French and English notes and existing guides before changing the version or creating a tag.",
+          "guide": "Versions-et-releases"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No database migration or new configuration variable. Install the server version through the usual update process, then reload the app.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
+  }
+}
