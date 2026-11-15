@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.60
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.61
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -85,7 +85,7 @@ Ce mode utilise Docker et Compose déjà installés, sans configurer le pare-feu
 | **Vendre et facturer** | [Devis](docs/Devis.md), conversion en facture brouillon, factures validées, avoirs, encaissements et remboursements clients. |
 | **Communiquer avec vos clients** | Envoi manuel des [devis](docs/Envoi-des-devis.md) et [factures](docs/Envoi-des-factures.md) par SMTP, aperçus, confirmations et historiques; [relances individuelles](docs/Relances-clients.md) sur les factures échues. |
 | **Préparer les factures récurrentes** | [Calendriers mensuels, trimestriels ou annuels](docs/Factures-recurrentes.md), génération confirmée de brouillons, pause et historique des échéances. |
-| **Suivre les achats** | Factures, [crédits fournisseurs disponibles](docs/Credits-fournisseurs-disponibles.md), dépenses, paiements partiels ou complets et [historique filtrable avec export CSV](docs/Recherche-des-paiements-fournisseurs.md); clients, fournisseurs et catalogue de produits/services. |
+| **Suivre les achats** | Factures, [crédits fournisseurs disponibles](docs/Credits-fournisseurs-disponibles.md), [affectations avec retrait daté](docs/Affectation-des-credits-fournisseurs.md), dépenses, paiements partiels ou complets et [historique filtrable avec export CSV](docs/Recherche-des-paiements-fournisseurs.md); clients, fournisseurs et catalogue de produits/services. |
 | **Organiser les transactions** | Imports CSV/OFX et de transactions Stripe/PayPal, appariement aux écritures, règles de catégorisation avec aperçu, dépôts groupés et rapprochement bancaire. |
 | **Gérer les taxes** | Codes et taux datés, calculs TPS/TVQ/TVH, consultation et import confirmé des [taux officiels ARC et Revenu Québec](docs/Sources-fiscales-officielles.md), avec provenance. |
 | **Consulter vos chiffres** | Bilan, état des résultats, grand livre, balance, âge des comptes, relevés clients/fournisseurs, sommaires des taxes mensuels/trimestriels/annuels ou personnalisés, comparatifs et exports CSV; impression/PDF depuis le navigateur. |
@@ -120,6 +120,12 @@ Choisissez un mois, un trimestre ou une année civile, ou saisissez les dates de
 Ouvrez une copie comptable des factures et crédits fournisseurs validés ou annulés, puis imprimez ou enregistrez en PDF. Coordonnées figées et montants exacts, sans notes privées. [Guide d’impression](docs/Impression-des-achats.md).
 
 ![Copie comptable d’un crédit fournisseur en anglais sombre](docs/images/achats-impression-credit-en-dark-desktop.png)
+
+### Affecter les crédits fournisseurs
+
+Affectez les crédits disponibles aux factures du même fournisseur, avec révision des soldes et retrait daté. [Guide des affectations](docs/Affectation-des-credits-fournisseurs.md).
+
+![Affectation en anglais sombre](docs/images/affectation-credit-fournisseur-en-dark-desktop.png)
 
 ### Historique des paiements fournisseurs
 

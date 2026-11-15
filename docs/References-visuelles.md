@@ -459,3 +459,13 @@ Rapports de taxes mensuels, trimestriels, annuels ou personnalisés : [[Sommaire
 ![Crédit fournisseur disponible](images/credit-fournisseur-disponible-en-dark-desktop.png)
 
 ![Choix du traitement sur téléphone](images/credit-fournisseur-disponible-choix-mobile.png)
+
+## Affectations des crédits fournisseurs
+
+Révision des soldes, affectation et retrait daté : [[Affectation-des-credits-fournisseurs]].
+
+![Révision de l’affectation](images/affectation-credit-fournisseur-formulaire-desktop.png)
+
+![Affectation en anglais sombre sur téléphone](images/affectation-credit-fournisseur-en-dark-mobile.png)
+
+![Historique du retrait](images/affectation-credit-fournisseur-retiree-desktop.png)
