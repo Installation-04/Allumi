@@ -5,14 +5,15 @@ import { createPaymentEntry, createPaymentReversal, formatNumber, isValidIsoDate
 import { AppError, toAppError } from "@/platform/errors";
 import { withCompany, type CompanyContext, type Tx } from "@/platform/tenant";
 import { acceptsDisbursements, disbursementSchema, receiptVoidSchema } from "../domain/disbursement";
+import { disbursementHistoryWhere, disbursementSupplierNames } from "./history";
 
 export const DISBURSEMENTS_PER_PAGE = 25;
 
 const iso = (date: Date) => date.toISOString().slice(0, 10);
 
 /**
- * Records a payment received from a supplier and applies it in full to one posted bill, in one transaction:
- * the journal entry (money in on the chosen account, payables down for the supplier), the payment with its
+ * Records a payment sent to a supplier and applies it in full to one posted bill, in one transaction:
+ * the journal entry (money out of the chosen account, payables down for the supplier), the payment with its
  * gap-free number, and the allocation. The database checks everything again at commit (balance, contact, period,
  * allocation within the open balance of the bill).
  *
@@ -28,8 +29,7 @@ export async function recordDisbursement(actor: CompanyContext, input: unknown, 
 }
 
 /**
- * The same, inside the caller's transaction: for an operation that must commit together with a receipt (a payment
- * collected online records the receipt and its fee as one). The caller maps database rules with `toAppError`.
+ * Records the disbursement inside the caller's transaction. The caller maps database rules with `toAppError`.
  */
 export async function recordDisbursementWithin(tx: Tx, actor: CompanyContext, input: unknown, options: { now?: Date } = {}): Promise<{ id: string; number: string }> {
   const parsed = disbursementSchema.safeParse(input);
@@ -113,7 +113,7 @@ export async function voidDisbursement(actor: CompanyContext, id: string, input:
   }
 }
 
-/** The accounts a supplier's money can be received into, in chart order. */
+/** The accounts from which a supplier can be paid, in chart order. */
 export async function listDisbursementAccounts(actor: CompanyContext) {
   return withCompany(actor, async (tx) => {
     await requireRole(tx, "ledger.read");
@@ -126,7 +126,7 @@ export async function listDisbursementAccounts(actor: CompanyContext) {
   });
 }
 
-/** The payments applied to an bill right now (a voided payment no longer is), oldest first. */
+/** The payments applied to a bill right now (a voided payment no longer is), oldest first. */
 export async function listBillPayments(actor: CompanyContext, billId: string) {
   return withCompany(actor, async (tx) => {
     await requireRole(tx, "ledger.read");
@@ -143,10 +143,10 @@ export async function listBillPayments(actor: CompanyContext, billId: string) {
   });
 }
 
-export async function listDisbursements(actor: CompanyContext, requestedPage = 1) {
+export async function listDisbursements(actor: CompanyContext, requestedPage = 1, filters: unknown = {}) {
   return withCompany(actor, async (tx) => {
     await requireRole(tx, "ledger.read");
-    const where = { companyId: actor.companyId, direction: "SENT", ledger: "PAYABLE" } as const;
+    const where = disbursementHistoryWhere(actor.companyId, filters);
     const total = await tx.payment.count({ where });
     const pageCount = Math.max(1, Math.ceil(total / DISBURSEMENTS_PER_PAGE));
     const page = Math.min(Math.max(1, Math.trunc(requestedPage) || 1), pageCount);
@@ -154,16 +154,19 @@ export async function listDisbursements(actor: CompanyContext, requestedPage = 1
       where,
       select: {
         id: true, number: true, paymentDate: true, amountCents: true, status: true, method: true, reference: true,
-        contact: { select: { displayName: true } },
-        allocations: { select: { purchaseDocument: { select: { id: true, number: true } } }, orderBy: { id: "asc" } },
+        contactId: true,
+        _count: { select: { allocations: true } },
+        allocations: { select: { purchaseDocument: { select: { id: true, number: true } } }, orderBy: { id: "asc" }, take: 5 },
       },
       orderBy: [{ paymentDate: "desc" }, { createdAt: "desc" }, { id: "desc" }],
       skip: (page - 1) * DISBURSEMENTS_PER_PAGE,
       take: DISBURSEMENTS_PER_PAGE,
     });
+    const names = await disbursementSupplierNames(tx, actor.companyId, rows);
     const receipts = rows.map((row) => ({
       id: row.id, number: row.number ?? "", date: iso(row.paymentDate), amountCents: row.amountCents, status: row.status, method: row.method, reference: row.reference,
-      supplier: row.contact.displayName,
+      supplier: names.get(row.id) ?? "",
+      hasMoreBills: row._count.allocations > row.allocations.length,
       bills: [...new Map(row.allocations.flatMap((a) => (a.purchaseDocument ? [[a.purchaseDocument.id, a.purchaseDocument.number ?? ""] as const] : []))).entries()].map(([billId, number]) => ({ id: billId, number })),
     }));
     return { receipts, total, page, pageCount };
@@ -176,21 +179,41 @@ export async function getDisbursement(actor: CompanyContext, id: string) {
     const row = await tx.payment.findFirst({
       where: { companyId: actor.companyId, id, direction: "SENT", ledger: "PAYABLE" },
       include: {
-        contact: { select: { displayName: true } },
         account: { select: { code: true, nameFr: true, nameEn: true } },
         voidEntry: { select: { entryDate: true } },
         allocations: { orderBy: [{ appliedDate: "asc" }, { id: "asc" }], select: { id: true, amountCents: true, appliedDate: true, unappliedDate: true, purchaseDocument: { select: { id: true, number: true } } } },
       },
     });
     if (!row) return null;
+    const names = await disbursementSupplierNames(tx, actor.companyId, [row]);
     return {
       id: row.id, number: row.number ?? "", date: iso(row.paymentDate), amountCents: row.amountCents, status: row.status, method: row.method,
-      reference: row.reference, memo: row.memo, supplier: row.contact.displayName, contactId: row.contactId, account: row.account,
+      reference: row.reference, memo: row.memo, supplier: names.get(row.id) ?? "", contactId: row.contactId, account: row.account,
       journalEntryId: row.journalEntryId, voidEntryId: row.voidEntryId, voidDate: row.voidEntry ? iso(row.voidEntry.entryDate) : null, voidReason: row.voidReason,
       allocations: row.allocations.map((a) => ({
         id: a.id, amountCents: a.amountCents, appliedDate: iso(a.appliedDate), unappliedDate: a.unappliedDate ? iso(a.unappliedDate) : null,
         billId: a.purchaseDocument?.id ?? "", billNumber: a.purchaseDocument?.number ?? "",
       })),
     };
+  });
+}
+
+export const DISBURSEMENT_EXPORT_LIMIT = 10_000;
+
+/** Export every matching payment, or refuse explicitly; never silently export only a page. */
+export async function exportDisbursements(actor: CompanyContext, filters: unknown = {}, options: { maxRows?: number } = {}) {
+  return withCompany(actor, async (tx) => {
+    await requireRole(tx, "ledger.read");
+    const limit = options.maxRows ?? DISBURSEMENT_EXPORT_LIMIT;
+    if (!Number.isInteger(limit) || limit < 0 || limit > DISBURSEMENT_EXPORT_LIMIT) throw new AppError("payments.invalidFilters");
+    const rows = await tx.payment.findMany({
+      where: disbursementHistoryWhere(actor.companyId, filters),
+      select: { id: true, contactId: true, number: true, paymentDate: true, amountCents: true, status: true, method: true, reference: true },
+      orderBy: [{ paymentDate: "desc" }, { createdAt: "desc" }, { id: "desc" }],
+      take: limit + 1,
+    });
+    if (rows.length > limit) throw new AppError("disbursements.exportLimit");
+    const names = await disbursementSupplierNames(tx, actor.companyId, rows);
+    return rows.map((row) => ({ number: row.number ?? "", date: iso(row.paymentDate), amountCents: row.amountCents, status: row.status, method: row.method, reference: row.reference, supplier: names.get(row.id) ?? "" }));
   });
 }

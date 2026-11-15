@@ -73,3 +73,5 @@ Les crédits restent limités aux factures avec taxes entièrement récupérable
 Pour les dépenses déjà réglées sans facture préalablement saisie, voir [[Depenses-payees]].
 
 Les [[Justificatifs]] permettent de joindre des documents privés aux factures et crédits fournisseurs.
+
+Retrouver les règlements par fournisseur, numéro, référence, date et état, ou exporter tous les résultats en CSV : [[Recherche-des-paiements-fournisseurs]].

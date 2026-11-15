@@ -102,3 +102,40 @@ export async function receiptCustomerNames(
   }
   return names;
 }
+
+/** Supplier histories use posted snapshots without requiring access to the Contacts directory. */
+export async function disbursementSupplierNames(tx: Tx, companyId: string, rows: { id: string; contactId: string }[]) {
+  if (!rows.length) return new Map<string, string>();
+  const snapshots = await tx.$queryRaw<{ id: string; name: string }[]>`
+    SELECT DISTINCT ON (a.payment_id) a.payment_id AS id, d.supplier_snapshot->>'name' AS name
+      FROM payment_allocation a
+      JOIN purchase_document d ON d.company_id = a.company_id AND d.id = a.purchase_document_id
+     WHERE a.company_id = ${companyId}::uuid AND d.company_id = ${companyId}::uuid
+       AND a.payment_id = ANY(${rows.map((row) => row.id)}::uuid[])
+       AND jsonb_typeof(d.supplier_snapshot->'name') = 'string'
+       AND d.supplier_snapshot->>'name' <> ''
+     ORDER BY a.payment_id, a.id`;
+  const names = new Map(snapshots.map((row) => [row.id, row.name]));
+  const missing = [...new Set(rows.filter((row) => !names.has(row.id)).map((row) => row.contactId))];
+  if (missing.length) {
+    const contacts = await tx.contact.findMany({ where: { companyId, id: { in: missing } }, select: { id: true, displayName: true } });
+    const visible = new Map(contacts.map((row) => [row.id, row.displayName]));
+    for (const row of rows) if (!names.has(row.id)) names.set(row.id, visible.get(row.contactId) ?? "");
+  }
+  return names;
+}
+
+export function disbursementHistoryWhere(companyId: string, input: unknown): Prisma.PaymentWhereInput {
+  const filters = parsePaymentHistoryFilters(input);
+  const term = filters.q.replace(/[\\%_]/g, "\\$&");
+  return {
+    ...paymentHistoryWhere(companyId, "SENT", { ...filters, q: "" }),
+    ledger: "PAYABLE",
+    ...(term ? { OR: [
+      { number: { contains: term, mode: "insensitive" } },
+      { reference: { contains: term, mode: "insensitive" } },
+      { contact: { companyId, displayName: { contains: term, mode: "insensitive" } } },
+      { allocations: { some: { companyId, purchaseDocument: { companyId, supplierSnapshot: { path: ["name"], string_contains: term, mode: "insensitive" } } } } },
+    ] } : {}),
+  };
+}

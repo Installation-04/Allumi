@@ -412,7 +412,8 @@
       "account": "Choisissez un compte bancaire, la caisse ou « Fonds non déposés » actif.",
       "notFound": "Encaissement introuvable.",
       "invalidVoid": "Indiquez un motif de 1 à 500 caractères et une date égale ou postérieure à l’décaissement et à ses affectations.",
-      "confirmVoid": "Confirmez l’annulation définitive de l’décaissement."
+      "confirmVoid": "Confirmez l’annulation définitive de l’décaissement.",
+      "exportLimit": "Plus de 10 000 paiements correspondent à ces filtres. Réduisez la période ou précisez la recherche avant d’exporter."
     },
     "purchases": {
       "paymentAccount": "Choisissez une banque, une encaisse ou une carte de crédit active de cette entreprise.",
@@ -2567,7 +2568,8 @@
     "empty": "Aucun paiement correspondant",
     "emptyHint": "Modifiez les filtres ou réinitialisez-les pour retrouver l’historique complet.",
     "reference": "Référence",
-    "customerUnavailable": "Client non disponible"
+    "customerUnavailable": "Client non disponible",
+    "supplierSearch": "Fournisseur, numéro ou référence"
   },
   "creditApplications": {
     "title": "Affectations aux factures",
@@ -2952,5 +2954,19 @@
     "publicContent": "Uniquement les données figées et conditions publiques. Notes internes, notes de réponse, pièces jointes et liens privés exclus. Aucun paiement n’est demandé.",
     "send": "Envoyer le devis par courriel",
     "confirm": "Je confirme le destinataire, le contenu public et l’envoi de ce devis."
+  },
+  "supplierPaymentHistory": {
+    "export": "Exporter les paiements (CSV)",
+    "exportHint": "Tous les résultats filtrés, jusqu’à 10 000 paiements. Montants d’origine en CAD et état actuel, y compris les annulations; ce fichier n’est pas un rapport de flux de trésorerie. Les notes privées sont exclues.",
+    "supplierUnavailable": "Fournisseur indisponible",
+    "moreBills": "Autres factures sur la fiche du paiement",
+    "number": "Numéro",
+    "date": "Date du paiement",
+    "supplier": "Fournisseur",
+    "amount": "Montant d’origine",
+    "status": "État actuel",
+    "method": "Mode de paiement",
+    "reference": "Référence",
+    "currency": "Devise"
   }
 }

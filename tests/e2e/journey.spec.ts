@@ -3296,3 +3296,33 @@ async function estimateEmailJourney(page: Page, quoteUrl: string) {
  await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await expect(page.locator("html")).toHaveAttribute("data-theme","light");await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.locator("html")).toHaveAttribute("lang","fr-CA");await expect(page.getByRole("heading",{name:"DEV-00001",exact:true})).toBeVisible();
  for(const query of ["?lang=es","?lang=en&lang=fr-CA"])expect((await page.request.get(`${quoteUrl}/envoyer${query}`)).status()).toBe(404);
 }
+
+test("supplier payment filters and complete private CSV export in French and English dark mode", async ({ page }) => {
+ test.setTimeout(90_000);cspViolations.length=0;watchCsp(page.context());await page.context().addCookies(updateCookies);await page.goto("/");
+ if(!/^\/c\/[0-9a-f-]{36}/.test(new URL(page.url()).pathname))await page.getByRole("link",{name:"Atelier Exemple inc.",exact:true}).click();
+ const company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0];expect(company).toBeTruthy();
+ await page.goto(`${company}/decaissements`);
+ await page.getByLabel("Fournisseur, numéro ou référence",{exact:true}).fill("Atelier Boréal");
+ await page.getByLabel("État du paiement",{exact:true}).selectOption("VOID");
+ await page.getByLabel("Date du paiement — du",{exact:true}).fill("2026-07-15");
+ await page.getByLabel("Date du paiement — au",{exact:true}).fill("2026-07-15");
+ await page.getByRole("button",{name:"Filtrer les paiements",exact:true}).click();
+ await expect(page.getByRole("heading",{name:/^D-\d+$/})).toHaveCount(1);
+ const paymentNumber=(await page.getByRole("heading",{name:/^D-\d+$/}).innerText()).trim();
+ await expectNoPageOverflow(page);await captureReference(page,"decaissements-recherche");
+ const exportLink=page.getByRole("link",{name:"Exporter les paiements (CSV)",exact:true});
+ const response=await page.request.get((await exportLink.getAttribute("href"))!);expect(response.status()).toBe(200);
+ expect(response.headers()["content-disposition"]).toContain("supplier_payments.csv");expect(response.headers()["cache-control"]).toContain("no-store");
+ const french=await response.text();expect(french).toContain("Montant d’origine");expect(french).toContain("50,00");expect(french).toContain(paymentNumber);expect(french).not.toContain("Correction du règlement de test");expect(french.split("\r\n")).toHaveLength(3);
+ await page.getByRole("button",{name:"English",exact:true}).click();await expect(page.locator("html")).toHaveAttribute("lang","en");await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
+ await expect(page.getByLabel("Supplier, number or reference",{exact:true})).toHaveValue("Atelier Boréal");await expectNoPageOverflow(page);await captureReference(page,"decaissements-recherche-en-dark");
+ const english=await page.request.get((await page.getByRole("link",{name:"Export payments (CSV)",exact:true}).getAttribute("href"))!);expect(english.status()).toBe(200);expect(await english.text()).toContain("50.00");expect(await english.text()).toContain("Original amount");
+ const [download]=await Promise.all([page.waitForEvent("download"),page.getByRole("link",{name:"Export payments (CSV)",exact:true}).click()]);expect(download.suggestedFilename()).toBe("supplier_payments.csv");
+ for(const suffix of ["?q=a&q=b","?q=%00","?etat=DRAFT","?du=2026-07-16&au=2026-07-15"]) {
+  expect((await page.request.get(`${company}/decaissements${suffix}`)).status()).toBe(404);
+  expect((await page.request.get(`${company}/decaissements/export${suffix}`)).status()).toBe(404);
+ }
+ for(const suffix of ["?page=0","?page=1&page=2","?page=100001"])expect((await page.request.get(`${company}/decaissements${suffix}`)).status()).toBe(404);
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await expect(page.locator("html")).toHaveAttribute("data-theme","light");await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.locator("html")).toHaveAttribute("lang","fr-CA");
+ expect(cspViolations).toEqual([]);
+});

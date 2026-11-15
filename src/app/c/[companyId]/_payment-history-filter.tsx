@@ -6,7 +6,9 @@ import { FOCUS } from "@/app/_components/focus";
 export async function PaymentHistoryFilter({
   base,
   filters,
+  kind = "customer",
 }: {
+  kind?: "customer" | "supplier";
   base: string;
   filters: PaymentHistoryFilters;
 }) {
@@ -27,7 +29,7 @@ export async function PaymentHistoryFilter({
           htmlFor="payment-history-search"
           className="block text-sm font-medium"
         >
-          {t("search")}
+          {t(kind === "supplier" ? "supplierSearch" : "search")}
         </label>
         <input
           id="payment-history-search"

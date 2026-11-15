@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Historique des décaissements : recherche littérale fournisseur/numéro/référence, filtres état/date et pagination conservée; export CSV complet jusqu’à 10 000 résultats, montants exacts et textes neutralisés, sans notes privées. Identités figées et consultation sans accès Contacts ou Ventes; interface FR/EN/mobile/sombre, tests de droits et guide illustré. Aucune nouvelle écriture ni migration.
+
 - Présentation GitHub en anglais par défaut : README et bannière traduits, version française conservée avec sélecteur de langue; installation et captures bilingues préservées.
 
 - Présentation du projet : README restructuré autour de l’application, de ses fonctions disponibles et de son installation depuis GitHub, bannière originale, captures sélectionnées et liens vers les guides; accueil du wiki harmonisé.

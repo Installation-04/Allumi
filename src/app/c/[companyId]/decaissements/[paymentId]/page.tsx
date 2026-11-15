@@ -19,9 +19,10 @@ export default async function PaymentPage({ params }: { params: Promise<{ compan
   const payment = await getDisbursement(actor, paymentId);
   if (!payment) notFound();
   const t = await getTranslations("disbursements");
+  const sh = await getTranslations("supplierPaymentHistory");
   const base = `/c/${company.id}`;
   const rows: [string, React.ReactNode][] = [
-    [t("supplier"), payment.supplier],
+    [t("supplier"), payment.supplier || sh("supplierUnavailable")],
     [t("amount"), <span key="a" className="tabular-nums">{formatMoney(payment.amountCents, locale)}</span>],
     [t("date"), payment.date],
     [t("method"), t(`methods.${payment.method}`)],

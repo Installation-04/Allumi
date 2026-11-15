@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.57
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.58
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -85,7 +85,7 @@ Ce mode utilise Docker et Compose déjà installés, sans configurer le pare-feu
 | **Vendre et facturer** | [Devis](docs/Devis.md), conversion en facture brouillon, factures validées, avoirs, encaissements et remboursements clients. |
 | **Communiquer avec vos clients** | Envoi manuel des [devis](docs/Envoi-des-devis.md) et [factures](docs/Envoi-des-factures.md) par SMTP, aperçus, confirmations et historiques; [relances individuelles](docs/Relances-clients.md) sur les factures échues. |
 | **Préparer les factures récurrentes** | [Calendriers mensuels, trimestriels ou annuels](docs/Factures-recurrentes.md), génération confirmée de brouillons, pause et historique des échéances. |
-| **Suivre les achats** | Factures et crédits fournisseurs, dépenses et paiements partiels ou complets; clients, fournisseurs et catalogue de produits/services. |
+| **Suivre les achats** | Factures et crédits fournisseurs, dépenses, paiements partiels ou complets et [historique filtrable avec export CSV](docs/Recherche-des-paiements-fournisseurs.md); clients, fournisseurs et catalogue de produits/services. |
 | **Organiser les transactions** | Imports CSV/OFX et de transactions Stripe/PayPal, appariement aux écritures, règles de catégorisation avec aperçu, dépôts groupés et rapprochement bancaire. |
 | **Gérer les taxes** | Codes et taux datés, calculs TPS/TVQ/TVH, consultation et import confirmé des [taux officiels ARC et Revenu Québec](docs/Sources-fiscales-officielles.md), avec provenance. |
 | **Consulter vos chiffres** | Bilan, état des résultats, grand livre, balance, âge des comptes, relevés clients/fournisseurs, sommaire des taxes, comparatifs et exports CSV; impression/PDF depuis le navigateur. |
@@ -108,6 +108,12 @@ Le tableau de bord rassemble les indicateurs de l’entreprise. La navigation pa
 La langue et l’apparence se choisissent dans l’en-tête. Les préférences sont conservées dans votre navigateur.
 
 ![Tableau de bord Allumi en anglais et thème sombre](docs/images/dashboard-en-dark-desktop.png)
+
+### Historique des paiements fournisseurs
+
+Retrouvez les paiements par fournisseur, numéro ou référence, filtrez par date et état, puis exportez tous les résultats en CSV. [Guide des paiements fournisseurs](docs/Recherche-des-paiements-fournisseurs.md).
+
+![Filtres des paiements fournisseurs et export CSV en anglais sombre](docs/images/decaissements-recherche-en-dark-desktop.png)
 
 ### Sur téléphone aussi
 
