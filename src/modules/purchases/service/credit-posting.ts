@@ -1,4 +1,5 @@
 import "server-only";
+import { purchaseTaxLabels } from "./tax-labels";
 import { requireRole } from "@/modules/companies";
 import { createPurchaseEntry, formatNumber, isValidIsoDate, type EntryLine } from "@/modules/ledger";
 import { AppError, toAppError } from "@/platform/errors";
@@ -47,7 +48,8 @@ export async function postCreditNote(actor: CompanyContext, id: string, revision
 export async function getPostedCredit(actor: CompanyContext, id: string) {
   return withCompany(actor, async tx => {
     await requireRole(tx,"ledger.read");
-    return tx.purchaseDocument.findFirst({ where:{ companyId:actor.companyId,id,kind:"SUPPLIER_CREDIT",status:{in:["POSTED","VOID"]} },include:{ lines:{orderBy:{position:"asc"}},taxes:{include:{tax:{select:{code:true}}}},creditedDocument:{select:{id:true,number:true}},creditsApplied:{orderBy:[{appliedDate:"asc"},{id:"asc"}],include:{bill:{select:{number:true}}}},voidEntry:{select:{entryDate:true}} } });
+    const row = await tx.purchaseDocument.findFirst({ where:{ companyId:actor.companyId,id,kind:"SUPPLIER_CREDIT",status:{in:["POSTED","VOID"]} },include:{ lines:{orderBy:{position:"asc"}},taxes:true,creditedDocument:{select:{id:true,number:true}},creditsApplied:{orderBy:[{appliedDate:"asc"},{id:"asc"}],include:{bill:{select:{number:true}}}},voidEntry:{select:{entryDate:true}} } });
+    return row ? { ...row, taxes: await purchaseTaxLabels(tx, actor.companyId, row.taxes) } : null;
   });
 }
 export async function listPostedCredits(actor: CompanyContext, billId?: string) {

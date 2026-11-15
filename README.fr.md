@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.58
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.59
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -108,6 +108,12 @@ Le tableau de bord rassemble les indicateurs de l’entreprise. La navigation pa
 La langue et l’apparence se choisissent dans l’en-tête. Les préférences sont conservées dans votre navigateur.
 
 ![Tableau de bord Allumi en anglais et thème sombre](docs/images/dashboard-en-dark-desktop.png)
+
+### Imprimer les pièces fournisseurs
+
+Ouvrez une copie comptable des factures et crédits fournisseurs validés ou annulés, puis imprimez ou enregistrez en PDF. Coordonnées figées et montants exacts, sans notes privées. [Guide d’impression](docs/Impression-des-achats.md).
+
+![Copie comptable d’un crédit fournisseur en anglais sombre](docs/images/achats-impression-credit-en-dark-desktop.png)
 
 ### Historique des paiements fournisseurs
 

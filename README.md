@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.58
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.59
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -108,6 +108,12 @@ The dashboard brings your company’s indicators together. Activity-based naviga
 Choose your language and appearance in the header. Your preferences are saved in your browser. The same dashboard is shown below in French with the light theme.
 
 ![Allumi desktop dashboard in French with the light theme](docs/images/tableau-de-bord-desktop.png)
+
+### Print supplier documents
+
+Open an internal accounting copy of a posted or voided supplier bill or credit, then print or save it as PDF. Frozen supplier details and exact recorded amounts are included; private notes are excluded. [Printing guide](docs/Impression-des-achats.md).
+
+![Supplier credit accounting copy in English with the dark theme](docs/images/achats-impression-credit-en-dark-desktop.png)
 
 ### Supplier payment history
 

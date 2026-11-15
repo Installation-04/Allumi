@@ -75,3 +75,5 @@ Pour les dépenses déjà réglées sans facture préalablement saisie, voir [[D
 Les [[Justificatifs]] permettent de joindre des documents privés aux factures et crédits fournisseurs.
 
 Retrouver les règlements par fournisseur, numéro, référence, date et état, ou exporter tous les résultats en CSV : [[Recherche-des-paiements-fournisseurs]].
+
+Impression/PDF de la copie comptable des factures et crédits validés ou annulés, sans notes privées : [[Impression-des-achats]].

@@ -11,6 +11,7 @@ import { validId } from "../../../achats/editor";
 import { voidCreditAction } from "../../actions";
 
 export default async function Page({ params }: { params: Promise<{ companyId: string; creditId: string }> }) {
+  const pt = await getTranslations("purchasePrint");
   const { company, actor, locale } = await loadCompany(params, "ledger.read");
   const { creditId } = await params;
   if (!validId(creditId)) notFound();
@@ -19,8 +20,8 @@ export default async function Page({ params }: { params: Promise<{ companyId: st
   const t = await getTranslations("supplierCredits");
   const s = await getTranslations("purchases");
   return <section className="max-w-3xl space-y-5">
-    <Link className="inline-flex min-h-11 items-center underline" href={`/c/${company.id}/credits-fournisseurs/valides`}>{t("postedList")}</Link>
-    <h1 className="text-2xl font-semibold">{credit.number}</h1>
+    <div className="flex flex-wrap items-center gap-3"><Link className="inline-flex min-h-11 items-center underline" href={`/c/${company.id}/credits-fournisseurs/valides`}>{t("postedList")}</Link>
+    <Link className="inline-flex min-h-11 items-center rounded border px-4 underline" href={`/c/${company.id}/credits-fournisseurs/valides/${creditId}/imprimer`}>{pt("open")}</Link></div><h1 className="text-2xl font-semibold">{credit.number}</h1>
     <p className="font-semibold">{t(credit.status === "VOID" ? "voided" : "posted")}</p>
     {credit.status === "VOID" && <div className="space-y-2 rounded border border-amber-600 p-4">
       <p>{t("voidHint")}</p><p>{s("voidDate")}: {credit.voidEntry?.entryDate.toISOString().slice(0, 10)}</p>
@@ -32,7 +33,7 @@ export default async function Page({ params }: { params: Promise<{ companyId: st
     <p>{t("date")}: {credit.documentDate.toISOString().slice(0, 10)} · {s("postingDate")}: {credit.postingDate.toISOString().slice(0, 10)}</p>
     <p className="whitespace-pre-wrap break-words">{t("reason")}: {credit.memo}</p>
     <ul className="space-y-3">{credit.lines.map(l => <li key={l.id} className="rounded border bg-white p-4 dark:bg-stone-900"><h2 className="font-semibold break-words">{l.description}</h2><p>{formatMoney(l.amountCents, locale)}</p></li>)}</ul>
-    <div className="space-y-2 rounded border p-4"><p>{s("subtotal")}: {formatMoney(credit.subtotalCents, locale)}</p>{credit.taxes.map(tax => <p key={tax.id}>{tax.tax.code}: {formatMoney(tax.amountCents, locale)}</p>)}<p className="text-xl font-semibold">{s("total")}: {formatMoney(credit.totalCents, locale)}</p></div>
+    <div className="space-y-2 rounded border p-4"><p>{s("subtotal")}: {formatMoney(credit.subtotalCents, locale)}</p>{credit.taxes.map(tax => <p key={tax.id}>{tax.tax?.code || pt("taxLine")}: {formatMoney(tax.amountCents, locale)}</p>)}<p className="text-xl font-semibold">{s("total")}: {formatMoney(credit.totalCents, locale)}</p></div>
     <section className="space-y-3 rounded border p-4"><h2 className="font-semibold">{t("applications")}</h2>{credit.creditsApplied.map(a => <div key={a.id}>
       <Link className="inline-flex min-h-11 items-center underline" href={`/c/${company.id}/achats/validees/${a.billId}`}>{a.bill.number}</Link>
       <p>{a.appliedDate.toISOString().slice(0, 10)} · {formatMoney(a.amountCents, locale)}</p>

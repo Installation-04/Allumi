@@ -2968,5 +2968,20 @@
     "method": "Mode de paiement",
     "reference": "Référence",
     "currency": "Devise"
+  },
+  "purchasePrint": {
+    "open": "Imprimer la copie comptable",
+    "copy": "Copie comptable interne",
+    "back": "Retour à la pièce comptable",
+    "bill": "Facture fournisseur",
+    "credit": "Crédit fournisseur",
+    "hint": "Utilisez Imprimer ou enregistrer en PDF, puis choisissez votre imprimante ou Enregistrer en PDF dans le navigateur. Les notes et motifs privés sont exclus.",
+    "scope": "Copie de la saisie comptable, sans valeur de facture originale du fournisseur. Coordonnées du fournisseur figées à la validation; montants d’origine et état actuel. Aucun solde courant ou justificatif joint.",
+    "source": "Facture source",
+    "supplierUnavailable": "Coordonnées du fournisseur indisponibles",
+    "taxLine": "Taxe",
+    "taxNumber": "Taxe {number}",
+    "voided": "Pièce annulée",
+    "company": "Entreprise (nom actuel)"
   }
 }

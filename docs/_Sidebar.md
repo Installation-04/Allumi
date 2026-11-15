@@ -101,6 +101,7 @@
 - [[Releve-de-compte-fournisseur]]
 
 - [[Recherche-globale]]
+- [[Impression-des-achats]] — copies comptables privées et PDF navigateur.
 - [[Recherche-des-paiements-fournisseurs]] — recherche, filtres et export CSV complet.
 - [[Recherche-des-paiements-clients]]
 

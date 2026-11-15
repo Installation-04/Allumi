@@ -2565,6 +2565,7 @@ async function supplierBillsJourney(page: Page) {
   await expectNoPageOverflow(page);
   await captureReference(page, "achat-valide");
   const supplierBillUrl = page.url();
+  await purchasePrintJourney(page, supplierBillUrl, false);
   await page.locator("summary", { hasText: "Enregistrer un décaissement" }).click();
   await page.getByLabel("Montant envoyé", { exact: true }).fill("50,00");
   await page.getByLabel("Date de paiement", { exact: true }).fill("2026-07-15");
@@ -2596,6 +2597,7 @@ async function supplierBillsJourney(page: Page) {
   await expectNoPageOverflow(page);
   await captureReference(page, "credit-fournisseur-valide");
   const supplierCreditUrl = page.url();
+  await purchasePrintJourney(page, supplierCreditUrl, true);
   await page.goto(supplierBillUrl);
   await expect(page.getByText(/Solde à payer:.*86,24/)).toBeVisible();
   const supplierBase=new URL(supplierBillUrl).pathname.split("/achats/")[0];
@@ -3324,5 +3326,50 @@ test("supplier payment filters and complete private CSV export in French and Eng
  }
  for(const suffix of ["?page=0","?page=1&page=2","?page=100001"])expect((await page.request.get(`${company}/decaissements${suffix}`)).status()).toBe(404);
  await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await expect(page.locator("html")).toHaveAttribute("data-theme","light");await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.locator("html")).toHaveAttribute("lang","fr-CA");
+ expect(cspViolations).toEqual([]);
+});
+
+
+/** The original supplier record prints independently of internal detail notes and workspace controls. */
+async function purchasePrintJourney(page: Page, documentUrl: string, credit: boolean) {
+ await page.getByRole("link",{name:"Imprimer la copie comptable",exact:true}).click();
+ const paper=page.getByRole("article",{name:"Copie comptable interne",exact:true});await expect(paper).toContainText("Atelier Boréal");await expect(paper).toContainText(credit ? "28,74" : "114,98");
+ for(const privateValue of ["Facture fournisseur de référence","Retour partiel de fournitures"])expect(await (await page.request.get(page.url())).text()).not.toContain(privateValue);
+ if(credit){await page.getByRole("button",{name:"English",exact:true}).click();await expect(page.locator("html")).toHaveAttribute("lang","en");await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");await expect(page.locator("html")).toHaveAttribute("data-theme","dark");await expect(page.getByRole("article",{name:"Internal accounting copy",exact:true})).toContainText("$28.74");}
+ await expectNoPageOverflow(page);await captureReference(page,credit ? "achats-impression-credit-en-dark" : "achats-impression-facture");
+ await page.evaluate(()=>{window.print=()=>document.documentElement.setAttribute("data-purchase-print","true");});await page.getByRole("button",{name:/^(Imprimer ou enregistrer en PDF|Print or save as PDF)$/,exact:true}).click();await expect(page.locator("html")).toHaveAttribute("data-purchase-print","true");
+ await page.emulateMedia({media:"print"});await expect(page.locator(".workspace-header")).toBeHidden();await expect(page.locator(".workspace-sidebar")).toBeHidden();await expect(page.locator("nav:visible")).toHaveCount(0);await expect(page.locator(".print-controls")).toBeHidden();
+ expect(await page.locator(".invoice-paper").evaluate(el=>getComputedStyle(el).backgroundColor)).toBe("rgb(255, 255, 255)");
+ if(process.env.E2E_MOBILE!=="1"){const pdf=await page.pdf({format:"A4",printBackground:true});expect(pdf.subarray(0,5).toString()).toBe("%PDF-");expect(pdf.length).toBeGreaterThan(3000);}
+ await page.emulateMedia({media:"screen"});
+ if(credit){await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await expect(page.locator("html")).toHaveAttribute("data-theme","light");await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.locator("html")).toHaveAttribute("lang","fr-CA");}
+ await page.getByRole("link",{name:"Retour à la pièce comptable",exact:true}).click();await expect(page).toHaveURL(documentUrl);
+}
+
+test("purchase print copies respect accounting permissions without Contacts or Taxes and show voids without private reasons", async ({ page }) => {
+ test.setTimeout(90_000);cspViolations.length=0;watchCsp(page.context());await page.context().addCookies(updateCookies);await page.goto("/");
+ if(!/^\/c\/[0-9a-f-]{36}/.test(new URL(page.url()).pathname))await page.getByRole("link",{name:"Atelier Exemple inc.",exact:true}).click();
+ const company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)?.[0];expect(company).toBeTruthy();const companyId=company!.split("/")[2];
+ const db=new pg.Client({connectionString:e2eUrls().owner});await db.connect();let userId:string|null=null,backupId:string|null=null,originalRole:string|null=null,originalAccess:unknown=null;
+ try{
+  const membership=(await db.query("SELECT m.user_id,m.role,m.module_access FROM membership m JOIN app_user u ON u.id=m.user_id WHERE m.company_id=$1 AND u.email=$2",[companyId,EMAIL])).rows[0];userId=membership.user_id;originalRole=membership.role;originalAccess=membership.module_access;
+  backupId=(await db.query("INSERT INTO app_user(id,email,display_name,updated_at) VALUES(gen_random_uuid(),'purchase-print-'||gen_random_uuid()::text||'@exemple.test','Permission test owner',now()) RETURNING id")).rows[0].id;
+  await db.query("INSERT INTO membership(id,company_id,user_id,role,updated_at) VALUES(gen_random_uuid(),$1,$2,'OWNER',now())",[companyId,backupId]);
+  await db.query("UPDATE membership SET role='ACCOUNTANT',module_access=$3::jsonb WHERE company_id=$1 AND user_id=$2",[companyId,userId,JSON.stringify({accounting:"read",contacts:"none",taxes:"none",sales:"none"})]);
+  const documents=(await db.query("SELECT id,kind FROM purchase_document WHERE company_id=$1 AND number IN ('A-00001','A-00002') ORDER BY number",[companyId])).rows;expect(documents).toHaveLength(2);
+  for(const document of documents){
+   const base=`${company}/${document.kind==="BILL" ? "achats/validees" : "credits-fournisseurs/valides"}/${document.id}`;
+   expect((await page.goto(base))?.status()).toBe(200);await page.getByRole("link",{name:"Imprimer la copie comptable",exact:true}).click();
+   const paper=page.getByRole("article",{name:"Copie comptable interne",exact:true});await expect(paper).toContainText("Atelier Boréal");await expect(paper.getByText("Taxe 1",{exact:true})).toBeVisible();await expect(paper.getByText("Taxe 2",{exact:true})).toBeVisible();await expect(paper).toContainText("Pièce annulée");
+   const html=await (await page.request.get(page.url())).text();for(const secret of ["Facture fournisseur de référence","Retour partiel de fournitures","Correction du crédit de test","Correction de la pièce"])expect(html).not.toContain(secret);
+   await expectNoPageOverflow(page);if(document.kind==="BILL")await captureReference(page,"achats-impression-annulee");
+   await db.query("UPDATE membership SET module_access='{\"accounting\":\"none\"}' WHERE company_id=$1 AND user_id=$2",[companyId,userId]);expect((await page.request.get(`${base}/imprimer`)).status()).toBe(404);
+   await db.query("UPDATE membership SET module_access=$3::jsonb WHERE company_id=$1 AND user_id=$2",[companyId,userId,JSON.stringify({accounting:"read",contacts:"none",taxes:"none",sales:"none"})]);
+   const wrong=`${company}/${document.kind==="BILL" ? "credits-fournisseurs/valides" : "achats/validees"}/${document.id}/imprimer`;expect((await page.request.get(wrong)).status()).toBe(404);
+  }
+ }finally{
+  if(userId&&originalRole)await db.query("UPDATE membership SET role=$3::member_role,module_access=$4::jsonb WHERE company_id=$1 AND user_id=$2",[companyId,userId,originalRole,originalAccess===null?null:JSON.stringify(originalAccess)]);
+  if(backupId){await db.query("DELETE FROM membership WHERE company_id=$1 AND user_id=$2",[companyId,backupId]);await db.query("UPDATE app_user SET disabled_at=now() WHERE id=$1",[backupId]);}await db.end();
+ }
  expect(cspViolations).toEqual([]);
 });

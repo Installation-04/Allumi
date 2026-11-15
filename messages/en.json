@@ -2968,5 +2968,20 @@
     "method": "Payment method",
     "reference": "Reference",
     "currency": "Currency"
+  },
+  "purchasePrint": {
+    "open": "Print accounting copy",
+    "copy": "Internal accounting copy",
+    "back": "Back to accounting document",
+    "bill": "Supplier bill",
+    "credit": "Supplier credit",
+    "hint": "Use Print or save as PDF, then select your printer or Save as PDF in your browser. Private notes and reasons are excluded.",
+    "scope": "Copy of the accounting record, not the supplier’s original invoice. Supplier details were frozen when posted; original amounts and current status. No current balance or supporting attachments.",
+    "source": "Source bill",
+    "supplierUnavailable": "Supplier details unavailable",
+    "taxLine": "Tax",
+    "taxNumber": "Tax {number}",
+    "voided": "Voided document",
+    "company": "Company (current name)"
   }
 }
