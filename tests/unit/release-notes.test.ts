@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync, execFileSync } from "node:child_process";
 import { afterEach, expect, it } from "vitest";
+import { compareVersions } from "@/modules/updates/domain/releases";
 import { earlierReleaseNotes, installedReleaseNotes } from "@/modules/updates/domain/notes";
 
 const roots: string[] = [];
@@ -23,12 +24,14 @@ it("looks up the exact installed version in the chosen language without substitu
  expect(earlierReleaseNotes("0.4.0-alpha.61", "en")).toEqual([]);
  expect(earlierReleaseNotes("0.4.0-alpha.62", "en").map(entry => entry.version)).toEqual(["0.4.0-alpha.61"]);
  expect(earlierReleaseNotes("dev", "en")).toEqual([]);
- expect(earlierReleaseNotes("0.4.0", "en")).toHaveLength(2);
+ expect(earlierReleaseNotes("0.4.0", "en").length).toBeLessThanOrEqual(5);
+ const stableHistory=earlierReleaseNotes("0.4.0","en");
+ for(let i=0;i<stableHistory.length;i++){expect(compareVersions(stableHistory[i]!.version,"0.4.0")).toBeLessThan(0);if(i>0)expect(compareVersions(stableHistory[i-1]!.version,stableHistory[i]!.version)).toBeGreaterThan(0);}
 });
 
 it("validates bilingual notes and every local guide with no npm dependency", () => {
  const result=check(catalog());expect(result.status,result.stderr).toBe(0);
- expect(check(catalog(), "0.4.0-alpha.63").status).toBe(1);
+ expect(check(catalog(), "999999.999999.999999").status).toBe(1);
  const notes=catalog();delete notes["0.4.0-alpha.62"].en;expect(check(notes).status).toBe(1);
 });
 

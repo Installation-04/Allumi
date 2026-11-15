@@ -110,5 +110,63 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.63": {
+    "fr-CA": {
+      "title": "Remboursements reçus des fournisseurs",
+      "added": [
+        {
+          "text": "Depuis un crédit fournisseur disponible, comptabilisez un remboursement déjà reçu dans une banque, encaisse ou carte de crédit.",
+          "guide": "Remboursements-fournisseurs"
+        },
+        {
+          "text": "Retrouvez les remboursements dans Dépenses → Remboursements fournisseurs, avec recherche, filtres et origines détaillées.",
+          "guide": "Remboursements-fournisseurs"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Annulez par contre-passation datée pour restaurer le crédit disponible et conserver l’historique. Les rapports restent rapprochés et les taxes ne sont pas recalculées."
+        },
+        {
+          "text": "La recherche globale et le relevé fournisseur ouvrent directement la fiche du remboursement; interface française/anglaise, mobile et sombre."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration ni nouvelle configuration. Allumi comptabilise les montants reçus séparément; il ne transmet aucun ordre bancaire.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Refunds received from suppliers",
+      "added": [
+        {
+          "text": "From an available supplier credit, record a refund already received into a bank, cash or credit-card account.",
+          "guide": "Remboursements-fournisseurs"
+        },
+        {
+          "text": "Find refunds under Expenses → Supplier refunds, with search, filters and detailed origins.",
+          "guide": "Remboursements-fournisseurs"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Reverse a refund on a chosen date to restore available credit and retain history. Reports stay aligned and taxes are not recalculated."
+        },
+        {
+          "text": "Global search and supplier statements open the refund directly; French/English, mobile and dark mode are supported."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration or new configuration. Allumi records money received separately; it does not send bank instructions.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

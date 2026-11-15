@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.62
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.63
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -132,6 +132,12 @@ Open an internal accounting copy of a posted or voided supplier bill or credit, 
 Apply available supplier credits to bills for the same supplier, with reviewed balances and dated releases. [Application guide](docs/Affectation-des-credits-fournisseurs.md).
 
 ![Supplier credit application in English with the dark theme](docs/images/affectation-credit-fournisseur-en-dark-desktop.png)
+
+### Refunds received from suppliers
+
+Record money already received against an available supplier credit, review its origins and reverse it on a chosen date. Supplier balances and historical reports stay aligned; taxes are preserved. [Supplier refund guide](docs/Remboursements-fournisseurs.md).
+
+![Supplier refund in English with the dark theme](docs/images/remboursement-fournisseur-en-dark-desktop.png)
 
 ### Supplier payment history
 

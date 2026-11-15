@@ -84,3 +84,5 @@ Taxes et produits/services : [[Taxes-et-catalogue]]. Consultation et import : [[
 - [[Relances-clients]] — factures échues, aperçu bilingue et envoi SMTP manuel confirmé.
 
 - [[Nouveautes-des-versions]] — changements de la version installée, historique et guides.
+
+- [[Remboursements-fournisseurs]] — comptabiliser les remboursements reçus et les annuler.

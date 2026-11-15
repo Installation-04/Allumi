@@ -35,7 +35,7 @@ L’[[Age-des-comptes-fournisseurs]] utilise les dates d’affectation et de ret
 
 La migration `20261118000000_supplier_credit_applications` ajoute des gardes SQL de chronologie, de période ouverte et de sérialisation. Elle n’ajoute aucune table ni colonne. Le service de migration doit être exécuté lors de la mise à jour habituelle; les opérations concernées exigent l’isolation PostgreSQL **READ COMMITTED**, également utilisée par l’application. Voir [[Schema-de-donnees]] et [[Mise-a-jour]].
 
-Les remboursements fournisseurs et les taxes partiellement récupérables restent indisponibles. Ce parcours utilise des crédits liés à une facture source; il ne crée pas de crédit autonome ni d’ordre bancaire.
+Les remboursements reçus sont disponibles dans [[Remboursements-fournisseurs]]. Les taxes partiellement récupérables restent indisponibles. Ce parcours utilise des crédits liés à une facture source; il ne crée pas de crédit autonome ni d’ordre bancaire.
 
 ![Révision sur téléphone](images/affectation-credit-fournisseur-formulaire-mobile.png)
 
