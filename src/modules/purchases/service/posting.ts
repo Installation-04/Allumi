@@ -1,4 +1,5 @@
 import "server-only";
+import { purchaseTaxLabels } from "./tax-labels";
 import { requireRole } from "@/modules/companies";
 import { createPurchaseEntry, formatNumber, isValidIsoDate, type EntryLine } from "@/modules/ledger";
 import { AppError, toAppError } from "@/platform/errors";
@@ -62,7 +63,8 @@ export async function listBills(actor: CompanyContext) {
 export async function getBill(actor: CompanyContext, id: string) {
   return withCompany(actor, async tx => {
     await requireRole(tx, "ledger.read");
-    return tx.purchaseDocument.findFirst({ where: { companyId: actor.companyId, id, kind: "BILL", status: { in: ["POSTED", "VOID"] } }, include: { voidEntry: { select: { entryDate: true } }, lines: { orderBy: { position: "asc" } }, taxes: { include: { tax: { select: { code: true } } } } } });
+    const row = await tx.purchaseDocument.findFirst({ where: { companyId: actor.companyId, id, kind: "BILL", status: { in: ["POSTED", "VOID"] } }, include: { voidEntry: { select: { entryDate: true } }, lines: { orderBy: { position: "asc" } }, taxes: true } });
+    return row ? { ...row, taxes: await purchaseTaxLabels(tx, actor.companyId, row.taxes) } : null;
   });
 }
 

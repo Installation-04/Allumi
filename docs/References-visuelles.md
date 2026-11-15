@@ -437,3 +437,13 @@ Filtres fournisseur/numéro/référence, état et période, export CSV des résu
 ![Recherche des paiements fournisseurs](images/decaissements-recherche-desktop.png)
 
 ![Recherche en anglais sombre sur téléphone](images/decaissements-recherche-en-dark-mobile.png)
+
+## Copies comptables des achats
+
+Impression/PDF des factures et crédits fournisseurs, montants et identités figés, notes privées exclues : [[Impression-des-achats]].
+
+![Facture fournisseur imprimable](images/achats-impression-facture-desktop.png)
+
+![Crédit en anglais sombre sur téléphone](images/achats-impression-credit-en-dark-mobile.png)
+
+![Annulation et taxes masquées](images/achats-impression-annulee-mobile.png)

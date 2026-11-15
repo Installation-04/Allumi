@@ -108,7 +108,7 @@ main:has(> .company-workspace) { max-width: none; padding: 0; }
   .company-workspace { @variant dark { background: linear-gradient(to right, #34373b 208px, var(--color-stone-950) 208px); } }
 }
 
-/* Printable sales documents keep a light sheet even inside the dark workspace. */
+/* Printable accounting documents keep a light sheet even inside the dark workspace. */
 .workspace-content .invoice-print .invoice-paper thead {
   background: var(--color-stone-100);
   color: var(--color-stone-900);

@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Copies comptables des factures et crédits fournisseurs : impression/PDF navigateur FR/EN, mobile et thèmes clair/sombre, coordonnées figées et montants exacts, annulations datées. Notes, motifs privés et justificatifs exclus du HTML imprimable. Consultation des copies et fiches indépendante des répertoires Contacts/Taxes, avec libellés fiscaux facultatifs; guide et captures. Aucune migration ni nouvelle écriture.
+
 ## [0.4.0-alpha.58] - 2026-11-14
 
 - Historique des décaissements : recherche littérale fournisseur/numéro/référence, filtres état/date et pagination conservée; export CSV complet jusqu’à 10 000 résultats, montants exacts et textes neutralisés, sans notes privées. Identités figées et consultation sans accès Contacts ou Ventes; interface FR/EN/mobile/sombre, tests de droits et guide illustré. Aucune nouvelle écriture ni migration.
