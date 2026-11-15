@@ -101,6 +101,7 @@
 - [[Releve-de-compte-fournisseur]]
 
 - [[Recherche-globale]]
+- [[Recherche-des-paiements-fournisseurs]] — recherche, filtres et export CSV complet.
 - [[Recherche-des-paiements-clients]]
 
 - [[HTTPS-local]]

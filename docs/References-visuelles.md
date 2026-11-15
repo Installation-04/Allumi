@@ -429,3 +429,11 @@ Aperçu bilingue et envoi SMTP individuel confirmé, avec conditions publiques e
 ![Aperçu du devis en anglais sombre](images/devis-courriel-apercu-en-dark-desktop.png)
 
 ![Historique sur téléphone](images/devis-courriel-historique-en-dark-mobile.png)
+
+## Recherche et export des décaissements
+
+Filtres fournisseur/numéro/référence, état et période, export CSV des résultats complets. Voir [[Recherche-des-paiements-fournisseurs]].
+
+![Recherche des paiements fournisseurs](images/decaissements-recherche-desktop.png)
+
+![Recherche en anglais sombre sur téléphone](images/decaissements-recherche-en-dark-mobile.png)

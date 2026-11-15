@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.57
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.58
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -85,7 +85,7 @@ This mode uses your existing Docker and Compose installation without configuring
 | **Manage sales and invoices** | [Estimates](docs/Devis.md), conversion to draft invoices, posted invoices, credit notes, customer payments and refunds. |
 | **Stay in touch with customers** | Manually email [estimates](docs/Envoi-des-devis.md) and [invoices](docs/Envoi-des-factures.md) through SMTP, with previews, confirmations and history; prepare [individual reminders](docs/Relances-clients.md) for overdue invoices. |
 | **Prepare recurring invoices** | [Monthly, quarterly or annual schedules](docs/Factures-recurrentes.md), confirmed draft generation, pause controls and occurrence history. |
-| **Track purchases** | Supplier bills and credits, expenses and partial or full payments; customers, suppliers and a products/services catalog. |
+| **Track purchases** | Supplier bills and credits, expenses, partial or full payments, and [searchable payment history with CSV export](docs/Recherche-des-paiements-fournisseurs.md); customers, suppliers and a products/services catalog. |
 | **Organize transactions** | Import CSV/OFX statements and Stripe/PayPal transactions, match them to journal entries, preview categorization rules, group deposits and reconcile bank accounts. |
 | **Manage taxes** | Dated tax codes and rates, GST/QST/HST calculations, consultation and confirmed import of [official CRA and Revenu Québec rates](docs/Sources-fiscales-officielles.md), with provenance. |
 | **Understand your finances** | Balance sheet, income statement, general ledger, trial balance, aging reports, customer/supplier statements, tax summary, comparisons and CSV exports; browser printing and PDF output. |
@@ -108,6 +108,12 @@ The dashboard brings your company’s indicators together. Activity-based naviga
 Choose your language and appearance in the header. Your preferences are saved in your browser. The same dashboard is shown below in French with the light theme.
 
 ![Allumi desktop dashboard in French with the light theme](docs/images/tableau-de-bord-desktop.png)
+
+### Supplier payment history
+
+Find payments by supplier, number or reference, narrow the dates and status, and export all matching results to CSV. [Payment history guide](docs/Recherche-des-paiements-fournisseurs.md).
+
+![Supplier payment filters and CSV export in English with the dark theme](docs/images/decaissements-recherche-en-dark-desktop.png)
 
 ### On your phone, too
 
