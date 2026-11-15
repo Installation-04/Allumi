@@ -102,6 +102,7 @@
 
 - [[Recherche-globale]]
 - [[Credits-fournisseurs-disponibles]] — crédit conservé sur facture payée et disponible.
+- [[Affectation-des-credits-fournisseurs]] — affectation aux factures du même fournisseur et retrait daté.
 - [[Impression-des-achats]] — copies comptables privées et PDF navigateur.
 - [[Recherche-des-paiements-fournisseurs]] — recherche, filtres et export CSV complet.
 - [[Recherche-des-paiements-clients]]

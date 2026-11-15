@@ -70,6 +70,7 @@ Taxes et produits/services : [[Taxes-et-catalogue]]. Consultation et import : [[
 - [[Encaissements-au-compte]] — fonds reçus sans facture, affectations partielles et retraits datés.
 - [[Recherche-globale]] — données de l’entreprise, filtres et permissions.
 - [[Credits-fournisseurs-disponibles]] — crédit conservé sur facture payée et disponible.
+- [[Affectation-des-credits-fournisseurs]] — affectation aux factures du même fournisseur et retrait daté.
 - [[Impression-des-achats]] — copies comptables privées et PDF navigateur.
 - [[Recherche-des-paiements-fournisseurs]] — recherche, filtres et export CSV complet.
 - [[Recherche-des-paiements-clients]] — client, numéro, référence, état et période.

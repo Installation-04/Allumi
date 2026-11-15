@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.60
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.61
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -85,7 +85,7 @@ This mode uses your existing Docker and Compose installation without configuring
 | **Manage sales and invoices** | [Estimates](docs/Devis.md), conversion to draft invoices, posted invoices, credit notes, customer payments and refunds. |
 | **Stay in touch with customers** | Manually email [estimates](docs/Envoi-des-devis.md) and [invoices](docs/Envoi-des-factures.md) through SMTP, with previews, confirmations and history; prepare [individual reminders](docs/Relances-clients.md) for overdue invoices. |
 | **Prepare recurring invoices** | [Monthly, quarterly or annual schedules](docs/Factures-recurrentes.md), confirmed draft generation, pause controls and occurrence history. |
-| **Track purchases** | Supplier bills, [available supplier credits](docs/Credits-fournisseurs-disponibles.md), expenses, partial or full payments, and [searchable payment history with CSV export](docs/Recherche-des-paiements-fournisseurs.md); customers, suppliers and a products/services catalog. |
+| **Track purchases** | Supplier bills, [available supplier credits](docs/Credits-fournisseurs-disponibles.md), [bill applications with dated releases](docs/Affectation-des-credits-fournisseurs.md), expenses, partial or full payments, and [searchable payment history with CSV export](docs/Recherche-des-paiements-fournisseurs.md); customers, suppliers and a products/services catalog. |
 | **Organize transactions** | Import CSV/OFX statements and Stripe/PayPal transactions, match them to journal entries, preview categorization rules, group deposits and reconcile bank accounts. |
 | **Manage taxes** | Dated tax codes and rates, GST/QST/HST calculations, consultation and confirmed import of [official CRA and Revenu Québec rates](docs/Sources-fiscales-officielles.md), with provenance. |
 | **Understand your finances** | Balance sheet, income statement, general ledger, trial balance, aging reports, customer/supplier statements, monthly/quarterly/annual or custom tax summaries, comparisons and CSV exports; browser printing and PDF output. |
@@ -120,6 +120,12 @@ Choose monthly, quarterly or annual calendar periods, or enter custom dates for 
 Open an internal accounting copy of a posted or voided supplier bill or credit, then print or save it as PDF. Frozen supplier details and exact recorded amounts are included; private notes are excluded. [Printing guide](docs/Impression-des-achats.md).
 
 ![Supplier credit accounting copy in English with the dark theme](docs/images/achats-impression-credit-en-dark-desktop.png)
+
+### Apply supplier credits
+
+Apply available supplier credits to bills for the same supplier, with reviewed balances and dated releases. [Application guide](docs/Affectation-des-credits-fournisseurs.md).
+
+![Supplier credit application in English with the dark theme](docs/images/affectation-credit-fournisseur-en-dark-desktop.png)
 
 ### Supplier payment history
 

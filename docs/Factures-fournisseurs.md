@@ -66,7 +66,7 @@ Depuis la facture, consultez son nouveau solde et ses crédits. **Crédits fourn
 
 ## Annuler un crédit validé
 
-**Annuler l’avoir** demande un motif et une date dans une période ouverte, au moins égale à sa validation et à tous les événements d’affectation/retrait. Si le crédit était affecté, l’application à la facture est retirée à cette date et une écriture inverse rétablit son solde. S’il était disponible sans affectation, sa contre-passation annule le disponible sans modifier la facture payée. Le crédit original, son numéro et l’historique sont conservés. Un remboursement actif ou une affectation active à une autre facture bloque cette annulation. Les remboursements et la gestion manuelle d’affectations à d’autres factures ne sont pas proposés par cette interface.
+**Annuler l’avoir** demande un motif et une date dans une période ouverte, au moins égale à sa validation et à tous les événements d’affectation/retrait. Si le crédit était affecté, l’application à la facture est retirée à cette date et une écriture inverse rétablit son solde. S’il était disponible sans affectation, sa contre-passation annule le disponible sans modifier la facture payée. Le crédit original, son numéro et l’historique sont conservés. Un remboursement actif ou une affectation active à une autre facture bloque cette annulation. Les affectations et retraits manuels sont accessibles depuis le crédit : [[Affectation-des-credits-fournisseurs]]. Les remboursements fournisseurs restent indisponibles.
 
 Les crédits restent limités aux factures avec taxes entièrement récupérables ou sans taxe. La récupération partielle et les ajustements manuels de taxes restent indisponibles.
 

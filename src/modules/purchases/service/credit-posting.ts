@@ -46,10 +46,10 @@ export async function postCreditNote(actor: CompanyContext, id: string, revision
     return id;
   }); } catch(error) { throw toAppError(error); }
 }
-export async function getPostedCredit(actor: CompanyContext, id: string) {
+export async function getPostedCredit(actor: CompanyContext, id: string, options: { includeApplications?: boolean } = {}) {
   return withCompany(actor, async tx => {
     await requireRole(tx,"ledger.read");
-    const row = await tx.purchaseDocument.findFirst({ where:{ companyId:actor.companyId,id,kind:"SUPPLIER_CREDIT",status:{in:["POSTED","VOID"]} },include:{ lines:{orderBy:{position:"asc"}},taxes:true,creditedDocument:{select:{id:true,number:true}},creditsApplied:{orderBy:[{appliedDate:"asc"},{id:"asc"}],include:{bill:{select:{number:true}}}},voidEntry:{select:{entryDate:true}} } });
+    const row = await tx.purchaseDocument.findFirst({ where:{ companyId:actor.companyId,id,kind:"SUPPLIER_CREDIT",status:{in:["POSTED","VOID"]} },include:{ lines:{orderBy:{position:"asc"}},taxes:true,creditedDocument:{select:{id:true,number:true}},creditsApplied:{take:options.includeApplications === false ? 0 : undefined,orderBy:[{appliedDate:"asc"},{id:"asc"}],include:{bill:{select:{number:true}}}},voidEntry:{select:{entryDate:true}} } });
     return row ? { ...row, taxes: await purchaseTaxLabels(tx, actor.companyId, row.taxes) } : null;
   });
 }

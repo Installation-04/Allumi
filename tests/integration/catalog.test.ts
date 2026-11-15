@@ -352,3 +352,17 @@ it("protects recurring plans and occurrences with Sales RLS, immutable history a
   expect((await q<{qual:string}>("SELECT qual FROM pg_policies WHERE tablename=$1 AND policyname='module_read' AND permissive='RESTRICTIVE'",[table]))[0]?.qual).toContain('sales');
  }
 });
+
+it("installs immediate supplier application and posting/cancellation guards under caller privileges",async()=>{
+ const triggers=await q<{name:string;table_name:string;function_name:string;events:number;enabled:string;deferred:boolean}>(`SELECT t.tgname AS name,c.relname AS table_name,p.proname AS function_name,t.tgtype::integer AS events,t.tgenabled AS enabled,t.tgdeferrable AS deferred FROM pg_trigger t JOIN pg_class c ON c.oid=t.tgrelid JOIN pg_namespace n ON n.oid=c.relnamespace JOIN pg_proc p ON p.oid=t.tgfoid WHERE n.nspname='public' AND NOT t.tgisinternal AND t.tgname IN ('supplier_credit_application_guard','supplier_payment_allocation_guard','supplier_credit_00_isolation') ORDER BY t.tgname`);
+ expect(triggers).toEqual([
+  {name:"supplier_credit_00_isolation",table_name:"purchase_document",function_name:"supplier_document_isolation",events:19,enabled:"O",deferred:false},
+  {name:"supplier_credit_application_guard",table_name:"purchase_credit_application",function_name:"supplier_application_guard",events:23,enabled:"O",deferred:false},
+  {name:"supplier_payment_allocation_guard",table_name:"payment_allocation",function_name:"supplier_application_guard",events:23,enabled:"O",deferred:false},
+ ]);
+ const functions=await q<{name:string;definer:boolean;config:string[];public_execute:boolean}>(`SELECT p.proname AS name,p.prosecdef AS definer,p.proconfig AS config,has_function_privilege('public',p.oid,'EXECUTE') AS public_execute FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='public' AND p.pronargs=0 AND p.proname IN ('supplier_application_guard','supplier_document_isolation') ORDER BY p.proname`);
+ expect(functions).toEqual([
+  {name:"supplier_application_guard",definer:false,config:["search_path=public, pg_temp"],public_execute:false},
+  {name:"supplier_document_isolation",definer:false,config:["search_path=public, pg_temp"],public_execute:false},
+ ]);
+});

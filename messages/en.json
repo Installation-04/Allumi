@@ -122,7 +122,7 @@
     "retainAvailable": "Keep credit available",
     "availableTitle": "Supplier credit available balance",
     "available": "Available: {amount}",
-    "availableHint": "Current unapplied balance of the posted credit. This is not a refund received. Receiving refunds and later applications are not offered in this workflow.",
+    "availableHint": "Current unapplied balance of the posted credit. This is not a refund received. Use the applications panel to apply it to an open bill for the same supplier.",
     "noApplications": "No applications recorded."
   },
   "disbursements": {
@@ -793,6 +793,22 @@
       "confirm": "Confirm the recipient, public content and sending of the estimate.",
       "confirmResend": "Confirm sending again; this estimate already has an email attempt.",
       "rate": "Wait one minute between attempts, or five minutes while a send is pending. Maximum: 20 attempts per estimate in 24 hours."
+    },
+    "supplierApplications": {
+      "invalid": "Check the amounts, documents and application date.",
+      "futureDate": "The date cannot be in the future.",
+      "creditNotFound": "This supplier credit could not be found.",
+      "notPosted": "Only posted credits and bills can be applied or released.",
+      "dateBeforeDocuments": "The date must be on or after the documents’ posting dates and the original application.",
+      "dateBeforeMovement": "The date must be on or after the latest settlement or release on these documents.",
+      "periodClosed": "The date must fall in an open accounting period.",
+      "stale": "An available balance has changed. Refresh the page before confirming.",
+      "exceeds": "The amount exceeds the available credit or bill balance.",
+      "alreadyApplied": "This credit is already applied to this bill. Release the existing application before changing its amount.",
+      "applicationNotFound": "This application could not be found.",
+      "confirm": "Confirm the application or release before continuing.",
+      "supplierMismatch": "The credit and bill must belong to the same supplier.",
+      "billNotFound": "This bill could not be found."
     }
   },
   "settingsPage": {
@@ -3001,5 +3017,34 @@
     "taxNumber": "Tax {number}",
     "voided": "Voided document",
     "company": "Company (current name)"
+  },
+  "supplierCreditApplications": {
+    "title": "Supplier bill applications",
+    "intro": "Apply this credit to an open bill for the same supplier. No money is sent and no new journal entry is created.",
+    "available": "Available credit: {amount}",
+    "search": "Find a bill by number or reference",
+    "searchAction": "Search",
+    "choose": "Choose a bill",
+    "review": "Review application",
+    "target": "Bill {number} — open balance: {amount}",
+    "amount": "Amount to apply",
+    "date": "Application date",
+    "apply": "Apply this credit",
+    "confirmApply": "I confirm this application and the displayed balances.",
+    "noTargets": "No eligible open bills.",
+    "limit": "Only the first 50 bills are shown. Refine your search.",
+    "historyEmpty": "No applications recorded.",
+    "release": "Release application",
+    "releaseHint": "The amount becomes available on this credit again and the bill becomes payable again. No money is sent.",
+    "confirmRelease": "I confirm releasing this amount.",
+    "releaseDate": "Release date",
+    "pagination": "Application pages",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {count}",
+    "reset": "Clear search",
+    "reviewHint": "Check the bill, amount and date before confirming. If a balance changes meanwhile, reload the page.",
+    "targetUnavailable": "This bill is no longer available here. Find and choose an open bill before confirming.",
+    "bill": "Bill to settle"
   }
 }

@@ -14,3 +14,6 @@ export { voidExpense } from "./service/expense-voiding";
 export { getPurchasePrintDocument } from "./service/printing";
 
 export { supplierCreditPostingOptionsSchema, type SupplierCreditPostingOptions } from "./domain/credit";
+
+export { applySupplierCredit, unapplySupplierCredit, listSupplierCreditTargets, listSupplierCreditApplications, SUPPLIER_CREDIT_TARGET_LIMIT, SUPPLIER_APPLICATIONS_PER_PAGE } from "./service/credit-applications";
+export { supplierCreditApplicationSchema, supplierCreditUnapplicationSchema, type SupplierCreditApplicationInput, type SupplierCreditUnapplicationInput } from "./domain/application";
