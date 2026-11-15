@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.63] - 2026-11-15
+
 - Nouveautés : remboursements reçus sur un crédit fournisseur disponible, compte banque/encaisse/carte, numéro d’encaissement, écriture et affectation atomiques; fiche avec origines paginées et contre-passation datée idempotente.
 - Améliorations : historique fournisseur recherché/filtré, nouveau lien Dépenses, accès direct depuis recherche globale et relevé fournisseur; disponible et rapports datés rapprochés, taxes inchangées, consultation sans répertoires Contacts/Taxes/Ventes. Interface FR/EN/mobile/sombre, guide et captures.
 - Fiabilité : soldes revérifiés sous verrou et refus des règlements concurrents, dates antérieures aux mouvements, périodes fermées, comptes non admissibles et accès étrangers; transactions financières et numérotation vérifiées.
