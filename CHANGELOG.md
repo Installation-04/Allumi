@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Présentation GitHub en anglais par défaut : README et bannière traduits, version française conservée avec sélecteur de langue; installation et captures bilingues préservées.
+
 - Présentation du projet : README restructuré autour de l’application, de ses fonctions disponibles et de son installation depuis GitHub, bannière originale, captures sélectionnées et liens vers les guides; accueil du wiki harmonisé.
 
 ## [0.4.0-alpha.57] - 2026-11-14
