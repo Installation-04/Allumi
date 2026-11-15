@@ -76,7 +76,7 @@ export async function searchCompany(actor: CompanyContext, params: Record<string
         : row.kind === "SUPPLIER_CREDIT" ? `credits-fournisseurs/${draft ? "" : "valides/"}${row.id}`
         : row.kind === "EXPENSE" ? `depenses/${draft ? "" : "validees/"}${row.id}`
         : row.kind === "RECEIPT" ? `encaissements/${row.id}` : row.kind === "REFUND" ? `remboursements/${row.id}`
-        : row.kind === "DISBURSEMENT" ? `decaissements/${row.id}` : `journal/${row.journal_id}`;
+        : row.kind === "DISBURSEMENT" ? `decaissements/${row.id}` : row.kind === "SUPPLIER_REFUND" ? `remboursements-fournisseurs/${row.id}` : `journal/${row.journal_id}`;
       return { id: row.id, kind: row.kind, reference: row.reference, name: row.name, date: row.date, amountCents: row.amount === null ? null : BigInt(row.amount), status: row.status, href: `${base}/${route}` };
     });
     return { filters, rows: mapped, hasMore: rows.length > SEARCH_PAGE_SIZE && filters.page < SEARCH_MAX_PAGE, capped: rows.length > SEARCH_PAGE_SIZE && filters.page === SEARCH_MAX_PAGE };

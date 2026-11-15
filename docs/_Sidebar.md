@@ -110,3 +110,5 @@
 - [[HTTPS-local]]
 
 - [[Nouveautes-des-versions]] — changements de la version installée, historique et guides.
+
+- [[Remboursements-fournisseurs]] — comptabiliser les remboursements reçus et les annuler.

@@ -477,3 +477,13 @@ Listes bilingues des changements de la version installée et historique : [[Nouv
 ![Nouveautés en français](images/nouveautes-versions-desktop.png)
 
 ![Nouveautés en anglais sombre sur téléphone](images/nouveautes-versions-en-dark-mobile.png)
+
+## Remboursements fournisseurs reçus
+
+Comptabilisation, origine et contre-passation datée : [[Remboursements-fournisseurs]].
+
+![Saisie du remboursement](images/remboursement-fournisseur-formulaire-desktop.png)
+
+![Fiche en anglais sombre sur téléphone](images/remboursement-fournisseur-en-dark-mobile.png)
+
+![Annulation datée](images/remboursement-fournisseur-annule-desktop.png)

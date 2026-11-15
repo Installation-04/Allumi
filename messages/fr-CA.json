@@ -122,7 +122,7 @@
     "retainAvailable": "Garder le crédit disponible",
     "availableTitle": "Disponible du crédit fournisseur",
     "available": "Disponible : {amount}",
-    "availableHint": "Solde actuel non affecté du crédit comptabilisé. Ce montant ne constitue pas un remboursement reçu. Vous pouvez l’affecter à une facture ouverte du même fournisseur dans le panneau d’affectation.",
+    "availableHint": "Solde actuel non affecté du crédit comptabilisé. Vous pouvez l’affecter à une facture ouverte du même fournisseur ou enregistrer un remboursement déjà reçu.",
     "noApplications": "Aucune affectation enregistrée."
   },
   "disbursements": {
@@ -809,6 +809,22 @@
       "confirm": "Confirmez l’affectation ou la désaffectation avant de continuer.",
       "supplierMismatch": "Le crédit et la facture doivent appartenir au même fournisseur.",
       "billNotFound": "Cette facture est introuvable."
+    },
+    "supplierRefunds": {
+      "invalid": "Remboursement invalide.",
+      "futureDate": "La date ne peut pas être future.",
+      "creditNotFound": "Avoir introuvable.",
+      "creditNotOpen": "Cet avoir doit être validé et disponible.",
+      "dateBeforeCredit": "La date précède la validation de l’avoir.",
+      "dateBeforeMovement": "La date doit être au moins celle du dernier mouvement de cet avoir.",
+      "stale": "Le disponible a changé. Rechargez la page et vérifiez le solde.",
+      "exceeds": "Le montant dépasse l’avoir disponible.",
+      "account": "Choisissez une banque, encaisse ou carte de crédit active de cette entreprise.",
+      "notFound": "Remboursement introuvable.",
+      "invalidVoid": "Vérifiez le motif et la date de contre-passation.",
+      "confirm": "Confirmez le remboursement.",
+      "confirmVoid": "Confirmez la contre-passation.",
+      "linked": "Résolvez les compensations liées avant d’annuler ce remboursement."
     }
   },
   "settingsPage": {
@@ -1293,7 +1309,8 @@
       "releves-fournisseurs": "Relevés fournisseurs",
       "devis": "Devis",
       "recurrences": "Factures récurrentes",
-      "relances": "Relances clients"
+      "relances": "Relances clients",
+      "remboursements-fournisseurs": "Remboursements fournisseurs"
     }
   },
   "updates": {
@@ -3060,5 +3077,70 @@
     "version": "Version {version}",
     "unavailable": "Aucune note intégrée n’est disponible pour cette version. Consultez les notes de release sur GitHub.",
     "link": "Nouveautés de cette version"
+  },
+  "supplierRefunds": {
+    "title": "Remboursements fournisseurs",
+    "intro": "Remboursements reçus et comptabilisés sur les crédits fournisseurs disponibles.",
+    "back": "Tous les remboursements",
+    "empty": "Aucun remboursement",
+    "emptyHint": "Ouvrez un crédit fournisseur validé avec un disponible positif pour enregistrer un remboursement reçu.",
+    "number": "Numéro",
+    "date": "Date",
+    "amount": "Montant",
+    "status": "État",
+    "method": "Mode de paiement",
+    "reference": "Référence",
+    "memo": "Note",
+    "account": "Compte de réception",
+    "statuses": {
+      "POSTED": "Comptabilisé",
+      "VOID": "Annulé"
+    },
+    "methods": {
+      "CASH": "Comptant",
+      "CHEQUE": "Chèque",
+      "EFT": "Virement",
+      "INTERAC": "Interac",
+      "CREDIT_CARD": "Carte de crédit",
+      "DEBIT_CARD": "Carte de débit",
+      "OTHER": "Autre"
+    },
+    "pagination": "Pages des remboursements",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {page} sur {count}",
+    "count": "{count, plural, =0 {Aucun remboursement} one {# remboursement} other {# remboursements}}",
+    "record": "Enregistrer un remboursement reçu",
+    "recordHint": "Enregistrez uniquement un montant déjà reçu séparément. Allumi ne transmet aucun ordre bancaire et ne recalcule pas les taxes.",
+    "amountField": "Montant remboursé",
+    "amountHint": "Jusqu’au solde restant, avec deux décimales au plus.",
+    "dateField": "Date du remboursement",
+    "accountField": "Compte du remboursement",
+    "accountHint": "Banque, encaisse ou carte de crédit active ayant reçu le remboursement.",
+    "methodField": "Mode de paiement",
+    "referenceField": "Référence (numéro de chèque, de transaction…)",
+    "memoField": "Note",
+    "submit": "Comptabiliser le remboursement",
+    "detail": "Remboursement {number}",
+    "journalEntry": "Écriture au journal",
+    "allocations": "Origines du remboursement",
+    "allocationLine": "{number} · {amount}",
+    "released": "retiré le {date}",
+    "voidTitle": "Annuler le remboursement",
+    "voidWarning": "La contre-passation rétablit le disponible du crédit et annule l’écriture du remboursement. Elle ne déplace aucun argent.",
+    "voidDate": "Date d’annulation",
+    "voidReason": "Motif (obligatoire, 500 caractères au plus)",
+    "confirmVoid": "Je confirme la contre-passation de ce remboursement.",
+    "voidSubmit": "Contre-passer le remboursement",
+    "voidedOn": "Annulé le {date}",
+    "voidedReason": "Motif : {reason}",
+    "creditTitle": "Remboursement reçu du fournisseur",
+    "available": "Disponible : {amount}",
+    "confirmRecord": "Je confirme le montant, la date et le compte du remboursement déjà reçu.",
+    "historyLimit": "Les 25 derniers remboursements sont affichés. Consultez la liste pour les autres.",
+    "supplier": "Fournisseur",
+    "originPage": "Page {page} sur {count}",
+    "supplierUnavailable": "Fournisseur indisponible",
+    "originsEmpty": "Aucune affectation à un crédit enregistrée pour ce paiement historique."
   }
 }

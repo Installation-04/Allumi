@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.62
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.63
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -132,6 +132,12 @@ Ouvrez une copie comptable des factures et crédits fournisseurs validés ou ann
 Affectez les crédits disponibles aux factures du même fournisseur, avec révision des soldes et retrait daté. [Guide des affectations](docs/Affectation-des-credits-fournisseurs.md).
 
 ![Affectation en anglais sombre](docs/images/affectation-credit-fournisseur-en-dark-desktop.png)
+
+### Remboursements reçus des fournisseurs
+
+Comptabilisez un montant déjà reçu sur un crédit disponible, consultez ses origines et annulez-le par contre-passation datée. Soldes et rapports historiques restent rapprochés, sans recalcul des taxes. [Guide des remboursements fournisseurs](docs/Remboursements-fournisseurs.md).
+
+![Remboursement en anglais sombre](docs/images/remboursement-fournisseur-en-dark-desktop.png)
 
 ### Historique des paiements fournisseurs
 

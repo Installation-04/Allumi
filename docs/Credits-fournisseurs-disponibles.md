@@ -41,7 +41,7 @@ Le relevé daté est accessible dans [[Releve-de-compte-fournisseur]]. La copie 
 
 La préparation, validation et annulation exigent les droits d’écriture comptable et l’accès aux références nécessaires. La consultation du disponible exige **Comptabilité en lecture** et fonctionne sans accès aux répertoires Contacts, Taxes ou Ventes. Les crédits sont isolés par entreprise.
 
-Le disponible peut être affecté à une facture ouverte du même fournisseur, avec retrait daté et historique : [[Affectation-des-credits-fournisseurs]]. La réception de remboursements fournisseurs reste indisponible. La récupération partielle des taxes et les ajustements fiscaux manuels ne sont pas pris en charge. Les crédits restent limités aux factures avec taxes entièrement récupérables ou sans taxe.
+Le disponible peut être affecté à une facture ouverte du même fournisseur, avec retrait daté et historique : [[Affectation-des-credits-fournisseurs]]. Les remboursements reçus peuvent être comptabilisés sur le crédit disponible : [[Remboursements-fournisseurs]]. La récupération partielle des taxes et les ajustements fiscaux manuels ne sont pas pris en charge. Les crédits restent limités aux factures avec taxes entièrement récupérables ou sans taxe.
 
 ![Choix sur téléphone](images/credit-fournisseur-disponible-choix-mobile.png)
 

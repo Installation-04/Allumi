@@ -1,5 +1,6 @@
 import { PurchaseAttachments } from "../../../_attachments/panel";
 import Link from "next/link";
+import { SupplierRefundPanel } from "../../../remboursements-fournisseurs/panel";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getSupplierCreditOpenCents, getPostedCredit } from "@/modules/purchases";
@@ -38,6 +39,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     <ul className="space-y-3">{credit.lines.map(l => <li key={l.id} className="rounded border bg-white p-4 dark:bg-stone-900"><h2 className="font-semibold break-words">{l.description}</h2><p>{formatMoney(l.amountCents, locale)}</p></li>)}</ul>
     <div className="space-y-2 rounded border p-4"><p>{s("subtotal")}: {formatMoney(credit.subtotalCents, locale)}</p>{credit.taxes.map(tax => <p key={tax.id}>{tax.tax?.code || pt("taxLine")}: {formatMoney(tax.amountCents, locale)}</p>)}<p className="text-xl font-semibold">{s("total")}: {formatMoney(credit.totalCents, locale)}</p></div>
     <SupplierCreditApplicationsPanel actor={actor} access={company} supplierCreditId={creditId} openCents={available} posted={credit.status === "POSTED"} locale={locale} query={await searchParams} />
+    <SupplierRefundPanel actor={actor} access={company} supplierCreditId={creditId} openCents={available} locale={locale} posted={credit.status === "POSTED"} />
     <Link className="inline-flex min-h-11 items-center underline" href={`/c/${company.id}/journal/${credit.journalEntryId}`}>{s("journal")}</Link>
     {credit.status === "POSTED" && can(company, "entry.post") && <details className="rounded border p-4">
       <summary className="min-h-11 cursor-pointer">{t("void")}</summary>

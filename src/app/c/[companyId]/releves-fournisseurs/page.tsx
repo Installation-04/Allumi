@@ -77,6 +77,7 @@ export default async function Page({
         ? `${base}/credits-fournisseurs/valides/${r.sourceId}`
         : r.kind === "PAYMENT"
           ? `${base}/decaissements/${r.sourceId}`
+          : r.kind === "REFUND" && r.sourceId ? `${base}/remboursements-fournisseurs/${r.sourceId}`
           : `${base}/journal/${r.entryId}`;
   return (
     <section

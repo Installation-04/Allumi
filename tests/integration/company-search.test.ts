@@ -56,7 +56,7 @@ it("finds each payment kind and uses the appropriate authorized detail destinati
   const result=await searchCompany(reader,{q:"PAYMENT-NEEDLE",montant:"1.01"},"en");
   expect(result.rows).toHaveLength(4);
   for(const payment of payments) {
-    const route=payment.kind==='RECEIPT'?`encaissements/${payment.id}`:payment.kind==='REFUND'?`remboursements/${payment.id}`:payment.kind==='DISBURSEMENT'?`decaissements/${payment.id}`:`journal/${payment.entry}`;
+    const route=payment.kind==='RECEIPT'?`encaissements/${payment.id}`:payment.kind==='REFUND'?`remboursements/${payment.id}`:payment.kind==='DISBURSEMENT'?`decaissements/${payment.id}`:`remboursements-fournisseurs/${payment.id}`;
     expect(result.rows.find(row=>row.id===payment.id)).toMatchObject({kind:payment.kind,amountCents:101n,href:`/c/${W.companyA}/${route}`});
   }
 });

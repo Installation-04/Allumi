@@ -122,7 +122,7 @@
     "retainAvailable": "Keep credit available",
     "availableTitle": "Supplier credit available balance",
     "available": "Available: {amount}",
-    "availableHint": "Current unapplied balance of the posted credit. This is not a refund received. Use the applications panel to apply it to an open bill for the same supplier.",
+    "availableHint": "Current unapplied balance of the posted credit. Apply it to an open bill for the same supplier or record a refund already received.",
     "noApplications": "No applications recorded."
   },
   "disbursements": {
@@ -809,6 +809,22 @@
       "confirm": "Confirm the application or release before continuing.",
       "supplierMismatch": "The credit and bill must belong to the same supplier.",
       "billNotFound": "This bill could not be found."
+    },
+    "supplierRefunds": {
+      "invalid": "Invalid refund.",
+      "futureDate": "The date cannot be in the future.",
+      "creditNotFound": "Credit not found.",
+      "creditNotOpen": "This credit must be posted and available.",
+      "dateBeforeCredit": "The date precedes the credit posting.",
+      "dateBeforeMovement": "The date must be on or after the latest credit movement.",
+      "stale": "Availability changed. Reload the page and review the balance.",
+      "exceeds": "The amount exceeds the available credit.",
+      "account": "Choose an active bank, cash or credit-card account in this company.",
+      "notFound": "Refund not found.",
+      "invalidVoid": "Check the reversal reason and date.",
+      "confirm": "Confirm the refund.",
+      "confirmVoid": "Confirm the reversal.",
+      "linked": "Resolve linked offsets before voiding this refund."
     }
   },
   "settingsPage": {
@@ -1293,7 +1309,8 @@
       "releves-fournisseurs": "Supplier statements",
       "devis": "Estimates",
       "recurrences": "Recurring invoices",
-      "relances": "Customer reminders"
+      "relances": "Customer reminders",
+      "remboursements-fournisseurs": "Supplier refunds"
     }
   },
   "updates": {
@@ -3060,5 +3077,70 @@
     "version": "Version {version}",
     "unavailable": "No bundled notes are available for this version. See the release notes on GitHub.",
     "link": "What’s new in this version"
+  },
+  "supplierRefunds": {
+    "title": "Supplier refunds",
+    "intro": "Refunds received and recorded against available supplier credits.",
+    "back": "All refunds",
+    "empty": "No refunds",
+    "emptyHint": "Open a posted supplier credit with an available balance to record a refund received.",
+    "number": "Number",
+    "date": "Date",
+    "amount": "Amount",
+    "status": "Status",
+    "method": "Payment method",
+    "reference": "Reference",
+    "memo": "Note",
+    "account": "Received into",
+    "statuses": {
+      "POSTED": "Posted",
+      "VOID": "Voided"
+    },
+    "methods": {
+      "CASH": "Cash",
+      "CHEQUE": "Cheque",
+      "EFT": "Bank transfer",
+      "INTERAC": "Interac",
+      "CREDIT_CARD": "Credit card",
+      "DEBIT_CARD": "Debit card",
+      "OTHER": "Other"
+    },
+    "pagination": "Refund pages",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {count}",
+    "count": "{count, plural, =0 {No refunds} one {# refund} other {# refunds}}",
+    "record": "Record a refund received",
+    "recordHint": "Record only money already received separately. Allumi does not send bank instructions or recalculate taxes.",
+    "amountField": "Refund amount",
+    "amountHint": "Up to the remaining balance, with at most two decimals.",
+    "dateField": "Refund date",
+    "accountField": "Refund account",
+    "accountHint": "Active bank, cash or credit-card account that received the refund.",
+    "methodField": "Payment method",
+    "referenceField": "Reference (cheque or transaction number…)",
+    "memoField": "Note",
+    "submit": "Post refund",
+    "detail": "Refund {number}",
+    "journalEntry": "Journal entry",
+    "allocations": "Refund origins",
+    "allocationLine": "{number} · {amount}",
+    "released": "released on {date}",
+    "voidTitle": "Void refund",
+    "voidWarning": "A reversal restores the available supplier credit and reverses the refund entry. It does not move money.",
+    "voidDate": "Void date",
+    "voidReason": "Reason (required, up to 500 characters)",
+    "confirmVoid": "I confirm reversal of this refund.",
+    "voidSubmit": "Reverse refund",
+    "voidedOn": "Voided on {date}",
+    "voidedReason": "Reason: {reason}",
+    "creditTitle": "Refund received from supplier",
+    "available": "Available: {amount}",
+    "confirmRecord": "I confirm the amount, date and account of the refund already received.",
+    "historyLimit": "Showing the latest 25 refunds. Open the refund list for earlier records.",
+    "supplier": "Supplier",
+    "originPage": "Page {page} of {count}",
+    "supplierUnavailable": "Supplier unavailable",
+    "originsEmpty": "No credit allocation is recorded for this historical payment."
   }
 }
