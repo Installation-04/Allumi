@@ -447,3 +447,15 @@ Impression/PDF des factures et crédits fournisseurs, montants et identités fig
 ![Crédit en anglais sombre sur téléphone](images/achats-impression-credit-en-dark-mobile.png)
 
 ![Annulation et taxes masquées](images/achats-impression-annulee-mobile.png)
+
+## Périodes fiscales et crédits fournisseurs disponibles
+
+Rapports de taxes mensuels, trimestriels, annuels ou personnalisés : [[Sommaire-des-taxes]]. Crédits conservés après règlement : [[Credits-fournisseurs-disponibles]].
+
+![Périodes de taxes](images/taxes-periodes-mensuelles-desktop.png)
+
+![Trimestre en anglais sombre sur téléphone](images/taxes-periodes-trimestre-en-dark-mobile.png)
+
+![Crédit fournisseur disponible](images/credit-fournisseur-disponible-en-dark-desktop.png)
+
+![Choix du traitement sur téléphone](images/credit-fournisseur-disponible-choix-mobile.png)

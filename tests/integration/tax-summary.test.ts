@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { beforeAll,afterAll,it,expect } from "vitest";
 import type pg from "pg";
-import { getTaxSummary,TAX_DETAIL_PAGE_SIZE } from "@/modules/reports";
+import { taxCalendarPeriod,getTaxSummary,TAX_DETAIL_PAGE_SIZE } from "@/modules/reports";
 import { saveDraft,getDraft,getInvoice,postInvoice,saveCreditDraft,getCreditDraft,postCreditNote,voidCreditNote,voidInvoice } from "@/modules/sales";
 import { saveDraft as saveBill,getDraft as getBillDraft,getBill,postBill,saveCreditDraft as saveSupplierCredit,getCreditDraft as getSupplierCredit,postCreditNote as postSupplierCredit,voidCreditNote as voidSupplierCredit,voidBill,saveExpenseDraft,getExpenseDraft,postExpense,voidExpense } from "@/modules/purchases";
 import { owner } from "./helpers";
@@ -38,6 +38,15 @@ it("reports posted amounts by period rather than today's document status or rate
  const [gst,qst]=r.taxes;expect(gst).toMatchObject({code:"TPS",collectedCents:375n,recoverableCents:200n,netCents:175n,settlementCents:0n});expect(qst).toMatchObject({code:"TVQ",collectedCents:749n,recoverableCents:399n,netCents:350n});expect(r.controlCents).toBe(525n);
  const july=await getTaxSummary(actor,{from:"2026-07-01",to:"2026-07-31"});expect(july.controlCents).toBe(-525n);expect(july.differenceCents).toBe(0n);
  const both=await getTaxSummary(actor,{from:"2026-06-01",to:"2026-07-31"});expect(both.taxes.every(t=>t.netCents===0n)).toBe(true);expect(both.controlCents).toBe(0n);
+});
+it("produces monthly, quarterly and annual tax reports on posted dates with exact reversal boundaries",async()=>{
+ const june=await getTaxSummary(actor,taxCalendarPeriod("MONTH","2026-06-15"));
+ const q2=await getTaxSummary(actor,taxCalendarPeriod("QUARTER","2026-06-30"));
+ const q3=await getTaxSummary(actor,taxCalendarPeriod("QUARTER","2026-07-01"));
+ const year=await getTaxSummary(actor,taxCalendarPeriod("YEAR","2026-12-31"));
+ expect(june.controlCents).toBe(525n);expect(q2.taxes).toEqual(june.taxes);expect(q2.controlCents).toBe(525n);
+ expect(q3.controlCents).toBe(-525n);expect(year.controlCents).toBe(0n);
+ for(const report of [june,q2,q3,year])expect(report.differenceCents).toBe(0n);
 });
 it("separates adjustments and settlements and uses only the recoverable amount actually posted",async()=>{
  await rawTax("2026-08-01","ADJUSTMENT",17);await rawTax("2026-08-02","RECOVERABLE",-42);await rawTax("2026-08-03","SETTLEMENT",-100);

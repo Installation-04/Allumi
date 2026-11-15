@@ -2,6 +2,30 @@
 
 Dans **Rapports → Sommaire TPS/TVQ**, choisis les dates **Du** et **Au**, puis **Afficher**. La consultation et le CSV exigent les permissions **Comptabilité en lecture** et **Taxes en lecture**. Les accès Ventes et Contacts ne sont pas nécessaires.
 
+## Rapports mensuels, trimestriels et annuels
+
+Dans **Périodes rapides**, sélectionner la **Fréquence du rapport**, une **Date dans la période**, puis **Afficher cette période**. Les bornes exactes sont affichées dans **Du / Au** :
+
+| Fréquence | Exemple de date choisie | Période incluse |
+|---|---|---|
+| Mensuel | 15 juillet 2026 | 1er au 31 juillet 2026 |
+| Trimestriel | 15 juillet 2026 | 1er juillet au 30 septembre 2026 |
+| Annuel | 15 juillet 2026 | 1er janvier au 31 décembre 2026 |
+
+Les mois de février tiennent compte des années bissextiles. Les trimestres rapides sont calendaires : janvier–mars, avril–juin, juillet–septembre et octobre–décembre. Ces choix ne configurent pas la fréquence de déclaration attribuée par l’ARC ou Revenu Québec.
+
+Pour un exercice décalé, un trimestre de déclaration différent, un semestre ou toute autre plage, saisir les bornes dans **Période personnalisée**, puis **Afficher**. Par exemple, du 1er mai au 31 juillet ou du 1er avril au 31 mars suivant. Sans sélection dans l’adresse, le rapport conserve le défaut existant : exercice courant jusqu’à aujourd’hui, ou dernier exercice disponible.
+
+![Rapport mensuel](images/taxes-periodes-mensuelles-desktop.png)
+
+Une période pas encore terminée est signalée : les écritures déjà comptabilisées ne constituent pas un rapport final de toute la période. La pagination et le CSV conservent la période choisie. Modifier un champ puis appliquer le formulaire avant d’exporter.
+
+Les dates impossibles, plages inversées, champs de période répétés et mélanges contradictoires de raccourci et de dates personnalisées sont refusés, à l’écran comme à l’export. Le rapport ne revient pas silencieusement à une autre période.
+
+![Trimestre en anglais sombre](images/taxes-periodes-trimestre-en-dark-desktop.png)
+
+![Période personnalisée](images/taxes-periodes-personnalisees-en-dark-desktop.png)
+
 ## Ce que le sommaire calcule
 
 Il reprend les lignes du grand livre datées de la période, pour chaque taxe configurée, y compris une taxe inactive ayant des mouvements. Il ne recalcule pas les montants avec les taux actuels et ne dépend pas du statut actuel des factures. Les dates sont inclusives.
@@ -46,3 +70,12 @@ Voir [[Taxes-et-catalogue]], [[Grand-livre]], [[Regles-comptables]] et [[Utilisa
 ![Sommaire des taxes — ordinateur](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/sommaire-taxes-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/sommaire-taxes-mobile.png" alt="Sommaire des taxes — téléphone" width="412">
+
+
+## Périodes sur téléphone
+
+![Périodes mensuelles sur téléphone](images/taxes-periodes-mensuelles-mobile.png)
+
+![Trimestre anglais sombre sur téléphone](images/taxes-periodes-trimestre-en-dark-mobile.png)
+
+![Plage personnalisée sur téléphone](images/taxes-periodes-personnalisees-en-dark-mobile.png)
