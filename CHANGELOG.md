@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.61] - 2026-11-15
+
 - Crédits fournisseurs : affectation partielle ou complète à une facture ouverte du même fournisseur, recherche littérale bornée, révision des soldes sous verrou, retrait daté et historique paginé; consultation indépendante des répertoires Contacts/Taxes/Ventes. Migration de gardes SQL pour la chronologie, les périodes ouvertes et l’isolation des opérations; paiements concurrents et rapports datés vérifiés, sans nouvelle écriture pour l’affectation. Interface FR/EN/mobile/sombre, guide et captures.
 
 ## [0.4.0-alpha.60] - 2026-11-15
