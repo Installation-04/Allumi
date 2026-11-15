@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.62] - 2026-11-15
+
 - Nouveautés : section intégrée à Versions et mises à jour, avec listes françaises/anglaises des fonctions, améliorations, corrections et consignes d’installation de la version exacte; guides associés et historique des cinq dernières versions documentées, sans version future.
 - Améliorations : notes lisibles sans connexion à GitHub et sans privilège serveur, interface mobile et thèmes clair/sombre; lien depuis l’administration serveur, guide et captures.
 - Fiabilité des releases : préparation et publication bloquées sans notes bilingues valides ou avec un guide introuvable, avant toute modification du changelog, des manifestes ou création de tag.
