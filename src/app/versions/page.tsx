@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ReleaseNotesPanel } from "./release-notes";
 import { getTranslations } from "next-intl/server";
 import { requireSession } from "@/app/_lib/session";
 import { getProfile } from "@/modules/auth";
@@ -14,6 +15,7 @@ export default async function VersionsPage() {
   if (mayManage) return <section className="mx-auto max-w-3xl space-y-5 p-4">
     <Link className="inline-flex min-h-11 items-center underline" href="/">{t("back")}</Link>
     <h1 className="text-2xl font-semibold">{t("title")}</h1>
+    <ReleaseNotesPanel version={appVersion()} />
     <ServerUpdatePanel overview={await getUpdateOverview(session.userId)} />
   </section>;
   const current = appVersion();
@@ -25,6 +27,7 @@ export default async function VersionsPage() {
     <Link className="inline-flex min-h-11 items-center underline" href="/">{t("back")}</Link>
     <h1 className="text-2xl font-semibold">{t("title")}</h1>
     <p>{t("current", { version: current })}</p>
+    <ReleaseNotesPanel version={current} />
     <p>{t("web")}</p>
     <p role="status">{unavailable ? t("unavailable") : release ? t(newer ? "available" : "upToDate", { version: release.tag }) : t("noRelease")}</p>
     <Link className="inline-flex min-h-11 items-center underline" href={release?.url ?? "https://github.com/Installation-04/Allumi/releases"}>{t("downloads")}</Link>

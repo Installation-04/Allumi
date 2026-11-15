@@ -3046,5 +3046,19 @@
     "reviewHint": "Check the bill, amount and date before confirming. If a balance changes meanwhile, reload the page.",
     "targetUnavailable": "This bill is no longer available here. Find and choose an open bill before confirming.",
     "bill": "Bill to settle"
+  },
+  "whatsNew": {
+    "title": "What’s new in version {version}",
+    "intro": "Changes included in the installed server version. These notes are bundled with Allumi; opening a guide requires a connection to GitHub.",
+    "added": "New features",
+    "improved": "Improvements",
+    "fixed": "Fixes",
+    "installation": "Installation",
+    "guide": "Open guide",
+    "release": "Full release notes on GitHub",
+    "earlier": "Earlier documented versions",
+    "version": "Version {version}",
+    "unavailable": "No bundled notes are available for this version. See the release notes on GitHub.",
+    "link": "What’s new in this version"
   }
 }

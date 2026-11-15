@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.61
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.62
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -108,6 +108,12 @@ Le tableau de bord rassemble les indicateurs de l’entreprise. La navigation pa
 La langue et l’apparence se choisissent dans l’en-tête. Les préférences sont conservées dans votre navigateur.
 
 ![Tableau de bord Allumi en anglais et thème sombre](docs/images/dashboard-en-dark-desktop.png)
+
+### Les nouveautés dans l’application
+
+Ouvrez **Versions et mises à jour** pour lire les nouveautés, améliorations, corrections et consignes d’installation de votre version serveur, en français ou anglais. Les notes sont intégrées à Allumi et donnent accès aux guides. [Guide des nouveautés](docs/Nouveautes-des-versions.md).
+
+![Nouveautés en français](docs/images/nouveautes-versions-desktop.png)
 
 ### Rapports de taxes selon votre période
 

@@ -4,6 +4,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Nouveautés : section intégrée à Versions et mises à jour, avec listes françaises/anglaises des fonctions, améliorations, corrections et consignes d’installation de la version exacte; guides associés et historique des cinq dernières versions documentées, sans version future.
+- Améliorations : notes lisibles sans connexion à GitHub et sans privilège serveur, interface mobile et thèmes clair/sombre; lien depuis l’administration serveur, guide et captures.
+- Fiabilité des releases : préparation et publication bloquées sans notes bilingues valides ou avec un guide introuvable, avant toute modification du changelog, des manifestes ou création de tag.
+- Installation : aucune migration de base ni nouvelle variable de configuration; mise à jour du serveur puis rechargement de l’application par le processus habituel.
+
 ## [0.4.0-alpha.61] - 2026-11-15
 
 - Crédits fournisseurs : affectation partielle ou complète à une facture ouverte du même fournisseur, recherche littérale bornée, révision des soldes sous verrou, retrait daté et historique paginé; consultation indépendante des répertoires Contacts/Taxes/Ventes. Migration de gardes SQL pour la chronologie, les périodes ouvertes et l’isolation des opérations; paiements concurrents et rapports datés vérifiés, sans nouvelle écriture pour l’affectation. Interface FR/EN/mobile/sombre, guide et captures.

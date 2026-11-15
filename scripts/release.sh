@@ -19,6 +19,9 @@ grep -q '^## \[Non publié\]' CHANGELOG.md || { echo "Section [Non publié] abse
 BODY="$(awk '/^## \[Non publié\]/{f=1;next} /^## \[/{f=0} f' CHANGELOG.md | sed '/^[[:space:]]*$/d')"
 [ -n "$BODY" ] || { echo "[Non publié] est vide : rien à publier." >&2; exit 1; }
 
+# Refuse incomplete user-facing notes before changing any file, commit or tag.
+node scripts/check-release-notes.mjs "$V"
+
 DATE="$(date +%F)"
 awk -v v="$V" -v d="$DATE" '/^## \[Non publié\]/{print; print ""; print "## [" v "] - " d; next} {print}' CHANGELOG.md > CHANGELOG.md.tmp
 mv CHANGELOG.md.tmp CHANGELOG.md

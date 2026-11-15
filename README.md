@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.61
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.62
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -108,6 +108,12 @@ The dashboard brings your company’s indicators together. Activity-based naviga
 Choose your language and appearance in the header. Your preferences are saved in your browser. The same dashboard is shown below in French with the light theme.
 
 ![Allumi desktop dashboard in French with the light theme](docs/images/tableau-de-bord-desktop.png)
+
+### What’s new, inside the app
+
+Open **Versions and updates** to see new features, improvements, fixes and installation instructions for your installed server version, in French or English. Notes are bundled with Allumi and include links to guides. [Release notes guide](docs/Nouveautes-des-versions.md).
+
+![In-app release notes in English with the dark theme](docs/images/nouveautes-versions-en-dark-desktop.png)
 
 ### Sales-tax reports for your reporting period
 

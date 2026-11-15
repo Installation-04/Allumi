@@ -19,13 +19,14 @@ Tant que la version est `0.x`, le projet est en pré-alpha/bêta : des changemen
 
 ## Publier une version (mainteneurs)
 1. Vérifie que la CI est verte sur `main` et que `CHANGELOG.md` a du contenu sous **[Non publié]**.
-2. Lance :
+2. Ajouter une entrée pour la version cible dans `release-notes.json`, en `fr-CA` et `en` : titre, listes `added`, `improved`, `fixed` et `installation`. Chaque élément contient `text` et éventuellement un `guide` correspondant à un fichier de `docs/`. Décrire au moins un changement et les consignes d’installation, même sans migration. `node scripts/check-release-notes.mjs X.Y.Z` vérifie le catalogue sans dépendances npm.
+3. Lance :
    ```bash
    ./scripts/release.sh 0.4.0
    git push origin main && git push origin v0.4.0
    ```
    Le script date la section du changelog, met à jour les versions du serveur et du client Windows, crée le commit `chore(release): v0.4.0` et le tag annoté `v0.4.0`.
-3. Le workflow **Release** crée la release GitHub (préversion si le numéro contient un `-`) construit le client Windows et les images Docker avant de publier la release. Un échec laisse la release en brouillon.
+4. Le workflow **Release** crée la release GitHub (préversion si le numéro contient un `-`) construit le client Windows et les images Docker avant de publier la release. Un échec laisse la release en brouillon.
 
 ## Installer une version précise
 ```bash
@@ -55,3 +56,7 @@ Pour les mises à jour Git, installer depuis un clone du dépôt : l’archive s
 Les images serveur et migrations sont construites nativement pour Linux AMD64 et ARM64, puis regroupées sous un tag de version commun. La publication de la release attend les deux architectures et la vérification des manifestes. Le client Windows reste x64.
 
 Avant publication des fichiers, deux runners natifs AMD64/ARM64 installent les images GHCR déjà publiées, sans connexion au registre. Le contrôle refuse le repli vers une compilation locale et vérifie les architectures, la version répondue par `/api/health`, les migrations et `/setup`. Un échec conserve la release en brouillon.
+
+## Nouveautés intégrées à l’application
+
+[[Nouveautes-des-versions]] présente les changements de la version serveur installée et au maximum cinq versions antérieures documentées, en français/anglais. Les notes sont intégrées au build, sans lecture disque ni appel GitHub pour leur contenu. Le script officiel refuse une version sans notes bilingues ou avec un guide introuvable avant de modifier le changelog, les manifestes ou les tags. Le workflow Release répète la vérification avant de créer un brouillon ou de construire les paquets. Les catégories vides sont masquées; les exigences d’installation sont obligatoires.

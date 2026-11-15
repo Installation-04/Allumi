@@ -108,3 +108,5 @@
 - [[Recherche-des-paiements-clients]]
 
 - [[HTTPS-local]]
+
+- [[Nouveautes-des-versions]] — changements de la version installée, historique et guides.
