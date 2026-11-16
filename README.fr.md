@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.63
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.64
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -138,6 +138,10 @@ Affectez les crédits disponibles aux factures du même fournisseur, avec révis
 Comptabilisez un montant déjà reçu sur un crédit disponible, consultez ses origines et annulez-le par contre-passation datée. Soldes et rapports historiques restent rapprochés, sans recalcul des taxes. [Guide des remboursements fournisseurs](docs/Remboursements-fournisseurs.md).
 
 ![Remboursement en anglais sombre](docs/images/remboursement-fournisseur-en-dark-desktop.png)
+
+Exportez tous les remboursements fournisseurs filtrés en CSV, au-delà de la page affichée. Montants exacts, dates originales et état actuel, sans notes privées. [Guide de l’export](docs/Export-des-remboursements-fournisseurs.md).
+
+![Filtres et export des remboursements](docs/images/export-remboursements-fournisseurs-desktop.png)
 
 ### Historique des paiements fournisseurs
 

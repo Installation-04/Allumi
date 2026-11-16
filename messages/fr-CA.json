@@ -824,7 +824,8 @@
       "invalidVoid": "Vérifiez le motif et la date de contre-passation.",
       "confirm": "Confirmez le remboursement.",
       "confirmVoid": "Confirmez la contre-passation.",
-      "linked": "Résolvez les compensations liées avant d’annuler ce remboursement."
+      "linked": "Résolvez les compensations liées avant d’annuler ce remboursement.",
+      "exportLimit": "Plus de 10 000 remboursements correspondent aux filtres. Précisez la recherche ou la période avant d’exporter."
     }
   },
   "settingsPage": {
@@ -3142,5 +3143,9 @@
     "originPage": "Page {page} sur {count}",
     "supplierUnavailable": "Fournisseur indisponible",
     "originsEmpty": "Aucune affectation à un crédit enregistrée pour ce paiement historique."
+  },
+  "supplierRefundExport": {
+    "download": "Exporter en CSV",
+    "hint": "Tous les résultats filtrés, jusqu’à 10 000 remboursements. Montants originaux et état actuel; notes et motifs privés exclus."
   }
 }

@@ -27,7 +27,7 @@ La fiche présente le fournisseur figé sur la pièce source, le montant, le com
 
 ![Fiche anglaise sombre](images/remboursement-fournisseur-en-dark-desktop.png)
 
-Ces remboursements ne figurent pas dans les encaissements clients ni dans les remboursements clients : leur auxiliaire comptable est celui des fournisseurs. Il n’y a pas d’export CSV dédié à cette nouvelle liste; le [[Releve-de-compte-fournisseur]] permet d’exporter les mouvements comptables du fournisseur.
+Ces remboursements ne figurent pas dans les encaissements clients ni dans les remboursements clients : leur auxiliaire comptable est celui des fournisseurs. **Exporter en CSV** télécharge tous les résultats filtrés jusqu’à 10 000 remboursements, avec montants exacts et état actuel, sans notes privées : [[Export-des-remboursements-fournisseurs]]. Le [[Releve-de-compte-fournisseur]] permet également d’exporter les mouvements comptables du fournisseur.
 
 ## Annuler par contre-passation
 
