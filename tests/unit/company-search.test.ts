@@ -29,3 +29,7 @@ it("searches aggregate journal amounts beyond one-line limits without changing p
  const max=(SEARCH_MAX_CENTS/100n).toString();expect(parseSearchFilters({montant:max},"en").amountCents).toBe(SEARCH_MAX_CENTS);
  expect(()=>parseSearchFilters({montant:`${max}.01`},"en")).toThrow(RangeError);
 });
+
+it("accepts bank states while preserving signed query amounts and positive exact filters",()=>{
+ for(const statut of ["UNMATCHED","MATCHED","EXCLUDED"])expect(parseSearchFilters({type:"BANK_TRANSACTION",statut,q:"-17.23",montant:"17,23"},"en")).toMatchObject({kind:"BANK_TRANSACTION",status:statut,queryCents:-1723n,amountCents:1723n});
+});

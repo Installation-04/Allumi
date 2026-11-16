@@ -547,3 +547,15 @@ Codes importés ou manuels, taux datés et écarts par composante : [[Comparaiso
 ![Écart sur téléphone](images/comparaison-code-fiscal-ecart-mobile.png)
 
 ![Anglais sombre sur téléphone](images/comparaison-code-fiscal-en-dark-mobile.png)
+
+## Recherche bancaire
+
+[[Recherche-bancaire]] : transactions importées et montants signés.
+
+![Recherche bancaire](images/recherche-bancaire-desktop.png)
+
+![Recherche bancaire](images/recherche-bancaire-en-dark-desktop.png)
+
+![Recherche bancaire](images/recherche-bancaire-mobile.png)
+
+![Recherche bancaire](images/recherche-bancaire-en-dark-mobile.png)

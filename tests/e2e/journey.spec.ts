@@ -2,7 +2,7 @@ import { smtpReceiver } from "../support/smtp";
 import { mkdirSync, readFileSync } from "node:fs";
 import * as updateFiles from "node:fs/promises";
 import { join } from "node:path";
-import { devices, expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
+import { devices, expect, test, type Browser, type BrowserContext, type Locator, type Page } from "@playwright/test";
 import { Secret, TOTP } from "otpauth";
 import pg from "pg";
 import { e2eUrls } from "./db";
@@ -23,14 +23,14 @@ test.describe.configure({ mode: "serial" });
 let updateCookies: Awaited<ReturnType<BrowserContext["cookies"]>>;
 
 /** Optional wiki references from the isolated, fictional browser-test company only. */
-async function captureReference(page: Page, name: string, mobileHeading?: string) {
+async function captureReference(page: Page, name: string, mobileHeading?: string | Locator) {
   if (process.env.ALLUMI_SCREENSHOTS !== "1") return;
   // One prefix, or several separated by commas.
   if (process.env.ALLUMI_SCREENSHOT_PREFIX && !process.env.ALLUMI_SCREENSHOT_PREFIX.split(",").some((prefix) => name.startsWith(prefix))) return;
   mkdirSync("docs/images", { recursive: true });
   await page.evaluate(() => window.scrollTo(0, 0));
   if (mobileHeading && process.env.E2E_MOBILE === "1") {
-    const heading = page.getByRole("heading", { name: mobileHeading, exact: true });
+    const heading = typeof mobileHeading === "string" ? page.getByRole("heading", { name: mobileHeading, exact: true }) : mobileHeading;
     await expect(heading, `reference ${name}: ${mobileHeading}`).toBeVisible();
     await heading.evaluate((element) => element.scrollIntoView({ block: "start" }));
   }
@@ -3608,4 +3608,24 @@ test("official rate comparison reviews imported codes, dated HST changes and mod
   if(backupId){await db.query("DELETE FROM membership WHERE company_id=$1 AND user_id=$2",[companyId,backupId]);await db.query("UPDATE app_user SET disabled_at=now() WHERE id=$1",[backupId]);}await db.end();
  }
  expect(cspViolations).toEqual([]);
+});
+
+
+test("global bank search finds signed statement amounts and respects modular read-only permissions",async({page})=>{
+ test.setTimeout(90_000);cspViolations.length=0;watchCsp(page.context());
+ // This scenario also runs alone against the disposable fresh database, through real onboarding.
+ if(updateCookies)await page.context().addCookies(updateCookies);await page.goto("/");
+ if(!updateCookies){
+  await expect(page).toHaveURL(/\/setup$/);await page.locator('[name="setupToken"]').fill("e2e-setup-token-123456789");await page.getByLabel("Nom de l'entreprise").fill("Atelier Exemple inc.");await page.getByLabel("Premier mois de l'exercice financier").selectOption("4");await page.getByLabel("Ton nom").fill("Alex Exemple");await page.getByLabel("Courriel").fill(EMAIL);await page.getByLabel("Langue de l'interface").selectOption("fr-CA");await page.getByLabel("Mot de passe",{exact:true}).fill(PASSWORD);await page.getByLabel("Confirmation du mot de passe").fill(PASSWORD);await page.getByRole("button",{name:"Créer l'entreprise et commencer",exact:true}).click();await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
+ }
+ if(!/^\/c\/[0-9a-f-]{36}/.test(new URL(page.url()).pathname))await page.getByRole("link",{name:"Atelier Exemple inc.",exact:true}).click();
+
+ const company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)![0],companyId=company.split("/")[2];
+ await page.goto(`${company}/transactions/importer`);await page.locator('select[name="accountId"]').selectOption({label:"1000 · Banque – compte courant"});await page.getByLabel(/^Fichier du relevé/).setInputFiles({name:"PRIVATE-SEARCH-FILE.csv",mimeType:"text/csv",buffer:Buffer.from("Date,Description,Montant\n2026-06-01,Recherche banque Érable,-17.23\n2026-06-02,Recherche banque Dépôt,17.23\n")});await page.getByRole("button",{name:"Importer le relevé",exact:true}).click();await expect(page.getByRole("heading",{name:"Transactions bancaires",exact:true})).toBeVisible();
+ const url=`${company}/recherche?${new URLSearchParams({type:"BANK_TRANSACTION",q:"Recherche banque",montant:"17,23",du:"2026-06-01",au:"2026-06-02"})}`;await page.goto(url);const results=page.getByRole("list",{name:"Résultats de recherche",exact:true});await expect(results.getByRole("link")).toHaveCount(2);await expect(results).toContainText("-17,23");await expect(results).toContainText("Montant signé du relevé");expect(await (await page.request.get(url)).text()).not.toContain("PRIVATE-SEARCH-FILE");await expectNoPageOverflow(page);await captureReference(page,"recherche-bancaire",results);
+ const negative=results.getByRole("link",{name:"Recherche banque Érable",exact:true}),detail=(await negative.getAttribute("href"))!;await negative.click();await expect(page.getByRole("heading",{name:"Recherche banque Érable",exact:true})).toBeVisible();await page.getByRole("button",{name:"Mettre de côté",exact:true}).click();await page.goto(url+"&statut=EXCLUDED");await expect(results.getByRole("link")).toHaveCount(1);await expect(results).toContainText("Exclue");
+ await page.getByRole("button",{name:"English",exact:true}).click();await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");await expect(page.getByRole("list",{name:"Search results",exact:true})).toContainText("Excluded");await expect(page.getByRole("list",{name:"Search results",exact:true})).toContainText("-$17.23");await expectNoPageOverflow(page);await captureReference(page,"recherche-bancaire-en-dark",page.getByRole("list",{name:"Search results",exact:true}));await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await page.getByRole("button",{name:"Français",exact:true}).click();
+ const db=new pg.Client({connectionString:e2eUrls().owner});await db.connect();let userId:string|null=null,backupId:string|null=null,role:string|null=null,access:unknown=null;
+ try{const member=(await db.query("SELECT m.user_id,m.role,m.module_access FROM membership m JOIN app_user u ON u.id=m.user_id WHERE m.company_id=$1 AND u.email=$2",[companyId,EMAIL])).rows[0];userId=member.user_id;role=member.role;access=member.module_access;backupId=(await db.query("INSERT INTO app_user(id,email,display_name,updated_at) VALUES(gen_random_uuid(),'bank-search-'||gen_random_uuid()::text||'@exemple.test','Permission test owner',now()) RETURNING id")).rows[0].id;await db.query("INSERT INTO membership(id,company_id,user_id,role,updated_at) VALUES(gen_random_uuid(),$1,$2,'OWNER',now())",[companyId,backupId]);await db.query("UPDATE membership SET role='ACCOUNTANT',module_access=$3::jsonb WHERE company_id=$1 AND user_id=$2",[companyId,userId,JSON.stringify({accounting:"read",contacts:"none",sales:"none",taxes:"none"})]);await page.goto(url);await expect(results.getByRole("link")).toHaveCount(2);await results.getByRole("link",{name:"Recherche banque Érable",exact:true}).click();await expect(page.getByRole("heading",{name:"Recherche banque Érable",exact:true})).toBeVisible();await expect(page.getByRole("button",{name:/Rétablir|Restaurer/})).toHaveCount(0);await db.query("UPDATE membership SET module_access='{\"accounting\":\"none\"}' WHERE company_id=$1 AND user_id=$2",[companyId,userId]);await page.goto(url);await expect(results.getByRole("link")).toHaveCount(0);expect((await page.request.get(detail)).status()).toBe(404);expect((await page.request.get('/c/00000000-0000-7000-8000-999999999999/recherche?type=BANK_TRANSACTION')).status()).toBe(404);
+ }finally{if(userId&&role)await db.query("UPDATE membership SET role=$3::member_role,module_access=$4::jsonb WHERE company_id=$1 AND user_id=$2",[companyId,userId,role,access===null?null:JSON.stringify(access)]);if(backupId){await db.query("DELETE FROM membership WHERE company_id=$1 AND user_id=$2",[companyId,backupId]);await db.query("UPDATE app_user SET disabled_at=now() WHERE id=$1",[backupId]);}await db.end();}expect(cspViolations).toEqual([]);
 });

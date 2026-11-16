@@ -438,5 +438,51 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.69": {
+    "en": {
+      "title": "Search imported bank transactions",
+      "added": [
+        {
+          "text": "Find imported CAD bank rows by statement description/payee, date, current state and exact net amount, then open their detail.",
+          "guide": "Recherche-bancaire"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Exact amount filters use absolute net values while displayed signs are preserved. Accounting read permission is required; technical import metadata is excluded.",
+          "guide": "Recherche-bancaire"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration or new configuration. Search never creates or changes a bank row or journal entry.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "fr-CA": {
+      "title": "Rechercher les transactions bancaires importées",
+      "added": [
+        {
+          "text": "Retrouvez les lignes CAD importées par libellé/bénéficiaire, date, état et montant net exact, puis ouvrez leur fiche.",
+          "guide": "Recherche-bancaire"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Le filtre exact utilise le net en valeur absolue et les signes affichés restent conservés. Comptabilité en lecture est requis; les métadonnées techniques sont exclues.",
+          "guide": "Recherche-bancaire"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration ni nouvelle configuration. La recherche ne crée ni ne modifie de transaction ou d’écriture.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

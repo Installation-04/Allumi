@@ -95,3 +95,5 @@ Rapports de taxes comparatifs : [[Comparaison-des-taxes]] — périodes mensuell
 Recherche comptable : [[Recherche-comptable]] — comptes actifs/inactifs et écritures manuelles/d’ouverture, total exact et contre-passation, sans notes privées.
 
 Comparaison fiscale : [[Comparaison-des-codes-fiscaux]] — codes existants et taux standards officiels, dates historiques et écarts par composante, en lecture seule.
+
+Recherche bancaire : [[Recherche-bancaire]] — lignes CAD importées, montants signés, états et accès aux fiches.

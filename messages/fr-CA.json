@@ -2777,7 +2777,7 @@
     "all": "Tous",
     "submit": "Rechercher",
     "reset": "Effacer les filtres",
-    "scope": "Seules les données autorisées sont visibles. Les dates et montants concernent les documents, paiements et écritures. Pour une écriture manuelle ou d’ouverture et sa contre-passation, le montant est le total positif des débits, pas un mouvement net. Les comptes n’ont ni date ni montant; leur lien ouvre le grand livre. Notes et descriptions privées exclues.",
+    "scope": "Seules les données autorisées sont visibles. Les dates et montants concernent les documents, paiements et écritures. Pour une écriture manuelle ou d’ouverture et sa contre-passation, le montant est le total positif des débits, pas un mouvement net. Les comptes n’ont ni date ni montant; leur lien ouvre le grand livre. Notes et descriptions privées exclues. Transactions bancaires : CAD seulement, libellé/bénéficiaire du relevé, dates et état actuel. Le filtre de montant exact utilise le net en valeur absolue; le signe affiché est conservé. Les métadonnées techniques des imports sont exclues.",
     "emptyQuery": "Saisissez un terme ou choisissez un filtre pour commencer.",
     "noResults": "Aucun résultat. Vérifiez les filtres ou vos permissions.",
     "pageResults": "{count, plural, one {# résultat} other {# résultats}} à la page {page}",
@@ -2801,7 +2801,8 @@
       "SUPPLIER_REFUND": "Remboursement fournisseur",
       "ESTIMATE": "Devis",
       "ACCOUNT": "Compte comptable",
-      "JOURNAL_ENTRY": "Écriture manuelle ou d’ouverture"
+      "JOURNAL_ENTRY": "Écriture manuelle ou d’ouverture",
+      "BANK_TRANSACTION": "Transaction bancaire"
     },
     "statuses": {
       "DRAFT": "Brouillon",
@@ -2815,14 +2816,19 @@
       "CANCELLED": "Devis annulé",
       "CONVERTED": "Converti en facture",
       "INACTIVE": "Inactif",
-      "REVERSED": "Contre-passée"
+      "REVERSED": "Contre-passée",
+      "UNMATCHED": "Non appariée",
+      "MATCHED": "Appariée",
+      "EXCLUDED": "Exclue"
     },
     "entrySources": {
       "MANUAL": "Saisie manuelle",
       "OPENING_BALANCE": "Soldes d’ouverture",
       "REVERSAL": "Contre-passation"
     },
-    "entryAmount": "Total des débits"
+    "entryAmount": "Total des débits",
+    "bankAmount": "Montant signé du relevé · CAD",
+    "bankScope": "CAD seulement : le filtre exact utilise le net en valeur absolue; le signe affiché est conservé. Libellés/bénéficiaires et états actuels exigent Comptabilité en lecture. Une ligne importée n’est pas une écriture validée."
   },
   "officialTaxes": {
     "audit": "Voir la provenance des imports",

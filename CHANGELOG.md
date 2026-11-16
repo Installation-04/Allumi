@@ -4,6 +4,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Nouveautés : recherche globale des transactions bancaires CAD importées par libellé/bénéficiaire, date, état et montant net, avec lien direct vers la fiche.
+- Améliorations : filtre exact en valeur absolue et signes affichés conservés, états non apparié/apparié/exclu, pagination stable, FR/EN/mobile/sombre, guide et quatre captures.
+- Confidentialité : permissions Banque selon le module Comptabilité existant, isolation dans le même instantané SQL/RLS, métadonnées techniques et notes comptables exclues; devises étrangères non étiquetées CAD.
+- Installation : aucune migration ni nouvelle configuration; aucune transaction ou écriture créée par la recherche.
+
 ## [0.4.0-alpha.68] - 2026-11-16
 
 - Nouveautés : comparaison des codes fiscaux importés ou manuels aux taux standards officiels ARC/TVQ pour une province et une date, accessible depuis les codes et les sources.

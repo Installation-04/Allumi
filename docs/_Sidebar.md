@@ -118,3 +118,5 @@
 
 - [[Export-des-remboursements-fournisseurs]] — CSV complet des résultats filtrés, sans notes privées.
 - [[Impression-des-remboursements-fournisseurs]] — copie comptable et PDF navigateur, origines et annulation sans notes privées.
+
+- [[Recherche-bancaire]] — transactions CAD importées et montants signés.
