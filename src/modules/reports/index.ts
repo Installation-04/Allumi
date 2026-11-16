@@ -27,3 +27,5 @@ export { getSupplierStatement, getSupplierStatementExport, listStatementSupplier
 export { toCsv, csvFormatFor, type CsvCell } from "./domain/csv";
 
 export { taxCalendarPeriod, resolveTaxReportPeriod, taxReportPeriodParams, type TaxFrequency, type TaxReportPeriod } from "./domain/tax-period";
+export * from "./domain/tax-comparison";
+export { getTaxComparison } from "./service/tax-comparison";

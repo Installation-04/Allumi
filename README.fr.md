@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.65
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.66
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -118,6 +118,10 @@ Ouvrez **Versions et mises à jour** pour lire les nouveautés, améliorations, 
 ### Rapports de taxes selon votre période
 
 Choisissez un mois, un trimestre ou une année civile, ou saisissez les dates de votre calendrier de déclaration. L’écran et le CSV utilisent les mêmes dates inclusives et montants comptabilisés. [Guide fiscal](docs/Sommaire-des-taxes.md).
+
+Comparez les taxes comptabilisées de deux périodes : variations exactes, versements séparés et contrôles du grand livre pour chacune. Exportez les agrégats privés ou imprimez un PDF navigateur. [Guide du comparatif fiscal](docs/Comparaison-des-taxes.md).
+
+![Comparaison des périodes de taxes](docs/images/taxes-comparatif-periodes-desktop.png)
 
 ![Rapport trimestriel en anglais sombre](docs/images/taxes-periodes-trimestre-en-dark-desktop.png)
 

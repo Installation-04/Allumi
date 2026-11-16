@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.65
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.66
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -118,6 +118,10 @@ Open **Versions and updates** to see new features, improvements, fixes and insta
 ### Sales-tax reports for your reporting period
 
 Choose monthly, quarterly or annual calendar periods, or enter custom dates for your filing schedule. The report and CSV use the same inclusive dates and recorded tax amounts. [Tax reporting guide](docs/Sommaire-des-taxes.md).
+
+Compare posted sales taxes across two periods, with exact changes, separate settlements and ledger checks for each period. Export private aggregates or print a browser PDF. [Tax comparison guide](docs/Comparaison-des-taxes.md).
+
+![Tax period comparison in English and dark theme](docs/images/taxes-comparatif-periodes-en-dark-desktop.png)
 
 ![Quarterly tax report in English with the dark theme](docs/images/taxes-periodes-trimestre-en-dark-desktop.png)
 

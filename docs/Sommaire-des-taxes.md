@@ -26,6 +26,10 @@ Les dates impossibles, plages inversées, champs de période répétés et méla
 
 ![Période personnalisée](images/taxes-periodes-personnalisees-en-dark-desktop.png)
 
+## Comparer deux périodes
+
+**Comparer les périodes de taxes** ouvre les montants de deux plages côte à côte, avec variations et contrôles séparés, export CSV privé et impression/PDF navigateur. La référence proposée suit le mois, trimestre ou année précédent pour un raccourci calendaire; les quatre dates restent modifiables. Voir [[Comparaison-des-taxes]].
+
 ## Ce que le sommaire calcule
 
 Il reprend les lignes du grand livre datées de la période, pour chaque taxe configurée, y compris une taxe inactive ayant des mouvements. Il ne recalcule pas les montants avec les taux actuels et ne dépend pas du statut actuel des factures. Les dates sont inclusives.

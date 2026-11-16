@@ -505,3 +505,15 @@ Montant original, origines complètes et contre-passation, sans notes privées :
 ![Anglais sombre sur téléphone](images/impression-remboursement-fournisseur-en-dark-mobile.png)
 
 ![Annulation datée](images/impression-remboursement-fournisseur-annule-desktop.png)
+
+## Comparaison des périodes de taxes
+
+Deux périodes, variations et contrôles par taxe, CSV et impression : [[Comparaison-des-taxes]].
+
+![Comparatif français](images/taxes-comparatif-periodes-desktop.png)
+
+![Comparatif anglais sombre](images/taxes-comparatif-periodes-en-dark-desktop.png)
+
+![Comparatif sur téléphone](images/taxes-comparatif-periodes-mobile.png)
+
+![Anglais sombre sur téléphone](images/taxes-comparatif-periodes-en-dark-mobile.png)

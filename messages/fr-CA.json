@@ -3165,5 +3165,28 @@
     "applied": "Date d’affectation",
     "released": "Date de retrait",
     "sourceUnavailable": "Origine indisponible"
+  },
+  "taxComparison": {
+    "title": "Comparaison des périodes de taxes",
+    "open": "Comparer les périodes de taxes",
+    "back": "Retour au sommaire des taxes",
+    "intro": "Comparez les montants de taxes comptabilisés de deux périodes, taxe par taxe.",
+    "current": "Période étudiée",
+    "reference": "Période de référence",
+    "difference": "Variation",
+    "metric": "Montant comparé",
+    "currentFrom": "Début de la période étudiée",
+    "currentTo": "Fin de la période étudiée",
+    "referenceFrom": "Début de la période de référence",
+    "referenceTo": "Fin de la période de référence",
+    "apply": "Comparer",
+    "periods": "Période étudiée : {from} au {to}. Référence : {referenceFrom} au {referenceTo}.",
+    "scope": "Variation = période étudiée moins référence, en CAD, sans normalisation de durée. Montants comptabilisés avant report des soldes antérieurs; les versements sont séparés du net fiscal. Les périodes peuvent se chevaucher ou être incomplètes. Ce comparatif ne constitue pas une déclaration fiscale et ne dépose ni ne paie aucune taxe.",
+    "checks": "Contrôles des deux périodes",
+    "reconciliation": "Écart de rapprochement",
+    "lines": "Lignes classées",
+    "source": "Ouvrir le sommaire détaillé",
+    "agrees": "Les deux périodes concordent avec les comptes de taxes du grand livre.",
+    "warning": "Au moins une période présente des lignes ou un écart à vérifier. Ouvrez les sommaires détaillés avant utilisation."
   }
 }

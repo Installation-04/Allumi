@@ -13,7 +13,7 @@ export const dynamic="force-dynamic";
 export async function generateMetadata(){return {title:(await getTranslations("taxSummary"))("title")};}
 export default async function Page({params,searchParams}:{params:Promise<{companyId:string}>;searchParams:Promise<Record<string,string|string[]|undefined>>}){
  const {company,actor,locale}=await loadCompany(params,"ledger.read");if(!can(company,"taxes.read"))notFound();
- const t=await getTranslations("taxSummary");const query=await searchParams;
+ const t=await getTranslations("taxSummary");const c=await getTranslations("taxComparison");const query=await searchParams;
  const today=todayIso();const period=taxPeriod(query,await listFiscalYears(actor),today);const {from,to}=period;
  if(query.page!==undefined&&(typeof query.page!=="string"||!/^\d{1,6}$/.test(query.page)||Number(query.page)<1||Number(query.page)>100000))notFound();
  const periodParams=taxReportPeriodParams(period);
@@ -33,6 +33,7 @@ export default async function Page({params,searchParams}:{params:Promise<{compan
     <button className={button}>{t("applyPreset")}</button>
    </form>
   </section>
+  <Link className={button} href={`${base}/comparer?${new URLSearchParams(periodParams)}`}>{c("open")}</Link>
   <h2 className="font-semibold">{t("customPeriod")}</h2>
   <form key={`${from}|${to}`} action={base} method="get" className="flex flex-wrap items-end gap-3">
    <label className="text-sm"><span className="mb-1 block">{t("from")}</span><input className={control} name="du" type="date" required defaultValue={from}/></label>
