@@ -3,3 +3,4 @@ export * from "./domain/statements";
 export * from "./domain/ledger-report";
 export * from "./domain/aging";
 export * from "./domain/tax-period";
+export * from "./domain/tax-comparison";

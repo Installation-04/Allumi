@@ -37,6 +37,7 @@
 - [[Journal-et-ecritures]]
 - [[Age-des-comptes-fournisseurs]]
 - [[Sommaire-des-taxes]]
+- [[Comparaison-des-taxes]] — deux périodes, variations, contrôles, CSV et impression.
 - [[Comparaison-des-resultats]]
 - [[Comparaison-des-bilans]]
 - [[Impression-des-etats-financiers]]

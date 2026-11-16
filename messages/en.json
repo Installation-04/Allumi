@@ -3165,5 +3165,28 @@
     "applied": "Application date",
     "released": "Release date",
     "sourceUnavailable": "Source unavailable"
+  },
+  "taxComparison": {
+    "title": "Tax period comparison",
+    "open": "Compare tax periods",
+    "back": "Back to tax summary",
+    "intro": "Compare posted tax amounts across two periods, tax by tax.",
+    "current": "Selected period",
+    "reference": "Reference period",
+    "difference": "Change",
+    "metric": "Compared amount",
+    "currentFrom": "Selected period start",
+    "currentTo": "Selected period end",
+    "referenceFrom": "Reference period start",
+    "referenceTo": "Reference period end",
+    "apply": "Compare",
+    "periods": "Selected period: {from} to {to}. Reference: {referenceFrom} to {referenceTo}.",
+    "scope": "Change = selected period minus reference, in CAD, without duration normalization. Posted amounts before opening balances; settlements are separate from net tax. Periods may overlap or be incomplete. This comparison is not a tax return and does not file or pay any tax.",
+    "checks": "Checks for both periods",
+    "reconciliation": "Reconciliation difference",
+    "lines": "Classified lines",
+    "source": "Open detailed tax summary",
+    "agrees": "Both periods reconcile to the general ledger tax accounts.",
+    "warning": "At least one period has lines or a difference to review. Open the detailed summaries before using these figures."
   }
 }

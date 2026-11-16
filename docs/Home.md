@@ -89,3 +89,5 @@ Taxes et produits/services : [[Taxes-et-catalogue]]. Consultation et import : [[
 
 - [[Export-des-remboursements-fournisseurs]] — CSV complet des résultats filtrés, sans notes privées.
 - [[Impression-des-remboursements-fournisseurs]] — copie comptable et PDF navigateur, origines et annulation sans notes privées.
+
+Rapports de taxes comparatifs : [[Comparaison-des-taxes]] — périodes mensuelles, trimestrielles, annuelles ou personnalisées, variations et contrôles séparés.

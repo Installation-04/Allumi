@@ -274,5 +274,61 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.66": {
+    "fr-CA": {
+      "title": "Comparer deux périodes de taxes",
+      "added": [
+        {
+          "text": "Depuis le Sommaire TPS/TVQ, comparez deux périodes par taxe et au total, avec variations exactes et contrôles du grand livre pour chacune.",
+          "guide": "Comparaison-des-taxes"
+        },
+        {
+          "text": "Séparez les taxes perçues/récupérables, ajustements, net avant versements, versements et mouvement net; ouvrez le détail source de chaque période."
+        }
+      ],
+      "improved": [
+        {
+          "text": "Référence précédente selon le mois, trimestre ou année calendaire choisi; quatre dates modifiables, CSV privé bilingue et impression/PDF navigateur, mobile et sombre."
+        },
+        {
+          "text": "Les deux périodes partagent un instantané SQL; les taxes inactives avec mouvements, contre-passations et anomalies à écart nul restent visibles. Les dates ambiguës ou répétées sont refusées."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration ni nouvelle configuration. Rapport en lecture seule : aucune déclaration, modification de taux ou opération financière.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Compare two tax periods",
+      "added": [
+        {
+          "text": "From Tax summary, compare two periods by tax and in total, with exact changes and separate general ledger checks.",
+          "guide": "Comparaison-des-taxes"
+        },
+        {
+          "text": "Review collected/recoverable tax, adjustments, net tax before settlements, settlements and net movement separately; open each period’s detailed source summary."
+        }
+      ],
+      "improved": [
+        {
+          "text": "Previous reference follows the selected calendar month, quarter or year; four editable dates, private bilingual CSV and browser print/PDF, mobile and dark-theme support."
+        },
+        {
+          "text": "Both periods share one SQL snapshot; inactive taxes with activity, reversals and zero-difference anomalies remain visible. Ambiguous or repeated dates are refused."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration or new configuration. This read-only report does not file returns, change tax rates or create financial transactions.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

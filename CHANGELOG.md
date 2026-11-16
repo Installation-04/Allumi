@@ -4,6 +4,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Nouveautés : comparaison de deux périodes de taxes, par taxe et au total, avec montants perçus/récupérables, ajustements, net avant versements, versements et mouvement net; variations exactes et contrôles séparés dans un même instantané SQL.
+- Améliorations : référence calendaire précédente depuis un mois/trimestre/année, quatre dates modifiables, sources détaillées conservées, CSV bilingue privé et impression/PDF navigateur, FR/EN/mobile/sombre, guide et captures.
+- Fiabilité : dates ambiguës ou contradictoires refusées, taxes inactives avec mouvements conservées, contre-passations aux dates comptables et anomalies signalées même à écart nul; droits Comptabilité et Taxes, sans notes du journal ni identifiants techniques dans le CSV.
+- Installation : aucune migration ni nouvelle configuration; aucun taux modifié, déclaration déposée, paiement envoyé ou écriture financière créée. Les règles de récupération partielle restent distinctes.
+
 ## [0.4.0-alpha.65] - 2026-11-16
 
 - Nouveautés : copie comptable imprimable des remboursements fournisseurs, avec PDF navigateur, montant et date originaux, crédits d’origine complets et contre-passation datée.
