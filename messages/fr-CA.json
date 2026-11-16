@@ -3199,5 +3199,23 @@
     "source": "Ouvrir le sommaire détaillé",
     "agrees": "Les deux périodes concordent avec les comptes de taxes du grand livre.",
     "warning": "Au moins une période présente des lignes ou un écart à vérifier. Ouvrez les sommaires détaillés avant utilisation."
+  },
+  "officialComparison": {
+    "title": "Comparer un code aux taux officiels",
+    "compare": "Comparer les taux",
+    "intro": "Vérifiez un code fiscal local existant face aux taux standards officiels pour une province et une date. Les codes importés et configurés manuellement peuvent être comparés.",
+    "limits": "Comparaison en lecture seule des taux de chaque composante, indépendamment de leur ordre. Des totaux identiques ne suffisent pas. Ce contrôle ne certifie ni la conformité fiscale, ni le lieu de fourniture, les exemptions, les comptes ou la récupération des taxes. Les états inactifs sont actuels. Les TVP séparées sont hors de la couverture des sources. Aucun code, taux ou document validé n’est modifié.",
+    "scope": "{code} · {province} · {date}",
+    "local": "Code local à la date choisie",
+    "official": "Taux standards officiels",
+    "missing": "Taux daté manquant ou ambigu",
+    "noComponents": "Ce code n’a aucune composante de taxe.",
+    "statuses": {
+      "MATCH": "Le code standard actif a les mêmes taux par composante à cette date. Il s’agit d’une comparaison de taux, pas d’une certification de conformité.",
+      "DIFFERENT": "Les taux des composantes diffèrent des taux standards officiels à cette date. Vérifiez les composantes et la province.",
+      "MISSING_RATE": "Une composante locale au moins n’a pas de taux unique à cette date. Un taux manquant n’est pas traité comme zéro.",
+      "INACTIVE": "Le code local ou une composante au moins est actuellement inactif. Des taux identiques ne rendent pas ce code utilisable.",
+      "NON_STANDARD": "Ce code utilise un traitement non standard. Les taux standards ne valident pas un traitement détaxé, exonéré ou hors champ."
+    }
   }
 }

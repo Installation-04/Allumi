@@ -3572,3 +3572,40 @@ test("accounting search opens inactive account ledgers and manual reversals with
  }
  expect(cspViolations).toEqual([]);
 });
+
+
+test("official rate comparison reviews imported codes, dated HST changes and modular read-only access",async({page})=>{
+ test.setTimeout(90_000);cspViolations.length=0;watchCsp(page.context());
+ // This scenario also runs alone against the disposable fresh database, through real onboarding.
+ if(updateCookies)await page.context().addCookies(updateCookies);await page.goto("/");
+ if(!updateCookies){
+  await expect(page).toHaveURL(/\/setup$/);await page.locator('[name="setupToken"]').fill("e2e-setup-token-123456789");await page.getByLabel("Nom de l'entreprise").fill("Atelier Exemple inc.");await page.getByLabel("Premier mois de l'exercice financier").selectOption("4");await page.getByLabel("Ton nom").fill("Alex Exemple");await page.getByLabel("Courriel").fill(EMAIL);await page.getByLabel("Langue de l'interface").selectOption("fr-CA");await page.getByLabel("Mot de passe",{exact:true}).fill(PASSWORD);await page.getByLabel("Confirmation du mot de passe").fill(PASSWORD);await page.getByRole("button",{name:"Créer l'entreprise et commencer",exact:true}).click();await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
+ }
+ if(!/^\/c\/[0-9a-f-]{36}/.test(new URL(page.url()).pathname))await page.getByRole("link",{name:"Atelier Exemple inc.",exact:true}).click();
+
+ const company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)![0],companyId=company.split("/")[2];
+ await page.goto(`${company}/sources-fiscales`);await page.getByLabel("Province ou territoire",{exact:true}).selectOption("NS");await page.getByLabel("Date de référence",{exact:true}).fill("2025-03-31");await page.getByRole("button",{name:"Consulter les taux",exact:true}).click();await page.getByLabel("Code local",{exact:true}).fill("NS-CMP");
+ for(const [label,code] of [["TPS/TVH à remettre","2100"],["TPS/TVH récupérable (facultatif)","1200"]]){const field=page.getByLabel(label!,{exact:true});const match=(await field.locator("option").allTextContents()).find(text=>text.startsWith(code!+" "))!;await field.selectOption({label:match});}
+ await page.getByRole("checkbox",{name:/J’ai vérifié la province/}).check();await page.getByRole("button",{name:"Créer le code et ses taxes",exact:true}).click();
+ const card=page.getByRole("article").filter({has:page.getByRole("heading",{name:/^NS-CMP —/})});await card.getByRole("link",{name:"Comparer un code aux taux officiels",exact:true}).click();await expect(page.getByLabel("Code local",{exact:true})).toHaveValue("NS-CMP");
+ await page.getByLabel("Province ou territoire",{exact:true}).selectOption("NS");await page.getByLabel("Date de référence",{exact:true}).fill("2025-03-31");await page.getByRole("button",{name:"Comparer les taux",exact:true}).click();
+ const status=page.getByRole("status");await expect(status).toContainText("Le code standard actif a les mêmes taux");await expect(page.getByRole("article",{name:"Code local à la date choisie",exact:true})).toContainText("15 %");
+ await page.getByLabel("Date de référence",{exact:true}).fill("2025-04-01");await page.getByRole("button",{name:"Comparer les taux",exact:true}).click();await expect(status).toContainText("Le code standard actif a les mêmes taux");await expect(page.getByRole("article",{name:"Code local à la date choisie",exact:true})).toContainText("14 %");await expectNoPageOverflow(page);await captureReference(page,"comparaison-code-fiscal","NS-CMP · Nouvelle-Écosse · 2025-04-01");
+ const db=new pg.Client({connectionString:e2eUrls().owner});await db.connect();let userId:string|null=null,backupId:string|null=null,role:string|null=null,access:unknown=null,rateId:string|null=null;
+ try{
+  const rate=(await db.query("SELECT r.id,t.payable_account_id,t.recoverable_account_id FROM tax_rate r JOIN tax t ON t.company_id=r.company_id AND t.id=r.tax_id WHERE t.company_id=$1 AND t.code='NS-CMP-FED' AND r.effective_from='2025-04-01'",[companyId])).rows[0];rateId=rate.id;
+  // Change an unused local definition in this disposable fixture, never a posted document.
+  await db.query("UPDATE tax_rate SET rate=0.13 WHERE id=$1",[rateId]);await page.reload();await expect(status).toContainText("Les taux des composantes diffèrent");await expect(page.getByRole("article",{name:"Code local à la date choisie",exact:true})).toContainText("13 %");await expect(page.getByRole("article",{name:"Taux standards officiels",exact:true})).toContainText("14 %");await expectNoPageOverflow(page);await captureReference(page,"comparaison-code-fiscal-ecart","NS-CMP · Nouvelle-Écosse · 2025-04-01");
+  await page.getByRole("button",{name:"English",exact:true}).click();await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");await expect(status).toContainText("The component rates differ");await expectNoPageOverflow(page);await captureReference(page,"comparaison-code-fiscal-en-dark","NS-CMP · Nova Scotia · 2025-04-01");await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await page.getByRole("button",{name:"Français",exact:true}).click();
+  const comparisonUrl=page.url(),member=(await db.query("SELECT m.user_id,m.role,m.module_access FROM membership m JOIN app_user u ON u.id=m.user_id WHERE m.company_id=$1 AND u.email=$2",[companyId,EMAIL])).rows[0];userId=member.user_id;role=member.role;access=member.module_access;
+  backupId=(await db.query("INSERT INTO app_user(id,email,display_name,updated_at) VALUES(gen_random_uuid(),'tax-comparison-'||gen_random_uuid()::text||'@exemple.test','Permission test owner',now()) RETURNING id")).rows[0].id;await db.query("INSERT INTO membership(id,company_id,user_id,role,updated_at) VALUES(gen_random_uuid(),$1,$2,'OWNER',now())",[companyId,backupId]);
+  await db.query("UPDATE membership SET role='ACCOUNTANT',module_access=$3::jsonb WHERE company_id=$1 AND user_id=$2",[companyId,userId,JSON.stringify({taxes:"read",accounting:"none",audit:"none",sales:"none",contacts:"none"})]);await page.reload();await expect(status).toContainText("Les taux des composantes diffèrent");const response=await page.request.get(comparisonUrl);expect(response.status()).toBe(200);const html=await response.text();expect(html).not.toContain(rate.payable_account_id);expect(html).not.toContain(rate.recoverable_account_id);await expect(page.getByRole("button",{name:"Créer le code et ses taxes",exact:true})).toHaveCount(0);
+  for(const suffix of ["code=NS-CMP&code=NO","code=NS-CMP&province=NS&province=QC","code=NS-CMP&date=2026-02-30","code=NS-CMP&charger=2","code=NO-SUCH-CODE&charger=1","charger=1"])expect((await page.request.get(`${company}/sources-fiscales/comparer?${suffix}`)).status()).toBe(404);
+  await db.query("UPDATE membership SET module_access='{\"taxes\":\"none\"}' WHERE company_id=$1 AND user_id=$2",[companyId,userId]);expect((await page.request.get(comparisonUrl)).status()).toBe(404);expect((await page.request.get('/c/00000000-0000-7000-8000-999999999999/sources-fiscales/comparer?code=NS-CMP&province=NS&date=2025-04-01&charger=1')).status()).toBe(404);
+ }finally{
+  if(rateId)await db.query("UPDATE tax_rate SET rate=0.14 WHERE id=$1",[rateId]);
+  if(userId&&role)await db.query("UPDATE membership SET role=$3::member_role,module_access=$4::jsonb WHERE company_id=$1 AND user_id=$2",[companyId,userId,role,access===null?null:JSON.stringify(access)]);
+  if(backupId){await db.query("DELETE FROM membership WHERE company_id=$1 AND user_id=$2",[companyId,backupId]);await db.query("UPDATE app_user SET disabled_at=now() WHERE id=$1",[backupId]);}await db.end();
+ }
+ expect(cspViolations).toEqual([]);
+});

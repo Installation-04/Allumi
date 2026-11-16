@@ -93,3 +93,5 @@ Taxes et produits/services : [[Taxes-et-catalogue]]. Consultation et import : [[
 Rapports de taxes comparatifs : [[Comparaison-des-taxes]] — périodes mensuelles, trimestrielles, annuelles ou personnalisées, variations et contrôles séparés.
 
 Recherche comptable : [[Recherche-comptable]] — comptes actifs/inactifs et écritures manuelles/d’ouverture, total exact et contre-passation, sans notes privées.
+
+Comparaison fiscale : [[Comparaison-des-codes-fiscaux]] — codes existants et taux standards officiels, dates historiques et écarts par composante, en lecture seule.

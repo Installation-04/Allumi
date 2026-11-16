@@ -386,5 +386,57 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.68": {
+    "fr-CA": {
+      "title": "Comparer les codes aux taux officiels",
+      "added": [
+        {
+          "text": "Comparez un code fiscal importé ou manuel aux taux standards ARC et TVQ à la date et pour la province choisies.",
+          "guide": "Comparaison-des-codes-fiscaux"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Contrôlez chaque composante exacte, les dates historiques, les écarts, les taux manquants et les états inactifs; des totaux identiques ne suffisent pas.",
+          "guide": "Comparaison-des-codes-fiscaux"
+        },
+        {
+          "text": "Taxes en lecture suffit sans Comptabilité ou Audit. La page FR/EN, mobile et sombre exclut les références comptables et ne modifie aucune définition locale."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration ni nouvelle configuration. Les sources officielles HTTPS doivent être joignables; aucune correction automatique ou déclaration fiscale n’est effectuée.",
+          "guide": "Sources-fiscales-officielles"
+        }
+      ]
+    },
+    "en": {
+      "title": "Compare codes with official rates",
+      "added": [
+        {
+          "text": "Compare an imported or manual tax code with CRA and QST standard rates for the selected province and date.",
+          "guide": "Comparaison-des-codes-fiscaux"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Review exact individual components, historical dates, differences, missing rates and inactive definitions; matching totals alone are insufficient.",
+          "guide": "Comparaison-des-codes-fiscaux"
+        },
+        {
+          "text": "Tax read access is enough without Accounting or Audit. The FR/EN, mobile and dark view excludes accounting references and never changes local definitions."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration or new configuration. Official HTTPS sources must be reachable; no automatic correction or tax filing takes place.",
+          "guide": "Sources-fiscales-officielles"
+        }
+      ]
+    }
   }
 }

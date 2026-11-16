@@ -13,7 +13,7 @@ export default async function TaxesPage({ params, searchParams }: { params: Prom
   const t = await getTranslations("catalog");
   const { taxes, codes } = await getTaxConfiguration(actor);
   const accounts = can(company,"ledger.read") ? await listAccounts(actor) : [];
-  const official = await getTranslations("officialTaxes");
+  const official = await getTranslations("officialTaxes"), comparison = await getTranslations("officialComparison");
   const imported = (await searchParams).importe;
   const importedCode = typeof imported === "string" ? codes.find(code=>code.id===imported) : null;
   const manage = can(company, "taxes.manage");
@@ -31,7 +31,7 @@ export default async function TaxesPage({ params, searchParams }: { params: Prom
       <ul className="space-y-2 text-sm">{tax.rates.map((rate) => <li key={rate.id}>{ratePercentage(rate.rate)} % · {rate.from} → {rate.to ?? t("ongoing")}</li>)}</ul>
     </article>)}</div>{taxes.length === 0 && <p>{t("emptyTaxes")}</p>}
     <h2 className="text-xl font-semibold">{t("taxCodes")}</h2>
-    <div className="grid gap-4 lg:grid-cols-2">{codes.map((code) => <article key={code.id} className={panel}><h3 className="font-semibold">{code.code} — {locale === "en" ? code.nameEn : code.nameFr}</h3><p>{t(`treatments.${code.treatment}`)} · {t(code.isActive ? "active" : "archived")}</p><p className="text-sm">{code.components.map((c) => taxes.find((tax) => tax.id === c.taxId)?.code).join(" + ")}</p>{manage && <ActionForm action={archiveAction.bind(null, company.id, "taxCode", code.id, !code.isActive)} label={t(code.isActive ? "archive" : "restore")} ariaLabel={`${t(code.isActive ? "archive" : "restore")} ${code.code}`} />}</article>)}</div>
+    <div className="grid gap-4 lg:grid-cols-2">{codes.map((code) => <article key={code.id} className={panel}><h3 className="font-semibold">{code.code} — {locale === "en" ? code.nameEn : code.nameFr}</h3><p>{t(`treatments.${code.treatment}`)} · {t(code.isActive ? "active" : "archived")}</p><p className="text-sm">{code.components.map((c) => taxes.find((tax) => tax.id === c.taxId)?.code).join(" + ")}</p><Link className="inline-flex min-h-11 items-center underline" href={`/c/${company.id}/sources-fiscales/comparer?${new URLSearchParams({code:code.code})}`}>{comparison("title")}</Link>{manage && <ActionForm action={archiveAction.bind(null, company.id, "taxCode", code.id, !code.isActive)} label={t(code.isActive ? "archive" : "restore")} ariaLabel={`${t(code.isActive ? "archive" : "restore")} ${code.code}`} />}</article>)}</div>
     <TaxPreview locale={locale} today={todayIso()} codes={codes.filter((c) => c.isActive).map((c) => ({ id: c.id, label: c.code, taxIds: c.components.map((part) => part.taxId) }))} taxes={taxes.filter((tax) => tax.isActive).map((tax) => ({ id: tax.id, code: tax.code, rates: tax.rates }))} />
     {manage && <div className="grid gap-6 xl:grid-cols-2">
       {can(company,"ledger.read") && <section className={panel}><h2 className="text-lg font-semibold">{t("newTax")}</h2><ActionForm action={configureAction.bind(null, company.id, "tax")} label={t("newTax")} variant="primary"><div className="grid gap-4 sm:grid-cols-2">{names}<Field name="percent" label={t("percent")} hint={t("percentHint")} /><Field name="from" label={t("from")} type="date" defaultValue={todayIso()} /><SelectField name="payableAccountId" label={t("payable")} options={accountOptions("LIABILITY")} /><SelectField name="recoverableAccountId" label={t("recoverable")} options={accountOptions("ASSET")} required={false} /></div></ActionForm></section>}

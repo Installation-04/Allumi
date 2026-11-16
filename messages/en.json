@@ -3199,5 +3199,23 @@
     "source": "Open detailed tax summary",
     "agrees": "Both periods reconcile to the general ledger tax accounts.",
     "warning": "At least one period has lines or a difference to review. Open the detailed summaries before using these figures."
+  },
+  "officialComparison": {
+    "title": "Compare a code with official rates",
+    "compare": "Compare rates",
+    "intro": "Review an existing local tax code against the official standard rates for a province and date. Imported and manually configured codes can be reviewed.",
+    "limits": "Read-only comparison of individual component rates, independent of order. Matching totals alone are insufficient. This does not certify tax compliance, place of supply, exemptions, account mappings or recoverability. Inactive states are current. Separate provincial sales taxes are outside this source coverage. No code, rate or posted document is updated.",
+    "scope": "{code} · {province} · {date}",
+    "local": "Local code at the selected date",
+    "official": "Official standard rates",
+    "missing": "Missing or ambiguous dated rate",
+    "noComponents": "This code has no tax components.",
+    "statuses": {
+      "MATCH": "The active standard code has the same component rates at this date. This is a rate comparison, not a compliance certification.",
+      "DIFFERENT": "The component rates differ from the official standard rates at this date. Review the individual components and province.",
+      "MISSING_RATE": "At least one local component has no unique rate at this date. A missing rate is not treated as zero.",
+      "INACTIVE": "The local code or at least one component is currently inactive. Matching rates do not make this code usable.",
+      "NON_STANDARD": "This code uses a non-standard treatment. Standard rates cannot validate a zero-rated, exempt or out-of-scope treatment."
+    }
   }
 }
