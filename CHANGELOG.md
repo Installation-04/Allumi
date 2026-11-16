@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.66] - 2026-11-16
+
 - Nouveautés : comparaison de deux périodes de taxes, par taxe et au total, avec montants perçus/récupérables, ajustements, net avant versements, versements et mouvement net; variations exactes et contrôles séparés dans un même instantané SQL.
 - Améliorations : référence calendaire précédente depuis un mois/trimestre/année, quatre dates modifiables, sources détaillées conservées, CSV bilingue privé et impression/PDF navigateur, FR/EN/mobile/sombre, guide et captures.
 - Fiabilité : dates ambiguës ou contradictoires refusées, taxes inactives avec mouvements conservées, contre-passations aux dates comptables et anomalies signalées même à écart nul; droits Comptabilité et Taxes, sans notes du journal ni identifiants techniques dans le CSV.
