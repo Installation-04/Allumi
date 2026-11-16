@@ -39,7 +39,7 @@ export default async function Page({ params, searchParams }: {
       </details>
       <div className="flex flex-wrap items-end gap-3 sm:col-span-2 lg:col-span-3"><button className={`min-h-11 rounded bg-brand-700 px-5 text-white hover:bg-brand-800 ${FOCUS}`} type="submit">{t("submit")}</button><Link className={`inline-flex min-h-11 items-center underline ${FOCUS}`} href={path}>{t("reset")}</Link></div>
     </form>
-    <p className="text-sm text-stone-600 dark:text-stone-400">{t(filters.kind === "BANK_TRANSACTION" ? "bankScope" : "scope")}</p>
+    <p className="text-sm text-stone-600 dark:text-stone-400">{t(filters.kind === "REPORT" ? "reportScope" : filters.kind === "BANK_TRANSACTION" ? "bankScope" : "scope")}</p>
     {!hasSearchCriteria(filters) ? <p>{t("emptyQuery")}</p> : <>
       <p role="status">{result.rows.length ? t("pageResults", { count: result.rows.length, page: filters.page }) : t("noResults")}</p>
       <ul aria-label={t("results")} className="min-w-0 divide-y divide-stone-200 rounded-lg border border-stone-200 bg-white dark:divide-stone-700 dark:border-stone-700 dark:bg-stone-900">

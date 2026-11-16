@@ -484,5 +484,51 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.70": {
+    "en": {
+      "title": "Find financial report forms",
+      "added": [
+        {
+          "text": "Find 13 existing financial report destinations by French/English names and explicit synonyms, then choose parameters on the destination form.",
+          "guide": "Recherche-des-rapports"
+        }
+      ],
+      "improved": [
+        {
+          "text": "The Report type and Available state distinguish destinations from records. Permission combinations are respected; date and amount filters exclude reports rather than inventing financial results.",
+          "guide": "Recherche-des-rapports"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration or new configuration. No saved report or accounting entry is created.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "fr-CA": {
+      "title": "Retrouver les formulaires de rapports",
+      "added": [
+        {
+          "text": "Retrouvez 13 destinations de rapports financiers existants par noms français/anglais et synonymes, puis choisissez les paramètres sur le formulaire de destination.",
+          "guide": "Recherche-des-rapports"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Le type Rapport et l’état Disponible distinguent les destinations des données. Les combinaisons de droits sont respectées; dates et montants excluent les rapports plutôt qu’inventer des résultats.",
+          "guide": "Recherche-des-rapports"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration ni nouvelle configuration. Aucun rapport enregistré ni mouvement comptable n’est créé.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

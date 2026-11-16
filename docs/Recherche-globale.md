@@ -43,10 +43,14 @@ En anglais, le champ et la page sont nommés **Search company data**. Les filtre
 
 ![Recherche en anglais sombre sur téléphone](images/recherche-globale-en-dark-mobile.png)
 
-Cette recherche porte sur les types décrits ci-dessus. Elle ne recherche pas encore les lignes bancaires en devise étrangère, les rapports, les écritures bancaires ou les autres sources de journal non décrites ici. Elle ne fournit pas de suggestions pendant la frappe ni d’interprétation de phrases en langage naturel. Les données restent dans PostgreSQL sur votre serveur.
+Cette recherche porte sur les types décrits ci-dessus. Elle ne recherche pas encore les lignes bancaires en devise étrangère, le contenu des rapports, les écritures bancaires ou les autres sources de journal non décrites ici. Elle ne fournit pas de suggestions pendant la frappe ni d’interprétation de phrases en langage naturel. Les données restent dans PostgreSQL sur votre serveur.
 
 Voir [[Interface-et-navigation]], [[Recherche-des-paiements-clients]] et [[Utilisateurs-et-permissions]].
 
 ## Transactions bancaires
 
 [[Recherche-bancaire]] ajoute les libellés/bénéficiaires de lignes importées CAD, états actuels, dates et montants nets. Le filtre exact utilise la valeur absolue et le résultat conserve le signe. Les métadonnées d’import restent exclues.
+
+## Formulaires de rapports
+
+[[Recherche-des-rapports]] propose les destinations autorisées des rapports existants. Le type Rapport et l’état Disponible les distinguent des données; dates et montants les excluent plutôt que calculer un rapport.

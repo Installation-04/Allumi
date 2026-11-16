@@ -4,6 +4,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Nouveautés : 13 destinations de rapports financiers existants dans la recherche globale, noms français/anglais, synonymes explicites et liens vers leurs formulaires.
+- Améliorations : type Rapport et état Disponible, recherche des noms sans accents, absence de dates/montants fictifs et filtres cohérents; FR/EN/mobile/sombre, guide et quatre captures.
+- Confidentialité : combinaisons Comptabilité/Ventes/Contacts/Taxes vérifiées dans le même instantané SQL, destinations interdites exclues, liens limités à l’entreprise et aucun contenu financier dans le catalogue.
+- Installation : aucune migration ni nouvelle configuration; aucun rapport enregistré ou mouvement comptable créé par la recherche.
+
 ## [0.4.0-alpha.69] - 2026-11-16
 
 - Nouveautés : recherche globale des transactions bancaires CAD importées par libellé/bénéficiaire, date, état et montant net, avec lien direct vers la fiche.

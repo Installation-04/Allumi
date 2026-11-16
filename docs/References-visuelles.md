@@ -559,3 +559,15 @@ Codes importés ou manuels, taux datés et écarts par composante : [[Comparaiso
 ![Recherche bancaire](images/recherche-bancaire-mobile.png)
 
 ![Recherche bancaire](images/recherche-bancaire-en-dark-mobile.png)
+
+## Recherche des rapports
+
+[[Recherche-des-rapports]] : formulaires autorisés et synonymes bilingues.
+
+![Recherche des rapports](images/recherche-rapports-desktop.png)
+
+![Recherche des rapports](images/recherche-rapports-en-dark-desktop.png)
+
+![Recherche des rapports](images/recherche-rapports-mobile.png)
+
+![Recherche des rapports](images/recherche-rapports-en-dark-mobile.png)

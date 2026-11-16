@@ -97,3 +97,5 @@ Recherche comptable : [[Recherche-comptable]] — comptes actifs/inactifs et éc
 Comparaison fiscale : [[Comparaison-des-codes-fiscaux]] — codes existants et taux standards officiels, dates historiques et écarts par composante, en lecture seule.
 
 Recherche bancaire : [[Recherche-bancaire]] — lignes CAD importées, montants signés, états et accès aux fiches.
+
+Rapports dans la recherche : [[Recherche-des-rapports]] — retrouver les formulaires autorisés, sans dates ou montants fictifs.
