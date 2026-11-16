@@ -4,6 +4,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Nouveautés : recherche globale des comptes du plan comptable et écritures manuelles/d’ouverture avec contre-passations, numéros formatés, dates, totaux exacts et états Inactif/Contre-passée.
+- Améliorations : noms de comptes français/anglais, grand livre lisible des comptes inactifs et liens autorisés en lecture, gros totaux d’écritures recherchables sans augmenter les limites de saisie; filtres, pagination, FR/EN/mobile/sombre, guide et captures.
+- Confidentialité : droit Comptabilité et isolation d’entreprise, notes/descriptions privées exclues, écritures des documents/paiements et leurs contre-passations exclues de ce nouveau type; source et total des débits explicités pour éviter une interprétation en mouvement net.
+- Installation : aucune migration ni nouvelle configuration; extension en lecture seule sans nouvelle écriture financière ni modification de compte. Les garde-fous monétaires de saisie et de base restent inchangés.
+
 ## [0.4.0-alpha.66] - 2026-11-16
 
 - Nouveautés : comparaison de deux périodes de taxes, par taxe et au total, avec montants perçus/récupérables, ajustements, net avant versements, versements et mouvement net; variations exactes et contrôles séparés dans un même instantané SQL.

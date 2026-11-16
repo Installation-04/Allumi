@@ -517,3 +517,17 @@ Deux périodes, variations et contrôles par taxe, CSV et impression : [[Compara
 ![Comparatif sur téléphone](images/taxes-comparatif-periodes-mobile.png)
 
 ![Anglais sombre sur téléphone](images/taxes-comparatif-periodes-en-dark-mobile.png)
+
+## Recherche comptable
+
+Comptes inactifs et écritures manuelles contre-passées, sans notes privées : [[Recherche-comptable]].
+
+![Compte trouvé](images/recherche-comptable-compte-desktop.png)
+
+![Écriture contre-passée](images/recherche-comptable-ecriture-desktop.png)
+
+![Anglais sombre](images/recherche-comptable-ecriture-en-dark-desktop.png)
+
+![Compte sur téléphone](images/recherche-comptable-compte-mobile.png)
+
+![Anglais sombre sur téléphone](images/recherche-comptable-ecriture-en-dark-mobile.png)

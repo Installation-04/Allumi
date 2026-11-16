@@ -2148,7 +2148,8 @@
     "accountName": "Libellé",
     "contact": "Contact",
     "file": "grand-livre",
-    "allFile": "tous-les-comptes"
+    "allFile": "tous-les-comptes",
+    "inactive": "Inactif"
   },
   "aging": {
     "title": "Âge des comptes clients",
@@ -2762,7 +2763,7 @@
   },
   "companySearch": {
     "title": "Recherche dans l’entreprise",
-    "intro": "Retrouvez un contact, un produit ou une pièce comptable dans votre entreprise. Combinez les filtres pour préciser les résultats.",
+    "intro": "Retrouvez un contact, un produit, un compte ou une pièce comptable dans votre entreprise. Combinez les filtres pour préciser les résultats.",
     "query": "Terme recherché",
     "placeholder": "Numéro, nom, référence, montant exact ou AAAA-MM-JJ",
     "shortPlaceholder": "Rechercher dans l’entreprise…",
@@ -2776,7 +2777,7 @@
     "all": "Tous",
     "submit": "Rechercher",
     "reset": "Effacer les filtres",
-    "scope": "Seules les pièces autorisées sont visibles. Les dates et montants concernent les documents et paiements. Les montants sont les totaux positifs en CAD; les crédits et remboursements sont identifiés par leur type. Les devis sont inclus selon vos droits de vente.",
+    "scope": "Seules les données autorisées sont visibles. Les dates et montants concernent les documents, paiements et écritures. Pour une écriture manuelle ou d’ouverture et sa contre-passation, le montant est le total positif des débits, pas un mouvement net. Les comptes n’ont ni date ni montant; leur lien ouvre le grand livre. Notes et descriptions privées exclues.",
     "emptyQuery": "Saisissez un terme ou choisissez un filtre pour commencer.",
     "noResults": "Aucun résultat. Vérifiez les filtres ou vos permissions.",
     "pageResults": "{count, plural, one {# résultat} other {# résultats}} à la page {page}",
@@ -2798,7 +2799,9 @@
       "REFUND": "Remboursement client",
       "DISBURSEMENT": "Décaissement",
       "SUPPLIER_REFUND": "Remboursement fournisseur",
-      "ESTIMATE": "Devis"
+      "ESTIMATE": "Devis",
+      "ACCOUNT": "Compte comptable",
+      "JOURNAL_ENTRY": "Écriture manuelle ou d’ouverture"
     },
     "statuses": {
       "DRAFT": "Brouillon",
@@ -2810,8 +2813,16 @@
       "ACCEPTED": "Accepté",
       "DECLINED": "Refusé",
       "CANCELLED": "Devis annulé",
-      "CONVERTED": "Converti en facture"
-    }
+      "CONVERTED": "Converti en facture",
+      "INACTIVE": "Inactif",
+      "REVERSED": "Contre-passée"
+    },
+    "entrySources": {
+      "MANUAL": "Saisie manuelle",
+      "OPENING_BALANCE": "Soldes d’ouverture",
+      "REVERSAL": "Contre-passation"
+    },
+    "entryAmount": "Total des débits"
   },
   "officialTaxes": {
     "audit": "Voir la provenance des imports",

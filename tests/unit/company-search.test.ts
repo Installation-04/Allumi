@@ -1,5 +1,6 @@
+import { parseMoney, MAX_LINE_CENTS } from "@/modules/ledger/client";
 import { expect, it } from "vitest";
-import { parseSearchFilters, hasSearchCriteria } from "@/modules/search";
+import { parseSearchFilters, hasSearchCriteria, SEARCH_MAX_CENTS } from "@/modules/search";
 it("parses exact Canadian amounts without floating point and recognizes zero", () => {
   expect(parseSearchFilters({ montant: "1,234.56", q: "$1,234.56" }, "en")).toMatchObject({amountCents:123456n,queryCents:123456n});
   expect(parseSearchFilters({ montant: "0", q: "0,01" }, "fr-CA")).toMatchObject({amountCents:0n,queryCents:1n});
@@ -15,4 +16,16 @@ it("keeps the same exact amount when switching between French and English",()=>{
   for(const value of ["1 234,56 $","$1,234.56","1234.56","1234,56"]){
     for(const locale of ["fr-CA","en"] as const)expect(parseSearchFilters({montant:value,q:value},locale)).toMatchObject({amountCents:123456n,queryCents:123456n});
   }
+});
+
+it("accepts accounting kinds and distinguishes inactive accounts from reversed entries",()=>{
+ expect(parseSearchFilters({type:"ACCOUNT",statut:"INACTIVE"},"en")).toMatchObject({kind:"ACCOUNT",status:"INACTIVE"});
+ expect(parseSearchFilters({type:"JOURNAL_ENTRY",statut:"REVERSED"},"fr-CA")).toMatchObject({kind:"JOURNAL_ENTRY",status:"REVERSED"});
+});
+it("searches aggregate journal amounts beyond one-line limits without changing posting input defaults",()=>{
+ const value="90071992547409.93";expect(parseSearchFilters({montant:value,q:value},"en")).toMatchObject({amountCents:9007199254740993n,queryCents:9007199254740993n});
+ expect(parseSearchFilters({montant:"90 071 992 547 409,93 $"},"fr-CA").amountCents).toBe(9007199254740993n);
+ expect(parseMoney(value,"en")).toBeNull();expect(parseMoney((MAX_LINE_CENTS/100n).toString(),"en")).toBe(MAX_LINE_CENTS);
+ const max=(SEARCH_MAX_CENTS/100n).toString();expect(parseSearchFilters({montant:max},"en").amountCents).toBe(SEARCH_MAX_CENTS);
+ expect(()=>parseSearchFilters({montant:`${max}.01`},"en")).toThrow(RangeError);
 });

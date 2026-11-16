@@ -37,3 +37,5 @@ Cycle commercial livré : [[Devis]]. Finalisation et réponse consignées manuel
 ## Factures récurrentes
 
 [[Factures-recurrentes]] : modèles mensuels/trimestriels/annuels issus de factures validées, génération confirmée de brouillons dus, recalcul fiscal daté, pause/annulation et historique conservé. Exécution de fond et envoi automatique restent à venir. Les [[Relances-clients]] permettent un aperçu et un envoi individuel confirmé sur les factures échues; aucun échéancier ni traitement groupé.
+
+[[Recherche-comptable]] étend la recherche globale aux comptes actifs/inactifs et aux écritures manuelles/d’ouverture et contre-passations associées. Les comptes ouvrent leur grand livre en lecture, y compris inactifs; les montants des écritures sont les totaux des débits, sans recherche dans les notes privées. Les autres sources de journal et les imports bancaires restent hors de cette extension.

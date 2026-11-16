@@ -40,8 +40,9 @@ export function formatMoney(cents: bigint, locale: Locale): string {
  * Reads an amount typed by a person. Returns cents, or null when the text is not an amount: more than two
  * decimals (no sub-cent), several separators, letters, or above the ceiling. fr-CA: spaces group digits and
  * the decimal mark is a comma (a lone dot is accepted too); en: commas group digits and the mark is a dot.
+ * Posting inputs keep the per-line default; read-only aggregate filters may supply a larger ceiling.
  */
-export function parseMoney(input: string, locale: Locale): bigint | null {
+export function parseMoney(input: string, locale: Locale, maxCents: bigint = MAX_LINE_CENTS): bigint | null {
   let text = input.replace(/\s/g, "").replace(/\$/g, "").replace("−", "-");
   let negative = false;
   if (text.startsWith("-")) {
@@ -73,6 +74,6 @@ export function parseMoney(input: string, locale: Locale): bigint | null {
   if (!/^\d*$/.test(wholeText) || !/^\d{0,2}$/.test(fractionText)) return null;
   if (wholeText === "" && fractionText === "") return null;
   const cents = BigInt(wholeText || "0") * 100n + BigInt(fractionText.padEnd(2, "0"));
-  if (cents > MAX_LINE_CENTS) return null;
+  if (cents > maxCents) return null;
   return negative ? -cents : cents;
 }
