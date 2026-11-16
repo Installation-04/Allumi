@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.68] - 2026-11-16
+
 - Nouveautés : comparaison des codes fiscaux importés ou manuels aux taux standards officiels ARC/TVQ pour une province et une date, accessible depuis les codes et les sources.
 - Améliorations : contrôle exact des composantes indépendamment de leur ordre, périodes historiques, écarts, couverture manquante, inactivité et traitements non standards explicites; FR/EN/mobile/sombre, guide et six captures.
 - Confidentialité : Taxes en lecture suffit sans Comptabilité/Audit; contrôle avant le réseau et relecture locale après consultation, projection sans comptes ni données transactionnelles et isolation par entreprise.
