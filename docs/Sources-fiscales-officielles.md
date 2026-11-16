@@ -17,6 +17,10 @@ Chaque carte affiche le taux applicable à la date choisie, l’heure de consult
 
 ![Taux officiels sur ordinateur](images/sources-fiscales-desktop.png)
 
+## Comparer un code existant
+
+[[Comparaison-des-codes-fiscaux]] permet de comparer un code déjà importé ou configuré manuellement aux taux standards officiels pour une province et une date. Les composantes sont comparées exactement, sans se limiter au total; les définitions locales restent inchangées. Le contrôle est accessible avec Taxes en lecture, sans Comptabilité ni Audit.
+
 ## Créer un code fiscal
 
 Un membre avec **Taxes en écriture** et **Comptabilité en lecture** peut importer les taux. Choisissez :

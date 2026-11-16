@@ -12,7 +12,7 @@ import { importAction } from "./actions";
 export const dynamic="force-dynamic";
 export async function generateMetadata(){return{title:(await getTranslations("officialTaxes"))("title")};}
 export default async function Page({params,searchParams}:{params:Promise<{companyId:string}>;searchParams:Promise<Record<string,string|string[]|undefined>>}) {
-  const {actor,company,locale}=await loadCompany(params,"taxes.read"),query=await searchParams,t=await getTranslations("officialTaxes");
+  const {actor,company,locale}=await loadCompany(params,"taxes.read"),query=await searchParams,t=await getTranslations("officialTaxes"),comparison=await getTranslations("officialComparison");
   for(const key of ["province","date","charger"])if(Array.isArray(query[key]))notFound();
   const province=(query.province as string|undefined)??"QC",date=(query.date as string|undefined)??todayIso();
   try{officialScope(province,date,todayIso());}catch{notFound();}
@@ -27,6 +27,7 @@ export default async function Page({params,searchParams}:{params:Promise<{compan
   return <section className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
     <Link className={`inline-flex min-h-11 items-center underline ${FOCUS}`} href={`/c/${company.id}/taxes`}>{t("back")}</Link>
     <h1 className="text-2xl font-semibold">{t("title")}</h1><p>{t("intro")}</p>
+    <Link className={`inline-flex min-h-11 items-center underline ${FOCUS}`} href={`/c/${company.id}/sources-fiscales/comparer`}>{comparison("title")}</Link>
     <form method="get" aria-label={t("consult")} className={`${panel} grid gap-3 sm:grid-cols-3`}>
       <input type="hidden" name="charger" value="1" />
       <div><label htmlFor="official-province">{t("province")}</label><select id="official-province" name="province" defaultValue={province} className={control}>{PROVINCES.map(code=><option key={code} value={code}>{t(`provinces.${code}`)}</option>)}</select></div>

@@ -27,6 +27,7 @@
 - [[Contacts]]
 - [[Taxes-et-catalogue]]
 - [[Sources-fiscales-officielles]]
+- [[Comparaison-des-codes-fiscaux]] — vérifier un code aux taux standards officiels.
 - [[Devis]]
 - [[Envoi-des-devis]]
 - [[Factures-recurrentes]]

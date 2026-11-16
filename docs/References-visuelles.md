@@ -531,3 +531,19 @@ Comptes inactifs et écritures manuelles contre-passées, sans notes privées : 
 ![Compte sur téléphone](images/recherche-comptable-compte-mobile.png)
 
 ![Anglais sombre sur téléphone](images/recherche-comptable-ecriture-en-dark-mobile.png)
+
+## Comparaison des codes aux taux officiels
+
+Codes importés ou manuels, taux datés et écarts par composante : [[Comparaison-des-codes-fiscaux]].
+
+![Taux concordants](images/comparaison-code-fiscal-desktop.png)
+
+![Écart local](images/comparaison-code-fiscal-ecart-desktop.png)
+
+![Anglais sombre](images/comparaison-code-fiscal-en-dark-desktop.png)
+
+![Taux concordants sur téléphone](images/comparaison-code-fiscal-mobile.png)
+
+![Écart sur téléphone](images/comparaison-code-fiscal-ecart-mobile.png)
+
+![Anglais sombre sur téléphone](images/comparaison-code-fiscal-en-dark-mobile.png)

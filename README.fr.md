@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.67
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.68
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -150,6 +150,10 @@ Exportez tous les remboursements fournisseurs filtrés en CSV, au-delà de la pa
 Imprimez une copie comptable d’un remboursement fournisseur : montant original, origines complètes et date de contre-passation, sans notes privées. Enregistrez-la en PDF depuis le navigateur, en français ou en anglais. [Guide d’impression](docs/Impression-des-remboursements-fournisseurs.md).
 
 ![Copie comptable du remboursement fournisseur](docs/images/impression-remboursement-fournisseur-desktop.png)
+
+Comparez les codes fiscaux importés ou manuels aux taux standards officiels pour une province et une date. Vérifiez les écarts par composante et la couverture datée en lecture seule. [Guide de comparaison fiscale](docs/Comparaison-des-codes-fiscaux.md).
+
+![Comparaison des taux officiels](docs/images/comparaison-code-fiscal-ecart-desktop.png)
 
 Retrouvez les comptes dans les deux langues et ouvrez leur historique, y compris inactifs. Recherchez les écritures manuelles/d’ouverture et leurs contre-passations par numéro, date et total exact des débits, sans rechercher les notes privées. [Guide de recherche comptable](docs/Recherche-comptable.md).
 
