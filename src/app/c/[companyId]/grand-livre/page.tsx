@@ -20,7 +20,7 @@ export default async function GeneralLedgerPage({ params, searchParams }: { para
   const { company, actor, locale } = await loadCompany(params, "ledger.read");
   const t = await getTranslations("ledgerReport");
   const query = await searchParams;
-  const [accounts, years] = [await listAccounts(actor), await listFiscalYears(actor)];
+  const [accounts, years] = [await listAccounts(actor, { includeInactive: true }), await listFiscalYears(actor)];
   const { from, to } = statementPeriod(query, years, todayIso());
   const accountId = reportAccountId(query.compte);
   if(accountId&&!accounts.some(a=>a.id===accountId))notFound();
@@ -61,7 +61,7 @@ export default async function GeneralLedgerPage({ params, searchParams }: { para
         <label className="min-w-0 text-sm"><span className="mb-1 block font-medium">{t("account")}</span>
           <select name="compte" defaultValue={accountId ?? ""} className={`${control} max-w-full`}>
             <option value="">{t("chooseAccount")}</option>
-            {accounts.map((account) => <option key={account.id} value={account.id}>{account.code} – {accountName(account, locale)}</option>)}
+            {accounts.map((account) => <option key={account.id} value={account.id}>{account.code} – {accountName(account, locale)}{account.isActive ? "" : ` · ${t("inactive")}`}</option>)}
           </select></label>
         <input type="hidden" name="q_contact" value={contactQuery}/>
         {mayFilter&&<div className="min-w-0 text-sm"><label htmlFor="ledger-contact" className="mb-1 block font-medium">{t("contactFilter")}</label><select id="ledger-contact" name="contact" defaultValue={contact?.id??""} className={`${control} max-w-full`}><option value="">{t("allContacts")}</option>{contacts.map(c=><option key={c.id} value={c.id}>{c.displayName}{c.isActive?"":` · ${t("inactiveContact")}`}</option>)}</select></div>}

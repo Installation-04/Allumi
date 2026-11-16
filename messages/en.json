@@ -2148,7 +2148,8 @@
     "accountName": "Name",
     "contact": "Contact",
     "file": "general-ledger",
-    "allFile": "all-accounts"
+    "allFile": "all-accounts",
+    "inactive": "Inactive"
   },
   "aging": {
     "title": "Receivables aging",
@@ -2762,7 +2763,7 @@
   },
   "companySearch": {
     "title": "Search company data",
-    "intro": "Find a contact, product or accounting document across your company. Combine the filters to narrow the results.",
+    "intro": "Find contacts, products, ledger accounts or accounting records in your company. Combine filters to narrow the results.",
     "query": "Search term",
     "placeholder": "Number, name, reference, exact amount or YYYY-MM-DD",
     "shortPlaceholder": "Search company data…",
@@ -2776,7 +2777,7 @@
     "all": "All",
     "submit": "Search",
     "reset": "Clear filters",
-    "scope": "Only records you are allowed to read appear. Dates and amounts apply to documents and payments. Amounts are positive document totals in CAD; credits and refunds are identified by their type. Estimates are included according to your sales permissions.",
+    "scope": "Only authorized data is visible. Dates and amounts apply to documents, payments and journal entries. For manual/opening entries and their reversals, the amount is total positive debits, not net movement. Accounts have no date or amount; their links open the general ledger. Private notes and descriptions are excluded.",
     "emptyQuery": "Enter a term or choose a filter to start.",
     "noResults": "No matching records. Check your filters or access permissions.",
     "pageResults": "{count, plural, one {# result} other {# results}} on page {page}",
@@ -2798,7 +2799,9 @@
       "REFUND": "Customer refund",
       "DISBURSEMENT": "Disbursement",
       "SUPPLIER_REFUND": "Supplier refund",
-      "ESTIMATE": "Estimate"
+      "ESTIMATE": "Estimate",
+      "ACCOUNT": "Ledger account",
+      "JOURNAL_ENTRY": "Manual or opening journal entry"
     },
     "statuses": {
       "DRAFT": "Draft",
@@ -2810,8 +2813,16 @@
       "ACCEPTED": "Accepted",
       "DECLINED": "Declined",
       "CANCELLED": "Cancelled estimate",
-      "CONVERTED": "Converted to invoice"
-    }
+      "CONVERTED": "Converted to invoice",
+      "INACTIVE": "Inactive",
+      "REVERSED": "Reversed"
+    },
+    "entrySources": {
+      "MANUAL": "Manual entry",
+      "OPENING_BALANCE": "Opening balances",
+      "REVERSAL": "Reversal"
+    },
+    "entryAmount": "Total debits"
   },
   "officialTaxes": {
     "audit": "View import provenance",

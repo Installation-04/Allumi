@@ -1,8 +1,10 @@
-import { isValidIsoDate, parseMoney, type Locale } from "@/modules/ledger/client";
+import { isValidIsoDate, parseMoney, MAX_LINE_CENTS, MAX_ENTRY_LINES, type Locale } from "@/modules/ledger/client";
 
-export const SEARCH_KINDS = ["CONTACT", "ITEM", "ESTIMATE", "INVOICE", "CREDIT_NOTE", "BILL", "SUPPLIER_CREDIT", "EXPENSE", "RECEIPT", "REFUND", "DISBURSEMENT", "SUPPLIER_REFUND"] as const;
+export const SEARCH_KINDS = ["CONTACT", "ITEM", "ESTIMATE", "INVOICE", "CREDIT_NOTE", "BILL", "SUPPLIER_CREDIT", "EXPENSE", "RECEIPT", "REFUND", "DISBURSEMENT", "SUPPLIER_REFUND", "ACCOUNT", "JOURNAL_ENTRY"] as const;
 export type SearchKind = (typeof SEARCH_KINDS)[number];
-export const SEARCH_STATUSES = ["DRAFT", "SENT", "ACCEPTED", "DECLINED", "CANCELLED", "CONVERTED", "POSTED", "VOID", "ACTIVE", "ARCHIVED"] as const;
+export const SEARCH_STATUSES = ["DRAFT", "SENT", "ACCEPTED", "DECLINED", "CANCELLED", "CONVERTED", "POSTED", "VOID", "ACTIVE", "ARCHIVED", "INACTIVE", "REVERSED"] as const;
+// A balanced journal can contain several maximum-sized debit lines. Posting limits stay unchanged.
+export const SEARCH_MAX_CENTS = MAX_LINE_CENTS * (BigInt(MAX_ENTRY_LINES) / 2n);
 export type SearchStatus = (typeof SEARCH_STATUSES)[number];
 export const SEARCH_PAGE_SIZE = 50;
 export const SEARCH_MAX_PAGE = 100;
@@ -19,7 +21,7 @@ export function parseSearchFilters(params: Record<string, string | string[] | un
   const query = value("q"), kind = value("type"), status = value("statut"), from = value("du"), to = value("au"), amount = value("montant"), page = value("page");
   if (amount.length > 32 || query.length > 120 || /[\u0000-\u001f\u007f]/.test(query) || (kind && !SEARCH_KINDS.includes(kind as SearchKind)) || (status && !SEARCH_STATUSES.includes(status as SearchStatus)) || (from && !isValidIsoDate(from)) || (to && !isValidIsoDate(to)) || (from && to && from > to) || (page && (!/^[1-9]\d{0,2}$/.test(page) || Number(page) > SEARCH_MAX_PAGE))) throw new RangeError("search.filter");
   // Both Canadian formats have disjoint grouping/decimal grammars; preserve exact filters across a language switch.
-  const money = (value: string) => parseMoney(value, locale) ?? parseMoney(value, locale === "en" ? "fr-CA" : "en");
+  const money = (value: string) => parseMoney(value, locale, SEARCH_MAX_CENTS) ?? parseMoney(value, locale === "en" ? "fr-CA" : "en", SEARCH_MAX_CENTS);
   const amountCents = amount ? money(amount) : null;
   if (amount && (amountCents === null || amountCents < 0n)) throw new RangeError("search.filter");
   return { query, kind: kind as SearchKind || null, status: status as SearchFilters["status"] || null, from: from || null, to: to || null, amountCents, queryCents: money(query), page: page ? Number(page) : 1 };
@@ -28,4 +30,4 @@ export function parseSearchFilters(params: Record<string, string | string[] | un
 export function hasSearchCriteria(filters: SearchFilters) {
   return Boolean(filters.query || filters.kind || filters.status || filters.from || filters.to || filters.amountCents !== null);
 }
-export type SearchRow = { id: string; kind: SearchKind; reference: string | null; name: string | null; date: string | null; amountCents: bigint | null; status: SearchStatus; href: string };
+export type SearchRow = { id: string; kind: SearchKind; reference: string | null; name: string | null; date: string | null; amountCents: bigint | null; status: SearchStatus; href: string; entrySource?: "MANUAL" | "OPENING_BALANCE" | "REVERSAL" };

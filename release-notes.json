@@ -330,5 +330,61 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.67": {
+    "fr-CA": {
+      "title": "Comptes et écritures dans la recherche globale",
+      "added": [
+        {
+          "text": "Recherchez les comptes par code ou nom français/anglais, y compris inactifs, et ouvrez leur grand livre sans droit d’édition.",
+          "guide": "Recherche-comptable"
+        },
+        {
+          "text": "Retrouvez les écritures manuelles/d’ouverture et leurs contre-passations par numéro, date et total exact des débits, avec l’état Contre-passée."
+        }
+      ],
+      "improved": [
+        {
+          "text": "Le grand livre conserve l’accès aux comptes inactifs. Les gros totaux restent exacts sans modifier le plafond de saisie des lignes; filtres, pagination, français/anglais, mobile et sombre sont conservés."
+        },
+        {
+          "text": "Les notes, descriptions privées et identités de contacts ne sont pas recherchées pour les écritures. Comptabilité en lecture suffit sans Contacts, Catalogue, Ventes ou Taxes."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration ni nouvelle configuration. Cette recherche en lecture seule ne modifie ni compte ni écriture.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Accounts and journal entries in company search",
+      "added": [
+        {
+          "text": "Find accounts by code or French/English name, including inactive accounts, and open their ledger without editing permission.",
+          "guide": "Recherche-comptable"
+        },
+        {
+          "text": "Find manual/opening entries and reversals by journal number, date and exact total debits, with a Reversed status."
+        }
+      ],
+      "improved": [
+        {
+          "text": "The general ledger keeps inactive accounts accessible. Large totals remain exact without increasing posting line limits; filters, pagination, French/English, mobile and dark-theme support are preserved."
+        },
+        {
+          "text": "Private notes, descriptions and contact identities are not searched for these entries. Accounting read access is sufficient without Contacts, Catalog, Sales or Taxes."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration or new configuration. This read-only search does not change accounts or journal entries.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

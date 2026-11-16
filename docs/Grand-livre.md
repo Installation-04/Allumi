@@ -41,3 +41,7 @@ Le sélecteur **Contact** limite les lignes et tous les soldes au contact choisi
 ## Sélection du compte dans l’adresse
 
 Un identifiant de compte mal formé, inconnu, étranger à l’entreprise ou répété dans l’adresse est refusé, à l’écran et dans le CSV. Il n’est jamais interprété comme **tous les comptes**. L’absence de compte ou une valeur vide conserve le parcours normal : choisir un compte à l’écran ou exporter tous les comptes explicitement.
+
+## Comptes inactifs et recherche globale
+
+La liste du compte inclut les comptes inactifs, signalés **Inactif**, pour consulter leurs mouvements historiques. Depuis [[Recherche-comptable]], un résultat de compte ouvre directement ce grand livre avec le compte sélectionné, sans exiger un droit de modification. Les dates par défaut du rapport restent applicables; ajuster la période si nécessaire.

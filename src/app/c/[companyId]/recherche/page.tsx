@@ -46,7 +46,7 @@ export default async function Page({ params, searchParams }: {
         {result.rows.map(row => <li key={`${row.kind}:${row.id}`} className="min-w-0 p-4">
           <div className="flex min-w-0 flex-wrap items-start justify-between gap-2">
             <div className="min-w-0 max-w-full"><p className="text-xs text-stone-600 dark:text-stone-400">{t(`kinds.${row.kind}`)} · {t(`statuses.${row.status}`)}</p><Link className={`inline-flex min-h-11 max-w-full items-center rounded text-brand-700 underline dark:text-brand-500 ${FOCUS}`} href={row.href}>{row.reference ?? row.name ?? (row.status === "DRAFT" ? t("unnumbered") : t(`kinds.${row.kind}`))}</Link>{row.reference && row.name && <p className="text-sm">{row.name}</p>}</div>
-            <div className="min-w-0 text-right text-sm">{row.amountCents !== null && <p className="font-semibold tabular-nums">{formatMoney(row.amountCents, locale)}</p>}{row.date && <time dateTime={row.date}>{row.date}</time>}</div>
+            <div className="min-w-0 text-right text-sm">{row.entrySource && <p>{t(`entrySources.${row.entrySource}`)}</p>}{row.amountCents !== null && <p className="font-semibold tabular-nums">{row.kind === "JOURNAL_ENTRY" && <span className="block text-xs font-normal">{t("entryAmount")}</span>}{formatMoney(row.amountCents, locale)}</p>}{row.date && <time dateTime={row.date}>{row.date}</time>}</div>
           </div>
         </li>)}
       </ul>

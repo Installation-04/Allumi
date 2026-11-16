@@ -91,3 +91,5 @@ Taxes et produits/services : [[Taxes-et-catalogue]]. Consultation et import : [[
 - [[Impression-des-remboursements-fournisseurs]] — copie comptable et PDF navigateur, origines et annulation sans notes privées.
 
 Rapports de taxes comparatifs : [[Comparaison-des-taxes]] — périodes mensuelles, trimestrielles, annuelles ou personnalisées, variations et contrôles séparés.
+
+Recherche comptable : [[Recherche-comptable]] — comptes actifs/inactifs et écritures manuelles/d’ouverture, total exact et contre-passation, sans notes privées.

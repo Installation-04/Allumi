@@ -30,6 +30,21 @@ export async function searchCompany(actor: CompanyContext, params: Record<string
           CASE WHEN i.is_active THEN 'ACTIVE' ELSE 'ARCHIVED' END,concat_ws(' ',i.code,i.name),NULL::uuid
         FROM item i CROSS JOIN access a WHERE i.company_id=${actor.companyId}::uuid AND a.catalog
         UNION ALL
+        SELECT c.id,'ACCOUNT',c.code,CASE WHEN ${locale}='en' THEN c.name_en ELSE c.name_fr END,NULL::date,NULL::bigint,
+          CASE WHEN c.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END,concat_ws(' ',c.code,c.name_fr,c.name_en),NULL::uuid
+        FROM account c CROSS JOIN access a WHERE c.company_id=${actor.companyId}::uuid AND a.accounting
+        UNION ALL
+        SELECT e.id,'JOURNAL_ENTRY',n.label,e.source_type::text,e.entry_date,tot.amount,
+          CASE WHEN EXISTS(SELECT 1 FROM journal_entry r WHERE r.company_id=e.company_id AND r.reverses_entry_id=e.id) THEN 'REVERSED' ELSE 'POSTED' END,
+          concat_ws(' ',n.label,e.entry_number::text),e.id
+        FROM journal_entry e CROSS JOIN access a
+        LEFT JOIN journal_entry original ON original.company_id=e.company_id AND original.id=e.reverses_entry_id
+        LEFT JOIN number_sequence s ON s.company_id=e.company_id AND s.key='JOURNAL_ENTRY'
+        CROSS JOIN LATERAL (SELECT coalesce(s.prefix,'') || lpad(e.entry_number::text,greatest(coalesce(s.padding,0),length(e.entry_number::text)),'0') AS label) n
+        CROSS JOIN LATERAL (SELECT coalesce(sum(l.debit_cents),0)::bigint AS amount FROM journal_line l WHERE l.company_id=e.company_id AND l.entry_id=e.id) tot
+        WHERE e.company_id=${actor.companyId}::uuid AND a.accounting
+          AND (e.source_type IN ('MANUAL','OPENING_BALANCE') OR (e.source_type='REVERSAL' AND original.source_type IN ('MANUAL','OPENING_BALANCE')))
+        UNION ALL
         SELECT d.id,d.kind::text,d.number,
           coalesce(d.billing_snapshot->>'name',CASE WHEN a.contacts THEN c.display_name END),d.issue_date,d.total_cents,d.status::text,
           concat_ws(' ',d.number,d.reference,d.billing_snapshot->>'name',CASE WHEN a.contacts THEN c.display_name END),d.journal_entry_id
@@ -69,6 +84,8 @@ export async function searchCompany(actor: CompanyContext, params: Record<string
     const mapped = rows.slice(0, SEARCH_PAGE_SIZE).map((row): SearchRow => {
       const draft = row.status === "DRAFT";
       const route = row.kind === "CONTACT" ? `contacts/${row.id}` : row.kind === "ITEM" ? `catalogue/${row.id}`
+        : row.kind === "ACCOUNT" ? `grand-livre?${new URLSearchParams({ compte: row.id })}`
+        : row.kind === "JOURNAL_ENTRY" ? `journal/${row.id}`
         : row.kind === "ESTIMATE" ? `devis/${row.id}`
         : row.kind === "INVOICE" ? `factures/${draft ? "" : "validees/"}${row.id}`
         : row.kind === "CREDIT_NOTE" ? `avoirs/${draft ? "" : "valides/"}${row.id}`
@@ -77,7 +94,8 @@ export async function searchCompany(actor: CompanyContext, params: Record<string
         : row.kind === "EXPENSE" ? `depenses/${draft ? "" : "validees/"}${row.id}`
         : row.kind === "RECEIPT" ? `encaissements/${row.id}` : row.kind === "REFUND" ? `remboursements/${row.id}`
         : row.kind === "DISBURSEMENT" ? `decaissements/${row.id}` : row.kind === "SUPPLIER_REFUND" ? `remboursements-fournisseurs/${row.id}` : `journal/${row.journal_id}`;
-      return { id: row.id, kind: row.kind, reference: row.reference, name: row.name, date: row.date, amountCents: row.amount === null ? null : BigInt(row.amount), status: row.status, href: `${base}/${route}` };
+      const entrySource = row.kind === "JOURNAL_ENTRY" && (row.name === "MANUAL" || row.name === "OPENING_BALANCE" || row.name === "REVERSAL") ? row.name : undefined;
+      return { id: row.id, kind: row.kind, reference: row.reference, name: row.kind === "JOURNAL_ENTRY" ? null : row.name, date: row.date, amountCents: row.amount === null ? null : BigInt(row.amount), status: row.status, href: `${base}/${route}`, ...(entrySource ? { entrySource } : {}) };
     });
     return { filters, rows: mapped, hasMore: rows.length > SEARCH_PAGE_SIZE && filters.page < SEARCH_MAX_PAGE, capped: rows.length > SEARCH_PAGE_SIZE && filters.page === SEARCH_MAX_PAGE };
   });

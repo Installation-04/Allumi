@@ -102,6 +102,7 @@
 - [[Releve-de-compte-fournisseur]]
 
 - [[Recherche-globale]]
+- [[Recherche-comptable]] — comptes, écritures manuelles/d’ouverture et contre-passations.
 - [[Credits-fournisseurs-disponibles]] — crédit conservé sur facture payée et disponible.
 - [[Affectation-des-credits-fournisseurs]] — affectation aux factures du même fournisseur et retrait daté.
 - [[Impression-des-achats]] — copies comptables privées et PDF navigateur.
