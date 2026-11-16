@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.65] - 2026-11-16
+
 - Nouveautés : copie comptable imprimable des remboursements fournisseurs, avec PDF navigateur, montant et date originaux, crédits d’origine complets et contre-passation datée.
 - Améliorations : accès depuis la fiche en français/anglais, mobile et sombre; papier clair, commandes masquées à l’impression, origines indépendantes de la pagination et refus explicite au-delà de 1 000.
 - Confidentialité : projection autorisée sans notes, motifs privés, coordonnées ni compte bancaire; fournisseur figé lisible sans Contacts/Taxes/Ventes, contrôle comptable et entreprise, copie stabilisée pendant une annulation.
