@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.68
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.69
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -150,6 +150,10 @@ Export all filtered supplier refunds to CSV, including results beyond the displa
 Print a private accounting copy of a supplier refund, including the original amount, all credit origins and any reversal date. Save it as PDF with your browser, in English or French. [Refund printing guide](docs/Impression-des-remboursements-fournisseurs.md).
 
 ![Supplier refund accounting copy in English and dark theme](docs/images/impression-remboursement-fournisseur-en-dark-desktop.png)
+
+Search imported CAD bank transactions by statement description/payee, date, current state and exact net amount. Signed amounts and direct detail links are preserved. [Bank search guide](docs/Recherche-bancaire.md).
+
+![Bank search in English with dark theme](docs/images/recherche-bancaire-en-dark-desktop.png)
 
 Compare existing imported or manually configured tax codes with official standard rates for a province and date. Review exact component differences and dated coverage in a read-only view. [Official-rate comparison guide](docs/Comparaison-des-codes-fiscaux.md).
 
