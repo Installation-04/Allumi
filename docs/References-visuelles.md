@@ -495,3 +495,13 @@ Résultats filtrés complets, format tableur bilingue et données privées exclu
 ![Filtres et export](images/export-remboursements-fournisseurs-desktop.png)
 
 ![Anglais sombre sur téléphone](images/export-remboursements-fournisseurs-en-dark-mobile.png)
+
+## Copie comptable des remboursements fournisseurs
+
+Montant original, origines complètes et contre-passation, sans notes privées : [[Impression-des-remboursements-fournisseurs]].
+
+![Copie imprimable](images/impression-remboursement-fournisseur-desktop.png)
+
+![Anglais sombre sur téléphone](images/impression-remboursement-fournisseur-en-dark-mobile.png)
+
+![Annulation datée](images/impression-remboursement-fournisseur-annule-desktop.png)

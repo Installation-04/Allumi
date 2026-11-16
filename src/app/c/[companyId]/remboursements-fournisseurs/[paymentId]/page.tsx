@@ -23,6 +23,7 @@ export default async function PaymentPage({ params, searchParams }: { params: Pr
   const history = await listSupplierRefundOrigins(actor,paymentId,Number(query.page ?? "1"));
   const t = await getTranslations("supplierRefunds");
   const sh = await getTranslations("supplierPaymentHistory");
+  const print = await getTranslations("supplierRefundPrint");
   const base = `/c/${company.id}`;
   const rows: [string, React.ReactNode][] = [
     [t("supplier"), payment.supplier || sh("supplierUnavailable")],
@@ -40,6 +41,7 @@ export default async function PaymentPage({ params, searchParams }: { params: Pr
         <h1 className="text-2xl font-semibold">{t("detail", { number: payment.number })}</h1>
         <span className="rounded-full bg-stone-200 px-3 py-1 text-sm dark:bg-stone-800">{t(`statuses.${payment.status}`)}</span>
       </div>
+      <Link href={`${base}/remboursements-fournisseurs/${paymentId}/imprimer`} className={`inline-flex min-h-11 items-center rounded underline ${FOCUS}`}>{print("open")}</Link>
       <dl className="grid gap-4 rounded-lg border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-900 sm:grid-cols-2">
         {rows.map(([label, value]) => <div key={label}><dt className="text-sm text-stone-600 dark:text-stone-400">{label}</dt><dd className="whitespace-pre-wrap">{value}</dd></div>)}
       </dl>

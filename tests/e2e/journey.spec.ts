@@ -3386,6 +3386,29 @@ test("purchase print copies respect accounting permissions without Contacts or T
  expect(cspViolations).toEqual([]);
 });
 
+/** Accounting copies use a white paper surface and exclude private detail data from HTML/RSC. */
+async function supplierRefundPrintJourney(page: Page, refundUrl: string, voided = false) {
+ await page.getByRole("link", { name: "Imprimer la copie comptable", exact: true }).click();
+ const paper = page.getByRole("article", { name: "Copie comptable interne", exact: true });
+ await expect(paper).toContainText("Atelier Boréal"); await expect(paper).toContainText("10,00"); await expect(paper).toContainText("2026-07-24"); await expect(paper).toContainText("RF-FOUR-E2E");
+ const html = await (await page.request.get(page.url())).text();
+ for (const secret of ["REFUND-PRIVATE-E2E", "DISPONIBLE-PRIVATE-E2E", "Correction fictive"]) expect(html).not.toContain(secret);
+ if (voided) { await expect(paper).toContainText("Remboursement annulé"); await expect(paper).toContainText("2026-07-25"); }
+ await expectNoPageOverflow(page); await captureReference(page, voided ? "impression-remboursement-fournisseur-annule" : "impression-remboursement-fournisseur", (await page.getByRole("heading", { level: 1 }).innerText()).trim());
+ if (!voided) {
+  await page.getByRole("button", { name: "English", exact: true }).click(); await expect(page.locator("html")).toHaveAttribute("lang", "en"); await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption("dark"); await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.getByRole("article", { name: "Internal accounting copy", exact: true })).toContainText("$10.00"); await expectNoPageOverflow(page); await captureReference(page, "impression-remboursement-fournisseur-en-dark", (await page.getByRole("heading", { level: 1 }).innerText()).trim());
+ }
+ await page.evaluate(() => { window.print = () => document.documentElement.setAttribute("data-refund-print", "true"); });
+ await page.getByRole("button", { name: /^(Imprimer ou enregistrer en PDF|Print or save as PDF)$/, exact: true }).click(); await expect(page.locator("html")).toHaveAttribute("data-refund-print", "true");
+ await page.emulateMedia({ media: "print" }); await expect(page.locator(".workspace-header")).toBeHidden(); await expect(page.locator(".workspace-sidebar")).toBeHidden(); await expect(page.locator(".print-controls")).toBeHidden(); await expect(page.locator("nav:visible")).toHaveCount(0);
+ expect(await page.locator(".invoice-paper").evaluate(el => getComputedStyle(el).backgroundColor)).toBe("rgb(255, 255, 255)");
+ if (process.env.E2E_MOBILE !== "1") { const pdf = await page.pdf({ format: "A4", printBackground: true }); expect(pdf.subarray(0, 5).toString()).toBe("%PDF-"); expect(pdf.length).toBeGreaterThan(3000); }
+ await page.emulateMedia({ media: "screen" });
+ if (!voided) { await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption("light"); await expect(page.locator("html")).toHaveAttribute("data-theme", "light"); await page.getByRole("button", { name: "Français", exact: true }).click(); await expect(page.locator("html")).toHaveAttribute("lang", "fr-CA"); }
+ await page.getByRole("link", { name: "Retour au remboursement", exact: true }).click(); await expect(page).toHaveURL(refundUrl);
+}
+
 test("supplier credit stays available on a paid bill, with explicit treatment and reversible posting",async({page})=>{
  test.setTimeout(90_000);cspViolations.length=0;watchCsp(page.context());await page.context().addCookies(updateCookies);await page.goto("/");
  if(!/^\/c\/[0-9a-f-]{36}/.test(new URL(page.url()).pathname))await page.getByRole("link",{name:"Atelier Exemple inc.",exact:true}).click();
@@ -3414,8 +3437,9 @@ test("supplier credit stays available on a paid bill, with explicit treatment an
  await page.goto(targetUrl);await expect(page.getByText(/^Solde à payer:\s*114,98/)).toBeVisible();
  await page.goto(creditUrl);const refundPanel=page.getByRole("region",{name:"Remboursement reçu du fournisseur",exact:true});await refundPanel.locator("summary",{hasText:"Enregistrer un remboursement reçu"}).click();await refundPanel.getByLabel("Montant remboursé",{exact:true}).fill("10,00");await refundPanel.getByLabel("Date du remboursement",{exact:true}).fill("2026-07-24");
  const refundAccount=refundPanel.getByLabel("Compte du remboursement",{exact:true});const accountLabels=await refundAccount.locator("option").allTextContents();const bank=accountLabels.find(text=>text.startsWith("1000"));expect(bank).toBeTruthy();await refundAccount.selectOption({label:bank!});await refundPanel.getByLabel("Référence (numéro de chèque, de transaction…)",{exact:true}).fill("RF-FOUR-E2E");await refundPanel.getByLabel("Note",{exact:true}).fill("REFUND-PRIVATE-E2E");await expectNoPageOverflow(page);await captureReference(page,"remboursement-fournisseur-formulaire","Remboursement reçu du fournisseur");await refundPanel.getByLabel("Je confirme le montant, la date et le compte du remboursement déjà reçu.",{exact:true}).check();await refundPanel.getByRole("button",{name:"Comptabiliser le remboursement",exact:true}).click();await expect(page).toHaveURL(/\/remboursements-fournisseurs\/[0-9a-f-]{36}$/);const refundUrl=page.url(),refundTitle=(await page.getByRole("heading",{level:1}).innerText()).trim();
+ await supplierRefundPrintJourney(page,refundUrl);
  await page.goto(creditUrl);await expect(page.getByRole("region",{name:"Disponible du crédit fournisseur",exact:true})).toContainText("18,74");await page.goto(refundUrl);await page.getByRole("button",{name:"English",exact:true}).click();await expect(page.locator("html")).toHaveAttribute("lang","en");await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");await expect(page.locator("html")).toHaveAttribute("data-theme","dark");const englishRefundTitle=(await page.getByRole("heading",{level:1}).innerText()).trim();await expect(page.getByRole("definition").filter({hasText:"$10.00"})).toBeVisible();await expectNoPageOverflow(page);await captureReference(page,"remboursement-fournisseur-en-dark",englishRefundTitle);
- await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await expect(page.locator("html")).toHaveAttribute("data-theme","light");await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.locator("html")).toHaveAttribute("lang","fr-CA");await page.locator("summary",{hasText:"Annuler le remboursement"}).click();await page.getByLabel("Date d’annulation",{exact:true}).fill("2026-07-25");await page.getByLabel("Motif (obligatoire, 500 caractères au plus)",{exact:true}).fill("Correction fictive");await page.getByLabel("Je confirme la contre-passation de ce remboursement.",{exact:true}).check();await page.getByRole("button",{name:"Contre-passer le remboursement",exact:true}).click();await expect(page.getByText("Annulé le 2026-07-25",{exact:true})).toBeVisible();await expectNoPageOverflow(page);await captureReference(page,"remboursement-fournisseur-annule",refundTitle);
+ await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await expect(page.locator("html")).toHaveAttribute("data-theme","light");await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.locator("html")).toHaveAttribute("lang","fr-CA");await page.locator("summary",{hasText:"Annuler le remboursement"}).click();await page.getByLabel("Date d’annulation",{exact:true}).fill("2026-07-25");await page.getByLabel("Motif (obligatoire, 500 caractères au plus)",{exact:true}).fill("Correction fictive");await page.getByLabel("Je confirme la contre-passation de ce remboursement.",{exact:true}).check();await page.getByRole("button",{name:"Contre-passer le remboursement",exact:true}).click();await expect(page.getByText("Annulé le 2026-07-25",{exact:true})).toBeVisible();await expectNoPageOverflow(page);await captureReference(page,"remboursement-fournisseur-annule",refundTitle);await supplierRefundPrintJourney(page,refundUrl,true);
  await page.goto(`${company}/remboursements-fournisseurs?q=RF-FOUR-E2E&etat=VOID&du=2026-07-24&au=2026-07-24`);await expect(page.getByRole("heading",{level:2})).toHaveCount(1);
  const csvLink=page.getByRole("link",{name:"Exporter en CSV",exact:true}),csvHref=(await csvLink.getAttribute("href"))!;const csvParams=new URL(csvHref,"http://localhost").searchParams;expect(csvParams.get("q")).toBe("RF-FOUR-E2E");expect(csvParams.get("etat")).toBe("VOID");expect(csvParams.get("du")).toBe("2026-07-24");expect(csvParams.get("au")).toBe("2026-07-24");
  const csvResponse=await page.request.get(csvHref);expect(csvResponse.status()).toBe(200);expect(csvResponse.headers()["cache-control"]).toBe("private, no-store");expect(csvResponse.headers()["x-content-type-options"]).toBe("nosniff");expect(csvResponse.headers()["content-disposition"]).toContain('filename="supplier_refunds.csv"');const frenchCsv=await csvResponse.text();expect(frenchCsv).toContain("10,00");expect(frenchCsv).toContain("Annulé");expect(frenchCsv).not.toContain("REFUND-PRIVATE-E2E");expect(frenchCsv).not.toContain("Correction fictive");expect(frenchCsv.trim().split("\r\n")).toHaveLength(2);expect(await (await page.request.get(csvHref+"&page=2")).text()).toBe(frenchCsv);
@@ -3426,6 +3450,33 @@ test("supplier credit stays available on a paid bill, with explicit treatment an
 for(const query of ["page=0","page=1&page=2"]){expect((await page.request.get(`${refundUrl}?${query}`)).status()).toBe(404);}
  await page.goto(creditUrl);await expect(page.getByRole("region",{name:"Disponible du crédit fournisseur",exact:true})).toContainText("28,74");
  await page.goto(billUrl);await expect(page.getByText(/^Solde à payer:\s*0,00/)).toBeVisible();await page.goto(creditUrl);await page.locator("summary",{hasText:"Annuler l’avoir"}).click();await page.getByLabel("Date de contre-passation",{exact:true}).fill("2026-07-26");await page.getByLabel("Motif",{exact:true}).fill("Correction de disponibilité");await page.getByLabel("Je confirme l’annulation définitive de cet avoir.",{exact:true}).check();await page.getByRole("button",{name:"Annuler l’avoir",exact:true}).click();await expect(page.getByRole("region",{name:"Disponible du crédit fournisseur",exact:true})).toHaveCount(0);await expect(page.getByText("Avoir annulé",{exact:true})).toBeVisible();
+ expect(cspViolations).toEqual([]);
+});
+
+test("supplier refund print copies require accounting access, preserve origins without directory access and reject other payment kinds", async ({ page }) => {
+ cspViolations.length = 0; watchCsp(page.context()); await page.context().addCookies(updateCookies); await page.goto("/");
+ if (!/^\/c\/[0-9a-f-]{36}/.test(new URL(page.url()).pathname)) await page.getByRole("link", { name: "Atelier Exemple inc.", exact: true }).click();
+ const company = new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)![0], companyId = company.split("/")[2];
+ const db = new pg.Client({ connectionString: e2eUrls().owner }); await db.connect();
+ let userId: string | null = null, backupId: string | null = null, originalRole: string | null = null, originalAccess: unknown = null;
+ try {
+  const membership = (await db.query("SELECT m.user_id,m.role,m.module_access FROM membership m JOIN app_user u ON u.id=m.user_id WHERE m.company_id=$1 AND u.email=$2", [companyId, EMAIL])).rows[0]; userId = membership.user_id; originalRole = membership.role; originalAccess = membership.module_access;
+  backupId = (await db.query("INSERT INTO app_user(id,email,display_name,updated_at) VALUES(gen_random_uuid(),'refund-print-'||gen_random_uuid()::text||'@exemple.test','Permission test owner',now()) RETURNING id")).rows[0].id;
+  await db.query("INSERT INTO membership(id,company_id,user_id,role,updated_at) VALUES(gen_random_uuid(),$1,$2,'OWNER',now())", [companyId, backupId]);
+  await db.query("UPDATE membership SET role='ACCOUNTANT',module_access=$3::jsonb WHERE company_id=$1 AND user_id=$2", [companyId, userId, JSON.stringify({ accounting: "read", contacts: "none", taxes: "none", sales: "none" })]);
+  const id = (await db.query("SELECT id FROM payment WHERE company_id=$1 AND reference='RF-FOUR-E2E' AND ledger='PAYABLE' AND direction='RECEIVED'", [companyId])).rows[0].id;
+  const url = `${company}/remboursements-fournisseurs/${id}/imprimer`;
+  expect((await page.goto(url))?.status()).toBe(200); await expect(page.getByRole("article", { name: "Copie comptable interne", exact: true })).toContainText("Atelier Boréal");
+  expect(await (await page.request.get(url)).text()).not.toContain("REFUND-PRIVATE-E2E");
+  const otherPayment = (await db.query("SELECT id FROM payment WHERE company_id=$1 AND ledger='PAYABLE' AND direction='SENT' LIMIT 1", [companyId])).rows[0].id;
+  for (const wrong of [otherPayment, "invalid", "00000000-0000-7000-8000-999999999999"]) expect((await page.request.get(`${company}/remboursements-fournisseurs/${wrong}/imprimer`)).status()).toBe(404);
+  expect((await page.request.get(`/c/00000000-0000-7000-8000-999999999999/remboursements-fournisseurs/${id}/imprimer`)).status()).toBe(404);
+  await db.query("UPDATE membership SET module_access='{\"accounting\":\"none\"}' WHERE company_id=$1 AND user_id=$2", [companyId, userId]); expect((await page.request.get(url)).status()).toBe(404);
+ } finally {
+  if (userId && originalRole) await db.query("UPDATE membership SET role=$3::member_role,module_access=$4::jsonb WHERE company_id=$1 AND user_id=$2", [companyId, userId, originalRole, originalAccess === null ? null : JSON.stringify(originalAccess)]);
+  if (backupId) { await db.query("DELETE FROM membership WHERE company_id=$1 AND user_id=$2", [companyId, backupId]); await db.query("UPDATE app_user SET disabled_at=now() WHERE id=$1", [backupId]); }
+  await db.end();
+ }
  expect(cspViolations).toEqual([]);
 });
 

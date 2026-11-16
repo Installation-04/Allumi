@@ -29,6 +29,10 @@ La fiche présente le fournisseur figé sur la pièce source, le montant, le com
 
 Ces remboursements ne figurent pas dans les encaissements clients ni dans les remboursements clients : leur auxiliaire comptable est celui des fournisseurs. **Exporter en CSV** télécharge tous les résultats filtrés jusqu’à 10 000 remboursements, avec montants exacts et état actuel, sans notes privées : [[Export-des-remboursements-fournisseurs]]. Le [[Releve-de-compte-fournisseur]] permet également d’exporter les mouvements comptables du fournisseur.
 
+## Copie comptable
+
+Depuis la fiche, **Imprimer la copie comptable** ouvre une vue papier/PDF navigateur avec montant reçu original, état actuel, éventuelle contre-passation et toutes les origines jusqu’à 1 000, sans notes ni motifs privés. Voir [[Impression-des-remboursements-fournisseurs]].
+
 ## Annuler par contre-passation
 
 Ouvrir **Annuler le remboursement**, saisir une date et un motif, confirmer puis **Contre-passer le remboursement**. La date suit le remboursement et les mouvements liés, reste non future et appartient à une période ouverte.

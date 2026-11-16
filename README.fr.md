@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.64
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.65
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -142,6 +142,10 @@ Comptabilisez un montant déjà reçu sur un crédit disponible, consultez ses o
 Exportez tous les remboursements fournisseurs filtrés en CSV, au-delà de la page affichée. Montants exacts, dates originales et état actuel, sans notes privées. [Guide de l’export](docs/Export-des-remboursements-fournisseurs.md).
 
 ![Filtres et export des remboursements](docs/images/export-remboursements-fournisseurs-desktop.png)
+
+Imprimez une copie comptable d’un remboursement fournisseur : montant original, origines complètes et date de contre-passation, sans notes privées. Enregistrez-la en PDF depuis le navigateur, en français ou en anglais. [Guide d’impression](docs/Impression-des-remboursements-fournisseurs.md).
+
+![Copie comptable du remboursement fournisseur](docs/images/impression-remboursement-fournisseur-desktop.png)
 
 ### Historique des paiements fournisseurs
 

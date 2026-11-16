@@ -825,7 +825,8 @@
       "confirm": "Confirm the refund.",
       "confirmVoid": "Confirm the reversal.",
       "linked": "Resolve linked offsets before voiding this refund.",
-      "exportLimit": "More than 10,000 refunds match. Narrow the search or date range before exporting."
+      "exportLimit": "More than 10,000 refunds match. Narrow the search or date range before exporting.",
+      "printLimit": "This copy exceeds 1,000 origins. Consult the paginated refund history; no partial copy is printed."
     }
   },
   "settingsPage": {
@@ -3147,5 +3148,22 @@
   "supplierRefundExport": {
     "download": "Export CSV",
     "hint": "All filtered results, up to 10,000 refunds. Original amounts and current status; private notes and reasons excluded."
+  },
+  "supplierRefundPrint": {
+    "open": "Print accounting copy",
+    "title": "Supplier refund",
+    "copy": "Internal accounting copy",
+    "back": "Back to refund",
+    "hint": "Print or save as PDF with your browser. Private notes and reasons are excluded.",
+    "scope": "Internal accounting record; retain bank evidence separately. Original amount and date, current status; this is not a historical net balance or tax report.",
+    "company": "Company",
+    "voided": "Voided refund — original amount retained",
+    "status": "Current status",
+    "supplierUnavailable": "Supplier unavailable",
+    "originalAmount": "Original amount received",
+    "credit": "Supplier credit",
+    "applied": "Application date",
+    "released": "Release date",
+    "sourceUnavailable": "Source unavailable"
   }
 }

@@ -218,5 +218,61 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.65": {
+    "fr-CA": {
+      "title": "Remboursements fournisseurs : copie comptable et PDF",
+      "added": [
+        {
+          "text": "Depuis la fiche d’un remboursement fournisseur, imprimez une copie comptable ou enregistrez-la en PDF avec le navigateur.",
+          "guide": "Impression-des-remboursements-fournisseurs"
+        },
+        {
+          "text": "Retrouvez le montant et la date originaux, l’état actuel, les origines et leurs retraits, ainsi que la date d’une éventuelle contre-passation."
+        }
+      ],
+      "improved": [
+        {
+          "text": "Copie française/anglaise, mobile et sombre, avec papier clair et commandes masquées à l’impression. Toutes les origines sont incluses jusqu’à 1 000, indépendamment de la pagination; la copie est refusée au-delà."
+        },
+        {
+          "text": "Les notes et motifs privés, coordonnées et compte bancaire sont exclus. Le fournisseur figé reste accessible avec Comptabilité en lecture, sans Contacts, Taxes ou Ventes."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration ni nouvelle configuration. La copie est en lecture seule et n’envoie aucun ordre bancaire.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Supplier refunds: accounting copies and PDF",
+      "added": [
+        {
+          "text": "From a supplier refund detail page, print an accounting copy or save it as PDF using your browser.",
+          "guide": "Impression-des-remboursements-fournisseurs"
+        },
+        {
+          "text": "Review the original amount and date, current status, origins and releases, and any reversal date."
+        }
+      ],
+      "improved": [
+        {
+          "text": "French/English, mobile and dark-theme support, with a white paper surface and hidden print controls. All origins are included up to 1,000, independently of pagination; larger copies are refused."
+        },
+        {
+          "text": "Private notes and reasons, contact details and the bank account are excluded. The frozen supplier name remains readable with accounting read access, without Contacts, Taxes or Sales."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration or new configuration. The copy is read-only and sends no bank instruction.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

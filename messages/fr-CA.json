@@ -825,7 +825,8 @@
       "confirm": "Confirmez le remboursement.",
       "confirmVoid": "Confirmez la contre-passation.",
       "linked": "Résolvez les compensations liées avant d’annuler ce remboursement.",
-      "exportLimit": "Plus de 10 000 remboursements correspondent aux filtres. Précisez la recherche ou la période avant d’exporter."
+      "exportLimit": "Plus de 10 000 remboursements correspondent aux filtres. Précisez la recherche ou la période avant d’exporter.",
+      "printLimit": "Cette copie dépasse 1 000 origines. Consulter l’historique paginé du remboursement; aucune copie partielle n’est imprimée."
     }
   },
   "settingsPage": {
@@ -3147,5 +3148,22 @@
   "supplierRefundExport": {
     "download": "Exporter en CSV",
     "hint": "Tous les résultats filtrés, jusqu’à 10 000 remboursements. Montants originaux et état actuel; notes et motifs privés exclus."
+  },
+  "supplierRefundPrint": {
+    "open": "Imprimer la copie comptable",
+    "title": "Remboursement fournisseur",
+    "copy": "Copie comptable interne",
+    "back": "Retour au remboursement",
+    "hint": "Imprimer ou enregistrer en PDF avec le navigateur. Les notes et motifs privés sont exclus.",
+    "scope": "Document interne des montants enregistrés, sans valeur de preuve bancaire. Montant et date originaux, état actuel; ne constitue pas un solde historique net ni un rapport de taxes.",
+    "company": "Entreprise",
+    "voided": "Remboursement annulé — montant original conservé",
+    "status": "État actuel",
+    "supplierUnavailable": "Fournisseur indisponible",
+    "originalAmount": "Montant reçu original",
+    "credit": "Crédit fournisseur",
+    "applied": "Date d’affectation",
+    "released": "Date de retrait",
+    "sourceUnavailable": "Origine indisponible"
   }
 }
