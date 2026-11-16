@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.64
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.65
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -142,6 +142,10 @@ Record money already received against an available supplier credit, review its o
 Export all filtered supplier refunds to CSV, including results beyond the displayed page. Exact amounts, original dates and current status are included; private notes are excluded. [Refund export guide](docs/Export-des-remboursements-fournisseurs.md).
 
 ![Supplier refund CSV filters in English with the dark theme](docs/images/export-remboursements-fournisseurs-en-dark-desktop.png)
+
+Print a private accounting copy of a supplier refund, including the original amount, all credit origins and any reversal date. Save it as PDF with your browser, in English or French. [Refund printing guide](docs/Impression-des-remboursements-fournisseurs.md).
+
+![Supplier refund accounting copy in English and dark theme](docs/images/impression-remboursement-fournisseur-en-dark-desktop.png)
 
 ### Supplier payment history
 

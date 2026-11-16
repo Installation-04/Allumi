@@ -88,3 +88,4 @@ Taxes et produits/services : [[Taxes-et-catalogue]]. Consultation et import : [[
 - [[Remboursements-fournisseurs]] — comptabiliser les remboursements reçus et les annuler.
 
 - [[Export-des-remboursements-fournisseurs]] — CSV complet des résultats filtrés, sans notes privées.
+- [[Impression-des-remboursements-fournisseurs]] — copie comptable et PDF navigateur, origines et annulation sans notes privées.
