@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.64] - 2026-11-16
+
 - Nouveautés : export CSV de tous les remboursements fournisseurs correspondant à la recherche, l’état et la période, au-delà de la page affichée; limite explicite de 10 000 résultats sans troncature silencieuse.
 - Améliorations : fournisseur figé, montants exacts, état actuel et date originale, formats tableur français/anglais, interface mobile/sombre, guide et captures; accès comptable indépendant des répertoires Contacts/Taxes/Ventes.
 - Sécurité : colonnes autorisées uniquement, notes et motifs privés exclus, textes de formule neutralisés, téléchargement privé non mis en cache et filtres ambigus refusés.
