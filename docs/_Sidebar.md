@@ -112,3 +112,5 @@
 - [[Nouveautes-des-versions]] — changements de la version installée, historique et guides.
 
 - [[Remboursements-fournisseurs]] — comptabiliser les remboursements reçus et les annuler.
+
+- [[Export-des-remboursements-fournisseurs]] — CSV complet des résultats filtrés, sans notes privées.

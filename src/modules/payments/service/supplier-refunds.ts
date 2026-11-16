@@ -129,3 +129,22 @@ export async function listCreditSupplierRefunds(actor: CompanyContext, creditId:
     return { payments: rows.slice(0,25).map(a => ({ id: a.payment.id, number: a.payment.number ?? "", date: iso(a.payment.paymentDate), amountCents: a.amountCents, unappliedDate: a.unappliedDate ? iso(a.unappliedDate) : null })), hasMore: rows.length>25 };
   });
 }
+
+export const SUPPLIER_REFUND_EXPORT_LIMIT = 10_000;
+
+/** Export the complete filtered history with a public accounting-field whitelist, never a single page. */
+export async function exportSupplierRefunds(actor: CompanyContext, filters: unknown = {}, options: { maxRows?: number } = {}) {
+  return withCompany(actor, async tx => {
+    await requireRole(tx, "ledger.read");
+    const limit = options.maxRows ?? SUPPLIER_REFUND_EXPORT_LIMIT;
+    if (!Number.isInteger(limit) || limit < 0 || limit > SUPPLIER_REFUND_EXPORT_LIMIT) throw new AppError("payments.invalidFilters");
+    const rows = await tx.payment.findMany({
+      where: historyWhere(actor.companyId, filters),
+      select: { id: true, contactId: true, number: true, paymentDate: true, amountCents: true, status: true, method: true, reference: true },
+      orderBy: [{ paymentDate: "desc" }, { createdAt: "desc" }, { id: "desc" }], take: limit + 1,
+    });
+    if (rows.length > limit) throw new AppError("supplierRefunds.exportLimit");
+    const names = await disbursementSupplierNames(tx, actor.companyId, rows);
+    return rows.map(row => ({ number: row.number ?? "", date: iso(row.paymentDate), supplier: names.get(row.id) ?? "", amountCents: row.amountCents, status: row.status, method: row.method, reference: row.reference }));
+  });
+}

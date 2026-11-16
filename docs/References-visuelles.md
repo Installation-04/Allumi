@@ -487,3 +487,11 @@ Comptabilisation, origine et contre-passation datée : [[Remboursements-fourniss
 ![Fiche en anglais sombre sur téléphone](images/remboursement-fournisseur-en-dark-mobile.png)
 
 ![Annulation datée](images/remboursement-fournisseur-annule-desktop.png)
+
+## Export des remboursements fournisseurs
+
+Résultats filtrés complets, format tableur bilingue et données privées exclues : [[Export-des-remboursements-fournisseurs]].
+
+![Filtres et export](images/export-remboursements-fournisseurs-desktop.png)
+
+![Anglais sombre sur téléphone](images/export-remboursements-fournisseurs-en-dark-mobile.png)

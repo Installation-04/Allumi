@@ -824,7 +824,8 @@
       "invalidVoid": "Check the reversal reason and date.",
       "confirm": "Confirm the refund.",
       "confirmVoid": "Confirm the reversal.",
-      "linked": "Resolve linked offsets before voiding this refund."
+      "linked": "Resolve linked offsets before voiding this refund.",
+      "exportLimit": "More than 10,000 refunds match. Narrow the search or date range before exporting."
     }
   },
   "settingsPage": {
@@ -3142,5 +3143,9 @@
     "originPage": "Page {page} of {count}",
     "supplierUnavailable": "Supplier unavailable",
     "originsEmpty": "No credit allocation is recorded for this historical payment."
+  },
+  "supplierRefundExport": {
+    "download": "Export CSV",
+    "hint": "All filtered results, up to 10,000 refunds. Original amounts and current status; private notes and reasons excluded."
   }
 }
