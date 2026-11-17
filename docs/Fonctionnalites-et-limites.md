@@ -49,3 +49,5 @@ Cycle commercial livré : [[Devis]]. Finalisation et réponse consignées manuel
 [[Budgets-annuels]] : scénarios annuels par exercice et compte de revenu/charge, comparaison au réel inclusif, objectifs absents signalés, CSV exact et droits Comptabilité. Limite de 1 000 comptes, sans ventilation mensuelle ni prévisions.
 
 [[Duplication-des-budgets]] : reprise des objectifs vers un scénario/exercice de la même entreprise, aperçu, exclusions explicites des comptes inactifs et refus des aperçus périmés. Aucune écriture financière.
+
+[[Import-CSV-des-budgets]] : objectifs annuels importés dans un nouveau scénario depuis un CSV UTF-8 français/anglais, aperçu local, confirmation, comptes locaux actifs et création atomique auditée. Aucun budget existant écrasé ni mouvement financier importé.

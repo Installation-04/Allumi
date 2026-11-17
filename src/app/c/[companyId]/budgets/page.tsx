@@ -13,6 +13,7 @@ export default async function Page({params}:{params:Promise<{companyId:string}>}
   const [budgets,years]=await Promise.all([listBudgets(actor),listFiscalYears(actor)]);
   return <section className="space-y-6">
     <div><h1 className="text-2xl font-semibold">{t("title")}</h1><p className="mt-2 text-sm text-stone-600 dark:text-stone-400">{t("intro")}</p></div>
+    {can(company,"budget.manage")?<Link href={`/c/${company.id}/budgets/importer`} className="inline-flex min-h-11 items-center rounded-md border border-stone-300 px-4 text-sm dark:border-stone-700">{t("importLink")}</Link>:null}
     {can(company,"budget.manage") && years.length>0 ? <section className="max-w-xl rounded-lg border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900" aria-labelledby="new-budget">
       <h2 id="new-budget" className="mb-4 text-lg font-semibold">{t("create")}</h2>
       <ActionForm action={createAction.bind(null,company.id)} label={t("create")} variant="primary">

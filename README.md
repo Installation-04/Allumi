@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.73
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.74
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -154,6 +154,14 @@ Print a private accounting copy of a supplier refund, including the original amo
 Find authorized matches while typing in the header: up to eight suggestions, keyboard/touch navigation and full-search fallback. [Search suggestions guide](docs/Suggestions-de-recherche.md).
 
 ![Search suggestions in English with dark theme](docs/images/suggestions-recherche-en-dark-desktop.png)
+
+### Import annual targets
+
+Create a new budget from a UTF-8 CSV after reviewing every target locally. English/French file formats, exact cents, explicit confirmation, server validation and an atomic audit trail keep existing budgets independent. [Guide](https://github.com/Installation-04/Allumi/wiki/Import-CSV-des-budgets).
+
+![Annual target import in English with dark theme](docs/images/import-budget-csv-en-dark-desktop.png)
+
+[Mobile reference](docs/images/import-budget-csv-en-dark-mobile.png)
 
 ### Reuse a budget
 

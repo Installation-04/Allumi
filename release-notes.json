@@ -680,5 +680,57 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.74": {
+    "fr-CA": {
+      "title": "Importer les objectifs annuels depuis un CSV",
+      "added": [
+        {
+          "text": "Prévisualisez localement un CSV UTF-8 français ou anglais puis créez un nouveau budget après confirmation.",
+          "guide": "Import-CSV-des-budgets"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Montants exacts et zéros conservés, modèle privé, comptes actifs de revenus/charges et limites de 256 Kio / 1 000 objectifs sans import partiel.",
+          "guide": "Import-CSV-des-budgets"
+        },
+        {
+          "text": "Le serveur relit le fichier et vérifie l’aperçu, verrouille les comptes et crée un lot atomique audité; toute modification du formulaire invalide la confirmation."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration ou nouvelle configuration. Aucun budget existant écrasé, fichier stocké ou mouvement comptable importé.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Import annual targets from CSV",
+      "added": [
+        {
+          "text": "Preview an English or French UTF-8 CSV locally, then create a new budget after confirmation.",
+          "guide": "Import-CSV-des-budgets"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Exact amounts and zero targets, private template, active revenue/expense accounts and 256 KiB / 1,000-target limits without partial imports.",
+          "guide": "Import-CSV-des-budgets"
+        },
+        {
+          "text": "The server rereads the file and validates the preview, locks accounts and creates one audited transaction; form changes invalidate confirmation."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration or new configuration. No existing budget overwritten, file stored or journal entry imported.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }
