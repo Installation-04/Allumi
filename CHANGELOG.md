@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.72] - 2026-11-16
+
 - Nouveautés : scénarios de budgets annuels par exercice et objectifs par compte de revenu/charge, modifiables sans écriture financière.
 - Améliorations : comparaison au réel sur l’exercice complet, objectifs absents distincts de zéro, contre-passations et comptes inactifs, export CSV exact; FR/EN/mobile/sombre, guide et quatre captures.
 - Sécurité : permissions modulaires Comptabilité, isolation RLS, audit, contraintes SQL et révisions contre les écrasements concurrents; limite explicite de 1 000 comptes sans rapport partiel.
