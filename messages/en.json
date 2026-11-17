@@ -2777,7 +2777,7 @@
     "all": "All",
     "submit": "Search",
     "reset": "Clear filters",
-    "scope": "Only authorized data is visible. Dates and amounts apply to documents, payments and journal entries. For manual/opening entries and their reversals, the amount is total positive debits, not net movement. Accounts have no date or amount; their links open the general ledger. Private notes and descriptions are excluded. Bank transactions: CAD only, statement description/payee, dates and current state. Exact amount filters use the absolute net amount; the displayed sign is preserved. Technical import metadata is excluded.",
+    "scope": "Only authorized data is visible. Dates and amounts apply to documents, payments and journal entries. For manual/opening entries and their reversals, the amount is total positive debits, not net movement. Accounts have no date or amount; their links open the general ledger. Private notes and descriptions are excluded. Bank transactions: CAD only, statement description/payee, dates and current state. Exact amount filters use the absolute net amount; the displayed sign is preserved. Technical import metadata is excluded. Report destinations have no amount or record date; open a report to choose its parameters.",
     "emptyQuery": "Enter a term or choose a filter to start.",
     "noResults": "No matching records. Check your filters or access permissions.",
     "pageResults": "{count, plural, one {# result} other {# results}} on page {page}",
@@ -2802,7 +2802,8 @@
       "ESTIMATE": "Estimate",
       "ACCOUNT": "Ledger account",
       "JOURNAL_ENTRY": "Manual or opening journal entry",
-      "BANK_TRANSACTION": "Bank transaction"
+      "BANK_TRANSACTION": "Bank transaction",
+      "REPORT": "Report"
     },
     "statuses": {
       "DRAFT": "Draft",
@@ -2819,7 +2820,8 @@
       "REVERSED": "Reversed",
       "UNMATCHED": "Unmatched",
       "MATCHED": "Matched",
-      "EXCLUDED": "Excluded"
+      "EXCLUDED": "Excluded",
+      "AVAILABLE": "Available"
     },
     "entrySources": {
       "MANUAL": "Manual entry",
@@ -2828,7 +2830,8 @@
     },
     "entryAmount": "Total debits",
     "bankAmount": "Signed statement amount · CAD",
-    "bankScope": "CAD only: exact filters use absolute net amounts; the displayed sign is preserved. Statement descriptions/payees and current states require Accounting read access. An imported row is not a posted journal entry."
+    "bankScope": "CAD only: exact filters use absolute net amounts; the displayed sign is preserved. Statement descriptions/payees and current states require Accounting read access. An imported row is not a posted journal entry.",
+    "reportScope": "Report links open existing forms. Choose periods, accounts or contacts on the destination page. Reports have no record date or amount; those filters exclude them. Names in both languages and explicit synonyms are searched; no saved report or financial data is created."
   },
   "officialTaxes": {
     "audit": "View import provenance",

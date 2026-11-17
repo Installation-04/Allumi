@@ -41,3 +41,5 @@ Cycle commercial livré : [[Devis]]. Finalisation et réponse consignées manuel
 [[Recherche-comptable]] étend la recherche globale aux comptes actifs/inactifs et aux écritures manuelles/d’ouverture et contre-passations associées. Les comptes ouvrent leur grand livre en lecture, y compris inactifs; les montants des écritures sont les totaux des débits, sans recherche dans les notes privées. Les autres sources de journal et les imports bancaires restent hors de cette extension.
 
 [[Recherche-bancaire]] étend la recherche globale aux transactions CAD importées, selon le module Comptabilité existant; dates, montants nets et états actuels sont filtrables sans créer d’écriture.
+
+[[Recherche-des-rapports]] ajoute 13 destinations de rapports existants à la recherche globale, selon leurs permissions, avec noms bilingues et synonymes; aucun rapport enregistré ou contenu financier n’est recherché.

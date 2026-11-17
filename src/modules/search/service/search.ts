@@ -4,11 +4,13 @@ import { withCompany, type CompanyContext } from "@/platform/tenant";
 import type { Locale } from "@/modules/ledger/client";
 import { hasSearchCriteria, parseSearchFilters, SEARCH_MAX_PAGE, SEARCH_PAGE_SIZE, type SearchKind, type SearchStatus, type SearchRow } from "../domain/search";
 
+import { reportSearchCatalog } from "../domain/reports";
+
 type Row = { id: string; kind: SearchKind; reference: string | null; name: string | null; date: string | null; amount: string | null; status: SearchStatus; journal_id: string | null };
 
 /** Company-scoped search; permissions and data share a single statement snapshot, in addition to RLS. */
 export async function searchCompany(actor: CompanyContext, params: Record<string, string | string[] | undefined>, locale: Locale) {
-  const filters = parseSearchFilters(params, locale);
+  const filters = parseSearchFilters(params, locale), reports = JSON.stringify(reportSearchCatalog(locale));
   return withCompany(actor, async (tx) => {
     await requireRole(tx, "company.read");
     if (!hasSearchCriteria(filters)) return { filters, rows: [] as SearchRow[], hasMore: false, capped: false };
@@ -18,23 +20,24 @@ export async function searchCompany(actor: CompanyContext, params: Record<string
         SELECT app_module_level('contacts')<>'none' AS contacts,
           app_module_level('catalog')<>'none' AS catalog,
           app_module_level('sales')<>'none' AS sales,
-          app_module_level('accounting')<>'none' AS accounting
+          app_module_level('accounting')<>'none' AS accounting,
+          app_module_level('taxes')<>'none' AS taxes
       ), records AS (
-        SELECT c.id,'CONTACT'::text AS kind,NULL::text AS reference,c.display_name AS name,
+        SELECT c.id::text,'CONTACT'::text AS kind,NULL::text AS reference,c.display_name AS name,
           NULL::date AS date,NULL::bigint AS amount,
           CASE WHEN c.is_active THEN 'ACTIVE' ELSE 'ARCHIVED' END AS status,
           concat_ws(' ',c.display_name,c.legal_name,c.email,c.phone) AS terms,NULL::uuid AS journal_id
         FROM contact c CROSS JOIN access a WHERE c.company_id=${actor.companyId}::uuid AND a.contacts
         UNION ALL
-        SELECT i.id,'ITEM',i.code,i.name,NULL::date,NULL::bigint,
+        SELECT i.id::text,'ITEM',i.code,i.name,NULL::date,NULL::bigint,
           CASE WHEN i.is_active THEN 'ACTIVE' ELSE 'ARCHIVED' END,concat_ws(' ',i.code,i.name),NULL::uuid
         FROM item i CROSS JOIN access a WHERE i.company_id=${actor.companyId}::uuid AND a.catalog
         UNION ALL
-        SELECT c.id,'ACCOUNT',c.code,CASE WHEN ${locale}='en' THEN c.name_en ELSE c.name_fr END,NULL::date,NULL::bigint,
+        SELECT c.id::text,'ACCOUNT',c.code,CASE WHEN ${locale}='en' THEN c.name_en ELSE c.name_fr END,NULL::date,NULL::bigint,
           CASE WHEN c.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END,concat_ws(' ',c.code,c.name_fr,c.name_en),NULL::uuid
         FROM account c CROSS JOIN access a WHERE c.company_id=${actor.companyId}::uuid AND a.accounting
         UNION ALL
-        SELECT e.id,'JOURNAL_ENTRY',n.label,e.source_type::text,e.entry_date,tot.amount,
+        SELECT e.id::text,'JOURNAL_ENTRY',n.label,e.source_type::text,e.entry_date,tot.amount,
           CASE WHEN EXISTS(SELECT 1 FROM journal_entry r WHERE r.company_id=e.company_id AND r.reverses_entry_id=e.id) THEN 'REVERSED' ELSE 'POSTED' END,
           concat_ws(' ',n.label,e.entry_number::text),e.id
         FROM journal_entry e CROSS JOIN access a
@@ -45,37 +48,41 @@ export async function searchCompany(actor: CompanyContext, params: Record<string
         WHERE e.company_id=${actor.companyId}::uuid AND a.accounting
           AND (e.source_type IN ('MANUAL','OPENING_BALANCE') OR (e.source_type='REVERSAL' AND original.source_type IN ('MANUAL','OPENING_BALANCE')))
         UNION ALL
-        SELECT b.id,'BANK_TRANSACTION',NULL::text,b.description,b.txn_date,b.amount_cents,b.status::text,
+        SELECT b.id::text,'BANK_TRANSACTION',NULL::text,b.description,b.txn_date,b.amount_cents,b.status::text,
           concat_ws(' ',b.description,b.payee),NULL::uuid
         FROM bank_transaction b CROSS JOIN access a WHERE b.company_id=${actor.companyId}::uuid AND a.accounting AND b.currency='CAD'
         UNION ALL
-        SELECT d.id,d.kind::text,d.number,
+        SELECT d.id::text,d.kind::text,d.number,
           coalesce(d.billing_snapshot->>'name',CASE WHEN a.contacts THEN c.display_name END),d.issue_date,d.total_cents,d.status::text,
           concat_ws(' ',d.number,d.reference,d.billing_snapshot->>'name',CASE WHEN a.contacts THEN c.display_name END),d.journal_entry_id
         FROM sales_document d CROSS JOIN access a
         LEFT JOIN contact c ON a.contacts AND c.company_id=d.company_id AND c.id=d.contact_id
         WHERE d.company_id=${actor.companyId}::uuid AND a.sales
         UNION ALL
-        SELECT e.id,'ESTIMATE',e.number,coalesce(e.customer_snapshot->>'name',CASE WHEN a.contacts THEN c.display_name END),e.issue_date,e.total_cents,e.status,
+        SELECT e.id::text,'ESTIMATE',e.number,coalesce(e.customer_snapshot->>'name',CASE WHEN a.contacts THEN c.display_name END),e.issue_date,e.total_cents,e.status,
           concat_ws(' ',e.number,e.reference,e.customer_snapshot->>'name',CASE WHEN a.contacts THEN c.display_name END),NULL::uuid
         FROM sales_estimate e CROSS JOIN access a
         LEFT JOIN contact c ON a.contacts AND c.company_id=e.company_id AND c.id=e.contact_id
         WHERE e.company_id=${actor.companyId}::uuid AND a.sales
         UNION ALL
-        SELECT d.id,d.kind::text,d.number,
+        SELECT d.id::text,d.kind::text,d.number,
           coalesce(d.supplier_snapshot->>'name',d.payee_name,CASE WHEN a.contacts THEN c.display_name END),d.document_date,d.total_cents,d.status::text,
           concat_ws(' ',d.number,d.supplier_reference,d.supplier_snapshot->>'name',d.payee_name,CASE WHEN a.contacts THEN c.display_name END),d.journal_entry_id
         FROM purchase_document d CROSS JOIN access a
         LEFT JOIN contact c ON a.contacts AND c.company_id=d.company_id AND c.id=d.contact_id
         WHERE d.company_id=${actor.companyId}::uuid AND a.accounting
         UNION ALL
-        SELECT p.id,CASE WHEN p.ledger='RECEIVABLE' THEN CASE WHEN p.direction='RECEIVED' THEN 'RECEIPT' ELSE 'REFUND' END
+        SELECT p.id::text,CASE WHEN p.ledger='RECEIVABLE' THEN CASE WHEN p.direction='RECEIVED' THEN 'RECEIPT' ELSE 'REFUND' END
           ELSE CASE WHEN p.direction='SENT' THEN 'DISBURSEMENT' ELSE 'SUPPLIER_REFUND' END END,p.number,
           CASE WHEN a.contacts THEN c.display_name END,p.payment_date,p.amount_cents,p.status::text,
           concat_ws(' ',p.number,p.reference,CASE WHEN a.contacts THEN c.display_name END),p.journal_entry_id
         FROM payment p CROSS JOIN access a
         LEFT JOIN contact c ON a.contacts AND c.company_id=p.company_id AND c.id=p.contact_id
         WHERE p.company_id=${actor.companyId}::uuid AND a.accounting AND (p.ledger='PAYABLE' OR a.sales)
+        UNION ALL
+        SELECT r.id,'REPORT',NULL::text,r.name,NULL::date,NULL::bigint,'AVAILABLE',r.terms,NULL::uuid
+        FROM jsonb_to_recordset(${reports}::jsonb) AS r(id text,name text,terms text,sales boolean,contacts boolean,taxes boolean)
+        CROSS JOIN access a WHERE a.accounting AND (NOT r.sales OR a.sales) AND (NOT r.contacts OR a.contacts) AND (NOT r.taxes OR a.taxes)
       ) SELECT id,kind,reference,name,to_char(date,'YYYY-MM-DD') AS date,amount::text,status,journal_id FROM records
       WHERE (${filters.kind}::text IS NULL OR kind=${filters.kind})
         AND (${filters.status}::text IS NULL OR status=${filters.status})
@@ -87,7 +94,7 @@ export async function searchCompany(actor: CompanyContext, params: Record<string
     const base = `/c/${actor.companyId}`;
     const mapped = rows.slice(0, SEARCH_PAGE_SIZE).map((row): SearchRow => {
       const draft = row.status === "DRAFT";
-      const route = row.kind === "CONTACT" ? `contacts/${row.id}` : row.kind === "ITEM" ? `catalogue/${row.id}`
+      const route = row.kind === "REPORT" ? row.id : row.kind === "CONTACT" ? `contacts/${row.id}` : row.kind === "ITEM" ? `catalogue/${row.id}`
         : row.kind === "BANK_TRANSACTION" ? `transactions/${row.id}`
         : row.kind === "ACCOUNT" ? `grand-livre?${new URLSearchParams({ compte: row.id })}`
         : row.kind === "JOURNAL_ENTRY" ? `journal/${row.id}`
