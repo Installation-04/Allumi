@@ -748,7 +748,11 @@
           "guide": "Budgets-mensuels"
         }
       ],
-      "fixed": [],
+      "fixed": [
+        {
+          "text": "Next.js passe en 16.4.6 pour corriger les avis de fuite de cache entre paramètres racine."
+        }
+      ],
       "installation": [
         {
           "text": "Migration additive des objectifs mensuels et de leurs gardes SQL, appliquée par le processus habituel. Aucune nouvelle configuration ni écriture financière. Copie et import restent annuels, sans reprise des répartitions mensuelles.",
@@ -770,7 +774,11 @@
           "guide": "Budgets-mensuels"
         }
       ],
-      "fixed": [],
+      "fixed": [
+        {
+          "text": "Next.js is updated to 16.4.6 to address cache disclosure advisories across root parameter values."
+        }
+      ],
       "installation": [
         {
           "text": "An additive migration adds monthly targets and SQL guards through the usual update process. No new configuration or journal entries. Copy and import remain annual only; monthly allocations are not carried over.",
