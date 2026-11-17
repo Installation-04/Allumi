@@ -530,5 +530,51 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.71": {
+    "en": {
+      "title": "Search suggestions in the header",
+      "added": [
+        {
+          "text": "Get up to eight authorized suggestions while typing, with keyboard and touch navigation and links to existing destinations.",
+          "guide": "Suggestions-de-recherche"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Delayed, cancelable requests ignore stale responses. Private no-store replies expose labels and destinations only; full search remains usable when suggestions fail or JavaScript is disabled.",
+          "guide": "Suggestions-de-recherche"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration or new configuration. No application search history, accounting entry or financial action is created.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "fr-CA": {
+      "title": "Suggestions de recherche dans l’en-tête",
+      "added": [
+        {
+          "text": "Obtenez jusqu’à huit suggestions autorisées pendant la frappe, avec navigation clavier/tactile et liens vers les destinations existantes.",
+          "guide": "Suggestions-de-recherche"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Les requêtes différées/annulables ignorent les réponses périmées. Les réponses privées sans cache exposent seulement les libellés/types/destinations; la recherche complète reste disponible en cas d’erreur ou sans JavaScript.",
+          "guide": "Suggestions-de-recherche"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration ni nouvelle configuration. Aucun historique applicatif, mouvement comptable ou action financière n’est créé.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

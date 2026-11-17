@@ -10,10 +10,10 @@ import { appVersion } from "@/platform/version";
 import { FOCUS } from "./focus";
 import { getSession } from "@/app/_lib/session";
 import { Logo } from "./logo";
+import { HeaderSearch } from "./header-search";
 
 export async function Header({ global = false, companyName, companyId }: { global?: boolean; companyName?: string; companyId?: string }) {
   const t = await getTranslations("common");
-  const search = await getTranslations("companySearch");
   const locale = await getLocale();
   const session = await getSession();
   const preference = (await cookies()).get("allumi_theme")?.value;
@@ -27,10 +27,7 @@ export async function Header({ global = false, companyName, companyId }: { globa
           Allumi
         </Link>
         )}
-        {companyId && <form action={`/c/${companyId}/recherche`} method="get" role="search" aria-label={search("title")} className="flex w-full min-w-0 items-center gap-2 lg:w-auto lg:min-w-56 lg:flex-1 lg:max-w-sm">
-          <input name="q" type="search" maxLength={120} aria-label={search("query")} placeholder={search("shortPlaceholder")} className={`min-h-11 min-w-0 w-full rounded border border-stone-300 bg-white px-3 text-sm dark:border-stone-700 dark:bg-stone-900 ${FOCUS}`} />
-          <button type="submit" aria-label={search("title")} className={`min-h-11 shrink-0 rounded px-2 text-sm underline ${FOCUS}`}>{search("submit")}</button>
-        </form>}
+        {companyId && <HeaderSearch key={`${companyId}:${locale}`} companyId={companyId} />}
         <div className="flex flex-wrap items-center gap-3 text-sm">
         {(profile?.isInstanceAdmin || profile?.canManageServer) && <Link href="/administration/serveur" className={`inline-flex min-h-11 items-center underline ${FOCUS}`}>{(await getTranslations("server"))("shortTitle")}</Link>}
         <nav aria-label={t("language")} className="flex items-center gap-3">

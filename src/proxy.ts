@@ -13,6 +13,14 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isPublic = PUBLIC_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
   if (!isPublic && !request.cookies.has(sessionCookieName())) {
+    // The suggestion endpoint returns JSON even before sign-in; it still performs full session/MFA checks.
+    if (/^\/c\/[^/]+\/recherche\/suggestions\/?$/.test(pathname)) {
+      const denied = NextResponse.json({ error: "unauthorized" }, { status: 401, headers: {
+        "Cache-Control": "private, no-store", "Vary": "Cookie", "Cross-Origin-Resource-Policy": "same-origin", "X-Content-Type-Options": "nosniff",
+      } });
+      denied.headers.set("x-request-id", requestId);
+      return denied;
+    }
     const redirect = NextResponse.redirect(new URL("/connexion", request.url));
     redirect.headers.set("x-request-id", requestId);
     return redirect;

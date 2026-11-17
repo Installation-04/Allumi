@@ -2831,7 +2831,13 @@
     "entryAmount": "Total des débits",
     "bankAmount": "Montant signé du relevé · CAD",
     "bankScope": "CAD seulement : le filtre exact utilise le net en valeur absolue; le signe affiché est conservé. Libellés/bénéficiaires et états actuels exigent Comptabilité en lecture. Une ligne importée n’est pas une écriture validée.",
-    "reportScope": "Les liens de rapports ouvrent les formulaires existants. Choisissez les périodes, comptes ou contacts sur la page de destination. Les rapports n’ont ni date de pièce ni montant; ces filtres les excluent. Les noms des deux langues et des synonymes explicites sont recherchés; aucun rapport enregistré ni donnée financière n’est créé."
+    "reportScope": "Les liens de rapports ouvrent les formulaires existants. Choisissez les périodes, comptes ou contacts sur la page de destination. Les rapports n’ont ni date de pièce ni montant; ces filtres les excluent. Les noms des deux langues et des synonymes explicites sont recherchés; aucun rapport enregistré ni donnée financière n’est créé.",
+    "suggestions": "Suggestions de recherche",
+    "suggestionsLoading": "Chargement des suggestions…",
+    "suggestionsError": "Suggestions indisponibles. Validez pour ouvrir la recherche complète.",
+    "suggestionsEmpty": "Aucune suggestion. Validez pour ouvrir la recherche complète.",
+    "suggestionsHint": "Jusqu’à 8 résultats. Utilisez les flèches et Entrée, ou validez pour la recherche complète.",
+    "suggestionsStart": "Saisissez au moins deux caractères pour les suggestions. Validez pour rechercher tous les résultats."
   },
   "officialTaxes": {
     "audit": "Voir la provenance des imports",

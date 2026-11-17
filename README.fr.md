@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.70
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.71
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -150,6 +150,10 @@ Exportez tous les remboursements fournisseurs filtrés en CSV, au-delà de la pa
 Imprimez une copie comptable d’un remboursement fournisseur : montant original, origines complètes et date de contre-passation, sans notes privées. Enregistrez-la en PDF depuis le navigateur, en français ou en anglais. [Guide d’impression](docs/Impression-des-remboursements-fournisseurs.md).
 
 ![Copie comptable du remboursement fournisseur](docs/images/impression-remboursement-fournisseur-desktop.png)
+
+Retrouvez les résultats autorisés pendant la frappe dans l’en-tête : huit propositions maximum, clavier/tactile et accès à la recherche complète. [Guide des suggestions](docs/Suggestions-de-recherche.md).
+
+![Suggestions de recherche](docs/images/suggestions-recherche-desktop.png)
 
 Retrouvez 13 formulaires de rapports financiers par nom français/anglais et synonymes explicites, avec destinations filtrées selon vos droits. [Guide de recherche des rapports](docs/Recherche-des-rapports.md).
 

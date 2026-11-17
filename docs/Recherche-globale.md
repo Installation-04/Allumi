@@ -43,7 +43,7 @@ En anglais, le champ et la page sont nommés **Search company data**. Les filtre
 
 ![Recherche en anglais sombre sur téléphone](images/recherche-globale-en-dark-mobile.png)
 
-Cette recherche porte sur les types décrits ci-dessus. Elle ne recherche pas encore les lignes bancaires en devise étrangère, le contenu des rapports, les écritures bancaires ou les autres sources de journal non décrites ici. Elle ne fournit pas de suggestions pendant la frappe ni d’interprétation de phrases en langage naturel. Les données restent dans PostgreSQL sur votre serveur.
+Cette recherche porte sur les types décrits ci-dessus. Elle ne recherche pas encore les lignes bancaires en devise étrangère, le contenu des rapports, les écritures bancaires ou les autres sources de journal non décrites ici. Les [[Suggestions-de-recherche]] sont disponibles dans l’en-tête; l’interprétation de phrases en langage naturel reste hors périmètre. Les données restent dans PostgreSQL sur votre serveur.
 
 Voir [[Interface-et-navigation]], [[Recherche-des-paiements-clients]] et [[Utilisateurs-et-permissions]].
 
@@ -54,3 +54,7 @@ Voir [[Interface-et-navigation]], [[Recherche-des-paiements-clients]] et [[Utili
 ## Formulaires de rapports
 
 [[Recherche-des-rapports]] propose les destinations autorisées des rapports existants. Le type Rapport et l’état Disponible les distinguent des données; dates et montants les excluent plutôt que calculer un rapport.
+
+## Suggestions de l’en-tête
+
+[[Suggestions-de-recherche]] propose huit résultats maximum après deux caractères, avec navigation clavier/tactile et réponse privée sans cache. Le formulaire complet reste utilisable, y compris sans JavaScript.

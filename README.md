@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.70
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.71
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -150,6 +150,10 @@ Export all filtered supplier refunds to CSV, including results beyond the displa
 Print a private accounting copy of a supplier refund, including the original amount, all credit origins and any reversal date. Save it as PDF with your browser, in English or French. [Refund printing guide](docs/Impression-des-remboursements-fournisseurs.md).
 
 ![Supplier refund accounting copy in English and dark theme](docs/images/impression-remboursement-fournisseur-en-dark-desktop.png)
+
+Find authorized matches while typing in the header: up to eight suggestions, keyboard/touch navigation and full-search fallback. [Search suggestions guide](docs/Suggestions-de-recherche.md).
+
+![Search suggestions in English with dark theme](docs/images/suggestions-recherche-en-dark-desktop.png)
 
 Find 13 existing financial report forms by French/English names and explicit synonyms, with destinations filtered by your permissions. [Report search guide](docs/Recherche-des-rapports.md).
 
