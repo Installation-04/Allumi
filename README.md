@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.71
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.72
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -154,6 +154,15 @@ Print a private accounting copy of a supplier refund, including the original amo
 Find authorized matches while typing in the header: up to eight suggestions, keyboard/touch navigation and full-search fallback. [Search suggestions guide](docs/Suggestions-de-recherche.md).
 
 ![Search suggestions in English with dark theme](docs/images/suggestions-recherche-en-dark-desktop.png)
+
+### Annual budgets
+
+Create fiscal-year scenarios, set revenue and expense targets, and compare them with posted actuals. Missing targets remain visible; concurrent changes are refused. Export exact CSV in English or French. Annual totals include all dated entries in the fiscal year; monthly forecasting is not included. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-annuels).
+
+![Annual budget in English with dark theme](docs/images/budgets-annuels-en-dark-desktop.png)
+
+[Mobile reference](docs/images/budgets-annuels-en-dark-mobile.png)
+
 
 Find 13 existing financial report forms by French/English names and explicit synonyms, with destinations filtered by your permissions. [Report search guide](docs/Recherche-des-rapports.md).
 

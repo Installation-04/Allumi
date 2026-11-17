@@ -576,5 +576,57 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.72": {
+    "fr-CA": {
+      "title": "Budgets annuels et comparaison au réel",
+      "added": [
+        {
+          "text": "Créez plusieurs scénarios par exercice et définissez des objectifs annuels de revenus et charges.",
+          "guide": "Budgets-annuels"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Comparez aux écritures validées de l’exercice complet, avec objectifs absents, comptes inactifs, contre-passations et CSV exact FR/EN.",
+          "guide": "Budgets-annuels"
+        },
+        {
+          "text": "Les révisions protègent les modifications concurrentes; permissions Comptabilité, audit et RLS protègent les données."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Migration additive de deux tables par la mise à jour habituelle, sans nouvelle variable. Budgets annuels uniquement; aucune prévision mensuelle.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Annual budgets and posted actuals",
+      "added": [
+        {
+          "text": "Create multiple fiscal-year scenarios and set annual revenue and expense targets.",
+          "guide": "Budgets-annuels"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Compare with full-year posted entries, including missing targets, inactive accounts, reversals and exact English/French CSV.",
+          "guide": "Budgets-annuels"
+        },
+        {
+          "text": "Revisions protect concurrent edits; Accounting permissions, audit and RLS protect company data."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "The normal update applies an additive two-table migration. No new configuration. Annual budgets only; monthly forecasting is not included.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

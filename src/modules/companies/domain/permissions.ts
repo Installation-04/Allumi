@@ -21,6 +21,7 @@ export type Action =
   | "catalog.manage"
   | "contact.read"
   | "contact.manage"
+  | "budget.manage"
   | "ledger.read"
   | "entry.post"
   | "entry.reverse"
@@ -48,6 +49,7 @@ const ALLOWED: Record<Action, readonly Role[]> = {
   "catalog.manage": ["OWNER", "USER", "ACCOUNTANT"],
   "contact.read": ["OWNER", "USER", "ACCOUNTANT", "READ_ONLY"],
   "contact.manage": ["OWNER", "USER", "ACCOUNTANT"],
+  "budget.manage": ["OWNER", "ACCOUNTANT"],
   "ledger.read": ["OWNER", "USER", "ACCOUNTANT", "READ_ONLY"],
   "entry.post": ["OWNER", "ACCOUNTANT"],
   "entry.reverse": ["OWNER", "ACCOUNTANT"],

@@ -827,6 +827,15 @@
       "linked": "Résolvez les compensations liées avant d’annuler ce remboursement.",
       "exportLimit": "Plus de 10 000 remboursements correspondent aux filtres. Précisez la recherche ou la période avant d’exporter.",
       "printLimit": "Cette copie dépasse 1 000 origines. Consulter l’historique paginé du remboursement; aucune copie partielle n’est imprimée."
+    },
+    "budgets": {
+      "invalid": "Vérifiez le nom, le compte, le montant non négatif à deux décimales et la révision du budget.",
+      "year": "Cet exercice est introuvable.",
+      "duplicate": "Un budget portant ce nom existe déjà pour cet exercice.",
+      "notFound": "Budget introuvable.",
+      "stale": "Ce budget a été modifié depuis le chargement de la page. Rechargez les données avant de réessayer.",
+      "account": "Choisissez un compte de revenu ou de charge actif. Un objectif existant sur un compte inactif peut être modifié ou retiré.",
+      "tooMany": "Ce rapport dépasse la limite de 1 000 comptes. Aucun résultat partiel n’est affiché ou exporté."
     }
   },
   "settingsPage": {
@@ -904,7 +913,8 @@
     "company": "Entreprise",
     "invoices": "Brouillons de factures",
     "credits": "Avoirs",
-    "members": "Utilisateurs et permissions"
+    "members": "Utilisateurs et permissions",
+    "budgets": "Budgets annuels"
   },
   "ledgerSetup": {
     "title": "Initialiser la comptabilité",
@@ -1312,7 +1322,8 @@
       "devis": "Devis",
       "recurrences": "Factures récurrentes",
       "relances": "Relances clients",
-      "remboursements-fournisseurs": "Remboursements fournisseurs"
+      "remboursements-fournisseurs": "Remboursements fournisseurs",
+      "budgets": "Budgets annuels"
     }
   },
   "updates": {
@@ -3232,5 +3243,43 @@
       "INACTIVE": "Le code local ou une composante au moins est actuellement inactif. Des taux identiques ne rendent pas ce code utilisable.",
       "NON_STANDARD": "Ce code utilise un traitement non standard. Les taux standards ne valident pas un traitement détaxé, exonéré ou hors champ."
     }
+  },
+  "budgets": {
+    "title": "Budgets annuels",
+    "intro": "Créez des scénarios annuels par exercice et comparez vos objectifs aux revenus et charges comptabilisés.",
+    "create": "Créer un budget",
+    "name": "Nom du scénario",
+    "year": "Exercice complet",
+    "noYear": "Créez d’abord un exercice dans Comptabilité → Exercices.",
+    "scenarios": "Scénarios",
+    "empty": "Aucun budget pour le moment.",
+    "back": "Tous les budgets",
+    "export": "Exporter en CSV",
+    "scope": "Exercice complet : toutes les écritures validées datées de cet exercice, y compris les dates futures, contre-passations et comptes inactifs. Aucun prorata mensuel ou calcul à ce jour. Les budgets ne créent aucune écriture.",
+    "coverage": "{count, plural, one {# compte avec activité n’a pas d’objectif.} other {# comptes avec activité n’ont pas d’objectif.}} Les totaux des objectifs définis ne constituent pas un budget complet.",
+    "revenue": "Revenus",
+    "expenses": "Charges",
+    "definedTargets": "Objectifs définis",
+    "actual": "Réel comptabilisé",
+    "saveTarget": "Ajouter ou remplacer un objectif",
+    "account": "Compte",
+    "amount": "Objectif annuel (CAD)",
+    "amountHint": "Montant positif ou zéro, maximum 1 000 milliards de dollars, deux décimales. Zéro est un objectif défini; « Non défini » indique un objectif absent.",
+    "editHint": "Choisissez un compte existant pour remplacer son objectif. Les modifications d’un autre utilisateur sont refusées si cette page est périmée; rechargez-la avant de réessayer.",
+    "comparison": "Budget et réel par compte",
+    "differenceHint": "Écart = réel moins objectif. Un écart positif a un sens différent pour un revenu et pour une charge; aucune couleur ne le qualifie de favorable.",
+    "type": "Type",
+    "target": "Objectif annuel",
+    "difference": "Écart",
+    "actions": "Actions",
+    "notSet": "Non défini",
+    "inactive": "Inactif",
+    "remove": "Retirer l’objectif",
+    "removeNamed": "Retirer l’objectif du compte {code}",
+    "noTargets": "Aucun objectif et aucune activité comptabilisée sur cet exercice.",
+    "reload": "Recharger les données",
+    "saved": "Objectif enregistré.",
+    "removed": "Objectif retiré.",
+    "code": "Code"
   }
 }

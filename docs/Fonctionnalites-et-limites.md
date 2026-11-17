@@ -45,3 +45,5 @@ Cycle commercial livré : [[Devis]]. Finalisation et réponse consignées manuel
 [[Recherche-des-rapports]] ajoute 13 destinations de rapports existants à la recherche globale, selon leurs permissions, avec noms bilingues et synonymes; aucun rapport enregistré ou contenu financier n’est recherché.
 
 [[Suggestions-de-recherche]] ajoute huit propositions maximum dans l’en-tête, selon les droits courants, sans historique applicatif ni action financière automatique.
+
+[[Budgets-annuels]] : scénarios annuels par exercice et compte de revenu/charge, comparaison au réel inclusif, objectifs absents signalés, CSV exact et droits Comptabilité. Limite de 1 000 comptes, sans ventilation mensuelle ni prévisions.

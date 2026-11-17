@@ -124,3 +124,5 @@
 - [[Recherche-des-rapports]] — retrouver les formulaires financiers autorisés.
 
 - [[Suggestions-de-recherche]] — propositions autorisées pendant la frappe.
+
+- [[Budgets-annuels]] — objectifs par compte et comparaison au réel sur l’exercice complet.

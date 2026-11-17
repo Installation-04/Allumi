@@ -101,3 +101,5 @@ Recherche bancaire : [[Recherche-bancaire]] — lignes CAD importées, montants 
 Rapports dans la recherche : [[Recherche-des-rapports]] — retrouver les formulaires autorisés, sans dates ou montants fictifs.
 
 Suggestions : [[Suggestions-de-recherche]] — résultats autorisés pendant la frappe dans l’en-tête, au clavier et au toucher.
+
+- [[Budgets-annuels]] — objectifs par compte et comparaison au réel sur l’exercice complet.
