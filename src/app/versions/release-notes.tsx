@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "@/platform/i18n/server";
 import { installedReleaseNotes, earlierReleaseNotes, RELEASE_TAG, type ReleaseNotes } from "@/modules/updates";
 import { FOCUS } from "@/app/_components/focus";
 

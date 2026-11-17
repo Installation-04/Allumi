@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { can } from "@/modules/companies";
 import { resolveLedgerContact } from "../_ledger-contact";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { FOCUS } from "@/app/_components/focus";
 import { TABLE_CLASS, TD_CLASS, TH_CLASS } from "@/app/_components/table";
 import { statementPeriod } from "@/app/_lib/report-period";

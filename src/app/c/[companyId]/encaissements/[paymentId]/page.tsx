@@ -2,7 +2,7 @@ import { ReceiptRefundPanel } from "../../remboursements/receipt-panel";
 import { ReceiptAllocationsPanel } from "../receipt-allocations-panel";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { can } from "@/modules/companies";
 import { formatMoney, todayIso } from "@/modules/ledger";
 import { getReceipt } from "@/modules/payments";

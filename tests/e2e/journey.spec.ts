@@ -15,6 +15,7 @@ test.afterAll(async()=>{
 });
 
 const VERSION = (JSON.parse(readFileSync("package.json", "utf8")) as { version: string }).version;
+const RELEASE_NOTES = JSON.parse(readFileSync("release-notes.json", "utf8")) as Record<string, Record<"fr-CA" | "en", { fixed: { text: string }[] }>>;
 
 const EMAIL = "admin@exemple.test";
 const PASSWORD = "une phrase de passe très longue 2026";
@@ -239,11 +240,11 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await expectNoPageOverflow(page);
   await captureReference(page, 'versions');
   const news=page.getByRole("region",{name:`Nouveautés de la version ${VERSION}`,exact:true});
-  await expect(news.getByRole("heading",{name:"Nouveautés",exact:true})).toBeVisible();await expect(news.getByRole("heading",{name:"Installation",exact:true})).toBeVisible();await expect(news.getByRole("heading",{name:"Corrections",exact:true})).toHaveCount(0);
+  await expect(news.getByRole("heading",{name:"Nouveautés",exact:true})).toBeVisible();await expect(news.getByRole("heading",{name:"Installation",exact:true})).toBeVisible();const frenchFixes=RELEASE_NOTES[VERSION]?.["fr-CA"].fixed??[];await expect(news.getByRole("heading",{name:"Corrections",exact:true})).toHaveCount(frenchFixes.length?1:0);for(const fix of frenchFixes)await expect(news.getByText(fix.text,{exact:true})).toBeVisible();
   await expect(news.getByRole("link",{name:"Notes complètes de la release sur GitHub",exact:true})).toHaveAttribute("href",`https://github.com/Installation-04/Allumi/releases/tag/v${VERSION}`);
   await expectNoPageOverflow(page);await captureReference(page,"nouveautes-versions",`Nouveautés de la version ${VERSION}`);
   await page.getByRole("button",{name:"English",exact:true}).click();await expect(page.locator("html")).toHaveAttribute("lang","en");await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
-  const englishNews=page.getByRole("region",{name:`What’s new in version ${VERSION}`,exact:true});await expect(englishNews.getByRole("heading",{name:"New features",exact:true})).toBeVisible();await expect(englishNews.getByRole("heading",{name:"Installation",exact:true})).toBeVisible();
+  const englishNews=page.getByRole("region",{name:`What’s new in version ${VERSION}`,exact:true});await expect(englishNews.getByRole("heading",{name:"New features",exact:true})).toBeVisible();await expect(englishNews.getByRole("heading",{name:"Installation",exact:true})).toBeVisible();const englishFixes=RELEASE_NOTES[VERSION]?.en.fixed??[];await expect(englishNews.getByRole("heading",{name:"Fixes",exact:true})).toHaveCount(englishFixes.length?1:0);for(const fix of englishFixes)await expect(englishNews.getByText(fix.text,{exact:true})).toBeVisible();
   if(VERSION==="0.4.0-alpha.62"){await englishNews.locator("summary",{hasText:"Earlier documented versions"}).click();await expect(englishNews.getByText("Version 0.4.0-alpha.61",{exact:true})).toBeVisible();}
   await expectNoPageOverflow(page);await captureReference(page,"nouveautes-versions-en-dark",`What’s new in version ${VERSION}`);
   await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await expect(page.locator("html")).toHaveAttribute("data-theme","light");await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.locator("html")).toHaveAttribute("lang","fr-CA");
@@ -3769,4 +3770,66 @@ test("budget CSV import previews locally, resets approval, validates accounts an
   const member=(await db.query('SELECT m.user_id,m.role,m.module_access FROM membership m JOIN app_user u ON u.id=m.user_id WHERE m.company_id=$1 AND u.email=$2',[companyId,EMAIL])).rows[0];userId=member.user_id;role=member.role;access=member.module_access;backupId=(await db.query("INSERT INTO app_user(id,email,display_name,updated_at) VALUES(gen_random_uuid(),'csv-'||gen_random_uuid()::text||'@exemple.test','CSV fixture owner',now()) RETURNING id")).rows[0].id;await db.query("INSERT INTO membership(id,company_id,user_id,role,updated_at) VALUES(gen_random_uuid(),$1,$2,'OWNER',now())",[companyId,backupId]);
   await db.query("UPDATE membership SET role='ACCOUNTANT',module_access='{\"accounting\":\"read\",\"contacts\":\"none\",\"sales\":\"none\",\"taxes\":\"none\"}' WHERE company_id=$1 AND user_id=$2",[companyId,userId]);await page.goto(company+'/budgets');await expect(page.getByRole('link',{name:'Importer un CSV',exact:true})).toHaveCount(0);expect((await page.request.get(url)).status()).toBe(404);expect((await page.request.get(url+'/modele?format=en')).status()).toBe(404);expect((await page.request.get('/c/00000000-0000-7000-8000-999999999999/budgets/importer')).status()).toBe(404);
  }finally{if(accountId&&accountName)await db.query('UPDATE account SET name_en=$2 WHERE id=$1',[accountId,accountName]);if(userId&&role)await db.query('UPDATE membership SET role=$3::member_role,module_access=$4::jsonb WHERE company_id=$1 AND user_id=$2',[companyId,userId,role,access===null?'{}':JSON.stringify(access)]);if(backupId){await db.query('DELETE FROM membership WHERE company_id=$1 AND user_id=$2',[companyId,backupId]);await db.query('UPDATE app_user SET disabled_at=now() WHERE id=$1',[backupId]);}await db.end();}expect(cspViolations).toEqual([]);
+});
+
+test("monthly budgets allocate exact fiscal periods, preserve annual limits and refuse stale editors",async({page,browser})=>{
+ test.setTimeout(150_000);cspViolations.length=0;watchCsp(page.context());
+ if(updateCookies)await page.context().addCookies(updateCookies);await page.goto('/');
+ if(!updateCookies){
+  await expect(page).toHaveURL(/\/setup$/);await page.locator('[name="setupToken"]').fill('e2e-setup-token-123456789');await page.getByLabel("Nom de l'entreprise").fill('Atelier Exemple inc.');await page.getByLabel("Premier mois de l'exercice financier").selectOption('4');await page.getByLabel('Ton nom').fill('Alex Exemple');await page.getByLabel('Courriel').fill(EMAIL);await page.getByLabel("Langue de l'interface").selectOption('fr-CA');await page.getByLabel('Mot de passe',{exact:true}).fill(PASSWORD);await page.getByLabel('Confirmation du mot de passe').fill(PASSWORD);await page.getByRole('button',{name:"Créer l'entreprise et commencer",exact:true}).click();await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
+ }
+ if(!/^\/c\/[0-9a-f-]{36}/.test(new URL(page.url()).pathname))await page.getByRole('link',{name:'Atelier Exemple inc.',exact:true}).click();
+ const company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)![0],companyId=company.split('/')[2];await page.goto(company+'/budgets');await page.getByLabel('Nom du scénario',{exact:true}).fill('Plan mensuel');await page.getByRole('button',{name:'Créer un budget',exact:true}).click();await expect(page).toHaveURL(/\/budgets\/[0-9a-f-]{36}$/);const annual=page.url();
+ await page.locator('details summary').click();const picker=page.getByLabel('Compte',{exact:true}),accountId=(await picker.locator('option').filter({hasText:/^4/}).first().getAttribute('value'))!;await picker.selectOption(accountId);await page.getByLabel('Objectif annuel (CAD)',{exact:true}).fill('10000,01');await page.getByRole('button',{name:'Ajouter ou remplacer un objectif',exact:true}).click();await expect(page.getByRole('status')).toContainText('Objectif enregistré.');
+ await page.getByRole('link',{name:'Budget mensuel',exact:true}).click();await expect(page).toHaveURL(/\/mensuel$/);const monthly=page.url();const period=page.getByLabel('Période de l’exercice',{exact:true});await period.selectOption({index:0});const firstPeriod=await period.inputValue();await page.getByRole('button',{name:'Afficher la période',exact:true}).click();await expect.poll(()=>new URL(page.url()).searchParams.get('periode')).toBe(firstPeriod);const reportUrl=page.url();
+ await page.getByRole('link',{name:'Répartir les mois',exact:true}).click();await expect(page).toHaveURL(/\/mensuel\/[0-9a-f-]{36}/);const editor=page.url();let proposalPosts=0;const countProposals=(r:{method:()=>string;url:()=>string})=>{if(r.method()==='POST'&&new URL(r.url()).pathname===new URL(editor).pathname)proposalPosts++;};page.on('request',countProposals);
+ const fields=page.locator('input[name^="period_"]');await expect(fields).toHaveCount(12);await page.getByRole('button',{name:'Répartir également les 12 périodes',exact:true}).click();await expect(fields.first()).toHaveValue('833,34');await expect(fields.nth(11)).toHaveValue('833,33');expect(proposalPosts).toBe(0);page.off('request',countProposals);await expectNoPageOverflow(page);await captureReference(page,'repartition-mensuelle','Répartir les mois');
+ await fields.nth(1).fill('10000,01');await page.getByRole('button',{name:'Enregistrer la répartition',exact:true}).click();await expect(page.locator('form').getByRole('alert').filter({hasText:'La répartition mensuelle dépasse'})).toBeVisible();await expect(fields.nth(1)).toHaveValue('10000,01');
+ await page.getByRole('button',{name:'Répartir également les 12 périodes',exact:true}).click();await page.getByRole('button',{name:'Enregistrer la répartition',exact:true}).click();await expect(page).toHaveURL(reportUrl);await expect(page.getByRole('region',{name:'Budget et réel de la période',exact:true})).toContainText('Répartition complète');
+ await page.getByRole('link',{name:'Répartir les mois',exact:true}).click();const stale=await browser.newPage();await stale.context().addCookies(await page.context().cookies());await stale.goto(page.url());await stale.getByRole('button',{name:'Effacer la répartition proposée',exact:true}).click();await stale.locator('input[name^="period_"]').first().fill('6000,00');
+ await page.getByRole('button',{name:'Effacer la répartition proposée',exact:true}).click();await fields.first().fill('5000,00');await page.getByRole('button',{name:'Enregistrer la répartition',exact:true}).click();await expect(page).toHaveURL(reportUrl);await stale.getByRole('button',{name:'Enregistrer la répartition',exact:true}).click();await expect(stale.locator('form').getByRole('alert')).toContainText('Ce budget a été modifié');await expect(stale.locator('input[name^="period_"]').first()).toHaveValue('6000,00');await stale.close();
+ const region=page.getByRole('region',{name:'Budget et réel de la période',exact:true});await expect(region).toContainText('1 / 12');await expect(region).toContainText('5');await expectNoPageOverflow(page);await captureReference(page,'budget-mensuel',region);const csv=await page.request.get(monthly+'/export?periode='+firstPeriod);expect(csv.status()).toBe(200);expect(csv.headers()['cache-control']).toBe('private, no-store');expect(await csv.text()).toContain('5000,00');expect(await csv.text()).toContain('5000,01');
+ await page.getByRole('button',{name:'English',exact:true}).click();await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption('dark');await expect(page.getByRole('heading',{name:'Monthly budget',exact:true})).toBeVisible();await expectNoPageOverflow(page);await captureReference(page,'budget-mensuel-en-dark',page.getByRole('region',{name:'Period budget vs actual',exact:true}));expect(await(await page.request.get(monthly+'/export?periode='+firstPeriod)).text()).toContain('5000.00');await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption('light');await expect(page.locator('html')).toHaveAttribute('data-theme','light');await page.getByRole('button',{name:'Français',exact:true}).click();await expect(page.locator('html')).toHaveAttribute('lang','fr-CA');
+ await page.goto(annual);await page.locator('details summary').click();await picker.selectOption(accountId);await page.getByLabel('Objectif annuel (CAD)',{exact:true}).fill('4999,00');await page.getByRole('button',{name:'Ajouter ou remplacer un objectif',exact:true}).click();await expect(page.locator('form').getByRole('alert').filter({hasText:'L’objectif annuel ne peut pas'})).toBeVisible();await page.getByRole('button',{name:/Retirer l’objectif du compte/}).click();await expect(page.locator('form').getByRole('alert').filter({hasText:'Retirez d’abord les objectifs mensuels'})).toBeVisible();
+ const db=new pg.Client({connectionString:e2eUrls().owner});await db.connect();let userId:string|null=null,backupId:string|null=null,role:string|null=null,access:unknown=null;
+ try{
+  const member=(await db.query('SELECT m.user_id,m.role,m.module_access FROM membership m JOIN app_user u ON u.id=m.user_id WHERE m.company_id=$1 AND u.email=$2',[companyId,EMAIL])).rows[0];userId=member.user_id;role=member.role;access=member.module_access;backupId=(await db.query("INSERT INTO app_user(id,email,display_name,updated_at) VALUES(gen_random_uuid(),'monthly-'||gen_random_uuid()::text||'@exemple.test','Monthly fixture owner',now()) RETURNING id")).rows[0].id;await db.query("INSERT INTO membership(id,company_id,user_id,role,updated_at) VALUES(gen_random_uuid(),$1,$2,'OWNER',now())",[companyId,backupId]);
+  await db.query("UPDATE membership SET role='ACCOUNTANT',module_access='{\"accounting\":\"read\",\"contacts\":\"none\",\"sales\":\"none\",\"taxes\":\"none\",\"audit\":\"none\"}' WHERE company_id=$1 AND user_id=$2",[companyId,userId]);await page.goto(reportUrl);await expect(region).toContainText('1 / 12');await expect(page.getByRole('link',{name:'Répartir les mois',exact:true})).toHaveCount(0);expect((await page.request.get(editor)).status()).toBe(404);expect((await page.request.get(monthly+'/export?periode='+firstPeriod)).status()).toBe(200);
+  await db.query("UPDATE membership SET module_access='{\"accounting\":\"none\"}' WHERE company_id=$1 AND user_id=$2",[companyId,userId]);expect((await page.request.get(reportUrl)).status()).toBe(404);expect((await page.request.get(monthly+'/export?periode='+firstPeriod)).status()).toBe(404);
+ }finally{if(userId&&role)await db.query('UPDATE membership SET role=$3::member_role,module_access=$4::jsonb WHERE company_id=$1 AND user_id=$2',[companyId,userId,role,access===null?'{}':JSON.stringify(access)]);if(backupId){await db.query('DELETE FROM membership WHERE company_id=$1 AND user_id=$2',[companyId,backupId]);await db.query('UPDATE app_user SET disabled_at=now() WHERE id=$1',[backupId]);}await db.end();}expect(cspViolations).toEqual([]);
+});
+
+/** Different users must not share cookie-derived catalogues through a server cache. */
+test("concurrent French and English requests keep server metadata, client forms and PWA language isolated", async ({ browser }) => {
+  const languages = ["fr-CA", "en"] as const;
+  const origin = `http://127.0.0.1:${process.env.E2E_PORT ?? 3100}`;
+  const contexts = await Promise.all(languages.map(locale => browser.newContext({
+    ...devices[process.env.E2E_MOBILE === "1" ? "Pixel 7" : "Desktop Chrome"],
+    baseURL: origin,
+    // The explicit app cookie must also win over a different browser language.
+    locale: locale === "en" ? "fr-CA" : "en",
+  })));
+  try {
+    const pages = await Promise.all(contexts.map(async (context, i) => {
+      await context.addCookies([{ name: "allumi_locale", value: languages[i]!, url: origin }]);
+      return context.newPage();
+    }));
+    for (let round = 0; round < 3; round++) {
+      await Promise.all(pages.map(page => page.goto("/connexion")));
+      await Promise.all(pages.map(async (page, i) => {
+        const locale = languages[i]!, messages = JSON.parse(readFileSync(`messages/${locale}.json`, "utf8"));
+        const setup = new URL(page.url()).pathname === "/setup";
+        await expect(page.locator("html")).toHaveAttribute("lang", locale);
+        await expect(page.getByRole("heading", { name: setup ? messages.setup.title : messages.login.title, exact: true })).toBeVisible();
+        await expect(page.getByLabel(messages.form.password, { exact: true })).toBeVisible();
+        await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", messages.app.tagline);
+        const response = await contexts[i]!.request.get("/manifest.webmanifest");
+        expect(response.status()).toBe(200);
+        expect(await response.json()).toMatchObject({ lang: locale, description: messages.app.tagline });
+        await expectNoPageOverflow(page);
+      }));
+    }
+  } finally {
+    await Promise.all(contexts.map(context => context.close()));
+  }
 });

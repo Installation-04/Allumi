@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/platform/i18n/client";
 import { compareVersions, type UpdateStatusDetails } from "@/modules/updates/client";
 import { ActionForm } from "@/app/_components/ui";
 import { FOCUS } from "@/app/_components/focus";

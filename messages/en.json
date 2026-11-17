@@ -842,7 +842,13 @@
       "importChanged": "The file no longer matches the reviewed targets. Select the file again and review the preview.",
       "importStale": "Accounts changed after this preview. Reload the page, select the file again and review the targets.",
       "importConfirm": "Confirm reviewing the targets and destination before importing.",
-      "importChartLimit": "The chart exceeds 5,000 accounts. Import is refused without a partial list or result."
+      "importChartLimit": "The chart exceeds 5,000 accounts. Import is refused without a partial list or result.",
+      "monthlyInvalid": "Check all 12 periods and non-negative amounts with up to two decimal places.",
+      "monthlyExcess": "Monthly allocation exceeds the annual target. No changes were saved.",
+      "monthlyAnnualFloor": "The annual target cannot fall below the amount already allocated. Reduce the monthly allocation first.",
+      "monthlyInUse": "Remove monthly targets before removing this annual target, including zero amounts.",
+      "monthlyPeriods": "The fiscal year needs its 12 periods for monthly planning. No partial results are shown.",
+      "monthlyPeriod": "This period does not belong to the budget fiscal year."
     }
   },
   "settingsPage": {
@@ -3291,7 +3297,7 @@
     "copyLink": "Duplicate budget",
     "copyTitle": "Duplicate an annual budget",
     "copyBack": "Back to source budget",
-    "copyIntro": "Reuse annual targets in a new scenario for this company. The source stays intact; posted actuals and journal entries are not copied. Targets remain annual, with no prorating for the destination fiscal year.",
+    "copyIntro": "Reuse annual targets in a new scenario for this company. The source stays intact; posted actuals and journal entries are not copied. Targets remain annual, with no prorating for the destination fiscal year. Monthly targets are not copied.",
     "copySource": "Source budget preview",
     "copyActive": "{count, plural, one {# target to copy} other {# targets to copy}}",
     "copyExcluded": "{count, plural, one {# inactive target to exclude} other {# inactive targets to exclude}}",
@@ -3339,6 +3345,28 @@
       "duplicate": "The account at row {row} appears more than once in the file.",
       "account": "Row {row} must reference an existing local revenue or expense account.",
       "inactive": "The account at row {row} is inactive. Reactivate it and reload the preview, or fix the file."
-    }
+    },
+    "monthlyTitle": "Monthly budget",
+    "monthlyPeriod": "Fiscal period",
+    "monthlyShow": "Show period",
+    "monthlyTarget": "Period target",
+    "monthlyComparison": "Period budget vs actual",
+    "monthlyAllocation": "Annual allocation",
+    "monthlyAllocated": "Allocated amount",
+    "monthlyRemaining": "Remaining to allocate",
+    "monthlyDefined": "{count} / 12 periods defined",
+    "monthlyComplete": "Allocation complete",
+    "monthlyEdit": "Allocate months",
+    "monthlyBack": "Back to monthly report",
+    "monthlyAnnualBack": "Back to annual budget",
+    "monthlySave": "Save allocation",
+    "monthlySplit": "Split equally across 12 periods",
+    "monthlyRange": "P{number} · {from} → {to}",
+    "monthlyScope": "Selected fiscal period, inclusive dates: posted entries, reversals and inactive accounts, including future-dated entries. Missing targets stay undefined; no year-to-date calculation or prorating. Prepare the allocation from the annual targets.",
+    "monthlyEditHint": "Blank leaves a period undefined; zero defines a zero-dollar target. The sum cannot exceed the annual target. Equal splitting places remaining cents in the first periods; review and save. Clearing all fields removes the allocation and keeps the annual target.",
+    "monthlyInvalidHint": "Correct invalid or negative amounts before saving.",
+    "monthlyExcessHint": "The sum exceeds the annual target. Reduce the allocation before saving.",
+    "monthlyClear": "Clear proposed allocation",
+    "monthlyDefinedCount": "Defined periods (out of 12)"
   }
 }

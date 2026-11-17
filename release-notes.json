@@ -732,5 +732,67 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.76": {
+    "fr-CA": {
+      "title": "Budgets mensuels et répartition exacte",
+      "added": [
+        {
+          "text": "Répartissez les objectifs annuels sur les douze périodes fiscales et comparez chaque mois au réel comptabilisé. Export CSV privé inclus.",
+          "guide": "Budgets-mensuels"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Proposez une division égale au cent près avant enregistrement; les champs vides restent distincts de zéro. Le reste annuel, les permissions et les révisions protègent les changements.",
+          "guide": "Budgets-mensuels"
+        }
+      ],
+      "fixed": [
+        {
+          "text": "Next.js passe en 16.4.6 pour corriger les avis de fuite de cache entre paramètres racine."
+        },
+        {
+          "text": "La chaîne d’extraction de traduction vulnérable est retirée. Le moteur ICU, les catalogues FR/EN et l’isolation des langues par requête sont conservés.",
+          "guide": "Architecture"
+        }
+      ],
+      "installation": [
+        {
+          "text": "Migration additive des objectifs mensuels et de leurs gardes SQL, appliquée par le processus habituel. Aucune nouvelle configuration ni écriture financière. Copie et import restent annuels, sans reprise des répartitions mensuelles.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Monthly budgets and exact allocation",
+      "added": [
+        {
+          "text": "Allocate annual targets across the twelve fiscal periods and compare each period with posted actuals. Includes private CSV export.",
+          "guide": "Budgets-mensuels"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Propose an equal split to the cent before saving; empty targets remain distinct from zero. Annual remaining amounts, permissions and revisions protect changes.",
+          "guide": "Budgets-mensuels"
+        }
+      ],
+      "fixed": [
+        {
+          "text": "Next.js is updated to 16.4.6 to address cache disclosure advisories across root parameter values."
+        },
+        {
+          "text": "The vulnerable translation extraction dependency chain is removed. ICU formatting, French/English catalogs and per-request language isolation are preserved.",
+          "guide": "Architecture"
+        }
+      ],
+      "installation": [
+        {
+          "text": "An additive migration adds monthly targets and SQL guards through the usual update process. No new configuration or journal entries. Copy and import remain annual only; monthly allocations are not carried over.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

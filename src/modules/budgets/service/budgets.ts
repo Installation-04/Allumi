@@ -41,6 +41,10 @@ export async function saveBudgetTarget(actor:CompanyContext,id:string,input:{acc
     if(!account || (!old && !account.isActive)) throw new AppError("budgets.account");
     if(!old && await tx.budgetLine.count({where:{companyId:actor.companyId,budgetId:id}})>=MAX_BUDGET_ACCOUNTS) throw new AppError("budgets.tooMany");
     // The database advances the parent revision on every line change, including direct SQL writes.
+    if(old){
+      const allocation=await tx.budgetMonthlyTarget.aggregate({where:{companyId:actor.companyId,budgetLineId:old.id},_sum:{amountCents:true}});
+      if(input.amountCents<(allocation._sum.amountCents??0n))throw new AppError("budgets.monthlyAnnualFloor");
+    }
     if(old) await tx.budgetLine.update({where:{id:old.id},data:{amountCents:input.amountCents}});
     else await tx.budgetLine.create({data:{companyId:actor.companyId,budgetId:id,accountId:input.accountId,amountCents:input.amountCents}});
   });
@@ -49,6 +53,8 @@ export async function removeBudgetTarget(actor:CompanyContext,id:string,accountI
   if(!UUID.test(accountId)) throw new AppError("budgets.invalid");
   return withCompany(actor,async tx=>{
     await requireRole(tx,"budget.manage"); await lockBudget(tx,actor,id,revision);
+    const used=await tx.budgetMonthlyTarget.count({where:{companyId:actor.companyId,budgetLine:{budgetId:id,accountId}}});
+    if(used)throw new AppError("budgets.monthlyInUse");
     const result=await tx.budgetLine.deleteMany({where:{companyId:actor.companyId,budgetId:id,accountId}});
     if(result.count!==1) throw new AppError("budgets.account");
   });

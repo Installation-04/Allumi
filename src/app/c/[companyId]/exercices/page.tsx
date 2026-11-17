@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { ActionForm, Field } from "@/app/_components/ui";
 import { TABLE_CLASS, TD_CLASS, TH_CLASS } from "@/app/_components/table";
 import { can } from "@/modules/companies";

@@ -15,14 +15,14 @@ Voir aussi [[Architecture]], [[Regles-comptables]], [[Plan-de-tests]].
 - Les `CHECK` qui comparent une colonne d'enum à un littéral s'écrivent sur `::text` (voir [la recette de changement d'enum](#changer-un-enum)).
 
 ## Vue d'ensemble
-59 tables : 7 tables d’identité ou techniques (`instance` et `rate_limit` sans RLS; 5 tables d’identité sous RLS par utilisateur), et 52 tables métier sous RLS d’entreprise, entreprise elle-même incluse.
+60 tables : 7 tables d’identité ou techniques (`instance` et `rate_limit` sans RLS; 5 tables d’identité sous RLS par utilisateur), et 53 tables métier sous RLS d’entreprise, entreprise elle-même incluse.
 
 | Domaine | Tables |
 |---|---|
 | Instance et identité | `instance`, `app_user`, `user_credential`, `user_recovery_code`, `session`, `password_reset_token`, `rate_limit` |
 | Entreprise | `company`, `membership`, `invitation`, `number_sequence` |
 | Exercices | `fiscal_year`, `fiscal_period` |
-| Budgets | `budget`, `budget_line` |
+| Budgets | `budget`, `budget_line`, `budget_monthly_target` |
 | Grand livre | `account`, `journal_entry`, `journal_line` |
 | Contacts | `contact`, `item` |
 | Taxes | `tax`, `tax_rate`, `tax_code`, `tax_code_component`, `tax_return` |
@@ -4783,3 +4783,11 @@ La comparaison utilise un seul instantané SQL pour révision, objectifs et gran
 La [[Duplication-des-budgets]] réutilise ces tables sans changement de schéma. L’aperçu lit objectifs et métadonnées des comptes dans un instantané SQL. La confirmation verrouille le parent source et les comptes référencés, vérifie révision et empreinte, puis insère un nouveau budget et ses objectifs actifs en une transaction. Les exclusions inactives exigent un choix explicite; la source et le grand livre restent inchangés.
 
 L’[[Import-CSV-des-budgets]] réutilise les tables existantes sans migration. Aperçu local sur une projection des comptes autorisés sans notes privées; à la confirmation, le serveur relit le CSV, compare objectifs et états des comptes puis verrouille les comptes concernés. Budget, lignes et événement budget.import_csv sont insérés en une transaction. La comparaison d’état sert à détecter un aperçu périmé, pas à autoriser une écriture : droits, RLS, portée, types/activité des comptes et montants sont toujours revalidés côté serveur. Le fichier et son nom ne sont pas stockés.
+
+## Objectifs mensuels des budgets
+
+`budget_monthly_target` référence `budget_line` et `fiscal_period` par clés composites d’entreprise; la ligne annuelle reçoit aussi une unicité `(company_id,id)`. Un seul objectif par ligne/période, montant BIGINT de 0 à 100000000000000 cents. L’absence de ligne distingue un objectif non défini de zéro. Les gardes interdisent le déplacement d’identité, vérifient que la période appartient au même exercice et imposent une somme mensuelle au plus égale à l’annuel. La FK RESTRICT empêche le retrait d’un annuel avec objectifs mensuels; une garde supplémentaire refuse sa baisse sous le total alloué.
+
+Les modifications mensuelles et les baisses annuelles exigent READ COMMITTED et prennent le verrou du parent `budget`. Les gardes VOLATILE relisent ensuite l’annuel et les autres allocations dans un instantané frais : deux transactions concurrentes ne peuvent valider un dépassement sur un ancien total. Les fonctions restent sous les privilèges de l’appelant, avec search_path fixé et exécution PUBLIC révoquée.
+
+RLS forcée, droits modulaires Comptabilité, audit standard et révision du parent à chaque insertion/mise à jour/suppression. L’enregistrement applicatif remplace atomiquement les objectifs définis d’un compte, contrôle la révision initiale et ajoute `budget.allocate_months` avec compte, nombre de périodes, total alloué et annuel; une erreur annule le lot et son audit. Le rapport lit en un instantané périodes, objectifs et réel, aux dates fiscales inclusives. Les périodes fermées restent inchangées; aucune écriture financière. Voir [[Budgets-mensuels]].

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ReleaseNotesPanel } from "./release-notes";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { requireSession } from "@/app/_lib/session";
 import { getProfile } from "@/modules/auth";
 import { latestRelease, getUpdateOverview, compareVersions } from "@/modules/updates";

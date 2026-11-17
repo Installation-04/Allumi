@@ -1,4 +1,4 @@
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "@/platform/i18n/server";
 import { ActionForm, Field, SelectField } from "@/app/_components/ui";
 import { can, FILING_FREQUENCIES, getCompanyProfile, LOCALES, PROVINCES, TAX_ROUNDINGS } from "@/modules/companies";
 import { loadCompany } from "../_lib";

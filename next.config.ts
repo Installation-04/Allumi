@@ -1,7 +1,4 @@
 import type { NextConfig } from "next";
-import createNextIntlPlugin from "next-intl/plugin";
-
-const withNextIntl = createNextIntlPlugin("./src/platform/i18n/request.ts");
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -25,4 +22,4 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["@node-rs/argon2", "pino", "pg"],
 };
 
-export default withNextIntl(nextConfig);
+export default nextConfig;

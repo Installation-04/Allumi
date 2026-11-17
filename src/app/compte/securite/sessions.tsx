@@ -1,4 +1,4 @@
-import { getFormatter, getTranslations } from "next-intl/server";
+import { getFormatter, getTranslations } from "@/platform/i18n/server";
 import { SubmitButton } from "@/app/_components/ui";
 import type { SessionSummary } from "@/modules/auth";
 import { revokeOtherSessionsAction, revokeSessionAction } from "./actions";

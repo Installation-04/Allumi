@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "@/platform/i18n/server";
 
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const t = await getTranslations("app");

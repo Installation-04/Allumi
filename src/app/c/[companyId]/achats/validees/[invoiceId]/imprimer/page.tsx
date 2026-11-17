@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { PurchasePrintPage } from "../../../../_purchase-print";
 
 export async function generateMetadata() { return { title: (await getTranslations("purchasePrint"))("copy") }; }

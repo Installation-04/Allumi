@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { loadCompany } from "../../_lib";
 import { todayIso } from "@/modules/ledger";
 import { getOfficialCodeComparison, officialScope, PROVINCES, COVERAGE_FROM, CRA_PAGE, RQ_URL, ratePercentage } from "@/modules/taxes";

@@ -2,7 +2,7 @@ import { CreditApplicationsPanel } from "../../credit-applications-panel";
 import { SalesAttachments } from "../../../_attachments/sales-panel";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { CustomerRefundPanel } from "../../../remboursements/panel";
 import { getCreditOpenCents, getPostedCredit } from "@/modules/sales";
 import { can } from "@/modules/companies";

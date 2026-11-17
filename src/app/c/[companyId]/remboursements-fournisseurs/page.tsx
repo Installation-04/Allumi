@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { formatMoney } from "@/modules/ledger";
 import { listSupplierRefunds } from "@/modules/payments";
 import { PaymentHistoryFilter } from "../_payment-history-filter";

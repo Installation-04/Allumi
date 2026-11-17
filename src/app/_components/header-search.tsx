@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/platform/i18n/client";
 import { SEARCH_KINDS, SEARCH_SUGGESTION_DELAY, SEARCH_SUGGESTION_LIMIT, suggestionQuery, type SearchSuggestion } from "@/modules/search/client";
 import { FOCUS } from "./focus";
 

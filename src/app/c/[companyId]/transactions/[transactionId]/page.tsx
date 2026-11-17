@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { can } from "@/modules/companies";
 import { acceptsManualEntries, formatMoney, listAccounts } from "@/modules/ledger";
 import { suggestedBankRules, DEFAULT_CANDIDATE_DAYS, getBankTransaction, listMatchCandidates, listTransferCandidates, MAX_CANDIDATE_DAYS } from "@/modules/banking";

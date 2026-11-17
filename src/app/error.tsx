@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/platform/i18n/client";
 
 /**
  * Anything that escapes a page (not a form: those answer with a message): a translated page, not Next's raw one.

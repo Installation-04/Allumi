@@ -2,7 +2,7 @@ import { ServerUpdatePanel } from "./update-panel";
 import { getUpdateOverview } from "@/modules/updates";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { requireSession } from "@/app/_lib/session";
 import { getProfile } from "@/modules/auth";
 import { serverOverview } from "@/modules/server";

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { can } from "@/modules/companies";
 import { acceptsManualEntries, listAccounts, todayIso } from "@/modules/ledger";
 import { accountName, loadCompany } from "../../_lib";

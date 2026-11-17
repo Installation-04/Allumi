@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { listInvoices } from "@/modules/sales";
 import { formatMoney } from "@/modules/ledger";
 import { loadCompany } from "../../_lib";

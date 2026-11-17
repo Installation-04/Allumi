@@ -24,7 +24,7 @@ Versions stables fixées dans `package.json` (mises à jour par PR).
 | Base de données | PostgreSQL 17 | Contraintes, triggers, RLS, `EXCLUDE` |
 | ORM | Prisma 7.10 + `@prisma/adapter-pg` | Migrations versionnées, client typé; la version 8 est encore en RC |
 | Validation | Zod 4 | Entrées, formulaires, environnement au démarrage |
-| i18n | next-intl 4 | fr-CA par défaut, en; sans préfixe de langue dans l'URL |
+| i18n | use-intl 4 + adaptateur plateforme | ICU React/serveur; fr-CA par défaut, en, sans préfixe dans l’URL |
 | Style | Tailwind CSS 4 | Polices auto-hébergées, aucun CDN |
 | Journaux | pino 10 | JSON sur stdout |
 | Mots de passe | `@node-rs/argon2` (argon2id) | Recommandation OWASP |
@@ -241,3 +241,11 @@ Ce que l'application garantit à l'infrastructure :
 | PostgreSQL 16 en session cloud, 17 en production | Écart de comportement | Aucune fonction propre à PG 17; la CI teste sur PG 17 |
 
 Voir aussi [[Regles-comptables]], [[Schema-de-donnees]], [[Plan-de-tests]].
+
+## Traductions et isolation des requêtes
+
+`src/platform/i18n/client.tsx` expose le fournisseur React et les hooks publics de `use-intl`. `server.ts`, marqué `server-only`, construit les traducteurs et les formateurs à partir des catalogues statiques autorisés. `request.ts` lit le cookie `allumi_locale`, puis `DEFAULT_LOCALE`; une valeur inconnue est ignorée, avec repli final `fr-CA`. Aucun chemin de fichier n’est construit depuis le cookie.
+
+Le cache React est limité à la requête/rendu serveur : aucune langue ou donnée de cookie n’est mémorisée dans un cache global ou persistant. Le fournisseur client reçoit explicitement la langue, le catalogue sélectionné et le même fuseau `America/Toronto` que le serveur. Pluriels ICU, interpolation, types des clés, métadonnées et manifeste PWA utilisent cette configuration. Deux utilisateurs peuvent demander simultanément des langues différentes.
+
+L’application n’utilise pas de routage localisé ou d’extraction automatique de messages. Elle emploie directement le moteur public ICU de `use-intl`, sans plugin Next ni watcher de fichiers. Le retrait de `next-intl` et de sa chaîne d’extraction supprime la dépendance de production à picomatch; l’audit de production reste obligatoire en CI. Les catalogues restent dans `messages/fr-CA.json` et `messages/en.json`, avec tests de parité. Aucun changement de configuration, de droits d’entreprise ou de données comptables pour cette adaptation.

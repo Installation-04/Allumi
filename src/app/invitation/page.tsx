@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { getSession } from "@/app/_lib/session";
 import { ActionForm, Card, Field, SelectField } from "@/app/_components/ui";
 import { acceptAction } from "./actions";

@@ -2,7 +2,7 @@
 
 import { createContext, useActionState, useContext, useId, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/platform/i18n/client";
 import type { FormState } from "@/app/_lib/form-state";
 import { FOCUS } from "./focus";
 

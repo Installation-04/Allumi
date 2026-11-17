@@ -2,7 +2,7 @@ import { PurchaseAttachments } from "../../../_attachments/panel";
 import Link from "next/link";
 import { SupplierRefundPanel } from "../../../remboursements-fournisseurs/panel";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { getSupplierCreditOpenCents, getPostedCredit } from "@/modules/purchases";
 import { can } from "@/modules/companies";
 import { formatMoney, todayIso } from "@/modules/ledger";

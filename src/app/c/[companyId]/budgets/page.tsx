@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { ActionForm, Field, SelectField } from "@/app/_components/ui";
 import { can } from "@/modules/companies";
 import { listFiscalYears } from "@/modules/ledger";

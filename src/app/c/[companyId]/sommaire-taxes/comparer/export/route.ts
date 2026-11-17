@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { can } from "@/modules/companies";
 import { listFiscalYears, todayIso } from "@/modules/ledger";
 import { getTaxComparison, taxComparisonCsv } from "@/modules/reports";

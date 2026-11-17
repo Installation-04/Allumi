@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { exportDisbursements } from "@/modules/payments";
 import { toCsv, csvFormatFor, type CsvCell } from "@/modules/reports";
 import { AppError } from "@/platform/errors";

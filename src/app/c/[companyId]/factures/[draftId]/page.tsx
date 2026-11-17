@@ -1,7 +1,7 @@
 import { SalesAttachments } from "../../_attachments/sales-panel";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { can } from "@/modules/companies";
 import { getDraft } from "@/modules/sales";
 import { formatMoney } from "@/modules/ledger";

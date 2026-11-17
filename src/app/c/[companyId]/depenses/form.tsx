@@ -1,6 +1,6 @@
 "use client";
 import { useId, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/platform/i18n/client";
 import { PAYMENT_METHODS } from "@/modules/payments/client";
 import { ActionForm, Field, SelectField } from "@/app/_components/ui";
 import type { DraftLineInput } from "@/modules/purchases/client";

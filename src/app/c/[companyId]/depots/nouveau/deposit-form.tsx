@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
-import { useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "@/platform/i18n/client";
 import { formatMoney } from "@/modules/ledger/client";
 import { ActionForm, Field, SelectField } from "@/app/_components/ui";
 import type { FormState } from "@/app/_lib/form-state";

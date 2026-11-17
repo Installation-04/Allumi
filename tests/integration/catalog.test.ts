@@ -376,3 +376,11 @@ it("isolates annual budgets with composite scope, audit, bounded cents and autom
  }
  expect((await q<{ok:boolean}>("SELECT has_table_privilege('allumi_app','budget','DELETE') AS ok"))[0]?.ok).toBe(false);
 });
+it('guards monthly targets with same-year scope, bounded sums, revision/audit and restricted execution',async()=>{
+ expect(await q("SELECT conname FROM pg_constraint WHERE conname IN ('budget_monthly_target_line_fkey','budget_monthly_target_period_fkey','budget_monthly_target_amount','budget_line_company_id_id_key')")).toHaveLength(4);
+ expect(await q("SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('budget_monthly_target_guard','budget_line_monthly_guard','budget_monthly_target_revision','budget_monthly_target_audit')")).toHaveLength(4);
+ expect((await q<{qual:string}>("SELECT qual FROM pg_policies WHERE tablename='budget_monthly_target' AND policyname='module_read' AND permissive='RESTRICTIVE'"))[0]?.qual).toContain('accounting');
+ const functions=await q<{definer:boolean;public_execute:boolean;definition:string}>("SELECT prosecdef AS definer,has_function_privilege('public',oid,'EXECUTE') AS public_execute,pg_get_functiondef(oid) AS definition FROM pg_proc WHERE proname IN ('budget_monthly_target_guard','budget_line_monthly_guard')");
+ expect(functions).toHaveLength(2);for(const f of functions){expect(f.definer).toBe(false);expect(f.public_execute).toBe(false);expect(f.definition).toContain('read committed');expect(f.definition).toContain('FOR UPDATE');}
+ expect((await q<{ok:boolean}>("SELECT has_table_privilege('allumi_app','budget_monthly_target','TRUNCATE') AS ok"))[0]?.ok).toBe(false);
+});

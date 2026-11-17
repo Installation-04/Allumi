@@ -1,4 +1,4 @@
-import type { getTranslations } from "next-intl/server";
+import type { getTranslations } from "@/platform/i18n/server";
 import type { StatementLabels } from "@/modules/reports";
 
 /** The words of a statement's CSV file, from the `statements` messages in the language of the person exporting it. */

@@ -2,7 +2,7 @@
 
 import { useId } from "react";
 import { useFormStatus } from "react-dom";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/platform/i18n/client";
 import { setTheme } from "@/app/appearance/actions";
 import { THEMES, type Theme } from "@/app/_lib/theme";
 import { FOCUS } from "./focus";

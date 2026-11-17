@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { can, listMembers } from "@/modules/companies";
 import { getProfile } from "@/modules/auth";
 import { ActionForm, Field } from "@/app/_components/ui";

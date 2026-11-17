@@ -1,8 +1,9 @@
 import { cookies } from "next/headers";
 import { isTheme } from "./_lib/theme";
 import type { Metadata, Viewport } from "next";
-import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages, getTranslations } from "next-intl/server";
+import { APP_TIME_ZONE } from "@/platform/i18n/locales";
+import { TranslationProvider } from "@/platform/i18n/client";
+import { getLocale, getMessages, getTranslations } from "@/platform/i18n/server";
 import { Footer, Header } from "./_components/shell";
 import "./globals.css";
 
@@ -21,11 +22,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale === "en" ? "en" : "fr-CA"} data-theme={theme}>
       <body className="flex min-h-dvh flex-col font-sans">
-        <NextIntlClientProvider locale={locale} messages={messages}>
+        <TranslationProvider locale={locale} messages={messages} timeZone={APP_TIME_ZONE}>
           <Header global />
           <main className="mx-auto min-w-0 w-full max-w-[1440px] flex-1 px-4 py-5 sm:px-6 sm:py-8">{children}</main>
           <Footer />
-        </NextIntlClientProvider>
+        </TranslationProvider>
       </body>
     </html>
   );

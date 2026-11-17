@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.74
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.76
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -162,6 +162,14 @@ Create a new budget from a UTF-8 CSV after reviewing every target locally. Engli
 ![Annual target import in English with dark theme](docs/images/import-budget-csv-en-dark-desktop.png)
 
 [Mobile reference](docs/images/import-budget-csv-en-dark-mobile.png)
+
+### Monthly budgets
+
+Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).
+
+![Monthly budget in English with dark theme](docs/images/budget-mensuel-en-dark-desktop.png)
+
+[Mobile reference](docs/images/budget-mensuel-en-dark-mobile.png) · [Allocation editor](docs/images/repartition-mensuelle-desktop.png)
 
 ### Reuse a budget
 

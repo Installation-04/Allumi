@@ -1,7 +1,7 @@
 import { balanceDay } from "@/app/_lib/report-period";
 import { todayIso } from "@/modules/ledger";
 import { agingCsv, getPayablesAging } from "@/modules/reports";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { agingLabels } from "../../_aging";
 import { loadCompany } from "../../_lib";
 

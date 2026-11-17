@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/platform/i18n/client";
 import { Field, FormScopeProvider, SelectField, StateError, SubmitButton, useScopedAction } from "@/app/_components/ui";
 import { FOCUS } from "@/app/_components/focus";
 import { ACCOUNT_TYPES, userCreatableSubtypes, type AccountType } from "@/modules/ledger/client";

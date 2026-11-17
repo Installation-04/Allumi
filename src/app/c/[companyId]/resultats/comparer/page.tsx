@@ -1,6 +1,6 @@
 import { StatementPrint } from "../../_statement-print";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { listFiscalYears,todayIso,formatMoney } from "@/modules/ledger";
 import { getIncomeComparison,comparisonPercent,type ComparedAmount } from "@/modules/reports";
 import { TABLE_CLASS,TD_CLASS,TH_CLASS } from "@/app/_components/table";

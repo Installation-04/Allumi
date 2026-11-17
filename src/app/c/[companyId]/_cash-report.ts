@@ -1,6 +1,6 @@
 import "server-only";
 import { searchText } from "@/app/_lib/search-params";
-import type { getTranslations } from "next-intl/server";
+import type { getTranslations } from "@/platform/i18n/server";
 import { CASH_FIGURES,type CashCsvLabels } from "@/modules/reports";
 export { reportAccountId as cashAccountId } from "@/app/_lib/report-account";
 export function cashPage(value:string|string[]|undefined){const n=Number(searchText(value));return Number.isSafeInteger(n)&&n>0?n:1;}

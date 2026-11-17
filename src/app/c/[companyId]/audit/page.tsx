@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { FOCUS } from "@/app/_components/focus";
 import { searchText } from "@/app/_lib/search-params";
 import { TABLE_CLASS, TD_CLASS, TH_CLASS } from "@/app/_components/table";

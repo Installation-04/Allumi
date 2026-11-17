@@ -1,6 +1,6 @@
 import "server-only";
 import { notFound } from "next/navigation";
-import { getLocale } from "next-intl/server";
+import { getLocale } from "@/platform/i18n/server";
 import { requireSession } from "@/app/_lib/session";
 import { getCompanyFor, can, type Action } from "@/modules/companies";
 import type { Locale } from "@/modules/ledger";

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { can } from "@/modules/companies";
 import { listContacts, type ContactFilter } from "@/modules/contacts";
 import { searchText } from "@/app/_lib/search-params";

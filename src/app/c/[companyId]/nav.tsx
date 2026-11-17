@@ -4,7 +4,7 @@ import Link from "next/link";
 import { matchesNavigationPath } from "./navigation-groups";
 import { usePathname } from "next/navigation";
 import { useId, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/platform/i18n/client";
 import { FOCUS } from "@/app/_components/focus";
 import { Icon, type IconName } from "@/app/_components/icon";
 

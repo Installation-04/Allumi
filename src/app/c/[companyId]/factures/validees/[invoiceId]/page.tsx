@@ -2,7 +2,7 @@ import { InvoiceEmailPanel } from "../../email-panel";
 import { SalesAttachments } from "../../../_attachments/sales-panel";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { can } from "@/modules/companies";
 import { ActionForm, Field } from "@/app/_components/ui";
 import { voidInvoiceAction } from "../../actions";

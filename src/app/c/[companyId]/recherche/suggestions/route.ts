@@ -1,4 +1,4 @@
-import { getLocale } from "next-intl/server";
+import { getLocale } from "@/platform/i18n/server";
 import { getSession } from "@/app/_lib/session";
 import { getCompanyFor } from "@/modules/companies";
 import { suggestCompany } from "@/modules/search";

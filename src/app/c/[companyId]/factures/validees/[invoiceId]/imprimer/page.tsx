@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { getInvoice } from "@/modules/sales";
 import { formatMoney } from "@/modules/ledger";
 import { loadCompany } from "../../../../_lib";

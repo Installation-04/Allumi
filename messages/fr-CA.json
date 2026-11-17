@@ -842,7 +842,13 @@
       "importChanged": "Le fichier ne correspond plus aux objectifs prévisualisés. Sélectionnez à nouveau le fichier et revérifiez l’aperçu.",
       "importStale": "Des comptes ont changé depuis cet aperçu. Rechargez la page, sélectionnez à nouveau le fichier et vérifiez les objectifs.",
       "importConfirm": "Confirmez la vérification des objectifs et de la destination avant l’import.",
-      "importChartLimit": "Le plan comptable dépasse 5 000 comptes. L’import est refusé sans liste ni résultat partiel."
+      "importChartLimit": "Le plan comptable dépasse 5 000 comptes. L’import est refusé sans liste ni résultat partiel.",
+      "monthlyInvalid": "Vérifiez les 12 périodes et les montants non négatifs, à deux décimales au plus.",
+      "monthlyExcess": "La répartition mensuelle dépasse l’objectif annuel. Aucun changement n’a été enregistré.",
+      "monthlyAnnualFloor": "L’objectif annuel ne peut pas être inférieur au montant déjà réparti. Réduisez d’abord la répartition mensuelle.",
+      "monthlyInUse": "Retirez d’abord les objectifs mensuels avant de retirer cet objectif annuel, y compris les montants zéro.",
+      "monthlyPeriods": "L’exercice doit contenir ses 12 périodes pour la planification mensuelle. Aucun résultat partiel n’est affiché.",
+      "monthlyPeriod": "Cette période n’appartient pas à l’exercice du budget."
     }
   },
   "settingsPage": {
@@ -3291,7 +3297,7 @@
     "copyLink": "Dupliquer le budget",
     "copyTitle": "Dupliquer un budget annuel",
     "copyBack": "Revenir au budget source",
-    "copyIntro": "Reprenez les objectifs annuels dans un nouveau scénario de cette entreprise. Le budget source reste intact; le réel comptabilisé et les écritures ne sont pas copiés. Les montants restent annuels, sans prorata selon la durée de l’exercice cible.",
+    "copyIntro": "Reprenez les objectifs annuels dans un nouveau scénario de cette entreprise. Le budget source reste intact; le réel comptabilisé et les écritures ne sont pas copiés. Les montants restent annuels, sans prorata selon la durée de l’exercice cible. Les objectifs mensuels ne sont pas copiés.",
     "copySource": "Aperçu du budget source",
     "copyActive": "{count, plural, one {# objectif à copier} other {# objectifs à copier}}",
     "copyExcluded": "{count, plural, one {# objectif inactif à exclure} other {# objectifs inactifs à exclure}}",
@@ -3339,6 +3345,28 @@
       "duplicate": "Le compte de la ligne {row} apparaît plusieurs fois dans le fichier.",
       "account": "La ligne {row} doit désigner un compte local existant de revenu ou de charge.",
       "inactive": "Le compte de la ligne {row} est inactif. Réactivez-le puis rechargez l’aperçu, ou corrigez le fichier."
-    }
+    },
+    "monthlyTitle": "Budget mensuel",
+    "monthlyPeriod": "Période de l’exercice",
+    "monthlyShow": "Afficher la période",
+    "monthlyTarget": "Objectif de la période",
+    "monthlyComparison": "Budget et réel de la période",
+    "monthlyAllocation": "Répartition annuelle",
+    "monthlyAllocated": "Montant réparti",
+    "monthlyRemaining": "Reste à répartir",
+    "monthlyDefined": "{count} / 12 périodes définies",
+    "monthlyComplete": "Répartition complète",
+    "monthlyEdit": "Répartir les mois",
+    "monthlyBack": "Revenir au rapport mensuel",
+    "monthlyAnnualBack": "Revenir au budget annuel",
+    "monthlySave": "Enregistrer la répartition",
+    "monthlySplit": "Répartir également les 12 périodes",
+    "monthlyRange": "P{number} · {from} → {to}",
+    "monthlyScope": "Période fiscale sélectionnée, dates inclusives : écritures validées, contre-passations et comptes inactifs compris, même à date future. Les objectifs absents restent non définis; aucun calcul à ce jour ou prorata. La répartition doit être préparée depuis les objectifs annuels.",
+    "monthlyEditHint": "Un champ vide laisse le mois non défini; zéro définit un objectif de zéro dollar. La somme ne peut pas dépasser l’objectif annuel. La proposition égale répartit les cents restants dans les premières périodes; vérifiez puis enregistrez. Effacer tous les champs retire la répartition sans retirer l’objectif annuel.",
+    "monthlyInvalidHint": "Corrigez les montants invalides ou négatifs avant d’enregistrer.",
+    "monthlyExcessHint": "La somme dépasse l’objectif annuel. Réduisez la répartition avant d’enregistrer.",
+    "monthlyClear": "Effacer la répartition proposée",
+    "monthlyDefinedCount": "Périodes définies (sur 12)"
   }
 }

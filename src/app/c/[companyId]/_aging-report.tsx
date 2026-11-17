@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { FOCUS } from "@/app/_components/focus";
 import { TABLE_CLASS, TD_CLASS, TH_CLASS } from "@/app/_components/table";
 import { formatMoney, type Locale } from "@/modules/ledger";

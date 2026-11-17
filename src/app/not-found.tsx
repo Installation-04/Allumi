@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 
 export async function generateMetadata() {
   return { title: (await getTranslations("errors"))("notFound") };

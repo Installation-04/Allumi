@@ -107,3 +107,5 @@ Suggestions : [[Suggestions-de-recherche]] — résultats autorisés pendant la 
 - [[Duplication-des-budgets]] — reprendre les objectifs annuels après aperçu et contrôle des comptes inactifs.
 
 - [[Import-CSV-des-budgets]] — créer un scénario après aperçu local et validation serveur du fichier.
+
+- [[Budgets-mensuels]] — répartition exacte des objectifs annuels, comparaison par période fiscale et CSV.

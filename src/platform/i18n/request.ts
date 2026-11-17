@@ -1,13 +1,15 @@
+import "server-only";
+import { cache } from "react";
 import { cookies } from "next/headers";
-import { getRequestConfig } from "next-intl/server";
-import { isLocale, type Locale } from "./locales";
+import french from "../../../messages/fr-CA.json";
+import english from "../../../messages/en.json";
+import { APP_TIME_ZONE, LOCALE_COOKIE, resolveLocale, type Locale } from "./locales";
 
-// No locale prefix in URLs: the language comes from a cookie, then DEFAULT_LOCALE.
-export default getRequestConfig(async () => {
+const catalogs: Record<Locale, typeof french> = { "fr-CA": french, en: english };
+
+// React cache is scoped to a server render/request. Never cache cookie-derived state at module level.
+export default cache(async () => {
   const store = await cookies();
-  const fromCookie = store.get("allumi_locale")?.value;
-  const fallback = process.env.DEFAULT_LOCALE;
-  const locale: Locale = isLocale(fromCookie) ? fromCookie : isLocale(fallback) ? fallback : "fr-CA";
-  const messages = (await import(`../../../messages/${locale}.json`)).default;
-  return { locale, messages, timeZone: "America/Toronto" };
+  const locale = resolveLocale(store.get(LOCALE_COOKIE)?.value, process.env.DEFAULT_LOCALE);
+  return { locale, messages: catalogs[locale], timeZone: APP_TIME_ZONE };
 });

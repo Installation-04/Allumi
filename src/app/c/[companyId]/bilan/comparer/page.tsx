@@ -1,6 +1,6 @@
 import { StatementPrint } from "../../_statement-print";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { formatMoney,todayIso } from "@/modules/ledger";
 import { getBalanceComparison,comparisonPercent,type ComparedAmount,type BalanceComparisonSection,type BalanceComparisonFigure } from "@/modules/reports";
 import { TABLE_CLASS,TD_CLASS,TH_CLASS } from "@/app/_components/table";

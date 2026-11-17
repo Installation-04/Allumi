@@ -1,6 +1,6 @@
 "use client";
 import { useId,useMemo,useRef,useState } from "react";
-import { useLocale,useTranslations } from "next-intl";
+import { useLocale,useTranslations } from "@/platform/i18n/client";
 import { StateError,SubmitButton,useScopedAction } from "@/app/_components/ui";
 import { FOCUS } from "@/app/_components/focus";
 import { formatMoney } from "@/modules/ledger/client";

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { ActionForm } from "@/app/_components/ui";
 import { TABLE_CLASS, TD_CLASS, TH_CLASS } from "@/app/_components/table";
 import { FOCUS } from "@/app/_components/focus";

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { getBudgetImportAccounts } from "@/modules/budgets";
 import { listFiscalYears } from "@/modules/ledger";
 import { AppError } from "@/platform/errors";
