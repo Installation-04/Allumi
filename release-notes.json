@@ -628,5 +628,57 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.73": {
+    "fr-CA": {
+      "title": "Reprendre les objectifs d’un budget annuel",
+      "added": [
+        {
+          "text": "Dupliquez les objectifs vers un nouveau scénario ou exercice de la même entreprise, après aperçu.",
+          "guide": "Duplication-des-budgets"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Les montants zéro sont conservés et les objectifs inactifs demandent une exclusion explicite; source indépendante, aperçu bilingue et mobile.",
+          "guide": "Duplication-des-budgets"
+        },
+        {
+          "text": "Les changements de source ou de comptes invalident l’aperçu. Les écritures atomiques, droits Comptabilité et la limite de 1 000 objectifs empêchent les copies partielles."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration ou nouvelle configuration. Aucun réel ni mouvement comptable copié; les montants restent annuels sans prorata.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Reuse annual budget targets",
+      "added": [
+        {
+          "text": "Duplicate targets into a new scenario or fiscal year for the same company, after reviewing a preview.",
+          "guide": "Duplication-des-budgets"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Zero targets are preserved and inactive targets require explicit exclusion; independent source, bilingual and mobile preview.",
+          "guide": "Duplication-des-budgets"
+        },
+        {
+          "text": "Changes to the source or accounts invalidate the preview. Atomic writes, Accounting permissions and the 1,000-target limit prevent partial copies."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration or new configuration. No posted actuals or journal entries are copied; targets stay annual without prorating.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

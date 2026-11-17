@@ -835,7 +835,9 @@
       "notFound": "Budget not found.",
       "stale": "This budget changed after you loaded the page. Reload the data before trying again.",
       "account": "Choose an active revenue or expense account. An existing target on an inactive account can be changed or removed.",
-      "tooMany": "This report exceeds the 1,000-account limit. No partial results are shown or exported."
+      "tooMany": "This report exceeds the 1,000-account limit. No partial results are shown or exported.",
+      "copyStale": "The source budget or its accounts changed after this preview. Reload the preview and review targets before trying again.",
+      "copyInactive": "Explicitly confirm excluding targets on inactive accounts, or reactivate these accounts and reload the preview."
     }
   },
   "settingsPage": {
@@ -3280,6 +3282,25 @@
     "reload": "Reload data",
     "saved": "Target saved.",
     "removed": "Target removed.",
-    "code": "Code"
+    "code": "Code",
+    "copyLink": "Duplicate budget",
+    "copyTitle": "Duplicate an annual budget",
+    "copyBack": "Back to source budget",
+    "copyIntro": "Reuse annual targets in a new scenario for this company. The source stays intact; posted actuals and journal entries are not copied. Targets remain annual, with no prorating for the destination fiscal year.",
+    "copySource": "Source budget preview",
+    "copyActive": "{count, plural, one {# target to copy} other {# targets to copy}}",
+    "copyExcluded": "{count, plural, one {# inactive target to exclude} other {# inactive targets to exclude}}",
+    "copyInactiveHint": "Some targets belong to inactive accounts. Review their details and confirm their exclusion, or reactivate the accounts and reload this preview. Nothing is excluded without your choice.",
+    "copyEmpty": "No active targets: confirmation will create an empty scenario.",
+    "copyDestination": "New scenario",
+    "copyName": "New scenario name",
+    "copyYear": "New scenario fiscal year",
+    "copyConfirm": "Create copy",
+    "copySkip": "{count, plural, one {I explicitly exclude this target on an inactive account.} other {I explicitly exclude these # targets on inactive accounts.}}",
+    "copyFreshHint": "If targets or accounts change after this preview, the copy is refused. Reload and review before trying again. Future changes to the source and copy are independent.",
+    "copyReload": "Reload preview",
+    "copyTargets": "{count, plural, one {Review target (#)} other {Review targets (#)}}",
+    "copyWillCopy": "Will be copied",
+    "copyWillSkip": "Will be excluded if confirmed"
   }
 }

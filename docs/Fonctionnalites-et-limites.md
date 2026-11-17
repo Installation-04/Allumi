@@ -47,3 +47,5 @@ Cycle commercial livré : [[Devis]]. Finalisation et réponse consignées manuel
 [[Suggestions-de-recherche]] ajoute huit propositions maximum dans l’en-tête, selon les droits courants, sans historique applicatif ni action financière automatique.
 
 [[Budgets-annuels]] : scénarios annuels par exercice et compte de revenu/charge, comparaison au réel inclusif, objectifs absents signalés, CSV exact et droits Comptabilité. Limite de 1 000 comptes, sans ventilation mensuelle ni prévisions.
+
+[[Duplication-des-budgets]] : reprise des objectifs vers un scénario/exercice de la même entreprise, aperçu, exclusions explicites des comptes inactifs et refus des aperçus périmés. Aucune écriture financière.

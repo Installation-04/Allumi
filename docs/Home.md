@@ -103,3 +103,5 @@ Rapports dans la recherche : [[Recherche-des-rapports]] — retrouver les formul
 Suggestions : [[Suggestions-de-recherche]] — résultats autorisés pendant la frappe dans l’en-tête, au clavier et au toucher.
 
 - [[Budgets-annuels]] — objectifs par compte et comparaison au réel sur l’exercice complet.
+
+- [[Duplication-des-budgets]] — reprendre les objectifs annuels après aperçu et contrôle des comptes inactifs.
