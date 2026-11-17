@@ -1,0 +1,12 @@
+import { beforeEach,expect,it,vi } from "vitest";
+const mocks=vi.hoisted(()=>({session:vi.fn(),company:vi.fn(),suggest:vi.fn()}));
+vi.mock("@/app/_lib/session",()=>({getSession:mocks.session}));
+vi.mock("@/modules/companies",()=>({getCompanyFor:mocks.company}));
+vi.mock("@/modules/search",()=>({suggestCompany:mocks.suggest}));
+vi.mock("next-intl/server",()=>({getLocale:async()=>"en"}));
+import { GET } from "@/app/c/[companyId]/recherche/suggestions/route";
+const companyId="00000000-0000-7000-8000-00000000000a",params=Promise.resolve({companyId});
+beforeEach(()=>{vi.resetAllMocks();mocks.session.mockResolvedValue({userId:"user",mfaPending:false});mocks.company.mockResolvedValue({id:companyId});mocks.suggest.mockResolvedValue([]);});
+it("rejects missing or pending-MFA sessions before any company or search lookup",async()=>{for(const session of [null,{userId:"user",mfaPending:true}]){mocks.session.mockResolvedValue(session);const r=await GET(new Request('https://example.test/c/'+companyId+'/recherche/suggestions?q=bilan'),{params});expect(r.status).toBe(401);expect(r.headers.get('cache-control')).toBe('private, no-store');}expect(mocks.company).not.toHaveBeenCalled();expect(mocks.suggest).not.toHaveBeenCalled();});
+it("rejects duplicate or unknown query parameters without running a search",async()=>{for(const q of ['q=a&q=b','page=2'])expect((await GET(new Request('https://example.test/?'+q),{params})).status).toBe(400);expect(mocks.suggest).not.toHaveBeenCalled();});
+it("returns private generic errors on backend failure without exposing exception details",async()=>{mocks.suggest.mockRejectedValue(new Error('PRIVATE-BACKEND-DETAIL'));const r=await GET(new Request('https://example.test/?q=bilan'),{params});expect(r.status).toBe(503);expect(await r.text()).not.toContain('PRIVATE-BACKEND-DETAIL');expect(r.headers.get('cache-control')).toBe('private, no-store');expect(r.headers.get('cross-origin-resource-policy')).toBe('same-origin');});

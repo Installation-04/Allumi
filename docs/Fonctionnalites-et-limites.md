@@ -43,3 +43,5 @@ Cycle commercial livré : [[Devis]]. Finalisation et réponse consignées manuel
 [[Recherche-bancaire]] étend la recherche globale aux transactions CAD importées, selon le module Comptabilité existant; dates, montants nets et états actuels sont filtrables sans créer d’écriture.
 
 [[Recherche-des-rapports]] ajoute 13 destinations de rapports existants à la recherche globale, selon leurs permissions, avec noms bilingues et synonymes; aucun rapport enregistré ou contenu financier n’est recherché.
+
+[[Suggestions-de-recherche]] ajoute huit propositions maximum dans l’en-tête, selon les droits courants, sans historique applicatif ni action financière automatique.

@@ -2831,7 +2831,13 @@
     "entryAmount": "Total debits",
     "bankAmount": "Signed statement amount · CAD",
     "bankScope": "CAD only: exact filters use absolute net amounts; the displayed sign is preserved. Statement descriptions/payees and current states require Accounting read access. An imported row is not a posted journal entry.",
-    "reportScope": "Report links open existing forms. Choose periods, accounts or contacts on the destination page. Reports have no record date or amount; those filters exclude them. Names in both languages and explicit synonyms are searched; no saved report or financial data is created."
+    "reportScope": "Report links open existing forms. Choose periods, accounts or contacts on the destination page. Reports have no record date or amount; those filters exclude them. Names in both languages and explicit synonyms are searched; no saved report or financial data is created.",
+    "suggestions": "Search suggestions",
+    "suggestionsLoading": "Loading suggestions…",
+    "suggestionsError": "Suggestions are unavailable. Submit to open full search.",
+    "suggestionsEmpty": "No suggestions. Submit to open full search.",
+    "suggestionsHint": "Up to 8 matches. Use arrow keys and Enter, or submit for full search.",
+    "suggestionsStart": "Type at least two characters for suggestions. Submit to search all results."
   },
   "officialTaxes": {
     "audit": "View import provenance",

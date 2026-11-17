@@ -99,3 +99,5 @@ Comparaison fiscale : [[Comparaison-des-codes-fiscaux]] — codes existants et t
 Recherche bancaire : [[Recherche-bancaire]] — lignes CAD importées, montants signés, états et accès aux fiches.
 
 Rapports dans la recherche : [[Recherche-des-rapports]] — retrouver les formulaires autorisés, sans dates ou montants fictifs.
+
+Suggestions : [[Suggestions-de-recherche]] — résultats autorisés pendant la frappe dans l’en-tête, au clavier et au toucher.

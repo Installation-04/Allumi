@@ -571,3 +571,15 @@ Codes importés ou manuels, taux datés et écarts par composante : [[Comparaiso
 ![Recherche des rapports](images/recherche-rapports-mobile.png)
 
 ![Recherche des rapports](images/recherche-rapports-en-dark-mobile.png)
+
+## Suggestions de recherche
+
+[[Suggestions-de-recherche]] : liste autorisée, clavier et tactile.
+
+![Suggestions de recherche](images/suggestions-recherche-desktop.png)
+
+![Suggestions de recherche](images/suggestions-recherche-en-dark-desktop.png)
+
+![Suggestions de recherche](images/suggestions-recherche-mobile.png)
+
+![Suggestions de recherche](images/suggestions-recherche-en-dark-mobile.png)

@@ -122,3 +122,5 @@
 - [[Recherche-bancaire]] — transactions CAD importées et montants signés.
 
 - [[Recherche-des-rapports]] — retrouver les formulaires financiers autorisés.
+
+- [[Suggestions-de-recherche]] — propositions autorisées pendant la frappe.
