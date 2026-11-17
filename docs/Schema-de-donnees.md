@@ -15,13 +15,14 @@ Voir aussi [[Architecture]], [[Regles-comptables]], [[Plan-de-tests]].
 - Les `CHECK` qui comparent une colonne d'enum à un littéral s'écrivent sur `::text` (voir [la recette de changement d'enum](#changer-un-enum)).
 
 ## Vue d'ensemble
-57 tables : 7 tables d’identité ou techniques (`instance` et `rate_limit` sans RLS; 5 tables d’identité sous RLS par utilisateur), et 50 tables métier sous RLS d’entreprise, entreprise elle-même incluse.
+59 tables : 7 tables d’identité ou techniques (`instance` et `rate_limit` sans RLS; 5 tables d’identité sous RLS par utilisateur), et 52 tables métier sous RLS d’entreprise, entreprise elle-même incluse.
 
 | Domaine | Tables |
 |---|---|
 | Instance et identité | `instance`, `app_user`, `user_credential`, `user_recovery_code`, `session`, `password_reset_token`, `rate_limit` |
 | Entreprise | `company`, `membership`, `invitation`, `number_sequence` |
 | Exercices | `fiscal_year`, `fiscal_period` |
+| Budgets | `budget`, `budget_line` |
 | Grand livre | `account`, `journal_entry`, `journal_line` |
 | Contacts | `contact`, `item` |
 | Taxes | `tax`, `tax_rate`, `tax_code`, `tax_code_component`, `tax_return` |
@@ -4770,3 +4771,11 @@ Les applications de crédit exigent Comptabilité `write`. Les opérations couve
 `supplier_document_isolation()` utilise les mêmes droits et chemin SQL restreint. `supplier_credit_00_isolation` est un trigger immédiat BEFORE UPDATE sur `purchase_document`, exécuté avant `supplier_credit_limits`. Il refuse un instantané autre que READ COMMITTED lors de la validation d’un crédit fournisseur ou de l’annulation d’une pièce d’achat : un changement concurrent de disponible ne peut pas être ignoré à cause d’un instantané ancien.
 
 Aucune affectation ne crée de nouvelle écriture de journal, numéro ou paiement. Les dates historiques déterminent encore les soldes et les rapports datés. Les nouvelles gardes ne réécrivent pas les données existantes; elles contrôlent les opérations suivantes, y compris celles sur une affectation historique.
+
+## Budgets annuels
+
+`budget` porte l’entreprise, l’exercice (FK composite), le nom unique par entreprise/exercice, la révision positive et les horodatages. `budget_line` porte l’entreprise, le budget et le compte (FK composites), un objectif `BIGINT` entre 0 et 100000000000000 cents et les horodatages; un seul objectif par budget/compte. Le type d’un compte portant un objectif ne peut pas changer; le compte est verrouillé en lecture partagée lors du contrôle de l’objectif. Les gardes empêchent tout déplacement d’identité/périmètre et exigent un compte REVENUE/EXPENSE actif à l’insertion.
+
+Les deux tables forcent la RLS d’entreprise et le module Comptabilité (lecture pour SELECT, écriture pour les changements), avec audit des lignes. Pas de droit DELETE sur les scénarios; retrait d’objectifs autorisé et audité. Le déclencheur AFTER de chaque insertion/modification/suppression d’objectif avance la révision du parent. Les services verrouillent ce parent avant de vérifier la révision attendue; un formulaire périmé est refusé. Les fonctions restent sous les droits de l’appelant, avec search_path fixe et sans EXECUTE public.
+
+La comparaison utilise un seul instantané SQL pour révision, objectifs et grand livre, aux bornes inclusives de l’exercice. Sommes NUMERIC converties en texte puis BigInt; absence d’objectif distincte de zéro, contre-passations et comptes inactifs conservés. Aucune écriture financière ni dépendance à l’état ouvert/fermé des périodes. Voir [[Budgets-annuels]].

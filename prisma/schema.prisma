@@ -458,6 +458,8 @@ model Company {
   recurringPlans         SalesRecurringPlan[]
   salesEstimates         SalesEstimate[]
   estimateCounter        SalesEstimateCounter?
+  budgets                Budget[]
+  budgetLines            BudgetLine[]
 
   @@map("company")
 }
@@ -527,6 +529,7 @@ model FiscalYear {
 
   company Company        @relation(fields: [companyId], references: [id], onDelete: Restrict)
   periods FiscalPeriod[]
+  budgets Budget[]
 
   @@unique([companyId, id])
   @@unique([companyId, startDate])
@@ -596,6 +599,7 @@ model Account {
   feeConnections         IntegrationConnection[] @relation("ConnectionFeeAccount")
   reconciliations        BankReconciliation[]
   estimateLines          SalesEstimateLine[]
+  budgetLines            BudgetLine[]
 
   @@unique([companyId, id])
   @@unique([companyId, code])
@@ -1827,4 +1831,39 @@ model SalesRecurringOccurrence {
   @@unique([companyId,planId,scheduledDate],map:"recurring_occurrence_date_key")
   @@unique([companyId,invoiceId],map:"recurring_occurrence_invoice_key")
   @@map("sales_recurring_occurrence")
+}
+
+model Budget {
+  id           String       @id @default(uuid(7)) @db.Uuid
+  companyId    String       @map("company_id") @db.Uuid
+  fiscalYearId String       @map("fiscal_year_id") @db.Uuid
+  name         String
+  revision     Int          @default(1)
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
+  company      Company      @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  fiscalYear   FiscalYear   @relation(fields: [companyId, fiscalYearId], references: [companyId, id], onDelete: Restrict, map: "budget_fiscal_year_fkey")
+  lines        BudgetLine[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, fiscalYearId, name])
+  @@map("budget")
+}
+
+model BudgetLine {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  companyId   String   @map("company_id") @db.Uuid
+  budgetId    String   @map("budget_id") @db.Uuid
+  accountId   String   @map("account_id") @db.Uuid
+  amountCents BigInt   @map("amount_cents")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  budget      Budget   @relation(fields: [companyId, budgetId], references: [companyId, id], onDelete: Restrict, map: "budget_line_budget_fkey")
+  account     Account  @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict, map: "budget_line_account_fkey")
+
+  @@unique([budgetId, accountId])
+  @@index([companyId, accountId])
+  @@index([companyId, budgetId])
+  @@map("budget_line")
 }

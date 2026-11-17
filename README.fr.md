@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.71
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.72
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -154,6 +154,15 @@ Imprimez une copie comptable d’un remboursement fournisseur : montant original
 Retrouvez les résultats autorisés pendant la frappe dans l’en-tête : huit propositions maximum, clavier/tactile et accès à la recherche complète. [Guide des suggestions](docs/Suggestions-de-recherche.md).
 
 ![Suggestions de recherche](docs/images/suggestions-recherche-desktop.png)
+
+### Budgets annuels
+
+Créez des scénarios par exercice, définissez vos objectifs de revenus/charges et comparez-les au réel comptabilisé. Objectifs absents signalés, modifications concurrentes refusées et CSV exact FR/EN. L’exercice complet inclut toutes les écritures datées de la période; les prévisions mensuelles ne sont pas incluses. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-annuels).
+
+![Budget annuel](docs/images/budgets-annuels-desktop.png)
+
+[Référence mobile](docs/images/budgets-annuels-mobile.png)
+
 
 Retrouvez 13 formulaires de rapports financiers par nom français/anglais et synonymes explicites, avec destinations filtrées selon vos droits. [Guide de recherche des rapports](docs/Recherche-des-rapports.md).
 

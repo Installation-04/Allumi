@@ -366,3 +366,13 @@ it("installs immediate supplier application and posting/cancellation guards unde
   {name:"supplier_document_isolation",definer:false,config:["search_path=public, pg_temp"],public_execute:false},
  ]);
 });
+
+it("isolates annual budgets with composite scope, audit, bounded cents and automatic revisions",async()=>{
+ expect(await q("SELECT conname FROM pg_constraint WHERE conname IN ('budget_fiscal_year_fkey','budget_line_budget_fkey','budget_line_account_fkey','budget_line_amount','budget_revision','budget_name')")).toHaveLength(6);
+ expect(await q("SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('budget_guard','budget_line_guard','budget_line_revision','budget_audit','budget_line_audit','budget_account_guard')")).toHaveLength(6);
+ for(const table of ['budget','budget_line']){
+  expect((await q<{qual:string}>("SELECT qual FROM pg_policies WHERE tablename=$1 AND policyname='module_read' AND permissive='RESTRICTIVE'",[table]))[0]?.qual).toContain('accounting');
+  expect((await q<{ok:boolean}>("SELECT has_table_privilege('allumi_app',$1,'TRUNCATE') AS ok",[table]))[0]?.ok).toBe(false);
+ }
+ expect((await q<{ok:boolean}>("SELECT has_table_privilege('allumi_app','budget','DELETE') AS ok"))[0]?.ok).toBe(false);
+});

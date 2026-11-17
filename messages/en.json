@@ -827,6 +827,15 @@
       "linked": "Resolve linked offsets before voiding this refund.",
       "exportLimit": "More than 10,000 refunds match. Narrow the search or date range before exporting.",
       "printLimit": "This copy exceeds 1,000 origins. Consult the paginated refund history; no partial copy is printed."
+    },
+    "budgets": {
+      "invalid": "Check the name, account, non-negative amount with two decimals and budget revision.",
+      "year": "Fiscal year not found.",
+      "duplicate": "A budget with this name already exists for this fiscal year.",
+      "notFound": "Budget not found.",
+      "stale": "This budget changed after you loaded the page. Reload the data before trying again.",
+      "account": "Choose an active revenue or expense account. An existing target on an inactive account can be changed or removed.",
+      "tooMany": "This report exceeds the 1,000-account limit. No partial results are shown or exported."
     }
   },
   "settingsPage": {
@@ -904,7 +913,8 @@
     "company": "Company",
     "invoices": "Invoice drafts",
     "credits": "Credit notes",
-    "members": "Users and permissions"
+    "members": "Users and permissions",
+    "budgets": "Annual budgets"
   },
   "ledgerSetup": {
     "title": "Set up the books",
@@ -1312,7 +1322,8 @@
       "devis": "Estimates",
       "recurrences": "Recurring invoices",
       "relances": "Customer reminders",
-      "remboursements-fournisseurs": "Supplier refunds"
+      "remboursements-fournisseurs": "Supplier refunds",
+      "budgets": "Annual budgets"
     }
   },
   "updates": {
@@ -3232,5 +3243,43 @@
       "INACTIVE": "The local code or at least one component is currently inactive. Matching rates do not make this code usable.",
       "NON_STANDARD": "This code uses a non-standard treatment. Standard rates cannot validate a zero-rated, exempt or out-of-scope treatment."
     }
+  },
+  "budgets": {
+    "title": "Annual budgets",
+    "intro": "Create annual fiscal-year scenarios and compare your targets with posted income and expenses.",
+    "create": "Create budget",
+    "name": "Scenario name",
+    "year": "Full fiscal year",
+    "noYear": "First create a fiscal year under Accounting → Fiscal years.",
+    "scenarios": "Scenarios",
+    "empty": "No budgets yet.",
+    "back": "All budgets",
+    "export": "Export CSV",
+    "scope": "Full fiscal year: all posted entries dated within this year, including future dates, reversals and inactive accounts. No monthly allocation or year-to-date calculation. Budgets create no journal entries.",
+    "coverage": "{count, plural, one {# account with activity has no target.} other {# accounts with activity have no target.}} Defined target totals are not a complete budget.",
+    "revenue": "Revenue",
+    "expenses": "Expenses",
+    "definedTargets": "Defined targets",
+    "actual": "Posted actuals",
+    "saveTarget": "Add or replace target",
+    "account": "Account",
+    "amount": "Annual target (CAD)",
+    "amountHint": "Positive or zero, up to $1 trillion, two decimal places. Zero is a defined target; “Not set” means no target.",
+    "editHint": "Choose an existing account to replace its target. Changes are refused if another user has changed this budget; reload this page before trying again.",
+    "comparison": "Budget vs actual by account",
+    "differenceHint": "Difference = actual minus target. Positive revenue and expense differences have different meanings; no color labels them as favorable.",
+    "type": "Type",
+    "target": "Annual target",
+    "difference": "Difference",
+    "actions": "Actions",
+    "notSet": "Not set",
+    "inactive": "Inactive",
+    "remove": "Remove target",
+    "removeNamed": "Remove target for account {code}",
+    "noTargets": "No targets or posted activity in this fiscal year.",
+    "reload": "Reload data",
+    "saved": "Target saved.",
+    "removed": "Target removed.",
+    "code": "Code"
   }
 }
