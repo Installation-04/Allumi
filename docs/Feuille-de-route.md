@@ -56,3 +56,5 @@ Lot 4.5 : encaissements sur facture et [[Encaissements-au-compte]] disponibles, 
 Budgets annuels par exercice et compte, comparaison au réel et CSV disponibles : [[Budgets-annuels]]. Ventilation mensuelle et prévisions de trésorerie restent hors périmètre.
 
 [[Duplication-des-budgets]] : reprise des objectifs vers un scénario/exercice de la même entreprise, aperçu, exclusions explicites des comptes inactifs et refus des aperçus périmés. Aucune écriture financière.
+
+[[Import-CSV-des-budgets]] : objectifs annuels importés dans un nouveau scénario depuis un CSV UTF-8 français/anglais, aperçu local, confirmation, comptes locaux actifs et création atomique auditée. Aucun budget existant écrasé ni mouvement financier importé.

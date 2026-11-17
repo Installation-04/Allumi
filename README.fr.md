@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.73
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.74
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -154,6 +154,14 @@ Imprimez une copie comptable d’un remboursement fournisseur : montant original
 Retrouvez les résultats autorisés pendant la frappe dans l’en-tête : huit propositions maximum, clavier/tactile et accès à la recherche complète. [Guide des suggestions](docs/Suggestions-de-recherche.md).
 
 ![Suggestions de recherche](docs/images/suggestions-recherche-desktop.png)
+
+### Importer les objectifs annuels
+
+Créez un nouveau budget depuis un CSV UTF-8 après aperçu local des objectifs. Formats de fichiers français/anglais, cents exacts, confirmation explicite, validation serveur et audit atomique; les budgets existants restent indépendants. [Guide](https://github.com/Installation-04/Allumi/wiki/Import-CSV-des-budgets).
+
+![Import des objectifs annuels](docs/images/import-budget-csv-desktop.png)
+
+[Référence mobile](docs/images/import-budget-csv-mobile.png)
 
 ### Reprendre un budget
 

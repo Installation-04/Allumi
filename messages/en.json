@@ -837,7 +837,12 @@
       "account": "Choose an active revenue or expense account. An existing target on an inactive account can be changed or removed.",
       "tooMany": "This report exceeds the 1,000-account limit. No partial results are shown or exported.",
       "copyStale": "The source budget or its accounts changed after this preview. Reload the preview and review targets before trying again.",
-      "copyInactive": "Explicitly confirm excluding targets on inactive accounts, or reactivate these accounts and reload the preview."
+      "copyInactive": "Explicitly confirm excluding targets on inactive accounts, or reactivate these accounts and reload the preview.",
+      "importInvalid": "The file or preview is invalid. Check its format, targets and 256 KiB / 1,000-row limit.",
+      "importChanged": "The file no longer matches the reviewed targets. Select the file again and review the preview.",
+      "importStale": "Accounts changed after this preview. Reload the page, select the file again and review the targets.",
+      "importConfirm": "Confirm reviewing the targets and destination before importing.",
+      "importChartLimit": "The chart exceeds 5,000 accounts. Import is refused without a partial list or result."
     }
   },
   "settingsPage": {
@@ -3301,6 +3306,39 @@
     "copyReload": "Reload preview",
     "copyTargets": "{count, plural, one {Review target (#)} other {Review targets (#)}}",
     "copyWillCopy": "Will be copied",
-    "copyWillSkip": "Will be excluded if confirmed"
+    "copyWillSkip": "Will be excluded if confirmed",
+    "importLink": "Import CSV",
+    "importTitle": "Import annual targets",
+    "importIntro": "Preview a CSV file to create a new scenario. Existing budgets stay independent; no posted actuals or journal entries are imported.",
+    "importChooseYear": "Choose a fiscal year",
+    "importFormat": "CSV file format",
+    "importFormatFr": "French: semicolon and decimal comma",
+    "importFormatEn": "English: comma and decimal point",
+    "importTemplate": "Download empty template",
+    "importFile": "UTF-8 CSV file",
+    "importFileHint": "Up to 256 KiB and 1,000 targets. Headers: account_code and annual_target. Exact codes of active revenue/expense accounts; positive or zero amounts, up to two decimals, without currency signs or thousands separators.",
+    "importReading": "Reading file…",
+    "importReady": "{count, plural, one {# target ready for review.} other {# targets ready for review.}}",
+    "importPick": "Choose a file to review targets before confirming. Nothing is sent to the server before confirmation.",
+    "importPreview": "Targets to import",
+    "importRow": "Row {row}",
+    "importConfirm": "{count, plural, one {I reviewed this target and the destination; I confirm creating a new scenario.} other {I reviewed these # targets and the destination; I confirm creating a new scenario.}}",
+    "importSubmit": "Create budget from CSV",
+    "importStaleHint": "If an account changed after this page loaded, the import is refused. Reload the preview, select the file again and review the targets. Amounts remain annual, without prorating.",
+    "importJavaScript": "Enable JavaScript to preview the file before confirming its import.",
+    "importErrors": {
+      "encoding": "The file must be valid UTF-8 CSV.",
+      "tooLarge": "The file exceeds 256 KiB.",
+      "syntax": "Malformed CSV at row {row}; check quotes and cells.",
+      "header": "The two headers must be exactly account_code and annual_target with the selected delimiter.",
+      "empty": "The file has no targets.",
+      "tooMany": "The file exceeds 1,000 targets; no partial import will be performed.",
+      "columns": "Row {row} must contain exactly two columns.",
+      "code": "Invalid account code at row {row}.",
+      "amount": "Invalid amount at row {row}; use the selected decimal separator, up to two decimal places and an amount from zero to $1 trillion.",
+      "duplicate": "The account at row {row} appears more than once in the file.",
+      "account": "Row {row} must reference an existing local revenue or expense account.",
+      "inactive": "The account at row {row} is inactive. Reactivate it and reload the preview, or fix the file."
+    }
   }
 }

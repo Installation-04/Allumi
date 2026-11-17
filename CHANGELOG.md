@@ -4,6 +4,13 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.74] - 2026-11-17
+
+- Nouveautés : import CSV UTF-8 des objectifs annuels vers un nouveau scénario, aperçu local complet et modèle privé français/anglais.
+- Améliorations : montants exacts et zéros conservés, formats explicites, confirmation réinitialisée aux changements, limites de 256 Kio / 1 000 objectifs et erreurs sans import partiel; FR/EN/mobile/sombre, guide et quatre captures.
+- Sécurité : fichier relu côté serveur, aperçu et comptes revérifiés, verrous et création atomique sous droits Comptabilité/RLS, audit par empreinte sans stockage du fichier; limite du rapport contrôlée avec l’activité existante.
+- Installation : aucune migration ni nouvelle configuration; aucun budget existant écrasé, aucun réel ou mouvement comptable importé et aucun prorata automatique.
+
 ## [0.4.0-alpha.73] - 2026-11-17
 
 - Nouveautés : duplication des objectifs annuels vers un nouveau scénario ou exercice de la même entreprise, avec aperçu et source indépendante.

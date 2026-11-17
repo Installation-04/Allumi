@@ -128,3 +128,5 @@
 - [[Budgets-annuels]] — objectifs par compte et comparaison au réel sur l’exercice complet.
 
 - [[Duplication-des-budgets]] — reprendre les objectifs annuels après aperçu et contrôle des comptes inactifs.
+
+- [[Import-CSV-des-budgets]] — créer un scénario après aperçu local et validation serveur du fichier.

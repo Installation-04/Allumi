@@ -44,8 +44,10 @@ Sur téléphone, les comptes sont présentés en cartes avec objectif, réel et 
 
 La mise à jour ajoute les tables `budget` et `budget_line`, leurs politiques RLS, contraintes, gardes et déclencheurs d’audit/révision. Sauvegardez avant la mise à jour; le service de migration habituel applique cet ajout. Aucune nouvelle variable d’environnement. Aucun déploiement automatique sur votre serveur personnel.
 
-Cette version couvre les scénarios **annuels** par compte. La ventilation mensuelle, les prévisions de trésorerie, l’import de budgets, le renommage et la suppression de scénarios ne sont pas proposés. Les captures proviennent d’une entreprise fictive, avec Chromium et émulation mobile; la validation physique Safari iOS reste à faire.
+Cette version couvre les scénarios **annuels** par compte. La ventilation mensuelle, les prévisions de trésorerie, le renommage et la suppression de scénarios ne sont pas proposés. Les captures proviennent d’une entreprise fictive, avec Chromium et émulation mobile; la validation physique Safari iOS reste à faire.
 
 Voir [[Etats-financiers]], [[Exercices-et-periodes]], [[Utilisateurs-et-permissions]], [[Mise-a-jour]] et [[Schema-de-donnees]].
 
 La reprise des objectifs dans un nouveau scénario est disponible avec aperçu et exclusions explicites : [[Duplication-des-budgets]].
+
+L’ajout d’objectifs depuis un fichier, après aperçu local et confirmation, est disponible : [[Import-CSV-des-budgets]].

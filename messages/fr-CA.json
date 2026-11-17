@@ -837,7 +837,12 @@
       "account": "Choisissez un compte de revenu ou de charge actif. Un objectif existant sur un compte inactif peut être modifié ou retiré.",
       "tooMany": "Ce rapport dépasse la limite de 1 000 comptes. Aucun résultat partiel n’est affiché ou exporté.",
       "copyStale": "Le budget source ou ses comptes ont changé depuis cet aperçu. Rechargez l’aperçu et vérifiez les objectifs avant de réessayer.",
-      "copyInactive": "Confirmez explicitement l’exclusion des objectifs sur des comptes inactifs, ou réactivez ces comptes et rechargez l’aperçu."
+      "copyInactive": "Confirmez explicitement l’exclusion des objectifs sur des comptes inactifs, ou réactivez ces comptes et rechargez l’aperçu.",
+      "importInvalid": "Le fichier ou l’aperçu est invalide. Vérifiez le format, les objectifs et la limite de 256 Kio / 1 000 lignes.",
+      "importChanged": "Le fichier ne correspond plus aux objectifs prévisualisés. Sélectionnez à nouveau le fichier et revérifiez l’aperçu.",
+      "importStale": "Des comptes ont changé depuis cet aperçu. Rechargez la page, sélectionnez à nouveau le fichier et vérifiez les objectifs.",
+      "importConfirm": "Confirmez la vérification des objectifs et de la destination avant l’import.",
+      "importChartLimit": "Le plan comptable dépasse 5 000 comptes. L’import est refusé sans liste ni résultat partiel."
     }
   },
   "settingsPage": {
@@ -3301,6 +3306,39 @@
     "copyReload": "Recharger l’aperçu",
     "copyTargets": "{count, plural, one {Vérifier l’objectif (#)} other {Vérifier les objectifs (#)}}",
     "copyWillCopy": "Sera copié",
-    "copyWillSkip": "Sera exclu si confirmé"
+    "copyWillSkip": "Sera exclu si confirmé",
+    "importLink": "Importer un CSV",
+    "importTitle": "Importer des objectifs annuels",
+    "importIntro": "Prévisualisez un fichier CSV pour créer un nouveau scénario. Les budgets existants restent indépendants; aucun réel ni mouvement comptable n’est importé.",
+    "importChooseYear": "Choisir un exercice",
+    "importFormat": "Format du fichier CSV",
+    "importFormatFr": "Français : point-virgule et décimale virgule",
+    "importFormatEn": "Anglais : virgule et décimale point",
+    "importTemplate": "Télécharger le modèle vide",
+    "importFile": "Fichier CSV UTF-8",
+    "importFileHint": "256 Kio maximum, 1 000 objectifs. En-têtes : account_code et annual_target. Codes exacts de comptes actifs de revenus/charges; montants positifs ou zéro, deux décimales au plus, sans symbole monétaire ni séparateur de milliers.",
+    "importReading": "Lecture du fichier…",
+    "importReady": "{count, plural, one {# objectif prêt à vérifier.} other {# objectifs prêts à vérifier.}}",
+    "importPick": "Choisissez un fichier pour voir les objectifs avant de confirmer. Rien n’est envoyé au serveur avant la confirmation.",
+    "importPreview": "Aperçu des objectifs à importer",
+    "importRow": "Ligne {row}",
+    "importConfirm": "{count, plural, one {J’ai vérifié cet objectif et la destination; je confirme la création d’un nouveau scénario.} other {J’ai vérifié ces # objectifs et la destination; je confirme la création d’un nouveau scénario.}}",
+    "importSubmit": "Créer le budget depuis le CSV",
+    "importStaleHint": "Si un compte a changé depuis le chargement de la page, l’import est refusé. Rechargez l’aperçu, sélectionnez à nouveau le fichier et revérifiez les objectifs. Les montants restent annuels, sans prorata.",
+    "importJavaScript": "Activez JavaScript pour prévisualiser le fichier avant de confirmer son import.",
+    "importErrors": {
+      "encoding": "Le fichier doit être un CSV UTF-8 valide.",
+      "tooLarge": "Le fichier dépasse 256 Kio.",
+      "syntax": "CSV mal formé à la ligne {row}; vérifiez les guillemets et les cellules.",
+      "header": "Les deux en-têtes doivent être exactement account_code et annual_target, avec le séparateur choisi.",
+      "empty": "Le fichier ne contient aucun objectif.",
+      "tooMany": "Le fichier dépasse 1 000 objectifs; aucun import partiel ne sera effectué.",
+      "columns": "La ligne {row} doit contenir exactement deux colonnes.",
+      "code": "Code de compte invalide à la ligne {row}.",
+      "amount": "Montant invalide à la ligne {row}; utilisez le séparateur décimal choisi, au plus deux décimales et un montant entre zéro et 1 000 milliards de dollars.",
+      "duplicate": "Le compte de la ligne {row} apparaît plusieurs fois dans le fichier.",
+      "account": "La ligne {row} doit désigner un compte local existant de revenu ou de charge.",
+      "inactive": "Le compte de la ligne {row} est inactif. Réactivez-le puis rechargez l’aperçu, ou corrigez le fichier."
+    }
   }
 }
