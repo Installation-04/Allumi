@@ -4,6 +4,13 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.73] - 2026-11-17
+
+- Nouveautés : duplication des objectifs annuels vers un nouveau scénario ou exercice de la même entreprise, avec aperçu et source indépendante.
+- Améliorations : objectifs zéro conservés, comptes inactifs et montants exclus présentés, choix d’exclusion explicite et scénario vide annoncé; FR/EN/mobile/sombre, guide et quatre captures.
+- Sécurité : confirmation atomique sous droits Comptabilité, source et comptes verrouillés, révision et empreinte contre les aperçus périmés, unicité et limite de 1 000 objectifs sans copie partielle.
+- Installation : aucune migration ni nouvelle configuration; aucun réel ou mouvement comptable copié, sans prorata ni prévision automatique.
+
 ## [0.4.0-alpha.72] - 2026-11-16
 
 - Nouveautés : scénarios de budgets annuels par exercice et objectifs par compte de revenu/charge, modifiables sans écriture financière.

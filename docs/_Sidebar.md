@@ -126,3 +126,5 @@
 - [[Suggestions-de-recherche]] — propositions autorisées pendant la frappe.
 
 - [[Budgets-annuels]] — objectifs par compte et comparaison au réel sur l’exercice complet.
+
+- [[Duplication-des-budgets]] — reprendre les objectifs annuels après aperçu et contrôle des comptes inactifs.

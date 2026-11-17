@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.72
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.73
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -154,6 +154,14 @@ Imprimez une copie comptable d’un remboursement fournisseur : montant original
 Retrouvez les résultats autorisés pendant la frappe dans l’en-tête : huit propositions maximum, clavier/tactile et accès à la recherche complète. [Guide des suggestions](docs/Suggestions-de-recherche.md).
 
 ![Suggestions de recherche](docs/images/suggestions-recherche-desktop.png)
+
+### Reprendre un budget
+
+Dupliquez les objectifs annuels vers un nouveau scénario ou exercice après aperçu. Les exclusions des comptes inactifs sont explicites et les aperçus périmés sont refusés. La source reste indépendante; aucune écriture n’est créée. [Guide](https://github.com/Installation-04/Allumi/wiki/Duplication-des-budgets).
+
+![Aperçu de duplication](docs/images/duplication-budget-desktop.png)
+
+[Référence mobile](docs/images/duplication-budget-mobile.png)
 
 ### Budgets annuels
 

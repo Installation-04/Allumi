@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.72
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.73
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -154,6 +154,14 @@ Print a private accounting copy of a supplier refund, including the original amo
 Find authorized matches while typing in the header: up to eight suggestions, keyboard/touch navigation and full-search fallback. [Search suggestions guide](docs/Suggestions-de-recherche.md).
 
 ![Search suggestions in English with dark theme](docs/images/suggestions-recherche-en-dark-desktop.png)
+
+### Reuse a budget
+
+Duplicate annual targets into a new scenario or fiscal year after reviewing the source. Inactive targets require explicit exclusion; stale previews are refused. The source stays independent and no journal entries are created. [Guide](https://github.com/Installation-04/Allumi/wiki/Duplication-des-budgets).
+
+![Budget copy preview in English with dark theme](docs/images/duplication-budget-en-dark-desktop.png)
+
+[Mobile reference](docs/images/duplication-budget-en-dark-mobile.png)
 
 ### Annual budgets
 

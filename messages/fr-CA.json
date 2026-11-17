@@ -835,7 +835,9 @@
       "notFound": "Budget introuvable.",
       "stale": "Ce budget a été modifié depuis le chargement de la page. Rechargez les données avant de réessayer.",
       "account": "Choisissez un compte de revenu ou de charge actif. Un objectif existant sur un compte inactif peut être modifié ou retiré.",
-      "tooMany": "Ce rapport dépasse la limite de 1 000 comptes. Aucun résultat partiel n’est affiché ou exporté."
+      "tooMany": "Ce rapport dépasse la limite de 1 000 comptes. Aucun résultat partiel n’est affiché ou exporté.",
+      "copyStale": "Le budget source ou ses comptes ont changé depuis cet aperçu. Rechargez l’aperçu et vérifiez les objectifs avant de réessayer.",
+      "copyInactive": "Confirmez explicitement l’exclusion des objectifs sur des comptes inactifs, ou réactivez ces comptes et rechargez l’aperçu."
     }
   },
   "settingsPage": {
@@ -3280,6 +3282,25 @@
     "reload": "Recharger les données",
     "saved": "Objectif enregistré.",
     "removed": "Objectif retiré.",
-    "code": "Code"
+    "code": "Code",
+    "copyLink": "Dupliquer le budget",
+    "copyTitle": "Dupliquer un budget annuel",
+    "copyBack": "Revenir au budget source",
+    "copyIntro": "Reprenez les objectifs annuels dans un nouveau scénario de cette entreprise. Le budget source reste intact; le réel comptabilisé et les écritures ne sont pas copiés. Les montants restent annuels, sans prorata selon la durée de l’exercice cible.",
+    "copySource": "Aperçu du budget source",
+    "copyActive": "{count, plural, one {# objectif à copier} other {# objectifs à copier}}",
+    "copyExcluded": "{count, plural, one {# objectif inactif à exclure} other {# objectifs inactifs à exclure}}",
+    "copyInactiveHint": "Des objectifs concernent des comptes inactifs. Vérifiez leur détail et confirmez leur exclusion, ou réactivez les comptes puis rechargez cet aperçu. Rien ne sera exclu sans votre choix.",
+    "copyEmpty": "Aucun objectif actif : la confirmation créera un scénario vide.",
+    "copyDestination": "Nouveau scénario",
+    "copyName": "Nom du nouveau scénario",
+    "copyYear": "Exercice du nouveau scénario",
+    "copyConfirm": "Créer la copie",
+    "copySkip": "{count, plural, one {J’exclus explicitement cet objectif sur un compte inactif.} other {J’exclus explicitement ces # objectifs sur des comptes inactifs.}}",
+    "copyFreshHint": "Si les objectifs ou les comptes ont changé depuis cet aperçu, la copie sera refusée. Rechargez et revérifiez avant de réessayer. Les changements futurs de la copie et de la source sont indépendants.",
+    "copyReload": "Recharger l’aperçu",
+    "copyTargets": "{count, plural, one {Vérifier l’objectif (#)} other {Vérifier les objectifs (#)}}",
+    "copyWillCopy": "Sera copié",
+    "copyWillSkip": "Sera exclu si confirmé"
   }
 }
