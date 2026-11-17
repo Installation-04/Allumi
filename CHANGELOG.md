@@ -4,7 +4,7 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
-- Sécurité : Next.js et sa configuration ESLint passent en 16.4.6 pour corriger les avis de fuite de cache entre paramètres racine.
+- Sécurité : Next.js et sa configuration ESLint passent en 16.4.6; la traduction utilise directement use-intl pour retirer la chaîne d’extraction picomatch vulnérable, avec cache limité à la requête, types de catalogues et fuseau préservés.
 
 - Nouveautés : objectifs mensuels par période fiscale, répartition égale exacte proposée avant enregistrement et comparaison mensuelle au réel avec CSV privé FR/EN.
 - Améliorations : champs vides distincts de zéro, reste annuel et état complet, édition atomique sur douze périodes; interface FR/EN/mobile/sombre, guide et six captures.

@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { statementPeriod } from "@/app/_lib/report-period";
 import { listFiscalYears, todayIso } from "@/modules/ledger";
 import { getIncomeStatement, incomeStatementCsv } from "@/modules/reports";

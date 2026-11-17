@@ -1,5 +1,5 @@
 "use client";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/platform/i18n/client";
 import { FOCUS } from "@/app/_components/focus";
 export function PrintButton() {
   const t = useTranslations("invoicePrint");

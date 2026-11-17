@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { getBudgetComparison,budgetCsv } from "@/modules/budgets";
 import { AppError } from "@/platform/errors";
 import { loadCompany } from "../../../_lib";

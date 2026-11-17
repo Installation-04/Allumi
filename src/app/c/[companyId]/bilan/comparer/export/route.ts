@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { todayIso } from "@/modules/ledger";
 import { getBalanceComparison,balanceComparisonCsv } from "@/modules/reports";
 import { loadCompany } from "../../../_lib";

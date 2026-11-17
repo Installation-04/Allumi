@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { can } from "@/modules/companies";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { balanceDay } from "@/app/_lib/report-period";
 import { todayIso } from "@/modules/ledger";
 import { getReceivablesAging } from "@/modules/reports";

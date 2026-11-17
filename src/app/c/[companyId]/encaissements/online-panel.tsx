@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { can, type AccessContext } from "@/modules/companies";
 import { listInvoicePaymentLinks, listPaymentConnections, type PaymentLinkDto } from "@/modules/integrations";
 import { formatMoney, type Locale } from "@/modules/ledger";

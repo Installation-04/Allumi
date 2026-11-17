@@ -1,5 +1,5 @@
 "use client";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/platform/i18n/client";
 import { Field, SelectField, StateError, SubmitButton, useScopedAction, FormScopeProvider } from "@/app/_components/ui";
 import type { FormState } from "@/app/_lib/form-state";
 const ROLES = ["OWNER", "USER", "READ_ONLY", "ACCOUNTANT"] as const;

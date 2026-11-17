@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { loadCompany } from "../_lib";
 import { can } from "@/modules/companies";
 import { listItems, getTaxConfiguration } from "@/modules/taxes";

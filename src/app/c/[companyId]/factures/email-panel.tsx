@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { can } from "@/modules/companies";
 import { formatMoney } from "@/modules/ledger";
 import { getInvoiceEmails } from "@/modules/sales";

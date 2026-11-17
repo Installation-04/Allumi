@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { loadCompany, accountName } from "../_lib";
 import { listAccounts } from "@/modules/ledger";
 import { can } from "@/modules/companies";

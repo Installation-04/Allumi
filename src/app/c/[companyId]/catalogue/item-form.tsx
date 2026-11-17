@@ -1,5 +1,5 @@
 "use client";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/platform/i18n/client";
 import { ActionForm, Field, SelectField } from "@/app/_components/ui";
 import { saveItemAction } from "../taxes/actions";
 

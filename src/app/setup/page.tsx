@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "@/platform/i18n/server";
 import { Card } from "@/app/_components/ui";
 import { currentSetupGate, isSetUp, PASSWORD_MIN_LENGTH } from "@/modules/auth";
 import { SetupForm } from "./form";

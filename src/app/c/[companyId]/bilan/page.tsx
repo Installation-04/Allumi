@@ -1,6 +1,6 @@
 import { StatementPrint } from "../_statement-print";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { FOCUS } from "@/app/_components/focus";
 import { TABLE_CLASS, TD_CLASS } from "@/app/_components/table";
 import { balanceDay } from "@/app/_lib/report-period";

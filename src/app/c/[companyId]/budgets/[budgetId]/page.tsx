@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { ActionForm, Field, SelectField } from "@/app/_components/ui";
 import { TABLE_CLASS,TH_CLASS,TD_CLASS } from "@/app/_components/table";
 import { can } from "@/modules/companies";

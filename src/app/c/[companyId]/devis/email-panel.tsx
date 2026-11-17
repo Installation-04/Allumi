@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { getEstimateEmails } from "@/modules/sales";
 
 export async function EstimateEmailPanel({ actor, estimateId, eligible }: { actor: { companyId: string; userId: string }; estimateId: string; eligible: boolean }) {

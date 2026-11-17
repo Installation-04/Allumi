@@ -1,7 +1,7 @@
 import { PurchaseAttachments } from "../../_attachments/panel";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { can } from "@/modules/companies";
 import { getExpenseDraft } from "@/modules/purchases";
 import { formatMoney } from "@/modules/ledger";

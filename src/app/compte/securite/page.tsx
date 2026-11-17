@@ -1,6 +1,6 @@
 import Link from "next/link";
 import QRCode from "qrcode";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { Card } from "@/app/_components/ui";
 import { readSessionToken, requireSession } from "@/app/_lib/session";
 import { getProfile, listSessions, pendingTotpEnrollment, totpStatus } from "@/modules/auth";

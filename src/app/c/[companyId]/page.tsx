@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { ActionForm, Card } from "@/app/_components/ui";
 import { Icon } from "@/app/_components/icon";
 import { FOCUS } from "@/app/_components/focus";

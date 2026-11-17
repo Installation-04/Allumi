@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { can } from "@/modules/companies";
 import { PROVIDERS, listConnectionAccounts, listConnections } from "@/modules/integrations";
 import { FOCUS } from "@/app/_components/focus";

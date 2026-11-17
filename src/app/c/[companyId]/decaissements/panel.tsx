@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { can, type AccessContext } from "@/modules/companies";
 import { formatMoney, todayIso, type Locale } from "@/modules/ledger";
 import { PAYMENT_METHODS, amountInput, listBillPayments, listDisbursementAccounts, settlementStatus } from "@/modules/payments";

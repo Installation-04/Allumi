@@ -1,4 +1,4 @@
-import type { getTranslations } from "next-intl/server";
+import type { getTranslations } from "@/platform/i18n/server";
 import type { AgingLabels } from "@/modules/reports";
 
 /** The words of the aging's CSV file, from the `aging` messages in the language of the person exporting it. */

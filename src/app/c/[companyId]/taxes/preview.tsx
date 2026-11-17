@@ -1,6 +1,6 @@
 "use client";
 import { useId, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/platform/i18n/client";
 import { calculateTaxes, decimalUnits, effectiveRate, type DatedRate } from "@/modules/taxes/client";
 import { formatMoney, isValidIsoDate, type Locale } from "@/modules/ledger/client";
 

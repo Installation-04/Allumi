@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/platform/i18n/client";
 import { FOCUS } from "@/app/_components/focus";
 
 /** Print the already authorized report, without fetching or recalculating its balances. */

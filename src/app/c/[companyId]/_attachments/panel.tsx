@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { can, type AccessContext } from "@/modules/companies";
 import { listPurchaseAttachments } from "@/modules/attachments";
 import { ActionForm } from "@/app/_components/ui";

@@ -1,5 +1,5 @@
 "use server";
-import { getLocale } from "next-intl/server";
+import { getLocale } from "@/platform/i18n/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireSession } from "@/app/_lib/session";

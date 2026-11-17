@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { formatMoney,listFiscalYears,todayIso } from "@/modules/ledger";
 import { getCashMovements,CASH_FIGURES } from "@/modules/reports";
 import { AppError } from "@/platform/errors";

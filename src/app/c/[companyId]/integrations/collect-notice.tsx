@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { searchText } from "@/app/_lib/search-params";
 
 type Query = Record<string, string | string[] | undefined>;

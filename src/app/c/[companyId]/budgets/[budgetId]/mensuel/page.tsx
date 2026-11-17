@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations } from '@/platform/i18n/server';
 import { getMonthlyBudget } from '@/modules/budgets';
 import { can } from '@/modules/companies';
 import { formatMoney } from '@/modules/ledger';

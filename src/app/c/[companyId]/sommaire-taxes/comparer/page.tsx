@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { can } from "@/modules/companies";
 import { listFiscalYears, todayIso, formatMoney } from "@/modules/ledger";
 import { getTaxComparison, taxComparisonParams, TAX_COMPARISON_METRICS, type TaxComparison } from "@/modules/reports";

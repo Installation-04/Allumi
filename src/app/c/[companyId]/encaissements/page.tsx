@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { can } from "@/modules/companies";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { formatMoney } from "@/modules/ledger";
 import { listReceipts } from "@/modules/payments";
 import { searchText } from "@/app/_lib/search-params";

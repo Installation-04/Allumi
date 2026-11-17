@@ -733,7 +733,7 @@
       ]
     }
   },
-  "0.4.0-alpha.75": {
+  "0.4.0-alpha.76": {
     "fr-CA": {
       "title": "Budgets mensuels et répartition exacte",
       "added": [
@@ -751,6 +751,10 @@
       "fixed": [
         {
           "text": "Next.js passe en 16.4.6 pour corriger les avis de fuite de cache entre paramètres racine."
+        },
+        {
+          "text": "La chaîne d’extraction de traduction vulnérable est retirée. Le moteur ICU, les catalogues FR/EN et l’isolation des langues par requête sont conservés.",
+          "guide": "Architecture"
         }
       ],
       "installation": [
@@ -777,6 +781,10 @@
       "fixed": [
         {
           "text": "Next.js is updated to 16.4.6 to address cache disclosure advisories across root parameter values."
+        },
+        {
+          "text": "The vulnerable translation extraction dependency chain is removed. ICU formatting, French/English catalogs and per-request language isolation are preserved.",
+          "guide": "Architecture"
         }
       ],
       "installation": [

@@ -3,7 +3,7 @@ const mocks=vi.hoisted(()=>({session:vi.fn(),company:vi.fn(),suggest:vi.fn()}));
 vi.mock("@/app/_lib/session",()=>({getSession:mocks.session}));
 vi.mock("@/modules/companies",()=>({getCompanyFor:mocks.company}));
 vi.mock("@/modules/search",()=>({suggestCompany:mocks.suggest}));
-vi.mock("next-intl/server",()=>({getLocale:async()=>"en"}));
+vi.mock("@/platform/i18n/server",()=>({getLocale:async()=>"en"}));
 import { GET } from "@/app/c/[companyId]/recherche/suggestions/route";
 const companyId="00000000-0000-7000-8000-00000000000a",params=Promise.resolve({companyId});
 beforeEach(()=>{vi.resetAllMocks();mocks.session.mockResolvedValue({userId:"user",mfaPending:false});mocks.company.mockResolvedValue({id:companyId});mocks.suggest.mockResolvedValue([]);});

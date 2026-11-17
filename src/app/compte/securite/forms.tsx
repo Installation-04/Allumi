@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/platform/i18n/client";
 import { Field, FormError, SubmitButton } from "@/app/_components/ui";
 import { beginEnrollmentAction, changePasswordAction, confirmEnrollmentAction, disableTotpAction } from "./actions";
 

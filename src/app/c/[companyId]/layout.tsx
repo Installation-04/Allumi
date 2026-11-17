@@ -4,7 +4,7 @@ import { AREAS, type Area } from "./sections";
 import Link from "next/link";
 import { Header } from "@/app/_components/shell";
 import { Icon } from "@/app/_components/icon";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { can } from "@/modules/companies";
 import { loadCompany } from "./_lib";
 import { CompanyNav, type NavLink } from "./nav";

@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { isTheme } from "@/app/_lib/theme";
 import { ThemePicker } from "./theme-picker";
 import Link from "next/link";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "@/platform/i18n/server";
 import { logoutAction } from "@/app/connexion/actions";
 import { setLocale } from "@/app/langue/actions";
 import { appVersion } from "@/platform/version";

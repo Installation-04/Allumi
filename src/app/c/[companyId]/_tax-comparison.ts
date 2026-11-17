@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import type { getTranslations } from "next-intl/server";
+import type { getTranslations } from "@/platform/i18n/server";
 import { resolveTaxComparisonPeriods, type TaxComparisonLabels } from "@/modules/reports";
 
 export function taxComparisonPeriod(query: Record<string,string|string[]|undefined>, years: readonly { start: string; end: string }[], today: string) {

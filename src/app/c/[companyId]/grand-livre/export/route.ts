@@ -1,7 +1,7 @@
 import { can } from "@/modules/companies";
 import { notFound } from "next/navigation";
 import { resolveLedgerContact } from "../../_ledger-contact";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { statementPeriod } from "@/app/_lib/report-period";
 import { listFiscalYears, todayIso } from "@/modules/ledger";
 import { getLedgerExport, ledgerCsv } from "@/modules/reports";

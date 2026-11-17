@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { Card } from "@/app/_components/ui";
 import { getSession } from "@/app/_lib/session";
 import { MfaForm } from "./form";

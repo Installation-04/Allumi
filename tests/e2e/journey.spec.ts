@@ -3798,3 +3798,38 @@ test("monthly budgets allocate exact fiscal periods, preserve annual limits and 
   await db.query("UPDATE membership SET module_access='{\"accounting\":\"none\"}' WHERE company_id=$1 AND user_id=$2",[companyId,userId]);expect((await page.request.get(reportUrl)).status()).toBe(404);expect((await page.request.get(monthly+'/export?periode='+firstPeriod)).status()).toBe(404);
  }finally{if(userId&&role)await db.query('UPDATE membership SET role=$3::member_role,module_access=$4::jsonb WHERE company_id=$1 AND user_id=$2',[companyId,userId,role,access===null?'{}':JSON.stringify(access)]);if(backupId){await db.query('DELETE FROM membership WHERE company_id=$1 AND user_id=$2',[companyId,backupId]);await db.query('UPDATE app_user SET disabled_at=now() WHERE id=$1',[backupId]);}await db.end();}expect(cspViolations).toEqual([]);
 });
+
+/** Different users must not share cookie-derived catalogues through a server cache. */
+test("concurrent French and English requests keep server metadata, client forms and PWA language isolated", async ({ browser }) => {
+  const languages = ["fr-CA", "en"] as const;
+  const origin = `http://127.0.0.1:${process.env.E2E_PORT ?? 3100}`;
+  const contexts = await Promise.all(languages.map(locale => browser.newContext({
+    ...devices[process.env.E2E_MOBILE === "1" ? "Pixel 7" : "Desktop Chrome"],
+    baseURL: origin,
+    // The explicit app cookie must also win over a different browser language.
+    locale: locale === "en" ? "fr-CA" : "en",
+  })));
+  try {
+    const pages = await Promise.all(contexts.map(async (context, i) => {
+      await context.addCookies([{ name: "allumi_locale", value: languages[i]!, url: origin }]);
+      return context.newPage();
+    }));
+    for (let round = 0; round < 3; round++) {
+      await Promise.all(pages.map(page => page.goto("/connexion")));
+      await Promise.all(pages.map(async (page, i) => {
+        const locale = languages[i]!, messages = JSON.parse(readFileSync(`messages/${locale}.json`, "utf8"));
+        const setup = new URL(page.url()).pathname === "/setup";
+        await expect(page.locator("html")).toHaveAttribute("lang", locale);
+        await expect(page.getByRole("heading", { name: setup ? messages.setup.title : messages.login.title, exact: true })).toBeVisible();
+        await expect(page.getByLabel(messages.form.password, { exact: true })).toBeVisible();
+        await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", messages.app.tagline);
+        const response = await contexts[i]!.request.get("/manifest.webmanifest");
+        expect(response.status()).toBe(200);
+        expect(await response.json()).toMatchObject({ lang: locale, description: messages.app.tagline });
+        await expectNoPageOverflow(page);
+      }));
+    }
+  } finally {
+    await Promise.all(contexts.map(context => context.close()));
+  }
+});

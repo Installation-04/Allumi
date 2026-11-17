@@ -1,6 +1,6 @@
 "use client";
 import { useId, useState, type ReactNode } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/platform/i18n/client";
 import { ActionForm, Field, SelectField } from "@/app/_components/ui";
 import type { DraftLineInput } from "@/modules/sales/client";
 import type { FormState } from "@/app/_lib/form-state";

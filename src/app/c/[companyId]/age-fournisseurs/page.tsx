@@ -1,5 +1,5 @@
 import { can } from "@/modules/companies";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import { balanceDay } from "@/app/_lib/report-period";
 import { todayIso } from "@/modules/ledger";
 import { getPayablesAging } from "@/modules/reports";

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/platform/i18n/server";
 import type { PaymentHistoryFilters } from "@/modules/payments";
 import { FOCUS } from "@/app/_components/focus";
 
