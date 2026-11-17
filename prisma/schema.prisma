@@ -460,6 +460,7 @@ model Company {
   estimateCounter        SalesEstimateCounter?
   budgets                Budget[]
   budgetLines            BudgetLine[]
+  budgetMonthlyTargets   BudgetMonthlyTarget[]
 
   @@map("company")
 }
@@ -549,6 +550,7 @@ model FiscalPeriod {
 
   fiscalYear     FiscalYear     @relation(fields: [companyId, fiscalYearId], references: [companyId, id], onDelete: Restrict)
   journalEntries JournalEntry[]
+  budgetMonthlyTargets BudgetMonthlyTarget[]
 
   @@unique([companyId, id])
   @@unique([fiscalYearId, periodNumber])
@@ -1862,8 +1864,28 @@ model BudgetLine {
   budget      Budget   @relation(fields: [companyId, budgetId], references: [companyId, id], onDelete: Restrict, map: "budget_line_budget_fkey")
   account     Account  @relation(fields: [companyId, accountId], references: [companyId, id], onDelete: Restrict, map: "budget_line_account_fkey")
 
+  monthlyTargets BudgetMonthlyTarget[]
+
+  @@unique([companyId, id])
   @@unique([budgetId, accountId])
   @@index([companyId, accountId])
   @@index([companyId, budgetId])
   @@map("budget_line")
+}
+
+model BudgetMonthlyTarget {
+  id String @id @default(uuid(7)) @db.Uuid
+  companyId String @map("company_id") @db.Uuid
+  budgetLineId String @map("budget_line_id") @db.Uuid
+  fiscalPeriodId String @map("fiscal_period_id") @db.Uuid
+  amountCents BigInt @map("amount_cents")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  company Company @relation(fields:[companyId],references:[id],onDelete:Restrict)
+  budgetLine BudgetLine @relation(fields:[companyId,budgetLineId],references:[companyId,id],onDelete:Restrict,map:"budget_monthly_target_line_fkey")
+  fiscalPeriod FiscalPeriod @relation(fields:[companyId,fiscalPeriodId],references:[companyId,id],onDelete:Restrict,map:"budget_monthly_target_period_fkey")
+  @@unique([budgetLineId,fiscalPeriodId])
+  @@index([companyId,budgetLineId])
+  @@index([companyId,fiscalPeriodId])
+  @@map("budget_monthly_target")
 }

@@ -8,7 +8,7 @@ Depuis **Rapports → Budgets annuels**, créez un scénario nommé pour un exer
 
 1. Choisissez **Créer un budget**, un nom de 1 à 120 caractères et l’exercice complet.
 2. Ouvrez **Ajouter ou remplacer un objectif**, choisissez un compte et saisissez le montant annuel en CAD.
-3. Choisir un compte déjà présent remplace son objectif. **Retirer l’objectif** conserve le compte dans le rapport s’il a de l’activité comptabilisée.
+3. Choisir un compte déjà présent remplace son objectif. **Retirer l’objectif** conserve le compte dans le rapport s’il a de l’activité comptabilisée. Si une répartition mensuelle existe, effacez-la et enregistrez-la avant ce retrait; une baisse annuelle sous le total réparti est refusée.
 
 Les objectifs sont positifs ou nuls, avec deux décimales au plus, jusqu’à 1 000 milliards de dollars par compte. Le compte doit être de type revenu ou charge et actif lors de l’ajout. Un objectif existant sur un compte devenu inactif peut être remplacé ou retiré. Les comptes inactifs avec activité restent visibles.
 
@@ -44,7 +44,7 @@ Sur téléphone, les comptes sont présentés en cartes avec objectif, réel et 
 
 La mise à jour ajoute les tables `budget` et `budget_line`, leurs politiques RLS, contraintes, gardes et déclencheurs d’audit/révision. Sauvegardez avant la mise à jour; le service de migration habituel applique cet ajout. Aucune nouvelle variable d’environnement. Aucun déploiement automatique sur votre serveur personnel.
 
-Cette version couvre les scénarios **annuels** par compte. La ventilation mensuelle, les prévisions de trésorerie, le renommage et la suppression de scénarios ne sont pas proposés. Les captures proviennent d’une entreprise fictive, avec Chromium et émulation mobile; la validation physique Safari iOS reste à faire.
+Cette version couvre les scénarios **annuels** par compte. La répartition par période fiscale est disponible dans [[Budgets-mensuels]]. Les prévisions de trésorerie, le renommage et la suppression de scénarios ne sont pas proposés. Les captures proviennent d’une entreprise fictive, avec Chromium et émulation mobile; la validation physique Safari iOS reste à faire.
 
 Voir [[Etats-financiers]], [[Exercices-et-periodes]], [[Utilisateurs-et-permissions]], [[Mise-a-jour]] et [[Schema-de-donnees]].
 
