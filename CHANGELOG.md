@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.75] - 2026-11-17
+
 - Nouveautés : objectifs mensuels par période fiscale, répartition égale exacte proposée avant enregistrement et comparaison mensuelle au réel avec CSV privé FR/EN.
 - Améliorations : champs vides distincts de zéro, reste annuel et état complet, édition atomique sur douze périodes; interface FR/EN/mobile/sombre, guide et six captures.
 - Sécurité : contraintes SQL annuel/mensuel et même exercice, verrous et relecture après attente, RLS/audit/révisions contre les écrasements concurrents; baisse et retrait annuels incompatibles refusés.
