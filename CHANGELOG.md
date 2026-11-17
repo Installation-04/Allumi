@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.71] - 2026-11-16
+
 - Nouveautés : suggestions dans la recherche d’en-tête après deux caractères, huit libellés/destinations autorisés maximum, avec navigation clavier et tactile.
 - Améliorations : requêtes différées et annulables, réponses périmées ignorées, fermeture par Échap/hors champ, choix au clavier et recherche complète préservée; FR/EN/mobile/sombre, guide et quatre captures.
 - Confidentialité : session complète/MFA et droits d’entreprise contrôlés à chaque requête, réponses privées sans cache, projection sans champs financiers structurés ni notes privées, destinations limitées à l’entreprise et aucun historique applicatif.
