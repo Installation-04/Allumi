@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.77] - 2026-11-17
+
 - Nouveautés : assistant CSV QuickBooks Online/Desktop pour clients, fournisseurs, produits/services hors inventaire et comptes, avec associations explicites et aperçu complet.
 - Comptabilité : balance cible à une date de bascule, comparaison au grand livre et écriture d’ouverture des écarts ordinaires; contrôles clients/fournisseurs/taxes déjà rapprochés requis, une seule bascule par entreprise.
 - Sécurité : accès administrateur, confirmation signée expirante liée au fichier/options/destination, refus des doublons et aperçus périmés, créations atomiques sous RLS/audit, provenance sans stockage du fichier brut.
