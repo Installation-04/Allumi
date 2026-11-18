@@ -18,7 +18,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ compa
   const profile = await getProfile(actor.userId);
   const theme = (await cookies()).get("allumi_theme")?.value;
   const base = `/c/${company.id}`;
-  const sections: { key: "company" | "accounting" | "access" | "connections" | "server" | "application"; links: { href: string; key: "identity" | "taxSettings" | "accounts" | "periods" | "taxes" | "members" | "audit" | "security" | "integrations" | "serverAdmin" | "updates" | "help" }[] }[] = [
+  const sections: { key: "company" | "accounting" | "access" | "connections" | "server" | "application"; links: { href: string; key: "migration" | "identity" | "taxSettings" | "accounts" | "periods" | "taxes" | "members" | "audit" | "security" | "integrations" | "serverAdmin" | "updates" | "help" }[] }[] = [
     { key: "company", links: [{ href: `${base}/entreprise`, key: "identity" as const }, { href: `${base}/entreprise#fiscal-settings`, key: "taxSettings" as const }] },
     { key: "accounting", links: [
       ...(can(company, "ledger.read") ? [{ href: `${base}/comptes`, key: "accounts" as const }, { href: `${base}/exercices`, key: "periods" as const }] : []),
@@ -29,7 +29,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ compa
       ...(can(company, "audit.read") ? [{ href: `${base}/audit`, key: "audit" as const }] : []),
       { href: "/compte/securite", key: "security" as const },
     ] },
-    { key: "connections", links: can(company, "integration.manage") ? [{ href: `${base}/integrations`, key: "integrations" as const }] : [] },
+    { key: "connections", links: [...(can(company, "integration.manage") ? [{ href: `${base}/integrations`, key: "integrations" as const }] : []), ...(can(company, "migration.manage") ? [{ href: `${base}/migration`, key: "migration" as const }] : [])] },
     { key: "server", links: profile?.isInstanceAdmin || profile?.canManageServer ? [{ href: "/administration/serveur", key: "serverAdmin" as const }] : [] },
     { key: "application", links: [{ href: "/versions", key: "updates" as const }, { href: "https://github.com/Installation-04/Allumi/wiki", key: "help" as const }] },
   ];

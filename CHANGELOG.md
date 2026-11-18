@@ -4,6 +4,12 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Nouveautés : assistant CSV QuickBooks Online/Desktop pour clients, fournisseurs, produits/services hors inventaire et comptes, avec associations explicites et aperçu complet.
+- Comptabilité : balance cible à une date de bascule, comparaison au grand livre et écriture d’ouverture des écarts ordinaires; contrôles clients/fournisseurs/taxes déjà rapprochés requis, une seule bascule par entreprise.
+- Sécurité : accès administrateur, confirmation signée expirante liée au fichier/options/destination, refus des doublons et aperçus périmés, créations atomiques sous RLS/audit, provenance sans stockage du fichier brut.
+- Interface : parcours FR/EN, mobile et sombre, historique des lots, colonnes ignorées explicites, guide de migration et six captures.
+- Installation : deux migrations additives pour les lots immuables et leurs politiques; aucune nouvelle configuration. Historique détaillé, inventaire et fichiers natifs QuickBooks non importés.
+
 ## [0.4.0-alpha.76] - 2026-11-17
 
 - Sécurité : Next.js et sa configuration ESLint passent en 16.4.6; la traduction utilise directement use-intl pour retirer la chaîne d’extraction picomatch vulnérable, avec cache limité à la requête, types de catalogues et fuseau préservés.

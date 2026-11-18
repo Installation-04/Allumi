@@ -76,3 +76,8 @@ Le suivi des [[Factures-recurrentes]] relève de Ventes en lecture. Création et
 Les [[Relances-clients]] exigent Ventes et Comptabilité en lecture pour la file et l’aperçu, puis Ventes en écriture et Comptabilité en lecture pour envoyer. L’historique des courriels, y compris le solde rappelé, est visible avec Ventes en lecture; aucune validation comptable n’est réalisée.
 
 L’[[Envoi-des-devis]] utilise les coordonnées, lignes et taxes figées. Aperçu et historique : Ventes en lecture; envoi : Ventes en écriture, sans droit Contacts, Comptabilité ou Taxes supplémentaire. La finalisation conserve ses contrôles de références.
+
+
+## Migration QuickBooks
+
+L’action `migration.manage` est réservée à `OWNER`, l’administrateur d’entreprise; elle ne peut pas être accordée aux autres profils par une simple permission de module. Les actions Contacts, Catalogue ou Comptabilité et la lecture des références sont aussi contrôlées selon le lot. L’historique suit la même restriction. Voir [[Migration-QuickBooks]].

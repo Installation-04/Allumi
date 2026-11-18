@@ -384,3 +384,13 @@ it('guards monthly targets with same-year scope, bounded sums, revision/audit an
  expect(functions).toHaveLength(2);for(const f of functions){expect(f.definer).toBe(false);expect(f.public_execute).toBe(false);expect(f.definition).toContain('read committed');expect(f.definition).toContain('FOR UPDATE');}
  expect((await q<{ok:boolean}>("SELECT has_table_privilege('allumi_app','budget_monthly_target','TRUNCATE') AS ok"))[0]?.ok).toBe(false);
 });
+
+it("keeps migration batches tenant-scoped, immutable and linked to one cutover entry", async () => {
+ const [table] = await q<{ force: boolean }>("SELECT relforcerowsecurity AS force FROM pg_class WHERE relname='migration_batch'");expect(table?.force).toBe(true);
+ const constraints = await q<{ def: string }>("SELECT pg_get_constraintdef(oid) AS def FROM pg_constraint WHERE conrelid='migration_batch'::regclass");
+ expect(constraints.some(c => /company_id, journal_entry_id/.test(c.def) && /journal_entry/.test(c.def))).toBe(true);
+ expect(constraints.some(c => /created_count \+ skipped_count/.test(c.def))).toBe(true);
+ const indexes = await q<{ indexdef: string }>("SELECT indexdef FROM pg_indexes WHERE tablename='migration_batch'");expect(indexes.some(i => /UNIQUE/.test(i.indexdef) && /BALANCES/.test(i.indexdef))).toBe(true);
+ const [grant] = await q<{ upd: boolean; del: boolean; trunc: boolean }>("SELECT has_table_privilege('allumi_app','migration_batch','UPDATE') AS upd,has_table_privilege('allumi_app','migration_batch','DELETE') AS del,has_table_privilege('allumi_app','migration_batch','TRUNCATE') AS trunc");expect(grant).toEqual({upd:false,del:false,trunc:false});
+ const [guard] = await q<{ def: string }>("SELECT pg_get_functiondef('migration_batch_guard()'::regprocedure) AS def");expect(guard?.def).toMatch(/app_current_user_id/);expect(guard?.def).toMatch(/read committed/);expect(guard?.def).toMatch(/immutable/);
+});
