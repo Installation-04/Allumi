@@ -3833,3 +3833,63 @@ test("concurrent French and English requests keep server metadata, client forms 
     await Promise.all(contexts.map(context => context.close()));
   }
 });
+
+/** Online/Desktop CSV lists and a separately reviewed, reconciled cutover entry. Fictional data only. */
+test("QuickBooks migration reviews mapped lists, rejects stale approval and reconciles cutover balances", async ({ page }) => {
+ test.setTimeout(240_000); cspViolations.length = 0; watchCsp(page.context());
+ if (updateCookies) await page.context().addCookies(updateCookies); await page.goto('/');
+ if (!updateCookies) {
+  await page.locator('[name="setupToken"]').fill('e2e-setup-token-123456789');await page.getByLabel("Nom de l'entreprise").fill('Atelier Exemple inc.');await page.getByLabel('Ton nom').fill('Alex Exemple');await page.getByLabel('Courriel').fill(EMAIL);await page.getByLabel("Langue de l'interface").selectOption('fr-CA');await page.getByLabel('Mot de passe',{exact:true}).fill(PASSWORD);await page.getByLabel('Confirmation du mot de passe').fill(PASSWORD);await page.getByRole('button',{name:"Créer l'entreprise et commencer",exact:true}).click();await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
+ }
+ const db = new pg.Client({ connectionString: e2eUrls().owner }); await db.connect();
+ let companyId = '', ownerId = '';
+ try {
+  ownerId = (await db.query('SELECT id FROM app_user WHERE email=$1',[EMAIL])).rows[0].id;
+  companyId = (await db.query("INSERT INTO company(id,name,updated_at) VALUES(gen_random_uuid(),'Migration Exemple inc.',now()) RETURNING id")).rows[0].id;
+  await db.query("INSERT INTO membership(id,company_id,user_id,role,updated_at) VALUES(gen_random_uuid(),$1,$2,'OWNER',now())",[companyId,ownerId]);
+  const company = '/c/' + companyId; await page.goto(company);
+  await page.getByRole('button',{name:'Initialiser',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Initialiser',exact:true})).toHaveCount(0);
+  const cutoff = (await db.query("SELECT to_char(end_date,'YYYY-MM-DD') AS date FROM fiscal_period WHERE company_id=$1 ORDER BY period_number LIMIT 1",[companyId])).rows[0].date;
+  await page.goto(company+'/parametres');await page.getByRole('link',{name:'Migrer depuis QuickBooks',exact:true}).click();await expect(page.getByRole('heading',{name:'Migrer depuis QuickBooks',exact:true})).toBeVisible();
+  const upload = async (kind:string,source:string,text:string) => {
+   await page.getByRole('combobox',{name:'Données à reprendre',exact:true}).selectOption(kind);await page.getByRole('combobox',{name:'Édition source',exact:true}).selectOption(source);
+   await page.getByLabel('Export CSV',{exact:true}).setInputFiles({name:'quickbooks-example.csv',mimeType:'text/csv',buffer:Buffer.from(text)});
+   await page.getByRole('button',{name:'Proposer les associations',exact:true}).click();
+   if(kind==='ACCOUNTS') { await page.getByRole('combobox',{name:'Nom',exact:true}).selectOption('0'); await page.getByRole('combobox',{name:'Code Allumi / UGS',exact:true}).selectOption('1'); }
+   await expect(page.getByRole('button',{name:'Vérifier avec Allumi',exact:true})).toBeEnabled();
+  };
+  const check = async () => { await page.getByRole('button',{name:'Vérifier avec Allumi',exact:true}).click();await expect(page.getByRole('heading',{name:'3. Vérifier le lot et confirmer',exact:true})).toBeVisible(); };
+  const confirm = async (balances=false) => { const previousLot=new URL(page.url()).searchParams.get('lot'); await page.getByRole('checkbox').last().check();await page.getByRole('button',{name:balances?'Valider les soldes de bascule':'Importer les listes',exact:true}).click();await expect.poll(()=>new URL(page.url()).searchParams.get('lot')).not.toBe(previousLot);await expect(page.getByRole('status').filter({hasText:'Import confirmé'})).toBeVisible(); };
+  const contacts='Customer,Company,Email,Phone,Bill State,Balance\nClient QB Exemple,Exemple inc.,qb-client@example.test,555-0100,QC,125.00';
+  let posts=0;const countPosts=(r:{method:()=>string;url:()=>string})=>{if(r.method()==='POST'&&new URL(r.url()).pathname===company+'/migration')posts++;};page.on('request',countPosts);
+  await upload('CUSTOMERS','ONLINE',contacts);expect(posts).toBe(0);page.off('request',countPosts);await check();
+  await expect(page.getByRole('button',{name:'Importer les listes',exact:true})).toBeDisabled();await expect(page.locator('form').filter({has:page.locator('input[type="file"]')})).toContainText('Balance');
+  expect((await db.query("SELECT id FROM contact WHERE company_id=$1 AND display_name='Client QB Exemple'",[companyId])).rowCount).toBe(0);
+  await db.query("INSERT INTO contact(id,company_id,is_customer,display_name,updated_at) VALUES(gen_random_uuid(),$1,true,'Contact concurrent',now())",[companyId]);
+  await page.getByRole('checkbox').last().check();await page.getByRole('button',{name:'Importer les listes',exact:true}).click();await expect(page.getByRole('alert').filter({hasText:'L’aperçu a expiré ou les données ont changé.'})).toBeVisible();
+  await expect(page.getByLabel('Export CSV',{exact:true})).not.toHaveValue('');await check();await expect(page.getByRole('checkbox').last()).not.toBeChecked();await expectNoPageOverflow(page);await captureReference(page,'migration-quickbooks','3. Vérifier le lot et confirmer');
+  await page.getByRole('button',{name:'English',exact:true}).click();await expect(page.locator('html')).toHaveAttribute('lang','en');await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption('dark');await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+  await page.getByRole('button',{name:'Check with Allumi',exact:true}).click();await expect(page.getByRole('heading',{name:'3. Review and confirm',exact:true})).toBeVisible();await expectNoPageOverflow(page);await captureReference(page,'migration-quickbooks-en-dark','3. Review and confirm');
+  await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption('light');await expect(page.locator('html')).toHaveAttribute('data-theme','light');await page.getByRole('button',{name:'Français',exact:true}).click();await expect(page.locator('html')).toHaveAttribute('lang','fr-CA');await check();await confirm();
+  expect((await db.query("SELECT email FROM contact WHERE company_id=$1 AND display_name='Client QB Exemple'",[companyId])).rows[0].email).toBe('qb-client@example.test');
+  await upload('SUPPLIERS','DESKTOP','Vendor,Email\nFournisseur QB Exemple,qb-supplier@example.test');await check();await confirm();
+  await upload('ACCOUNTS','DESKTOP','Account,Account #,Account type\nBanque QB Exemple,QB-1000,Bank');await check();await confirm();
+  await upload('ITEMS','DESKTOP','Product/Service,SKU,Type,Sales price/rate,Income account\nService QB Exemple,QB-SERVICE,Service,12.345678,4000');await check();await confirm();
+  expect((await db.query("SELECT unit_price::text FROM item WHERE company_id=$1 AND code='QB-SERVICE'",[companyId])).rows[0].unit_price).toBe('12.345678');
+  await upload('BALANCES','ONLINE','Code,Debit,Credit\n1100,10.00,0\n3000,0,10.00');await page.getByLabel('Date de bascule',{exact:true}).fill(cutoff);await check();await expect(page.getByRole('button',{name:'Valider les soldes de bascule',exact:true})).toBeDisabled();await expect(page.locator('form').filter({has:page.locator('input[type="file"]')})).toContainText('Écart sur un compte clients, fournisseurs ou de taxes');
+  expect((await db.query('SELECT id FROM journal_entry WHERE company_id=$1',[companyId])).rowCount).toBe(0);
+  await upload('BALANCES','ONLINE','Code,Debit,Credit\n1000,1234.56,0\n3000,0,1234.56');await check();await expectNoPageOverflow(page);await captureReference(page,'soldes-bascule-quickbooks','3. Vérifier le lot et confirmer');await confirm(true);
+  const entry=(await db.query("SELECT id FROM journal_entry WHERE company_id=$1 AND source_type='OPENING_BALANCE'",[companyId])).rows;expect(entry).toHaveLength(1);
+  expect((await db.query('SELECT sum(debit_cents)::text AS debit,sum(credit_cents)::text AS credit FROM journal_line WHERE company_id=$1 AND entry_id=$2',[companyId,entry[0].id])).rows[0]).toEqual({debit:'123456',credit:'123456'});
+  await upload('BALANCES','ONLINE','Code,Debit,Credit\n1000,2000.00,0\n3000,0,2000.00');await page.getByLabel('Date de bascule',{exact:true}).fill(cutoff);await page.getByRole('button',{name:'Vérifier avec Allumi',exact:true}).click();await expect(page.getByRole('alert').filter({hasText:'Ce lot ou cette bascule a déjà été confirmé.'})).toBeVisible();
+  await upload('CUSTOMERS','ONLINE','Name,Email\nInterdit QB,denied@example.test');await check();
+  const backup=(await db.query("INSERT INTO app_user(id,email,display_name,updated_at) VALUES(gen_random_uuid(),'qb-backup-owner@example.test','Backup',now()) RETURNING id")).rows[0].id;await db.query("INSERT INTO membership(id,company_id,user_id,role,updated_at) VALUES(gen_random_uuid(),$1,$2,'OWNER',now())",[companyId,backup]);
+  await db.query("UPDATE membership SET role='ACCOUNTANT' WHERE company_id=$1 AND user_id=$2",[companyId,ownerId]);
+  try {
+   await page.getByRole('checkbox').last().check();await page.getByRole('button',{name:'Importer les listes',exact:true}).click();await expect(page.locator('form').filter({has:page.locator('input[type="file"]')}).getByRole('alert')).toBeVisible();expect((await page.context().request.get(company+'/migration')).status()).toBe(404);
+   expect((await db.query("SELECT id FROM contact WHERE company_id=$1 AND display_name='Interdit QB'",[companyId])).rowCount).toBe(0);
+  } finally {await db.query("UPDATE membership SET role='OWNER' WHERE company_id=$1 AND user_id=$2",[companyId,ownerId]);}
+  expect(cspViolations).toEqual([]);
+ } finally {await db.end();}
+});

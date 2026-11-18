@@ -11,11 +11,11 @@ Voir aussi [[Architecture]], [[Regles-comptables]], [[Plan-de-tests]].
 - Dates comptables en `DATE`; horodatages en `timestamptz`.
 - Toute table de données d'entreprise porte `company_id`, avec RLS `ENABLE` + `FORCE`.
 - Les références entre tables d'une entreprise sont des **clés étrangères composites** `(company_id, x_id) → (company_id, id)`. Les index et unicités consultés par les triggers commencent par `company_id`.
-- Les colonnes d'auteur (`created_by_id`, `posted_by_id`…) n'ont pas de clé étrangère, sauf sur `journal_entry` et `audit_log` : un utilisateur n'est jamais supprimé, et la piste d'audit fait foi.
+- Les colonnes d'auteur (`created_by_id`, `posted_by_id`…) n'ont pas de clé étrangère, sauf sur `journal_entry`, `audit_log` et `migration_batch` : un utilisateur n'est jamais supprimé, et la piste d'audit fait foi.
 - Les `CHECK` qui comparent une colonne d'enum à un littéral s'écrivent sur `::text` (voir [la recette de changement d'enum](#changer-un-enum)).
 
 ## Vue d'ensemble
-60 tables : 7 tables d’identité ou techniques (`instance` et `rate_limit` sans RLS; 5 tables d’identité sous RLS par utilisateur), et 53 tables métier sous RLS d’entreprise, entreprise elle-même incluse.
+61 tables : 7 tables d’identité ou techniques (`instance` et `rate_limit` sans RLS; 5 tables d’identité sous RLS par utilisateur), et 54 tables métier sous RLS d’entreprise, entreprise elle-même incluse.
 
 | Domaine | Tables |
 |---|---|
@@ -32,6 +32,7 @@ Voir aussi [[Architecture]], [[Regles-comptables]], [[Plan-de-tests]].
 | Banque | `bank_account_profile`, `bank_import`, `bank_transaction`, `bank_rule`, `bank_match`, `bank_reconciliation`, `reconciled_line` |
 | Intégrations | `integration_connection`, `integration_credential`, `payment_link`, `online_payment` |
 | Pièces jointes | `attachment`, `attachment_link` |
+| Migration | `migration_batch` |
 | Audit | `audit_log` |
 
 ```mermaid
@@ -4791,3 +4792,12 @@ L’[[Import-CSV-des-budgets]] réutilise les tables existantes sans migration. 
 Les modifications mensuelles et les baisses annuelles exigent READ COMMITTED et prennent le verrou du parent `budget`. Les gardes VOLATILE relisent ensuite l’annuel et les autres allocations dans un instantané frais : deux transactions concurrentes ne peuvent valider un dépassement sur un ancien total. Les fonctions restent sous les privilèges de l’appelant, avec search_path fixé et exécution PUBLIC révoquée.
 
 RLS forcée, droits modulaires Comptabilité, audit standard et révision du parent à chaque insertion/mise à jour/suppression. L’enregistrement applicatif remplace atomiquement les objectifs définis d’un compte, contrôle la révision initiale et ajoute `budget.allocate_months` avec compte, nombre de périodes, total alloué et annuel; une erreur annule le lot et son audit. Le rapport lit en un instantané périodes, objectifs et réel, aux dates fiscales inclusives. Les périodes fermées restent inchangées; aucune écriture financière. Voir [[Budgets-mensuels]].
+
+
+## Lots de migration QuickBooks
+
+`migration_batch` conserve la provenance `ONLINE`/`DESKTOP`, le type (`CUSTOMERS`, `SUPPLIERS`, `ITEMS`, `ACCOUNTS`, `BALANCES`), les empreintes SHA-256 du lot canonique et du texte UTF-8, les nombres de lignes créées/conservées, l’auteur et la date. Le fichier brut n’est pas conservé. Les migrations additives `20261121000000_quickbooks_migration` et `20261122000000_migration_module_policies` ajoutent cette table et ses politiques de modules.
+
+Les nombres doivent être positifs/cohérents et totaliser le nombre source. L’unicité `(company_id, kind, fingerprint)` empêche un rejeu logique. Un index unique partiel limite `BALANCES` à une bascule par entreprise. Le lien d’écriture est présent si et seulement si le lot est financier; la FK composite garantit la même entreprise. L’auteur référence `app_user`. La garde impose un auteur actif du contexte, le rôle `OWNER`, le module concerné en écriture, une transaction READ COMMITTED et, pour la bascule, une écriture `OPENING_BALANCE` du même auteur.
+
+La table est immuable après insertion (UPDATE, DELETE et TRUNCATE refusés), sous RLS forcée, avec lecture/insertion d’administrateur et politiques restrictives par module. Le rôle applicatif ne reçoit que SELECT/INSERT. L’audit des lignes et l’événement métier sont créés dans la même transaction que les fiches ou l’écriture. Les verrous sur l’entreprise et les références, puis la relecture et la signature HMAC expirante, protègent contre les confirmations concurrentes/périmées. Les contrôles existants de journal équilibré et d’interdiction d’ajustement manuel des contrôles clients/fournisseurs/taxes restent applicables. Voir [[Migration-QuickBooks]].

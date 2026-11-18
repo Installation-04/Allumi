@@ -324,6 +324,8 @@ model User {
   auditEvents         AuditLog[]           @relation("AuditActor")
   auditSubjectEvents  AuditLog[]           @relation("AuditSubject")
 
+  migrationBatches MigrationBatch[]
+
   @@map("app_user")
 }
 
@@ -461,6 +463,8 @@ model Company {
   budgets                Budget[]
   budgetLines            BudgetLine[]
   budgetMonthlyTargets   BudgetMonthlyTarget[]
+
+  migrationBatches MigrationBatch[]
 
   @@map("company")
 }
@@ -652,6 +656,8 @@ model JournalEntry {
   @@unique([companyId, reversesEntryId])
   @@index([companyId, entryDate])
   @@index([companyId, sourceType, sourceId])
+  migrationBatches MigrationBatch[]
+
   @@map("journal_entry")
 }
 
@@ -1888,4 +1894,27 @@ model BudgetMonthlyTarget {
   @@index([companyId,budgetLineId])
   @@index([companyId,fiscalPeriodId])
   @@map("budget_monthly_target")
+}
+
+/// Métadonnées immuables d’un lot de migration confirmé, sans fichier source ni données de lignes.
+model MigrationBatch {
+  id String @id @default(uuid(7)) @db.Uuid
+  companyId String @map("company_id") @db.Uuid
+  createdById String @map("created_by_id") @db.Uuid
+  source String
+  kind String
+  fingerprint String @db.Char(64)
+  sourceDigest String @map("source_digest") @db.Char(64)
+  journalEntryId String? @map("journal_entry_id") @db.Uuid
+  journalEntry JournalEntry? @relation(fields: [companyId, journalEntryId], references: [companyId, id], onDelete: Restrict, map: "migration_batch_entry_fkey")
+  rowCount Int @map("row_count")
+  createdCount Int @map("created_count")
+  skippedCount Int @map("skipped_count")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  @@unique([companyId, kind, fingerprint])
+  @@unique([companyId], map: "migration_batch_one_cutover", where: raw("kind = 'BALANCES'"))
+  @@index([companyId, createdAt])
+  @@map("migration_batch")
 }

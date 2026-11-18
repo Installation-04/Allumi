@@ -583,3 +583,8 @@ Codes importés ou manuels, taux datés et écarts par composante : [[Comparaiso
 ![Suggestions de recherche](images/suggestions-recherche-mobile.png)
 
 ![Suggestions de recherche](images/suggestions-recherche-en-dark-mobile.png)
+
+
+## Migration QuickBooks
+
+[[Migration-QuickBooks]] présente six captures de l’assistant, de la balance de bascule et du thème sombre anglais, sur ordinateur et mobile. Données fictives, Chromium et émulation mobile; Safari physique reste à valider.

@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.76
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.77
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -94,6 +94,14 @@ This mode uses your existing Docker and Compose installation without configuring
 The accounting system uses **double-entry bookkeeping**, exact amounts in cents or Decimal, and immutable posted entries corrected through reversals. Access is enforced in the application and database, with isolation between companies.
 
 Direct bank feeds, inventory tracking, payroll, multiple currencies, electronic signatures and scheduled execution of recurring invoices/reminders remain under development. Tax features do not file returns. [Detailed availability and limitations](docs/Fonctionnalites-et-limites.md).
+
+
+### Move from QuickBooks
+
+Import **customer, supplier, service/noninventory product and account lists** from QuickBooks Online or Desktop CSV exports. Review column mappings and every planned change before confirming. A reconciled cutover trial balance can post ordinary account adjustments; customer, supplier and tax control balances must already match Allumi’s native records. Detailed history and native QuickBooks files are outside this import. [Migration guide](docs/Migration-QuickBooks.md).
+
+![QuickBooks migration preview — English, dark theme](docs/images/migration-quickbooks-en-dark-desktop.png)
+![Cutover balance preview — mobile](docs/images/soldes-bascule-quickbooks-mobile.png)
 
 ## Screenshots
 

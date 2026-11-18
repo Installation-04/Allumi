@@ -18,6 +18,8 @@
 - [[FAQ]]
 
 **Utiliser**
+- [[Migration-QuickBooks]]
+
 - [[Guide-utilisateur]]
 - [[Interface-et-navigation]]
 - [[Appearance-and-language]]
