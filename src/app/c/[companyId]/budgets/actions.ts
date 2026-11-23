@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { requireSession } from "@/app/_lib/session";
 import { safeAction } from "@/app/_lib/safe-action";
 import { textValues, type FormState } from "@/app/_lib/form-state";
-import { createBudget, saveBudgetTarget, removeBudgetTarget, duplicateBudget, importBudgetCsv, decodeBudgetCsv, MAX_BUDGET_CSV_BYTES, saveMonthlyAllocation } from "@/modules/budgets";
+import { createBudget, saveBudgetTarget, removeBudgetTarget, duplicateBudget, duplicateMonthlyBudget, importBudgetCsv, decodeBudgetCsv, MAX_BUDGET_CSV_BYTES, saveMonthlyAllocation } from "@/modules/budgets";
 import { parseMoney } from "@/modules/ledger";
 import { AppError } from "@/platform/errors";
 function unique(form:FormData,names:string[]) { if(names.some(n=>form.getAll(n).length!==1 || typeof form.get(n)!=="string")) throw new AppError("budgets.invalid"); }
@@ -70,5 +70,18 @@ export async function saveMonthsAction(companyId:string,budgetId:string,accountI
     const targets=periodIds.map(periodId=>{const value=values[`period_${periodId}`]??'';if(!value.trim())return {periodId,amountCents:null};const cents=parseMoney(value,locale);if(cents===null)throw new AppError('budgets.monthlyInvalid');return {periodId,amountCents:cents};});
     await saveMonthlyAllocation({userId,companyId},budgetId,accountId,{revision,targets});
     revalidatePath(`/c/${companyId}`,'layout');redirect(`/c/${companyId}/budgets/${budgetId}/mensuel?periode=${encodeURIComponent(periodIds.includes(returnPeriod)?returnPeriod:periodIds[0]??'')}`);
+  },values);
+}
+
+export async function duplicateMonthlyAction(companyId:string,sourceId:string,fiscalYearId:string,sourceRevision:number,stateToken:string,_previous:FormState,form:FormData):Promise<FormState> {
+  const values=textValues(form,["name"]);
+  return safeAction(async()=>{
+    unique(form,["name","confirmed"]);
+    if(form.get("confirmed")!=="yes")throw new AppError("budgets.monthlyCopyConfirm");
+    const flags=form.getAll("skipInactive");
+    if(flags.length>1||(flags.length===1&&flags[0]!=="yes"))throw new AppError("budgets.invalid");
+    const {userId}=await requireSession();
+    const copied=await duplicateMonthlyBudget({userId,companyId},sourceId,{name:values.name??"",fiscalYearId,sourceRevision,stateToken,skipInactive:flags.length===1,confirmed:true});
+    revalidatePath(`/c/${companyId}`,"layout");redirect(`/c/${companyId}/budgets/${copied.id}/mensuel?periode=${copied.firstPeriodId}`);
   },values);
 }

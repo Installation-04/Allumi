@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.80
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.81
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -169,6 +169,14 @@ Créez un nouveau budget depuis un CSV UTF-8 après aperçu local des objectifs.
 ![Import des objectifs annuels](docs/images/import-budget-csv-desktop.png)
 
 [Référence mobile](docs/images/import-budget-csv-mobile.png)
+
+### Reprendre les répartitions mensuelles
+
+Reprenez les objectifs annuels et leurs montants mensuels définis dans un scénario ou exercice indépendant. Vérifiez les douze correspondances fiscales avant confirmation; les zéros et les mois absents restent distincts. Exclusions explicites, refus des aperçus périmés et aucune écriture réelle copiée. [Guide](https://github.com/Installation-04/Allumi/wiki/Duplication-des-budgets-mensuels).
+
+![Copie des répartitions mensuelles](docs/images/duplication-budget-mensuel-desktop.png)
+
+[Référence mobile](docs/images/duplication-budget-mensuel-mobile.png)
 
 ### Budgets mensuels
 

@@ -4,6 +4,12 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Nouveautés : duplication des objectifs annuels et répartitions mensuelles dans un nouveau scénario/exercice de la même entreprise, après aperçu des douze correspondances fiscales.
+- Budgets : cents et zéros explicites conservés, mois absents non définis, exclusions des comptes inactifs confirmées, source indépendante et aucun mouvement réel copié.
+- Sécurité : permissions revérifiées, verrouillages et empreinte d’aperçu, copie atomique auditée avec refus des modifications concurrentes et aucune création partielle.
+- Capacité : jusqu’à 1 000 objectifs et 12 000 montants mensuels; fenêtre transactionnelle de 60 secondes réservée à cette copie bornée, gardes SQL et audit maintenus.
+- Documentation : guide et références FR/EN, thème sombre, ordinateur et mobile. Aucune migration ni nouvelle configuration; import CSV mensuel et prévisions de trésorerie hors périmètre.
+
 ## [0.4.0-alpha.80] - 2026-11-22
 
 - Nouveautés : modèles vierges pour les cinq types de lots QuickBooks, en français/anglais et avec virgule, point-virgule ou tabulation; CSV/TSV UTF-8 compatible avec les associations de l’assistant.

@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.80
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.81
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -170,6 +170,14 @@ Create a new budget from a UTF-8 CSV after reviewing every target locally. Engli
 ![Annual target import in English with dark theme](docs/images/import-budget-csv-en-dark-desktop.png)
 
 [Mobile reference](docs/images/import-budget-csv-en-dark-mobile.png)
+
+### Copy monthly budget allocations
+
+Carry annual targets and their defined monthly amounts into an independent scenario or fiscal year. Review all twelve fiscal-period mappings before confirming; exact zeros and missing months stay distinct. Inactive exclusions are explicit, stale previews are refused, and no journal entries are copied. [Guide](https://github.com/Installation-04/Allumi/wiki/Duplication-des-budgets-mensuels).
+
+![Monthly budget copy in English with dark theme](docs/images/duplication-budget-mensuel-en-dark-desktop.png)
+
+[Mobile reference](docs/images/duplication-budget-mensuel-en-dark-mobile.png)
 
 ### Monthly budgets
 

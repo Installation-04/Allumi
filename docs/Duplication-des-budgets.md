@@ -2,7 +2,7 @@
 
 Depuis la fiche d’un budget, **Dupliquer le budget** reprend les objectifs dans un nouveau scénario de la **même entreprise**. Choisissez un nom et un exercice déjà créé. Cela permet de préparer un autre scénario ou de reprendre des objectifs pour l’exercice suivant sans les ressaisir.
 
-Le budget source reste intact. Les répartitions mensuelles ne sont pas copiées; elles devront être définies dans [[Budgets-mensuels]]. Seuls les objectifs annuels sont copiés : les écritures, les soldes réels et les contre-passations ne sont pas dupliqués. Le nouveau rapport calcule son réel depuis le grand livre aux dates de son propre exercice. Si deux scénarios utilisent le même exercice, ils affichent donc le même réel à cet instant. Les montants annuels ne sont pas répartis ou proratisés selon la durée de l’exercice cible.
+Le budget source reste intact. Cette option copie seulement les objectifs annuels. Pour reprendre aussi les répartitions définies, choisissez **Dupliquer avec les répartitions mensuelles** : [[Duplication-des-budgets-mensuels]]. Seuls les objectifs annuels sont copiés : les écritures, les soldes réels et les contre-passations ne sont pas dupliqués. Le nouveau rapport calcule son réel depuis le grand livre aux dates de son propre exercice. Si deux scénarios utilisent le même exercice, ils affichent donc le même réel à cet instant. Les montants annuels ne sont pas répartis ou proratisés selon la durée de l’exercice cible.
 
 ![Aperçu sur ordinateur](images/duplication-budget-desktop.png)
 

@@ -45,7 +45,7 @@ L’objectif annuel ne peut pas descendre sous la somme mensuelle. Son retrait e
 
 Une migration additive ajoute `budget_monthly_target`, les clés composites d’entreprise, les contraintes, les politiques RLS et les déclencheurs de garde, d’audit et de révision. Sauvegardez avant la mise à jour; le service de migration habituel applique cet ajout. Aucune nouvelle variable de configuration et aucun déploiement automatique sur votre serveur.
 
-Le rapport exige les **douze périodes fiscales** et limite à **1 000 comptes** l’ensemble des comptes avec objectif annuel ou activité de l’exercice. Un dépassement est refusé explicitement, sans rapport ou export tronqué. L’éditeur peut charger un compte séparément. La duplication et l’import CSV concernent toujours les **objectifs annuels seulement** : les répartitions mensuelles ne sont pas copiées ni importées. Les prévisions de trésorerie restent hors périmètre.
+Le rapport exige les **douze périodes fiscales** et limite à **1 000 comptes** l’ensemble des comptes avec objectif annuel ou activité de l’exercice. Un dépassement est refusé explicitement, sans rapport ou export tronqué. L’éditeur peut charger un compte séparément. La [[Duplication-des-budgets-mensuels]] reprend maintenant les objectifs annuels et les répartitions définies selon le numéro de période, après aperçu des douze correspondances. L’import CSV concerne encore les **objectifs annuels seulement**. Les prévisions de trésorerie restent hors périmètre.
 
 Les six captures utilisent une entreprise fictive dans Chromium et son émulation mobile. Les essais physiques Safari iOS restent à effectuer.
 

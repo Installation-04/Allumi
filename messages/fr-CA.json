@@ -848,7 +848,8 @@
       "monthlyAnnualFloor": "L’objectif annuel ne peut pas être inférieur au montant déjà réparti. Réduisez d’abord la répartition mensuelle.",
       "monthlyInUse": "Retirez d’abord les objectifs mensuels avant de retirer cet objectif annuel, y compris les montants zéro.",
       "monthlyPeriods": "L’exercice doit contenir ses 12 périodes pour la planification mensuelle. Aucun résultat partiel n’est affiché.",
-      "monthlyPeriod": "Cette période n’appartient pas à l’exercice du budget."
+      "monthlyPeriod": "Cette période n’appartient pas à l’exercice du budget.",
+      "monthlyCopyConfirm": "Confirmez la correspondance des périodes avant de créer la copie."
     },
     "migration": {
       "invalid": "Fichier, associations ou options invalides. Aucun changement enregistré.",
@@ -3381,7 +3382,31 @@
     "monthlyInvalidHint": "Corrigez les montants invalides ou négatifs avant d’enregistrer.",
     "monthlyExcessHint": "La somme dépasse l’objectif annuel. Réduisez la répartition avant d’enregistrer.",
     "monthlyClear": "Effacer la répartition proposée",
-    "monthlyDefinedCount": "Périodes définies (sur 12)"
+    "monthlyDefinedCount": "Périodes définies (sur 12)",
+    "monthlyCopyTitle": "Dupliquer les objectifs annuels et mensuels",
+    "monthlyCopyLink": "Dupliquer avec les répartitions mensuelles",
+    "monthlyCopyBack": "Retour à la duplication annuelle",
+    "monthlyCopyIntro": "Créez un nouveau scénario indépendant dans la même entreprise. Les montants sont repris selon le numéro de période fiscale, sans prorata. Les mois non définis restent non définis et les zéros explicites sont conservés. Aucune activité réelle ni écriture comptable n’est copiée.",
+    "monthlyCopyCounts": "{accounts, plural, one {# compte actif} other {# comptes actifs}} et {months, plural, one {# objectif mensuel défini à copier} other {# objectifs mensuels définis à copier}}.",
+    "monthlyCopyAnnualRevenue": "Objectifs annuels de revenus",
+    "monthlyCopyAnnualExpenses": "Objectifs annuels de charges",
+    "monthlyCopyRevenue": "Revenus déjà répartis sur les mois",
+    "monthlyCopyExpenses": "Charges déjà réparties sur les mois",
+    "monthlyCopyExcluded": "{accounts, plural, one {# compte inactif exclu} other {# comptes inactifs exclus}}, avec {months, plural, one {# objectif mensuel} other {# objectifs mensuels}}. Une confirmation d’exclusion est nécessaire.",
+    "monthlyCopyEmpty": "Aucune répartition mensuelle active n’est définie dans la source. Seuls les objectifs annuels actifs seront repris.",
+    "monthlyCopyChooseYear": "Choisir l’exercice de destination",
+    "monthlyCopyPreview": "Vérifier la correspondance des périodes",
+    "monthlyCopyPeriods": "Correspondance des périodes fiscales",
+    "monthlyCopyPeriodHint": "Chaque montant passe de la période source à la période destination de même numéro. Les dates peuvent différer : vérifiez les douze correspondances. Aucune conversion selon le mois civil ou la durée n’est appliquée.",
+    "monthlyCopyPeriod": "Période {number}",
+    "monthlyCopyChangeYear": "Choisir un autre exercice",
+    "monthlyCopyReview": "Confirmer la nouvelle copie",
+    "monthlyCopyConfirm": "Créer le scénario avec les répartitions",
+    "monthlyCopySkip": "Je confirme l’exclusion de {accounts, plural, one {# compte inactif} other {# comptes inactifs}} et de {months, plural, one {# objectif mensuel associé} other {# objectifs mensuels associés}}.",
+    "monthlyCopyConsent": "J’ai vérifié la destination et les douze périodes. Je confirme la copie des objectifs annuels et des répartitions définies, sans écriture réelle, prorata ou création de valeurs pour les mois absents.",
+    "monthlyCopyTarget": "Annuel : {annual} · réparti : {allocated} · reste : {remaining} · {count}/12 périodes définies.",
+    "monthlyCopyAmount": "Période {number} : {amount}",
+    "monthlyCopyWorking": "Copie des objectifs en cours…"
   },
   "migration": {
     "title": "Migrer depuis QuickBooks",

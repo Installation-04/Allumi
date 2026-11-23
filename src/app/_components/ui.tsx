@@ -73,7 +73,7 @@ export function Field(props: {
   );
 }
 
-export function SubmitButton({ children, variant = "primary", ariaLabel }: { children: React.ReactNode; variant?: "primary" | "secondary"; ariaLabel?: string }) {
+export function SubmitButton({ children, variant = "primary", ariaLabel, pendingLabel }: { children: React.ReactNode; variant?: "primary" | "secondary"; ariaLabel?: string; pendingLabel?: string }) {
   const { pending } = useFormStatus();
   const styles =
     variant === "primary"
@@ -90,7 +90,7 @@ export function SubmitButton({ children, variant = "primary", ariaLabel }: { chi
       }}
       className={`min-h-11 rounded-md px-4 py-2 text-sm font-medium aria-disabled:opacity-60 ${FOCUS} ${styles}`}
     >
-      {children}
+      {pending && pendingLabel ? pendingLabel : children}
     </button>
   );
 }
@@ -158,6 +158,7 @@ export function ActionForm(props: {
   label: string;
   /** What assistive technology announces for the button, when the visible label alone does not say what it acts on. */
   ariaLabel?: string;
+  pendingLabel?: string;
   variant?: "primary" | "secondary";
   children?: React.ReactNode;
   /** Dynamic controlled fields must keep their DOM selection after a refused action. */
@@ -172,7 +173,7 @@ export function ActionForm(props: {
       <StateError state={state} />
       {state?.notice === "saved" && <p role="status" className="text-brand-700 dark:text-brand-500">{props.savedMessage ?? t("saved")}</p>}
       <FormScopeProvider scope={scope}>{props.children}</FormScopeProvider>
-      <SubmitButton variant={props.variant ?? "secondary"} ariaLabel={props.ariaLabel}>
+      <SubmitButton variant={props.variant ?? "secondary"} ariaLabel={props.ariaLabel} pendingLabel={props.pendingLabel}>
         {props.label}
       </SubmitButton>
     </form>

@@ -7,3 +7,4 @@ export * from "./service/import-csv";
 export * from "./domain/monthly";
 export * from "./service/monthly";
 export * from "./domain/monthly-csv";
+export * from "./service/duplicate-monthly";

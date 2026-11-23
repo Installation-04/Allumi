@@ -848,7 +848,8 @@
       "monthlyAnnualFloor": "The annual target cannot fall below the amount already allocated. Reduce the monthly allocation first.",
       "monthlyInUse": "Remove monthly targets before removing this annual target, including zero amounts.",
       "monthlyPeriods": "The fiscal year needs its 12 periods for monthly planning. No partial results are shown.",
-      "monthlyPeriod": "This period does not belong to the budget fiscal year."
+      "monthlyPeriod": "This period does not belong to the budget fiscal year.",
+      "monthlyCopyConfirm": "Confirm the period mapping before creating the copy."
     },
     "migration": {
       "invalid": "Invalid file, mapping or options. No changes saved.",
@@ -3381,7 +3382,31 @@
     "monthlyInvalidHint": "Correct invalid or negative amounts before saving.",
     "monthlyExcessHint": "The sum exceeds the annual target. Reduce the allocation before saving.",
     "monthlyClear": "Clear proposed allocation",
-    "monthlyDefinedCount": "Defined periods (out of 12)"
+    "monthlyDefinedCount": "Defined periods (out of 12)",
+    "monthlyCopyTitle": "Copy annual and monthly budget targets",
+    "monthlyCopyLink": "Copy with monthly allocations",
+    "monthlyCopyBack": "Back to annual duplication",
+    "monthlyCopyIntro": "Create an independent scenario in the same company. Amounts follow fiscal period numbers with no proration. Undefined months remain undefined and explicit zeros are preserved. No actual activity or journal entries are copied.",
+    "monthlyCopyCounts": "{accounts, plural, one {# active account} other {# active accounts}} and {months, plural, one {# defined monthly target to copy} other {# defined monthly targets to copy}}.",
+    "monthlyCopyAnnualRevenue": "Annual revenue targets",
+    "monthlyCopyAnnualExpenses": "Annual expense targets",
+    "monthlyCopyRevenue": "Revenue allocated to months",
+    "monthlyCopyExpenses": "Expenses allocated to months",
+    "monthlyCopyExcluded": "{accounts, plural, one {# inactive account excluded} other {# inactive accounts excluded}}, with {months, plural, one {# monthly target} other {# monthly targets}}. Explicit exclusion is required.",
+    "monthlyCopyEmpty": "The source has no defined active monthly allocations. Only active annual targets will be copied.",
+    "monthlyCopyChooseYear": "Choose the destination fiscal year",
+    "monthlyCopyPreview": "Review period mapping",
+    "monthlyCopyPeriods": "Fiscal period mapping",
+    "monthlyCopyPeriodHint": "Each amount moves to the destination period with the same number. Dates may differ: review all twelve mappings. Calendar-month matching and duration-based conversion are not applied.",
+    "monthlyCopyPeriod": "Period {number}",
+    "monthlyCopyChangeYear": "Choose another fiscal year",
+    "monthlyCopyReview": "Confirm the new copy",
+    "monthlyCopyConfirm": "Create scenario with allocations",
+    "monthlyCopySkip": "I confirm excluding {accounts, plural, one {# inactive account} other {# inactive accounts}} and {months, plural, one {# related monthly target} other {# related monthly targets}}.",
+    "monthlyCopyConsent": "I reviewed the destination and all twelve periods. I confirm copying annual targets and defined allocations, with no actual entries, proration or generated values for undefined months.",
+    "monthlyCopyTarget": "Annual: {annual} · allocated: {allocated} · remaining: {remaining} · {count}/12 periods defined.",
+    "monthlyCopyAmount": "Period {number}: {amount}",
+    "monthlyCopyWorking": "Copying budget targets…"
   },
   "migration": {
     "title": "Migrate from QuickBooks",
