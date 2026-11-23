@@ -3935,6 +3935,7 @@ test("monthly budget duplication reviews fiscal mappings, preserves gaps and zer
   await expect(page).toHaveURL(/\/setup$/); await page.locator('[name="setupToken"]').fill('e2e-setup-token-123456789'); await page.getByLabel("Nom de l'entreprise").fill('Atelier Exemple inc.'); await page.getByLabel("Premier mois de l'exercice financier").selectOption('4'); await page.getByLabel('Ton nom').fill('Alex Exemple'); await page.getByLabel('Courriel').fill(EMAIL); await page.getByLabel("Langue de l'interface").selectOption('fr-CA'); await page.getByLabel('Mot de passe',{exact:true}).fill(PASSWORD); await page.getByLabel('Confirmation du mot de passe').fill(PASSWORD); await page.getByRole('button',{name:"Créer l'entreprise et commencer",exact:true}).click(); await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
  }
  if(!/^\/c\/[0-9a-f-]{36}/.test(new URL(page.url()).pathname)) await page.getByRole('link',{name:'Atelier Exemple inc.',exact:true}).click();
+ await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}/);
  const company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)![0], companyId=company.split('/')[2];
  const db=new pg.Client({connectionString:e2eUrls().owner}); await db.connect();
  let sourceId='', destinationId='', userId='', backupId='', originalRole='', originalAccess:unknown=null;
