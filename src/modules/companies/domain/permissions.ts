@@ -6,6 +6,7 @@ import { moduleLevel, type AccessContext, type Module } from "./module-access";
 export type Role = "OWNER" | "USER" | "ACCOUNTANT" | "READ_ONLY";
 
 export type Action =
+  | "migration.manage"
   | "contact.anonymize"
   | "bank.read"
   | "bank.manage"
@@ -34,6 +35,7 @@ export type Action =
   | "audit.read";
 
 const ALLOWED: Record<Action, readonly Role[]> = {
+  "migration.manage": ["OWNER"],
   "contact.anonymize": ["OWNER"],
   "bank.read": ["OWNER", "USER", "ACCOUNTANT", "READ_ONLY"],
   "bank.manage": ["OWNER", "ACCOUNTANT"],

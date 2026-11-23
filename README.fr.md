@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.76
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.77
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -94,6 +94,13 @@ Ce mode utilise Docker et Compose déjà installés, sans configurer le pare-feu
 La comptabilité utilise la **partie double**, des montants exacts en cents ou Decimal, et des écritures validées immuables corrigées par contre-passation. Les accès sont contrôlés côté application et en base, avec isolation par entreprise.
 
 Les flux bancaires directs, le suivi des stocks, la paie, la multidevise, la signature électronique et l’exécution planifiée des récurrences/relances restent à développer. Les fonctionnalités fiscales ne constituent pas un dépôt de déclaration. [Disponibilités et limites détaillées](docs/Fonctionnalites-et-limites.md).
+
+### Migrer depuis QuickBooks
+
+Reprenez les **clients, fournisseurs, produits/services hors inventaire et comptes** depuis des CSV QuickBooks Online ou Desktop. Vérifiez les associations et chaque ligne avant confirmation. La balance de bascule rapprochée ajuste les comptes ordinaires; les contrôles clients, fournisseurs et taxes doivent déjà correspondre aux pièces natives Allumi. L’historique détaillé et les fichiers QuickBooks natifs sont exclus. [Guide de migration](docs/Migration-QuickBooks.md).
+
+![Aperçu de migration QuickBooks](docs/images/migration-quickbooks-desktop.png)
+![Balance de bascule sur mobile](docs/images/soldes-bascule-quickbooks-mobile.png)
 
 ## En images
 

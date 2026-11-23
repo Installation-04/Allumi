@@ -249,3 +249,8 @@ Voir aussi [[Regles-comptables]], [[Schema-de-donnees]], [[Plan-de-tests]].
 Le cache React est limité à la requête/rendu serveur : aucune langue ou donnée de cookie n’est mémorisée dans un cache global ou persistant. Le fournisseur client reçoit explicitement la langue, le catalogue sélectionné et le même fuseau `America/Toronto` que le serveur. Pluriels ICU, interpolation, types des clés, métadonnées et manifeste PWA utilisent cette configuration. Deux utilisateurs peuvent demander simultanément des langues différentes.
 
 L’application n’utilise pas de routage localisé ou d’extraction automatique de messages. Elle emploie directement le moteur public ICU de `use-intl`, sans plugin Next ni watcher de fichiers. Le retrait de `next-intl` et de sa chaîne d’extraction supprime la dépendance de production à picomatch; l’audit de production reste obligatoire en CI. Les catalogues restent dans `messages/fr-CA.json` et `messages/en.json`, avec tests de parité. Aucun changement de configuration, de droits d’entreprise ou de données comptables pour cette adaptation.
+
+
+## Migration de données
+
+Le module `migration` sépare le parseur CSV pur (`domain/`) de la planification, signature d’aperçu et confirmation transactionnelle (`service/`). Les listes sont créées sans modification des fiches existantes. La balance de bascule utilise le service public `ledger.postManualEntryWithin` : aucun contournement des gardes comptables ou accès Prisma direct depuis l’interface. La provenance est conservée dans `migration_batch`, sous RLS et audit. Voir [[Migration-QuickBooks]] et [[Schema-de-donnees]].

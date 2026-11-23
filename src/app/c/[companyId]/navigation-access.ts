@@ -5,6 +5,7 @@ import { AREAS, type Area } from "./sections";
 export const ROUTE_ACCESS: Record<string, readonly Action[]> = {
   "": ["company.read"],
   parametres: ["company.read"],
+  migration: ["migration.manage"],
   recherche: ["company.read"],
   contacts: ["contact.read"],
   journal: ["ledger.read"],

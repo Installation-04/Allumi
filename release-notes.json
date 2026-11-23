@@ -794,5 +794,57 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.77": {
+    "fr-CA": {
+      "title": "Migration QuickBooks : listes et soldes de bascule",
+      "added": [
+        {
+          "text": "Importez les clients, fournisseurs, produits/services hors inventaire et comptes depuis des CSV QuickBooks Online ou Desktop, après association et aperçu.",
+          "guide": "Migration-QuickBooks"
+        },
+        {
+          "text": "Rapprochez une balance cible et confirmez les ajustements ordinaires de bascule; les contrôles clients, fournisseurs et taxes doivent déjà correspondre aux pièces natives Allumi.",
+          "guide": "Migration-QuickBooks"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Aperçus signés expirants, confirmation explicite, refus des conflits, import atomique et historique sous accès administrateur; interface FR/EN, mobile et sombre."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Deux migrations additives créent les lots immuables et leurs politiques. Aucune nouvelle configuration. Historique détaillé, inventaire et fichiers natifs QuickBooks exclus.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "QuickBooks migration: lists and cutover balances",
+      "added": [
+        {
+          "text": "Import customer, supplier, service/noninventory product and account lists from QuickBooks Online or Desktop CSV exports after mapping and review.",
+          "guide": "Migration-QuickBooks"
+        },
+        {
+          "text": "Reconcile a target trial balance and confirm ordinary cutover adjustments; customer, supplier and tax control balances must already match Allumi native records.",
+          "guide": "Migration-QuickBooks"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Expiring signed previews, explicit confirmation, conflict checks, atomic import and administrator-only history; French/English, mobile and dark theme."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Two additive migrations create immutable batches and their policies. No new configuration. Detailed history, inventory and native QuickBooks files are excluded.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

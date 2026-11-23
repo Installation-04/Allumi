@@ -27,6 +27,7 @@ export default async function CompanyLayout({ children, params }: { children: Re
     { href: `${base}/balance`, label: t("trial"), shortLabel: t("short.trial"), icon: "trial" },
     { href: `${base}/exercices`, label: t("fiscal"), icon: "fiscal" },
     { href: `${base}/parametres`, label: t("settings"), icon: "accounts" },
+    ...(can(company, "migration.manage") ? [{ href: `${base}/migration`, label: t("migration"), icon: "accounts" as const }] : []),
     { href: `${base}/entreprise`, label: t("company"), icon: "accounts" },
     ...(can(company, "members.manage") ? [{ href: `${base}/utilisateurs`, label: t("members"), icon: "contacts" as const }] : []),
     ...(can(company, "audit.read") ? [{ href: `${base}/audit`, label: t("audit"), shortLabel: t("short.audit"), icon: "audit" as const }] : []),
@@ -37,7 +38,7 @@ export default async function CompanyLayout({ children, params }: { children: Re
     href: `${base}/espace/${area}`,
     links: routes.filter(route => canAccessRoute(company, route)).map(route => visibleLinks.find(link => link.href === `${base}/${route}`) ?? { href: `${base}/${route}`, label: ta(`links.${route}`), icon: AREAS[area as Area].icon }),
   }));
-  groups.push({ href: `${base}/parametres`, links: visibleLinks.filter(link => ["entreprise", "utilisateurs", "audit"].some(route => link.href === `${base}/${route}`)) });
+  groups.push({ href: `${base}/parametres`, links: visibleLinks.filter(link => ["entreprise", "utilisateurs", "audit", "migration"].some(route => link.href === `${base}/${route}`)) });
   const groupedHrefs = new Set(groups.flatMap(group => group.links.map(link => link.href)));
   const desktopLinks = [visibleLinks[0]!, ...areaLinks, ...visibleLinks.slice(1).filter(link => !groupedHrefs.has(link.href))];
   const allLinks = [...visibleLinks.slice(0, 3), ...areaLinks, ...visibleLinks.slice(3)];

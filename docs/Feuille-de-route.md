@@ -58,3 +58,6 @@ Budgets annuels par exercice et compte, comparaison au réel et CSV disponibles 
 [[Duplication-des-budgets]] : reprise des objectifs vers un scénario/exercice de la même entreprise, aperçu, exclusions explicites des comptes inactifs et refus des aperçus périmés. Aucune écriture financière.
 
 [[Import-CSV-des-budgets]] : objectifs annuels importés dans un nouveau scénario depuis un CSV UTF-8 français/anglais, aperçu local, confirmation, comptes locaux actifs et création atomique auditée. Aucun budget existant écrasé ni mouvement financier importé.
+
+
+[[Migration-QuickBooks]] : reprise CSV des listes Online/Desktop et balance de bascule avec ajustements des comptes ordinaires. Les contrôles clients/fournisseurs/taxes doivent déjà être rapprochés via les parcours natifs; reprise automatique des postes ouverts, historique et fichiers natifs restent hors périmètre.
