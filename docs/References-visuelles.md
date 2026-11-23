@@ -587,4 +587,4 @@ Codes importés ou manuels, taux datés et écarts par composante : [[Comparaiso
 
 ## Migration QuickBooks
 
-[[Migration-QuickBooks]] présente six captures de l’assistant, de la balance de bascule et du thème sombre anglais, sur ordinateur et mobile. Données fictives, Chromium et émulation mobile; Safari physique reste à valider.
+[[Migration-QuickBooks]] présente six captures de l’assistant et de la balance de bascule, ainsi que quatre captures des modèles vierges, en français/anglais, sur ordinateur et mobile avec thème sombre. Données fictives, Chromium et émulation mobile; Safari physique reste à valider.

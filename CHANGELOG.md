@@ -4,6 +4,14 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.80] - 2026-11-22
+
+- Nouveautés : modèles vierges pour les cinq types de lots QuickBooks, en français/anglais et avec virgule, point-virgule ou tabulation; CSV/TSV UTF-8 compatible avec les associations de l’assistant.
+- Interface : téléchargement depuis la préparation sans perdre le fichier, l’aperçu ou le consentement, FR/EN/mobile/sombre; guide et quatre nouvelles captures.
+- Confidentialité : accès administrateur et session complète, paramètres stricts et réponses privées sans cache; aucune donnée d’entreprise ou ligne d’exemple dans le fichier.
+- Correction : le choix Tabulation transmet désormais une vraie tabulation au lecteur CSV et au modèle TSV, avec import fournisseur tabulé vérifié.
+- Installation : aucune migration ni nouvelle configuration; aucun import ou mouvement comptable créé par le téléchargement. Les conditions de bascule restent inchangées.
+
 ## [0.4.0-alpha.79] - 2026-11-22
 
 - Sécurité : famille Prisma en 7.10.1 et dépendance Effect corrigée en 3.22.1 contre GHSA-7589-6fvf-x4pw; audit de production conservé, sans rétrogradation de Prisma ni adoption de sa préversion majeure.

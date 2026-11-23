@@ -3500,6 +3500,10 @@
       "duplicate": "Identité ou code répété à la ligne {row}.",
       "currency": "Devise autre que CAD à la ligne {row} : aucune conversion automatique.",
       "inventory": "Type de produit non pris en charge à la ligne {row}. Exportez seulement les services et produits hors stock."
-    }
+    },
+    "templateTitle": "Préparer un fichier",
+    "downloadTemplate": "Télécharger le modèle vierge",
+    "templateHint": "En-têtes du type de données choisi, dans la langue de l’écran et avec le séparateur sélectionné. CSV/TSV UTF-8 sans donnée ni exemple. Ajoutez vos lignes, utilisez l’en-tête 1 et vérifiez le format des nombres avant l’import. Le téléchargement conserve votre saisie.",
+    "templateFor": "Modèle : {kind}"
   }
 }

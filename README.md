@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.79
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.80
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -98,9 +98,9 @@ Direct bank feeds, inventory tracking, payroll, multiple currencies, electronic 
 
 ### Move from QuickBooks
 
-Import **customer, supplier, service/noninventory product and account lists** from QuickBooks Online or Desktop CSV exports. Review column mappings and every planned change before confirming. A reconciled cutover trial balance can post ordinary account adjustments; customer, supplier and tax control balances must already match Allumi’s native records. Detailed history and native QuickBooks files are outside this import. [Migration guide](docs/Migration-QuickBooks.md).
+Import **customer, supplier, service/noninventory product and account lists** from QuickBooks Online or Desktop CSV exports. Review column mappings and every planned change before confirming. A reconciled cutover trial balance can post ordinary account adjustments; customer, supplier and tax control balances must already match Allumi’s native records. Download blank French/English CSV or TSV templates from the assistant, using your selected delimiter. Detailed history and native QuickBooks files are outside this import. [Migration guide](docs/Migration-QuickBooks.md).
 
-![QuickBooks migration preview — English, dark theme](docs/images/migration-quickbooks-en-dark-desktop.png)
+![Blank QuickBooks migration templates — English, dark theme](docs/images/modele-migration-en-dark-desktop.png)
 ![Cutover balance preview — mobile](docs/images/soldes-bascule-quickbooks-mobile.png)
 
 ## Screenshots

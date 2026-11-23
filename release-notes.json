@@ -880,5 +880,57 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.80": {
+    "fr-CA": {
+      "title": "Modèles vierges pour préparer votre migration QuickBooks",
+      "added": [
+        {
+          "text": "Téléchargez un modèle pour les clients, fournisseurs, produits/services, comptes ou soldes de bascule, avec en-têtes français ou anglais et séparateur choisi.",
+          "guide": "Migration-QuickBooks"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Les fichiers CSV/TSV UTF-8 ne contiennent que les en-têtes, sans donnée ni exemple. Le téléchargement conserve votre fichier, aperçu et consentement."
+        }
+      ],
+      "fixed": [
+        {
+          "text": "Le choix Tabulation utilise désormais le bon séparateur pour télécharger et importer les fichiers TSV."
+        }
+      ],
+      "installation": [
+        {
+          "text": "Aucune migration ni nouvelle configuration. Le téléchargement ne crée aucune fiche ou écriture; les contrôles de bascule existants restent applicables.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Blank templates for your QuickBooks migration",
+      "added": [
+        {
+          "text": "Download a customer, supplier, product/service, account or cutover balance template with French or English headers and your selected delimiter.",
+          "guide": "Migration-QuickBooks"
+        }
+      ],
+      "improved": [
+        {
+          "text": "UTF-8 CSV/TSV files contain headers only, with no data or examples. Downloading preserves your selected file, preview and consent."
+        }
+      ],
+      "fixed": [
+        {
+          "text": "The Tab delimiter now uses the correct separator when downloading templates and importing TSV files."
+        }
+      ],
+      "installation": [
+        {
+          "text": "No migration or new configuration. Downloading creates no records or journal entries; existing cutover checks still apply.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

@@ -3845,7 +3845,7 @@ test("concurrent French and English requests keep server metadata, client forms 
 });
 
 /** Online/Desktop CSV lists and a separately reviewed, reconciled cutover entry. Fictional data only. */
-test("QuickBooks migration reviews mapped lists, rejects stale approval and reconciles cutover balances", async ({ page }) => {
+test("QuickBooks migration reviews templates and mapped lists, rejects stale approval and reconciles cutover balances", async ({ page, browser }) => {
  test.setTimeout(240_000); cspViolations.length = 0; watchCsp(page.context());
  if (updateCookies) await page.context().addCookies(updateCookies); await page.goto('/');
  if (!updateCookies) {
@@ -3862,6 +3862,26 @@ test("QuickBooks migration reviews mapped lists, rejects stale approval and reco
   await expect(page.getByRole('button',{name:'Initialiser',exact:true})).toHaveCount(0);
   const cutoff = (await db.query("SELECT to_char(end_date,'YYYY-MM-DD') AS date FROM fiscal_period WHERE company_id=$1 ORDER BY period_number LIMIT 1",[companyId])).rows[0].date;
   await page.goto(company+'/parametres');await page.getByRole('link',{name:'Migrer depuis QuickBooks',exact:true}).click();await expect(page.getByRole('heading',{name:'Migrer depuis QuickBooks',exact:true})).toBeVisible();
+  const templateUrl = (kind: string, locale: string, delimiter: string) => company + '/migration/modele?' + new URLSearchParams({ kind, locale, delimiter });
+  const auditBefore = (await db.query('SELECT count(*)::int AS n FROM audit_log WHERE company_id=$1',[companyId])).rows[0].n;
+  for (const kind of ['CUSTOMERS','SUPPLIERS','ITEMS','ACCOUNTS','BALANCES']) for (const locale of ['fr-CA','en']) for (const delimiter of [',',';','\t']) {
+    const response = await page.request.get(templateUrl(kind,locale,delimiter)); expect(response.status()).toBe(200);
+    expect(response.headers()['cache-control']).toBe('private, no-store');expect(response.headers()['vary']).toContain('Cookie');expect(response.headers()['x-content-type-options']).toBe('nosniff');
+    expect(response.headers()['content-disposition']).toBe(`attachment; filename="quickbooks_${kind.toLowerCase()}_${locale}.${delimiter==='\t'?'tsv':'csv'}"`);
+    const bytes=await response.body();expect([...bytes.subarray(0,3)]).toEqual([239,187,191]);const text=bytes.toString('utf8').replace(/^\uFEFF/,'').trim();expect(text.split(/\r?\n/)).toHaveLength(1);expect(text).toContain(locale==='en'?'"Name"':'"Nom"');expect(text).not.toContain('Migration Exemple');
+  }
+  const url=templateUrl('CUSTOMERS','en',',');
+  for (const bad of [url+'&kind=ITEMS',url+'&extra=1',url.replace('CUSTOMERS','HISTORY'),url.replace('locale=en','locale=fr'),url.replace('delimiter=%2C','delimiter=%7C'),company+'/migration/modele']) {
+    const response=await page.request.get(bad);expect(response.status()).toBe(400);expect(response.headers()['cache-control']).toBe('private, no-store');
+  }
+  expect((await page.request.get(url.replace(company,'/c/00000000-0000-0000-0000-000000000000'))).status()).toBe(404);
+  const anonymous=await browser.newContext();try {const response=await anonymous.request.get(new URL(url,page.url()).href,{maxRedirects:0});expect(response.status()).toBe(307);expect(response.headers()['location']).toContain('/connexion');}finally{await anonymous.close();}
+  await page.getByRole('combobox',{name:'Données à reprendre',exact:true}).selectOption('BALANCES');await page.getByRole('combobox',{name:'Séparateur du fichier',exact:true}).selectOption('\t');
+  await expect(page.getByRole('link',{name:'Télécharger le modèle vierge',exact:true})).toHaveAttribute('href',templateUrl('BALANCES','fr-CA','\t'));
+  const [tabTemplate]=await Promise.all([page.waitForEvent('download'),page.getByRole('link',{name:'Télécharger le modèle vierge',exact:true}).click()]);expect(tabTemplate.suggestedFilename()).toBe('quickbooks_balances_fr-CA.tsv');await tabTemplate.delete();
+  await page.getByRole('combobox',{name:'Données à reprendre',exact:true}).selectOption('CUSTOMERS');await page.getByRole('combobox',{name:'Séparateur du fichier',exact:true}).selectOption(',');
+  expect((await db.query('SELECT count(*)::int AS n FROM audit_log WHERE company_id=$1',[companyId])).rows[0].n).toBe(auditBefore);
+  await expectNoPageOverflow(page);await captureReference(page,'modele-migration','Préparer un fichier');
   const upload = async (kind:string,source:string,text:string) => {
    await page.getByRole('combobox',{name:'Données à reprendre',exact:true}).selectOption(kind);await page.getByRole('combobox',{name:'Édition source',exact:true}).selectOption(source);
    await page.getByLabel('Export CSV',{exact:true}).setInputFiles({name:'quickbooks-example.csv',mimeType:'text/csv',buffer:Buffer.from(text)});
@@ -3876,14 +3896,18 @@ test("QuickBooks migration reviews mapped lists, rejects stale approval and reco
   await upload('CUSTOMERS','ONLINE',contacts);expect(posts).toBe(0);page.off('request',countPosts);await check();
   await expect(page.getByRole('button',{name:'Importer les listes',exact:true})).toBeDisabled();await expect(page.locator('form').filter({has:page.locator('input[type="file"]')})).toContainText('Balance');
   expect((await db.query("SELECT id FROM contact WHERE company_id=$1 AND display_name='Client QB Exemple'",[companyId])).rowCount).toBe(0);
+  await page.getByRole('checkbox').last().check();const reviewedToken=await page.locator('input[name="token"]').inputValue(), selectedFile=await page.getByLabel('Export CSV',{exact:true}).inputValue(), beforeDownloadUrl=page.url();
+  const [download]=await Promise.all([page.waitForEvent('download'),page.getByRole('link',{name:'Télécharger le modèle vierge',exact:true}).click()]);expect(download.suggestedFilename()).toBe('quickbooks_customers_fr-CA.csv');await download.delete();
+  await expect(page).toHaveURL(beforeDownloadUrl);await expect(page.getByRole('checkbox').last()).toBeChecked();await expect(page.locator('input[name="token"]')).toHaveValue(reviewedToken);await expect(page.getByLabel('Export CSV',{exact:true})).toHaveValue(selectedFile);
   await db.query("INSERT INTO contact(id,company_id,is_customer,display_name,updated_at) VALUES(gen_random_uuid(),$1,true,'Contact concurrent',now())",[companyId]);
   await page.getByRole('checkbox').last().check();await page.getByRole('button',{name:'Importer les listes',exact:true}).click();await expect(page.getByRole('alert').filter({hasText:'L’aperçu a expiré ou les données ont changé.'})).toBeVisible();
   await expect(page.getByLabel('Export CSV',{exact:true})).not.toHaveValue('');await check();await expect(page.getByRole('checkbox').last()).not.toBeChecked();await expectNoPageOverflow(page);await captureReference(page,'migration-quickbooks','3. Vérifier le lot et confirmer');
   await page.getByRole('button',{name:'English',exact:true}).click();await expect(page.locator('html')).toHaveAttribute('lang','en');await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption('dark');await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+  await expect(page.getByRole('link',{name:'Download a blank template',exact:true})).toHaveAttribute('href',templateUrl('CUSTOMERS','en',','));await captureReference(page,'modele-migration-en-dark','Prepare a file');
   await page.getByRole('button',{name:'Check with Allumi',exact:true}).click();await expect(page.getByRole('heading',{name:'3. Review and confirm',exact:true})).toBeVisible();await expectNoPageOverflow(page);await captureReference(page,'migration-quickbooks-en-dark','3. Review and confirm');
   await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption('light');await expect(page.locator('html')).toHaveAttribute('data-theme','light');await page.getByRole('button',{name:'Français',exact:true}).click();await expect(page.locator('html')).toHaveAttribute('lang','fr-CA');await check();await confirm();
   expect((await db.query("SELECT email FROM contact WHERE company_id=$1 AND display_name='Client QB Exemple'",[companyId])).rows[0].email).toBe('qb-client@example.test');
-  await upload('SUPPLIERS','DESKTOP','Vendor,Email\nFournisseur QB Exemple,qb-supplier@example.test');await check();await confirm();
+  await page.getByRole('combobox',{name:'Séparateur du fichier',exact:true}).selectOption('\t');await upload('SUPPLIERS','DESKTOP','Vendor\tEmail\nFournisseur QB Exemple\tqb-supplier@example.test');await check();await confirm();await page.getByRole('combobox',{name:'Séparateur du fichier',exact:true}).selectOption(',');
   await upload('ACCOUNTS','DESKTOP','Account,Account #,Account type\nBanque QB Exemple,QB-1000,Bank');await check();await confirm();
   await upload('ITEMS','DESKTOP','Product/Service,SKU,Type,Sales price/rate,Income account\nService QB Exemple,QB-SERVICE,Service,12.345678,4000');await check();await confirm();
   expect((await db.query("SELECT unit_price::text FROM item WHERE company_id=$1 AND code='QB-SERVICE'",[companyId])).rows[0].unit_price).toBe('12.345678');
@@ -3897,7 +3921,7 @@ test("QuickBooks migration reviews mapped lists, rejects stale approval and reco
   const backup=(await db.query("INSERT INTO app_user(id,email,display_name,updated_at) VALUES(gen_random_uuid(),'qb-backup-owner@example.test','Backup',now()) RETURNING id")).rows[0].id;await db.query("INSERT INTO membership(id,company_id,user_id,role,updated_at) VALUES(gen_random_uuid(),$1,$2,'OWNER',now())",[companyId,backup]);
   await db.query("UPDATE membership SET role='ACCOUNTANT' WHERE company_id=$1 AND user_id=$2",[companyId,ownerId]);
   try {
-   await page.getByRole('checkbox').last().check();await page.getByRole('button',{name:'Importer les listes',exact:true}).click();await expect(page.locator('form').filter({has:page.locator('input[type="file"]')}).getByRole('alert')).toBeVisible();expect((await page.context().request.get(company+'/migration')).status()).toBe(404);
+   await page.getByRole('checkbox').last().check();await page.getByRole('button',{name:'Importer les listes',exact:true}).click();await expect(page.locator('form').filter({has:page.locator('input[type="file"]')}).getByRole('alert')).toBeVisible();expect((await page.context().request.get(company+'/migration')).status()).toBe(404);expect((await page.request.get(templateUrl('CUSTOMERS','en',','))).status()).toBe(404);
    expect((await db.query("SELECT id FROM contact WHERE company_id=$1 AND display_name='Interdit QB'",[companyId])).rowCount).toBe(0);
   } finally {await db.query("UPDATE membership SET role='OWNER' WHERE company_id=$1 AND user_id=$2",[companyId,ownerId]);}
   expect(cspViolations).toEqual([]);
