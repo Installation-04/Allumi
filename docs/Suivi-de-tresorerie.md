@@ -39,6 +39,8 @@ Le CSV est privé, sans cache, UTF-8 avec BOM; les séparateurs et décimales su
 
 Voir [[Grand-livre]], [[Etats-financiers]], [[Appariement-bancaire]], [[Rapprochement-bancaire]] et [[Fonctionnalites-et-limites]].
 
+Pour les montants attendus aux échéances des factures ouvertes, consulte [[Previsions-de-tresorerie]]. Ce rapport séparé formule des hypothèses sans déclencher de paiements.
+
 ## Captures
 
 Entreprise fictive; un virement pur de 40,00 $ laisse la variation totale inchangée à 580,00 $.

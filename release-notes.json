@@ -1042,5 +1042,51 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.86": {
+    "fr-CA": {
+      "title": "Prévoir la trésorerie selon les échéances",
+      "added": [
+        {
+          "text": "Prévision sur 7, 30, 60 ou 90 jours, graphique, détail et CSV privé, depuis Trésorerie.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Soldes historiques, retards reportés, alertes de liquidités négatives, exclusions et rapprochement des comptes de contrôle.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration ni nouvelle configuration. Rapport en lecture seule : Comptabilité et Ventes en lecture requises; 1 000 comptes banque/caisse et 5 000 éléments ouverts maximum.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ]
+    },
+    "en": {
+      "title": "Project cash from invoice and bill due dates",
+      "added": [
+        {
+          "text": "A 7, 30, 60 or 90-day due-date cash projection with chart, detail and private CSV, under Cash flow.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Historical balances, overdue carry-forwards, negative cash warnings, exclusions and control account reconciliation.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration or new configuration. Read-only report requires Accounting and Sales read access; up to 1,000 bank/cash accounts and 5,000 open source items.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ]
+    }
   }
 }

@@ -126,3 +126,5 @@ La recherche, les filtres de dates/état et la pagination des paiements sont dé
 
 - [[Factures-recurrentes]] — calendrier, préparation contrôlée de brouillons et historique des échéances.
 - [[Relances-clients]] — factures échues, aperçu bilingue et envoi SMTP manuel confirmé.
+
+- [[Previsions-de-tresorerie]] — projection par échéances sur 7, 30, 60 ou 90 jours, hypothèses et exclusions explicites.

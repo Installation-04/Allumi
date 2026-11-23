@@ -29,3 +29,6 @@ export { toCsv, csvFormatFor, type CsvCell } from "./domain/csv";
 export { taxCalendarPeriod, resolveTaxReportPeriod, taxReportPeriodParams, type TaxFrequency, type TaxReportPeriod } from "./domain/tax-period";
 export * from "./domain/tax-comparison";
 export { getTaxComparison } from "./service/tax-comparison";
+
+export * from "./domain/cash-forecast";
+export { getCashForecast } from "./service/cash-forecast";

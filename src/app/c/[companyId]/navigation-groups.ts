@@ -4,7 +4,7 @@ export const NAVIGATION_GROUPS = {
   ventes: ["devis", "factures", "recurrences", "relances", "avoirs", "encaissements", "remboursements", "contacts", "catalogue"],
   banque: ["transactions", "depots", "rapprochement", "integrations"],
   comptabilite: ["comptes", "journal", "balance", "exercices"],
-  tresorerie: ["flux-tresorerie"],
+  tresorerie: ["flux-tresorerie", "previsions-tresorerie"],
   rapports: ["budgets", "resultats", "bilan", "grand-livre", "releves-clients", "releves-fournisseurs", "age-clients", "age-fournisseurs", "sommaire-taxes"],
 } as const;
 

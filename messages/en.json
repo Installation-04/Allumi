@@ -679,7 +679,10 @@
       "contact": "Contact not found in this company.",
       "period": "The period is not valid: both days must exist and the start must come before the end.",
       "account": "Choose an account of this company.",
-      "tooManyLines": "The period has too many entries for one file (200,000 lines at most): choose a shorter period or a single account."
+      "tooManyLines": "The period has too many entries for one file (200,000 lines at most): choose a shorter period or a single account.",
+      "forecastDate": "Choose a valid reference date up to today and a horizon of 7, 30, 60 or 90 days. Each filter must appear once; the page must be a positive integer.",
+      "forecastSource": "The forecast sources could not be reconciled. Check the posted open items before trying again.",
+      "forecastLimit": "The forecast exceeds 1,000 bank/cash accounts or 5,000 open source items. No partial projection is displayed."
     },
     "bankRules": {
       "invalid": "Invalid rule. Check the text, accounts, priority and amount limits.",
@@ -1281,8 +1284,8 @@
     },
     "tresorerie": {
       "title": "Cash flow",
-      "description": "Consult accounting balances and journal movements.",
-      "planned": "Cash flow statements by activity and cash forecasts are still planned."
+      "description": "Review recorded cash movements and a due-date cash projection.",
+      "planned": "Cash flow statements by activity and manual forecast scenarios are still planned."
     },
     "rapports": {
       "title": "Reports",
@@ -1355,7 +1358,8 @@
       "recurrences": "Recurring invoices",
       "relances": "Customer reminders",
       "remboursements-fournisseurs": "Supplier refunds",
-      "budgets": "Annual budgets"
+      "budgets": "Annual budgets",
+      "previsions-tresorerie": "Cash flow forecast"
     }
   },
   "updates": {
@@ -3566,5 +3570,65 @@
     "downloadTemplate": "Download a blank template",
     "templateHint": "Headers for the selected data type, in the interface language and selected delimiter. UTF-8 CSV/TSV with no data or examples. Add your rows, use header record 1 and check the number format before importing. Downloading preserves your input.",
     "templateFor": "Template: {kind}"
+  },
+  "cashForecast": {
+    "title": "Cash flow forecast",
+    "intro": "Due-date projection from posted open customer invoices and supplier bills. Amounts are assumed to move through bank or cash accounts on their due dates; this report does not initiate payments.",
+    "scope": "Reference balance is the end-of-day total of all bank and cash asset accounts, including inactive accounts. Credit cards and undeposited funds are excluded. Past-due items are carried to the first projected day. Applied payments and credits reduce balances as of the reference date.",
+    "rules": "Unapplied credits, payments and refunds are not scheduled or netted automatically. Future posted cash entries are excluded to avoid double counting. Payroll, tax remittances, drafts, recurring transactions and manual scenarios are not predicted. Dates after the horizon are excluded. This is an assumption-based projection, not a guarantee of available cash.",
+    "limits": "Up to 1,000 bank/cash accounts and 5,000 open source items, including exclusions. The whole report is refused above these limits. Detail shows 100 items per page; CSV includes all projected items.",
+    "rulesTitle": "Assumptions and limits",
+    "asOf": "Reference date",
+    "horizon": "Horizon (days)",
+    "apply": "Apply",
+    "export": "Export CSV",
+    "reset": "Reset filters",
+    "end": "Projection ends",
+    "opening": "Opening cash",
+    "incoming": "Expected receipts",
+    "outgoing": "Expected payments",
+    "closing": "Projected closing cash",
+    "minimum": "Lowest balance",
+    "negativeDays": "Days closing below zero",
+    "excluded": "Unscheduled credits, payments and refunds",
+    "beyond": "Invoices and bills beyond the horizon",
+    "future": "Excluded future cash entries",
+    "receivableDifference": "Receivable control difference",
+    "payableDifference": "Payable control difference",
+    "daily": "Daily projection",
+    "date": "Date",
+    "detail": "Projected invoices and bills",
+    "projectedDate": "Projected date",
+    "kind": "Type",
+    "number": "Number",
+    "party": "Customer / supplier",
+    "documentDate": "Document date",
+    "dueDate": "Due date",
+    "carried": "Carried forward",
+    "amount": "Open amount",
+    "invoice": "Customer invoice",
+    "bill": "Supplier bill",
+    "yes": "Yes",
+    "no": "No",
+    "accounts": "Opening bank and cash balances",
+    "code": "Code",
+    "account": "Account",
+    "empty": "No open invoices or bills within this horizon.",
+    "noAccounts": "No bank or cash asset accounts found.",
+    "firstNegative": "First negative balance: {date}",
+    "period": "From {from} to {to}, based on balances at {asOf}.",
+    "count": "{count} projected invoices and bills.",
+    "warning": "Review the exclusions and control differences below before relying on this projection.",
+    "agrees": "Receivable and payable control balances agree with the dated open items.",
+    "chart": "Projected closing cash by day",
+    "previous": "Previous",
+    "next": "Next",
+    "pagination": "Forecast pages",
+    "page": "Page {page} of {pages}",
+    "inactive": "inactive",
+    "file": "cash_forecast",
+    "cash": "Recorded cash movements",
+    "receivables": "Receivable aging",
+    "payables": "Payable aging"
   }
 }
