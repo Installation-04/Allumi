@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.79
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.80
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -97,9 +97,9 @@ Les flux bancaires directs, le suivi des stocks, la paie, la multidevise, la sig
 
 ### Migrer depuis QuickBooks
 
-Reprenez les **clients, fournisseurs, produits/services hors inventaire et comptes** depuis des CSV QuickBooks Online ou Desktop. Vérifiez les associations et chaque ligne avant confirmation. La balance de bascule rapprochée ajuste les comptes ordinaires; les contrôles clients, fournisseurs et taxes doivent déjà correspondre aux pièces natives Allumi. L’historique détaillé et les fichiers QuickBooks natifs sont exclus. [Guide de migration](docs/Migration-QuickBooks.md).
+Reprenez les **clients, fournisseurs, produits/services hors inventaire et comptes** depuis des CSV QuickBooks Online ou Desktop. Vérifiez les associations et chaque ligne avant confirmation. La balance de bascule rapprochée ajuste les comptes ordinaires; les contrôles clients, fournisseurs et taxes doivent déjà correspondre aux pièces natives Allumi. Des modèles CSV/TSV vierges français/anglais sont téléchargeables dans l’assistant avec le séparateur choisi. L’historique détaillé et les fichiers QuickBooks natifs sont exclus. [Guide de migration](docs/Migration-QuickBooks.md).
 
-![Aperçu de migration QuickBooks](docs/images/migration-quickbooks-desktop.png)
+![Modèles vierges de migration QuickBooks](docs/images/modele-migration-desktop.png)
 ![Balance de bascule sur mobile](docs/images/soldes-bascule-quickbooks-mobile.png)
 
 ## En images

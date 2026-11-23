@@ -61,3 +61,6 @@ Budgets annuels par exercice et compte, comparaison au réel et CSV disponibles 
 
 
 [[Migration-QuickBooks]] : reprise CSV des listes Online/Desktop et balance de bascule avec ajustements des comptes ordinaires. Les contrôles clients/fournisseurs/taxes doivent déjà être rapprochés via les parcours natifs; reprise automatique des postes ouverts, historique et fichiers natifs restent hors périmètre.
+
+
+Des modèles CSV/TSV vierges des cinq types de lots, dans les deux langues et trois séparateurs, complètent la préparation de [[Migration-QuickBooks]]. Ils ne contiennent aucune donnée d’entreprise et ne créent aucun import lors du téléchargement.

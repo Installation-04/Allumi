@@ -3500,6 +3500,10 @@
       "duplicate": "Repeated identity or code at row {row}.",
       "currency": "Non-CAD currency at row {row}: no automatic conversion.",
       "inventory": "Unsupported product type at row {row}. Export services and non-inventory products only."
-    }
+    },
+    "templateTitle": "Prepare a file",
+    "downloadTemplate": "Download a blank template",
+    "templateHint": "Headers for the selected data type, in the interface language and selected delimiter. UTF-8 CSV/TSV with no data or examples. Add your rows, use header record 1 and check the number format before importing. Downloading preserves your input.",
+    "templateFor": "Template: {kind}"
   }
 }

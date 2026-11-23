@@ -25,6 +25,27 @@ Chaque fichier est limité à **1 Mio, 1 000 lignes de données et 50 colonnes**
 
 L’assistant accepte la virgule, le point-virgule ou la tabulation comme séparateur. Indiquez le numéro de l’enregistrement non vide contenant les en-têtes, entre 1 et 20 : les titres précédents sont ignorés. Les cellules entre guillemets et les retours de ligne cités sont acceptés. Les lignes vides sont ignorées; les autres lignes doivent avoir le même nombre de colonnes.
 
+## Modèles CSV vierges
+
+Dans **Préparer un fichier**, choisissez d’abord les données et le séparateur dans le formulaire, puis **Télécharger le modèle vierge**. Les cinq modèles sont disponibles : clients, fournisseurs, produits/services hors inventaire, comptes et soldes de bascule. Les en-têtes suivent la langue actuelle de l’interface, français ou anglais. Les deux langues sont reconnues par les associations d’import.
+
+Le fichier contient **uniquement une ligne d’en-têtes**, en UTF-8 avec marqueur BOM et fin de ligne CRLF pour les tableurs. Il ne contient ni exemple, ni nom d’entreprise, ni donnée comptable. Ajoutez vos propres lignes avant de l’importer : le modèle vide est volontairement refusé comme un lot sans données.
+
+- Virgule ou point-virgule : extension `.csv`.
+- Tabulation : extension `.tsv`.
+- Nom prévisible, par exemple `quickbooks_customers_fr-CA.csv` ou `quickbooks_balances_en.tsv`.
+
+Utilisez **l’en-tête 1** pour un fichier issu du modèle. Le format des nombres reste le choix explicite du formulaire : changer la langue des en-têtes ne convertit pas les montants. La balance doit toujours être équilibrée et employer vos codes Allumi; le modèle ne renseigne aucun solde ou compte à votre place. Les conditions de reprise des comptes clients, fournisseurs et de taxes restent celles décrites ci-dessous.
+
+Télécharger ne réinitialise ni le fichier sélectionné, ni ses associations, ni l’aperçu ou le consentement déjà saisis. Une modification des options d’import continue d’exiger une nouvelle vérification. Le téléchargement est réservé à l’administrateur de l’entreprise, avec session complète; il ne crée ni fiche, ni lot, ni écriture. Les réponses sont privées et sans cache. Ces modèles servent à préparer des données pour Allumi; ce ne sont pas des exports produits par Intuit.
+
+Captures avec données fictives dans Chromium et en émulation mobile; Safari sur appareil physique reste à valider.
+
+![Modèle de migration sur ordinateur](images/modele-migration-desktop.png)
+![Modèle de migration sur mobile](images/modele-migration-mobile.png)
+![Blank migration template in English and dark theme](images/modele-migration-en-dark-desktop.png)
+![Blank migration template on mobile in English and dark theme](images/modele-migration-en-dark-mobile.png)
+
 ## Importer les listes
 
 1. Initialisez la comptabilité dans l’entreprise de destination et sauvegardez l’instance.

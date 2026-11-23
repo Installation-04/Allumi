@@ -40,12 +40,18 @@ export function MigrationForm({ companyId, kinds }: { companyId: string; kinds: 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <label className="block text-sm">{t("source")}<select aria-label={t("source")} value={spec.source} onChange={e => change({ source: e.target.value as MigrationSpec["source"] })} className={INPUT}><option value="ONLINE">QuickBooks Online</option><option value="DESKTOP">QuickBooks Desktop</option></select></label>
         <label className="block text-sm">{t("kind")}<select aria-label={t("kind")} value={spec.kind} onChange={e => change({ kind: e.target.value as MigrationKind, mapping: {}, skipExisting: false })} className={INPUT}>{kinds.map(k => <option key={k} value={k}>{t(`kinds.${k}`)}</option>)}</select></label>
-        <label className="block text-sm">{t("delimiter")}<select aria-label={t("delimiter")} value={spec.delimiter} onChange={e => change({ delimiter: e.target.value as MigrationSpec["delimiter"], mapping: {} })} className={INPUT}><option value=",">{t("comma")}</option><option value=";">{t("semicolon")}</option><option value="\t">{t("tab")}</option></select></label>
+        <label className="block text-sm">{t("delimiter")}<select aria-label={t("delimiter")} value={spec.delimiter} onChange={e => change({ delimiter: e.target.value as MigrationSpec["delimiter"], mapping: {} })} className={INPUT}><option value=",">{t("comma")}</option><option value=";">{t("semicolon")}</option><option value={"\t"}>{t("tab")}</option></select></label>
         <label className="block text-sm">{t("format")}<select aria-label={t("format")} value={spec.format} onChange={e => change({ format: e.target.value as MigrationSpec["format"] })} className={INPUT}><option value="en">{t("formatEn")}</option><option value="fr-CA">{t("formatFr")}</option></select></label>
         <label className="block text-sm">{t("headerRecord")}<input type="number" min="1" max="20" value={spec.headerRecord} onChange={e => change({ headerRecord: Number(e.target.value), mapping: {} })} className={INPUT}/></label>
         {spec.kind === "BALANCES" ? <label className="block text-sm">{t("cutoverDate")}<input type="date" value={spec.cutoverDate} onChange={e => change({ cutoverDate: e.target.value })} className={INPUT} required/></label> : null}
         {spec.kind === "CUSTOMERS" || spec.kind === "SUPPLIERS" ? <label className="block text-sm">{t("defaultLocale")}<select aria-label={t("defaultLocale")} value={spec.defaultLocale} onChange={e => change({ defaultLocale: e.target.value as MigrationSpec["defaultLocale"] })} className={INPUT}><option value="fr_CA">Français</option><option value="en">English</option></select></label> : null}
       </div>
+      <section aria-labelledby="migration-template-title" className="space-y-2 rounded-md border border-stone-200 p-3 dark:border-stone-700">
+        <h2 id="migration-template-title" className="font-semibold">{t("templateTitle")}</h2>
+        <p className="text-sm">{t("templateFor", { kind: t(`kinds.${spec.kind}`) })}</p>
+        <a href={`/c/${companyId}/migration/modele?${new URLSearchParams({ kind: spec.kind, locale: locale === "en" ? "en" : "fr-CA", delimiter: spec.delimiter })}`} className={`inline-flex items-center ${BUTTON}`}>{t("downloadTemplate")}</a>
+        <p className="text-sm text-stone-600 dark:text-stone-400">{t("templateHint")}</p>
+      </section>
       <label className="block space-y-2 text-sm"><span>{t("file")}</span><input name="file" type="file" accept=".csv,.tsv,text/csv,text/tab-separated-values" onChange={e => void chooseFile(e.target.files?.[0])} className={`block min-h-11 w-full text-sm ${FOCUS}`} required/></label>
       <p className="text-sm text-stone-600 dark:text-stone-400">{t("fileHint")}</p>
       {reading ? <p role="status">{t("reading")}</p> : null}{fileError ? <p role="alert" className="text-sm text-red-700 dark:text-red-300">{fileError}</p> : null}
