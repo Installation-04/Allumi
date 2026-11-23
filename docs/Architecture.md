@@ -254,3 +254,7 @@ L’application n’utilise pas de routage localisé ou d’extraction automatiq
 ## Migration de données
 
 Le module `migration` sépare le parseur CSV pur (`domain/`) de la planification, signature d’aperçu et confirmation transactionnelle (`service/`). Les listes sont créées sans modification des fiches existantes. La balance de bascule utilise le service public `ledger.postManualEntryWithin` : aucun contournement des gardes comptables ou accès Prisma direct depuis l’interface. La provenance est conservée dans `migration_batch`, sous RLS et audit. Voir [[Migration-QuickBooks]] et [[Schema-de-donnees]].
+
+## Transactions de copie mensuelle bornée
+
+`withCompany` conserve le contexte RLS transactionnel et la limite habituelle de 20 secondes (attente de connexion : 5 secondes). Le profil explicite `bounded-bulk`, réservé à la confirmation de [[Duplication-des-budgets-mensuels]], autorise 120 secondes pour au plus 1 000 objectifs annuels et 12 000 montants mensuels. Les aperçus, autres opérations, `withUser` et `withAnonymous` conservent la limite habituelle. Les contraintes, déclencheurs, révisions et audits restent actifs; une expiration annule intégralement la copie.

@@ -932,5 +932,55 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.83": {
+    "fr-CA": {
+      "title": "Reprendre les répartitions mensuelles des budgets",
+      "added": [
+        {
+          "text": "Copiez les objectifs annuels et les montants mensuels définis vers un nouveau scénario ou exercice après vérification des douze correspondances fiscales.",
+          "guide": "Duplication-des-budgets-mensuels"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Les zéros restent définis, les mois absents restent vides et les comptes inactifs exigent une exclusion explicite. La source reste indépendante, sans écriture réelle copiée."
+        },
+        {
+          "text": "Les permissions, révisions et périodes sont revérifiées dans une copie atomique auditée, jusqu’à 1 000 objectifs et 12 000 montants mensuels."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration ni nouvelle configuration. La copie bornée dispose de 120 secondes; les autres transactions gardent leur limite actuelle.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Reuse monthly budget allocations",
+      "added": [
+        {
+          "text": "Copy annual targets and defined monthly amounts into a new scenario or fiscal year after reviewing all twelve fiscal-period mappings.",
+          "guide": "Duplication-des-budgets-mensuels"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Explicit zeros stay defined, missing months stay empty and inactive accounts require explicit exclusion. The source stays independent and no actual entries are copied."
+        },
+        {
+          "text": "Permissions, revisions and periods are rechecked in an atomic audited copy, supporting up to 1,000 targets and 12,000 monthly amounts."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration or new configuration. The bounded copy has a 120-second transaction window; other transactions retain their current limit.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

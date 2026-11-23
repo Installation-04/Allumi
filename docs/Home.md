@@ -111,3 +111,5 @@ Suggestions : [[Suggestions-de-recherche]] — résultats autorisés pendant la 
 - [[Import-CSV-des-budgets]] — créer un scénario après aperçu local et validation serveur du fichier.
 
 - [[Budgets-mensuels]] — répartition exacte des objectifs annuels, comparaison par période fiscale et CSV.
+
+- [[Duplication-des-budgets-mensuels]] — reprendre l’annuel et les répartitions après vérification des douze périodes.

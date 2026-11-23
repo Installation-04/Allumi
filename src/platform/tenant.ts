@@ -8,6 +8,9 @@ export type UserContext = { userId: string; requestId?: string };
 export type CompanyContext = UserContext & { companyId: string };
 
 const TX_OPTIONS = { maxWait: 5_000, timeout: 20_000 } as const;
+// Opt-in for reviewed, bounded bulk writes (at most 1,000 annual + 12,000 monthly
+// budget targets). Keep SQL guards and audit enabled without relaxing ordinary requests.
+const BULK_TX_OPTIONS = { ...TX_OPTIONS, timeout: 120_000 } as const;
 
 async function setContext(tx: Tx, ctx: { userId?: string; companyId?: string; requestId?: string }): Promise<void> {
   // is_local = true: the setting dies with the transaction, so a pooled connection never leaks it.
@@ -21,11 +24,11 @@ async function setContext(tx: Tx, ctx: { userId?: string; companyId?: string; re
  * Runs `fn` in one transaction scoped to a user and a company. The database only honours the
  * company if the user is an active member (row level security), whatever the caller passes.
  */
-export function withCompany<T>(ctx: CompanyContext, fn: (tx: Tx) => Promise<T>): Promise<T> {
+export function withCompany<T>(ctx: CompanyContext, fn: (tx: Tx) => Promise<T>, profile: "standard" | "bounded-bulk" = "standard"): Promise<T> {
   return prisma().$transaction(async (tx) => {
     await setContext(tx, ctx);
     return fn(tx);
-  }, TX_OPTIONS);
+  }, profile === "bounded-bulk" ? BULK_TX_OPTIONS : TX_OPTIONS);
 }
 
 /** Scoped to a user, without a company (profile, sessions, company picker). */

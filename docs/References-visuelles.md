@@ -588,3 +588,15 @@ Codes importés ou manuels, taux datés et écarts par composante : [[Comparaiso
 ## Migration QuickBooks
 
 [[Migration-QuickBooks]] présente six captures de l’assistant et de la balance de bascule, ainsi que quatre captures des modèles vierges, en français/anglais, sur ordinateur et mobile avec thème sombre. Données fictives, Chromium et émulation mobile; Safari physique reste à valider.
+
+## Reprendre les répartitions mensuelles
+
+[[Duplication-des-budgets-mensuels]] : douze correspondances fiscales, objectifs annuels et montants définis, exclusions explicites et confirmation. Entreprise fictive, Chromium et émulation mobile; aucun essai physique Safari iOS revendiqué.
+
+![Correspondance des périodes](images/duplication-budget-mensuel-desktop.png)
+
+![Correspondance anglaise sombre](images/duplication-budget-mensuel-en-dark-desktop.png)
+
+![Correspondance mobile](images/duplication-budget-mensuel-mobile.png)
+
+![Correspondance anglaise sombre mobile](images/duplication-budget-mensuel-en-dark-mobile.png)

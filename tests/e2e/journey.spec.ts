@@ -3927,3 +3927,58 @@ test("QuickBooks migration reviews templates and mapped lists, rejects stale app
   expect(cspViolations).toEqual([]);
  } finally {await db.end();}
 });
+
+test("monthly budget duplication reviews fiscal mappings, preserves gaps and zeros, and rejects stale confirmations", async ({ page }) => {
+ test.setTimeout(150_000); cspViolations.length=0; watchCsp(page.context());
+ if(updateCookies) await page.context().addCookies(updateCookies); await page.goto('/');
+ if(!updateCookies) {
+  await expect(page).toHaveURL(/\/setup$/); await page.locator('[name="setupToken"]').fill('e2e-setup-token-123456789'); await page.getByLabel("Nom de l'entreprise").fill('Atelier Exemple inc.'); await page.getByLabel("Premier mois de l'exercice financier").selectOption('4'); await page.getByLabel('Ton nom').fill('Alex Exemple'); await page.getByLabel('Courriel').fill(EMAIL); await page.getByLabel("Langue de l'interface").selectOption('fr-CA'); await page.getByLabel('Mot de passe',{exact:true}).fill(PASSWORD); await page.getByLabel('Confirmation du mot de passe').fill(PASSWORD); await page.getByRole('button',{name:"Créer l'entreprise et commencer",exact:true}).click(); await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
+ }
+ if(!/^\/c\/[0-9a-f-]{36}/.test(new URL(page.url()).pathname)) await page.getByRole('link',{name:'Atelier Exemple inc.',exact:true}).click();
+ await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}/);
+ const company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)![0], companyId=company.split('/')[2];
+ const db=new pg.Client({connectionString:e2eUrls().owner}); await db.connect();
+ let sourceId='', destinationId='', userId='', backupId='', originalRole='', originalAccess:unknown=null;
+ try {
+  const member=(await db.query('SELECT m.user_id,m.role,m.module_access FROM membership m JOIN app_user u ON u.id=m.user_id WHERE m.company_id=$1 AND u.email=$2',[companyId,EMAIL])).rows[0]; userId=member.user_id; originalRole=member.role; originalAccess=member.module_access;
+  const sourceYear=(await db.query('SELECT id FROM fiscal_year WHERE company_id=$1 ORDER BY start_date LIMIT 1',[companyId])).rows[0].id;
+  // Fictional fixtures only: intentionally different calendar months make ordinal mapping visible.
+  destinationId=(await db.query("INSERT INTO fiscal_year(id,company_id,start_date,end_date) SELECT gen_random_uuid(),$1,d,d+interval '1 year'-interval '1 day' FROM (SELECT date_trunc('year',max(end_date)+interval '1 year')::date AS d FROM fiscal_year WHERE company_id=$1) x RETURNING id",[companyId])).rows[0].id;
+  await db.query("INSERT INTO fiscal_period(id,company_id,fiscal_year_id,period_number,start_date,end_date) SELECT gen_random_uuid(),$1,f.id,n,(f.start_date+make_interval(months=>n-1))::date,(f.start_date+make_interval(months=>n)-interval '1 day')::date FROM fiscal_year f CROSS JOIN generate_series(1,12) n WHERE f.company_id=$1 AND f.id=$2",[companyId,destinationId]);
+  const accounts=(await db.query("INSERT INTO account(id,company_id,code,name_fr,name_en,type,subtype,updated_at) VALUES(gen_random_uuid(),$1,'MC81-REV','Ventes du scénario','Scenario sales','REVENUE','OPERATING_REVENUE',now()),(gen_random_uuid(),$1,'MC81-ZERO','Objectif zéro','Zero target','EXPENSE','OTHER_EXPENSE',now()),(gen_random_uuid(),$1,'MC81-INACTIVE','Ancien objectif','Old target','EXPENSE','OTHER_EXPENSE',now()) RETURNING id,code",[companyId])).rows;
+  const sales=accounts.find(r=>r.code==='MC81-REV')!.id, zero=accounts.find(r=>r.code==='MC81-ZERO')!.id, inactive=accounts.find(r=>r.code==='MC81-INACTIVE')!.id;
+  await db.query('BEGIN');
+  try {
+   await db.query("SELECT set_config('app.user_id',$1,true),set_config('app.company_id',$2,true)",[userId,companyId]);
+   sourceId=(await db.query("INSERT INTO budget(id,company_id,fiscal_year_id,name,updated_at) VALUES(gen_random_uuid(),$1,$2,'Plan de référence mensuel',now()) RETURNING id",[companyId,sourceYear])).rows[0].id;
+   await db.query('INSERT INTO budget_line(id,company_id,budget_id,account_id,amount_cents,updated_at) VALUES(gen_random_uuid(),$1,$2,$3,30000,now()),(gen_random_uuid(),$1,$2,$4,0,now()),(gen_random_uuid(),$1,$2,$5,5000,now())',[companyId,sourceId,sales,zero,inactive]);
+   await db.query('INSERT INTO budget_monthly_target(id,company_id,budget_line_id,fiscal_period_id,amount_cents,updated_at) SELECT gen_random_uuid(),$1,l.id,p.id,x.amount,now() FROM (VALUES($3::uuid,1,10001::bigint),($3::uuid,2,0::bigint),($3::uuid,12,19999::bigint),($4::uuid,3,0::bigint),($5::uuid,1,5000::bigint)) x(account_id,num,amount) JOIN budget_line l ON l.company_id=$1 AND l.budget_id=$2 AND l.account_id=x.account_id JOIN fiscal_period p ON p.company_id=$1 AND p.fiscal_year_id=$6 AND p.period_number=x.num',[companyId,sourceId,sales,zero,inactive,sourceYear]);
+   await db.query('COMMIT');
+  } catch(error) { await db.query('ROLLBACK'); throw error; }
+  await db.query('UPDATE account SET is_active=false WHERE company_id=$1 AND id=$2',[companyId,inactive]);
+  const before=(await db.query('SELECT count(*)::int AS n FROM journal_entry WHERE company_id=$1',[companyId])).rows[0].n;
+  await page.goto(company+'/budgets/'+sourceId+'/mensuel'); await page.getByRole('link',{name:'Dupliquer avec les répartitions mensuelles',exact:true}).click();
+  await expect(page).toHaveURL(/\/dupliquer\/mensuel$/); const selection=page.url(); await expect(page.getByRole('button',{name:'Créer le scénario avec les répartitions',exact:true})).toHaveCount(0);
+  const chooseYear=async()=>{await page.getByLabel('Exercice du nouveau scénario',{exact:true}).selectOption(destinationId);await page.getByRole('button',{name:'Vérifier la correspondance des périodes',exact:true}).click();await expect(page.getByRole('region',{name:'Correspondance des périodes fiscales',exact:true}).getByRole('listitem')).toHaveCount(12);};
+  await chooseYear(); await expect(page.getByLabel('Exercice du nouveau scénario',{exact:true})).toHaveCount(0);
+  await page.getByRole('link',{name:'Choisir un autre exercice',exact:true}).click(); await expect(page).toHaveURL(selection); await chooseYear();
+  await page.getByLabel('Nom du nouveau scénario',{exact:true}).fill('Scénario mensuel repris'); await expectNoPageOverflow(page); await captureReference(page,'duplication-budget-mensuel','Correspondance des périodes fiscales');
+  await page.getByRole('button',{name:'English',exact:true}).click(); await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption('dark'); await expect(page.getByRole('heading',{name:'Copy annual and monthly budget targets',exact:true})).toBeVisible(); await expectNoPageOverflow(page); await captureReference(page,'duplication-budget-mensuel-en-dark','Fiscal period mapping');
+  await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption('light'); await expect(page.locator('html')).toHaveAttribute('data-theme','light'); await page.getByRole('button',{name:'Français',exact:true}).click(); await expect(page.locator('html')).toHaveAttribute('lang','fr-CA'); await expect(page.getByRole('heading',{name:'Dupliquer les objectifs annuels et mensuels',exact:true})).toBeVisible();
+  // Change an actually displayed amount after the preview. SQL guards bump the source revision.
+  await db.query('BEGIN'); await db.query("SELECT set_config('app.user_id',$1,true),set_config('app.company_id',$2,true)",[userId,companyId]); await db.query('UPDATE budget_monthly_target SET amount_cents=9999 WHERE company_id=$1 AND budget_line_id=(SELECT id FROM budget_line WHERE company_id=$1 AND budget_id=$2 AND account_id=$3) AND fiscal_period_id=(SELECT id FROM fiscal_period WHERE company_id=$1 AND fiscal_year_id=$4 AND period_number=1)',[companyId,sourceId,sales,sourceYear]); await db.query('COMMIT');
+  await page.getByLabel('Nom du nouveau scénario',{exact:true}).fill('Scénario mensuel repris'); await page.locator('input[name="skipInactive"]').check(); await page.locator('input[name="confirmed"]').check(); await page.getByRole('button',{name:'Créer le scénario avec les répartitions',exact:true}).click(); await expect(page.locator('form').getByRole('alert')).toContainText('Le budget source ou ses comptes ont changé'); await expect(page.getByLabel('Nom du nouveau scénario',{exact:true})).toHaveValue('Scénario mensuel repris');
+  await page.getByRole('link',{name:'Recharger l’aperçu',exact:true}).click(); await expect(page.locator('input[name="confirmed"]')).not.toBeChecked(); await page.getByLabel('Nom du nouveau scénario',{exact:true}).fill('Scénario mensuel repris'); await page.locator('input[name="skipInactive"]').check(); await page.locator('input[name="confirmed"]').check(); await page.getByRole('button',{name:'Créer le scénario avec les répartitions',exact:true}).click(); await expect(page).toHaveURL(/\/budgets\/[0-9a-f-]{36}\/mensuel\?periode=/);
+  const copiedId=new URL(page.url()).pathname.split('/')[4]; expect(copiedId).not.toBe(sourceId);
+  const rows=(await db.query('SELECT l.account_id,p.period_number,t.amount_cents::text AS cents FROM budget_monthly_target t JOIN budget_line l ON l.company_id=t.company_id AND l.id=t.budget_line_id JOIN fiscal_period p ON p.company_id=t.company_id AND p.id=t.fiscal_period_id WHERE l.company_id=$1 AND l.budget_id=$2 ORDER BY p.period_number',[companyId,copiedId])).rows;
+  expect(rows).toEqual([{account_id:sales,period_number:1,cents:'9999'},{account_id:sales,period_number:2,cents:'0'},{account_id:zero,period_number:3,cents:'0'},{account_id:sales,period_number:12,cents:'19999'}]);
+  expect((await db.query('SELECT count(*)::int AS n FROM journal_entry WHERE company_id=$1',[companyId])).rows[0].n).toBe(before);
+  // A form that was authorized on render must still fail after write access is removed.
+  await page.goto(selection+'?exercice='+destinationId); await page.getByLabel('Nom du nouveau scénario',{exact:true}).fill('Copie refusée'); await page.locator('input[name="skipInactive"]').check(); await page.locator('input[name="confirmed"]').check();
+  backupId=(await db.query("INSERT INTO app_user(id,email,display_name,updated_at) VALUES(gen_random_uuid(),'mc81-'||gen_random_uuid()::text||'@example.test','Backup fixture owner',now()) RETURNING id")).rows[0].id; await db.query("INSERT INTO membership(id,company_id,user_id,role,updated_at) VALUES(gen_random_uuid(),$1,$2,'OWNER',now())",[companyId,backupId]); await db.query("UPDATE membership SET role='ACCOUNTANT',module_access='{\"accounting\":\"read\"}' WHERE company_id=$1 AND user_id=$2",[companyId,userId]);
+  await page.getByRole('button',{name:'Créer le scénario avec les répartitions',exact:true}).click(); await expect(page.locator('form').getByRole('alert')).toBeVisible(); expect((await page.request.get(selection+'?exercice='+destinationId)).status()).toBe(404); await page.goto(company+'/budgets/'+sourceId+'/mensuel'); await expect(page.getByRole('link',{name:'Dupliquer avec les répartitions mensuelles',exact:true})).toHaveCount(0);
+  expect((await db.query("SELECT id FROM budget WHERE company_id=$1 AND name='Copie refusée'",[companyId])).rowCount).toBe(0); expect(cspViolations).toEqual([]);
+ } finally {
+  await db.query('ROLLBACK'); if(userId&&originalRole) await db.query('UPDATE membership SET role=$3::member_role,module_access=$4::jsonb WHERE company_id=$1 AND user_id=$2',[companyId,userId,originalRole,JSON.stringify(originalAccess??{})]); if(backupId) { await db.query('DELETE FROM membership WHERE company_id=$1 AND user_id=$2',[companyId,backupId]); await db.query('UPDATE app_user SET disabled_at=now() WHERE id=$1',[backupId]); } await db.end();
+ }
+});
