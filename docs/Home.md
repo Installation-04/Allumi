@@ -115,3 +115,5 @@ Suggestions : [[Suggestions-de-recherche]] — résultats autorisés pendant la 
 - [[Duplication-des-budgets-mensuels]] — reprendre l’annuel et les répartitions après vérification des douze périodes.
 
 - [[Import-CSV-des-budgets-mensuels]] — aperçu actuel/proposé, remplacement des seuls comptes listés et annuels conservés.
+
+- [[Previsions-de-tresorerie]] — projection par échéances sur 7, 30, 60 ou 90 jours, hypothèses et exclusions explicites.

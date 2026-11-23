@@ -9,6 +9,7 @@ export const SEARCH_REPORTS = [
   { id: "bilan/comparer", fr: "Comparaison des bilans", en: "Balance sheet comparison", aliases: "compare assets liabilities bilan" },
   { id: "grand-livre", fr: "Grand livre", en: "General ledger", aliases: "grand livre ledger compte account" },
   { id: "flux-tresorerie", fr: "Suivi de trésorerie comptabilisée", en: "Recorded cash movements", aliases: "tresorerie cash movements liquidity liquidites" },
+  { id: "previsions-tresorerie", fr: "Prévision de trésorerie", en: "Cash flow forecast", aliases: "cash flow forecast projection due date prevision tresorerie echeances liquidites", sales: true },
   { id: "age-clients", fr: "Âge des comptes clients", en: "Accounts receivable aging", aliases: "receivables overdue unpaid clients impayes", sales: true },
   { id: "age-fournisseurs", fr: "Âge des comptes fournisseurs", en: "Accounts payable aging", aliases: "payables supplier vendor overdue fournisseurs" },
   { id: "sommaire-taxes", fr: "Sommaire TPS/TVQ", en: "GST/QST summary", aliases: "taxes taxe vente sales tax tps tvq tvh gst qst hst", taxes: true },

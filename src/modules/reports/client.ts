@@ -6,3 +6,5 @@ export * from "./domain/tax-period";
 export * from "./domain/tax-comparison";
 
 export { toCsv,csvFormatFor,type CsvCell } from "./domain/csv";
+
+export * from "./domain/cash-forecast";

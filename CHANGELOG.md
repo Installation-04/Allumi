@@ -4,6 +4,14 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.86] - 2026-11-23
+
+- Nouveautés : prévision de trésorerie par échéances sur 7, 30, 60 ou 90 jours, soldes initiaux banque/caisse et factures clients/fournisseurs ouvertes à la référence.
+- Comptabilité : historique des affectations et contre-passations, retards reportés, soldes négatifs et écarts de contrôle; crédits non affectés et écritures futures exclus explicitement.
+- Interface : navigation Trésorerie, recherche de rapports, graphique et tableau quotidien, détail paginé, FR/EN, thème sombre et mobile.
+- Sécurité : lecture seule, droits Comptabilité et Ventes revérifiés, données isolées par entreprise, filtres stricts et export CSV complet privé avec protection contre les formules.
+- Installation : aucune migration ni configuration; limites de 1 000 comptes banque/caisse et 5 000 éléments ouverts, refus intégral au-delà; documentation et captures de référence.
+
 ## [0.4.0-alpha.85] - 2026-11-23
 
 - Nouveautés : import CSV des douze répartitions mensuelles d’un budget existant, aperçu local actuel/proposé et confirmation du remplacement des seuls comptes listés.

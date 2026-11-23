@@ -679,7 +679,10 @@
       "contact": "Contact introuvable dans cette entreprise.",
       "period": "La période n’est pas valide : les deux jours doivent exister et le début précède la fin.",
       "account": "Choisissez un compte de cette entreprise.",
-      "tooManyLines": "La période contient trop d’écritures pour un seul fichier (200 000 lignes au plus) : choisissez une période plus courte ou un seul compte."
+      "tooManyLines": "La période contient trop d’écritures pour un seul fichier (200 000 lignes au plus) : choisissez une période plus courte ou un seul compte.",
+      "forecastDate": "Choisissez une date de référence valide au plus tard aujourd’hui et un horizon de 7, 30, 60 ou 90 jours. Chaque filtre doit être unique; la page doit être un entier positif.",
+      "forecastSource": "Les sources de la prévision n’ont pas pu être rapprochées. Vérifiez les éléments ouverts comptabilisés avant de réessayer.",
+      "forecastLimit": "La prévision dépasse 1 000 comptes banque/caisse ou 5 000 éléments ouverts. Aucune projection partielle n’est affichée."
     },
     "bankRules": {
       "invalid": "Règle invalide. Vérifiez le texte, les comptes, la priorité et les limites de montant.",
@@ -1281,8 +1284,8 @@
     },
     "tresorerie": {
       "title": "Trésorerie",
-      "description": "Consultez les soldes comptables et les mouvements du journal.",
-      "planned": "État des flux par activité et prévisions de trésorerie restent à venir."
+      "description": "Consultez les mouvements comptabilisés et une projection de trésorerie par échéances.",
+      "planned": "Les tableaux de flux par activité et les scénarios manuels restent prévus."
     },
     "rapports": {
       "title": "Rapports",
@@ -1355,7 +1358,8 @@
       "recurrences": "Factures récurrentes",
       "relances": "Relances clients",
       "remboursements-fournisseurs": "Remboursements fournisseurs",
-      "budgets": "Budgets annuels"
+      "budgets": "Budgets annuels",
+      "previsions-tresorerie": "Prévision de trésorerie"
     }
   },
   "updates": {
@@ -3566,5 +3570,65 @@
     "downloadTemplate": "Télécharger le modèle vierge",
     "templateHint": "En-têtes du type de données choisi, dans la langue de l’écran et avec le séparateur sélectionné. CSV/TSV UTF-8 sans donnée ni exemple. Ajoutez vos lignes, utilisez l’en-tête 1 et vérifiez le format des nombres avant l’import. Le téléchargement conserve votre saisie.",
     "templateFor": "Modèle : {kind}"
+  },
+  "cashForecast": {
+    "title": "Prévision de trésorerie",
+    "intro": "Projection par échéances des factures clients et fournisseurs comptabilisées et ouvertes. Les montants sont supposés transiter par la banque ou la caisse aux dates d’échéance; ce rapport ne déclenche aucun paiement.",
+    "scope": "Le solde de référence est le total en fin de journée des comptes d’actif banque et caisse, même inactifs. Les cartes de crédit et fonds non déposés sont exclus. Les retards sont reportés au premier jour projeté. Les paiements et crédits affectés réduisent les soldes à la date de référence.",
+    "rules": "Les crédits, paiements et remboursements non affectés ne sont ni planifiés ni compensés automatiquement. Les écritures de trésorerie futures sont exclues pour éviter les doublons. La paie, les remises fiscales, les brouillons, les récurrences et les scénarios manuels ne sont pas prédits. Les échéances après l’horizon sont exclues. Cette projection repose sur des hypothèses et ne garantit pas les liquidités disponibles.",
+    "limits": "Maximum de 1 000 comptes banque/caisse et de 5 000 éléments ouverts, exclusions comprises. Le rapport entier est refusé au-delà. Détail de 100 éléments par page; le CSV inclut toutes les échéances projetées.",
+    "rulesTitle": "Hypothèses et limites",
+    "asOf": "Date de référence",
+    "horizon": "Horizon (jours)",
+    "apply": "Appliquer",
+    "export": "Exporter en CSV",
+    "reset": "Réinitialiser les filtres",
+    "end": "Fin de la projection",
+    "opening": "Trésorerie initiale",
+    "incoming": "Encaissements prévus",
+    "outgoing": "Décaissements prévus",
+    "closing": "Trésorerie finale projetée",
+    "minimum": "Solde le plus bas",
+    "negativeDays": "Jours terminant sous zéro",
+    "excluded": "Crédits, paiements et remboursements non planifiés",
+    "beyond": "Factures après l’horizon",
+    "future": "Écritures de trésorerie futures exclues",
+    "receivableDifference": "Écart du compte de contrôle clients",
+    "payableDifference": "Écart du compte de contrôle fournisseurs",
+    "daily": "Projection quotidienne",
+    "date": "Date",
+    "detail": "Factures clients et fournisseurs projetées",
+    "projectedDate": "Date projetée",
+    "kind": "Type",
+    "number": "Numéro",
+    "party": "Client / fournisseur",
+    "documentDate": "Date du document",
+    "dueDate": "Échéance",
+    "carried": "Reportée",
+    "amount": "Montant ouvert",
+    "invoice": "Facture client",
+    "bill": "Facture fournisseur",
+    "yes": "Oui",
+    "no": "Non",
+    "accounts": "Soldes initiaux banque et caisse",
+    "code": "Code",
+    "account": "Compte",
+    "empty": "Aucune facture ouverte dans cet horizon.",
+    "noAccounts": "Aucun compte d’actif banque ou caisse trouvé.",
+    "firstNegative": "Premier solde négatif : {date}",
+    "period": "Du {from} au {to}, selon les soldes au {asOf}.",
+    "count": "{count} factures clients et fournisseurs projetées.",
+    "warning": "Vérifiez les exclusions et les écarts de contrôle ci-dessous avant d’utiliser cette projection.",
+    "agrees": "Les comptes de contrôle clients et fournisseurs concordent avec les éléments ouverts à la date choisie.",
+    "chart": "Trésorerie finale projetée par jour",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "pagination": "Pages de la prévision",
+    "page": "Page {page} sur {pages}",
+    "inactive": "inactif",
+    "file": "prevision_tresorerie",
+    "cash": "Suivi de trésorerie comptabilisée",
+    "receivables": "Âge des comptes clients",
+    "payables": "Âge des comptes fournisseurs"
   }
 }

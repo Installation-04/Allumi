@@ -187,6 +187,14 @@ Carry annual targets and their defined monthly amounts into an independent scena
 
 [Mobile reference](docs/images/duplication-budget-mensuel-en-dark-mobile.png)
 
+### Due-date cash forecast
+
+Project cash over 7, 30, 60 or 90 days from posted bank/cash balances and open invoice/bill due dates. Review overdue carry-forwards, negative balances, exclusions and control differences before using the results. Read-only, with a private bilingual CSV; no automatic payments or manual scenarios. [Guide](https://github.com/Installation-04/Allumi/wiki/Previsions-de-tresorerie).
+
+![Cash flow forecast in English with dark theme](docs/images/previsions-tresorerie-en-dark-desktop.png)
+
+[Mobile reference](docs/images/previsions-tresorerie-en-dark-mobile.png)
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

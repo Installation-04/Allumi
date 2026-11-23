@@ -186,6 +186,14 @@ Reprenez les objectifs annuels et leurs montants mensuels définis dans un scén
 
 [Référence mobile](docs/images/duplication-budget-mensuel-mobile.png)
 
+### Prévision de trésorerie par échéances
+
+Projetez les liquidités sur 7, 30, 60 ou 90 jours selon les soldes banque/caisse comptabilisés et les échéances des factures ouvertes. Vérifiez les retards reportés, soldes négatifs, exclusions et écarts de contrôle. Lecture seule et CSV privé bilingue; aucun paiement automatique ni scénario manuel. [Guide](https://github.com/Installation-04/Allumi/wiki/Previsions-de-tresorerie).
+
+![Prévision de trésorerie en français](docs/images/previsions-tresorerie-desktop.png)
+
+[Référence mobile](docs/images/previsions-tresorerie-mobile.png)
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

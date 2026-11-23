@@ -612,3 +612,13 @@ Codes importés ou manuels, taux datés et écarts par composante : [[Comparaiso
 ![Aperçu mobile](images/import-budget-mensuel-mobile.png)
 
 ![Aperçu anglais sombre mobile](images/import-budget-mensuel-en-dark-mobile.png)
+
+## Prévision de trésorerie
+
+Voir [[Previsions-de-tresorerie]] pour les hypothèses et contrôles.
+
+![Prévision FR](images/previsions-tresorerie-desktop.png)
+
+![Cash forecast EN dark](images/previsions-tresorerie-en-dark-desktop.png)
+
+[Mobile FR](images/previsions-tresorerie-mobile.png) · [Mobile EN sombre](images/previsions-tresorerie-en-dark-mobile.png)

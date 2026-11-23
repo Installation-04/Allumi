@@ -40,6 +40,7 @@ export const ROUTE_ACCESS: Record<string, readonly Action[]> = {
   resultats: ["ledger.read"],
   bilan: ["ledger.read"],
   "flux-tresorerie": ["ledger.read"],
+  "previsions-tresorerie": ["ledger.read", "sales.read"],
   "grand-livre": ["ledger.read"],
   "sommaire-taxes": ["ledger.read", "taxes.read"],
   "age-fournisseurs": ["ledger.read"],
