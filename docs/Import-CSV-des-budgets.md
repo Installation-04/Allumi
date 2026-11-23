@@ -66,3 +66,5 @@ Aucune migration ni nouvelle configuration. Cet import concerne des objectifs an
 Voir [[Budgets-annuels]], [[Duplication-des-budgets]], [[Exercices-et-periodes]], [[Utilisateurs-et-permissions]] et [[Mise-a-jour]].
 
 Pour mettre à jour les douze périodes des comptes d’un budget existant en conservant ses annuels, voir [[Import-CSV-des-budgets-mensuels]]. Ce parcours emploie un modèle distinct à treize colonnes et un aperçu actuel/proposé.
+
+Un changement de langue invalide la confirmation de revue. Revenir à la langue initiale ne rétablit pas l’ancien accord : cochez de nouveau après vérification.

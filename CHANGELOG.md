@@ -4,12 +4,10 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
-## [0.4.0-alpha.84] - 2026-11-23
-
 - Nouveautés : import CSV des douze répartitions mensuelles d’un budget existant, aperçu local actuel/proposé et confirmation du remplacement des seuls comptes listés.
 - Budgets : objectifs annuels et comptes absents conservés, cellules vides retirant les objectifs, zéros explicites maintenus et somme mensuelle plafonnée à l’annuel.
 - Sécurité : fichier relu côté serveur, permissions et empreinte/révision revérifiées après verrouillage, remplacement atomique audité et rollback intégral même après plusieurs lots.
-- Interface : modèle vierge authentifié FR/EN, dates fiscales des colonnes, consentement réinitialisé après changement et captures ordinateur/mobile, dont thème sombre.
+- Interface : modèle vierge authentifié FR/EN, dates fiscales des colonnes et captures ordinateur/mobile, dont thème sombre; un aller-retour de langue ne réactive plus un accord ancien dans les imports annuel et mensuel.
 - Installation : aucune migration ni nouvelle configuration; 250 comptes / 3 000 montants par fichier UTF-8 de 256 Kio, insertions par lots et fenêtre bornée de 120 secondes; limites ordinaires inchangées.
 
 ## [0.4.0-alpha.83] - 2026-11-23

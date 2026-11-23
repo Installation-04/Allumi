@@ -15,7 +15,10 @@ export function MonthlyImportForm({companyId,budgetId,snapshot,initialFormat}:{c
  const read=useMemo(()=>{if(text===null)return null;try{return {ok:true as const,rows:previewMonthlyBudgetCsv(text,format,snapshot.accounts)};}catch(e){return {ok:false as const,error:e instanceof MonthlyCsvError?e:new MonthlyCsvError("syntax")};}},[text,format,snapshot.accounts]);
  const rows=read?.ok?read.rows:null,issue=fileError?new MonthlyCsvError(fileError):read&&!read.ok?read.error:null;
  const reviewJson=useMemo(()=>JSON.stringify(rows?monthlyImportReview(rows):[]),[rows]),confirmationKey=JSON.stringify([format,locale,text,reviewJson,snapshot.stateToken]);
- const confirmed=rows!==null&&reviewedKey===confirmationKey;
+ // Forget the old acknowledgement permanently, even when a language change is reversed.
+  const [observedKey,setObservedKey]=useState(confirmationKey);
+  if(observedKey!==confirmationKey){setObservedKey(confirmationKey);setReviewedKey(null);}
+  const confirmed=rows!==null&&reviewedKey===confirmationKey;
  const totals=rows?.reduce((s,r)=>({defined:s.defined+r.definedCount,changed:s.changed+r.changedCount,removed:s.removed+r.removedCount}),{defined:0,changed:0,removed:0});
  async function onFile(file:File|undefined){
   const seq=++sequence.current;setText(null);setReviewedKey(null);setFileError(null);setReading(false);

@@ -41,7 +41,7 @@ Pour chaque compte présent dans le CSV, ses **douze objectifs mensuels sont rem
 - Une ligne de compte avec douze cellules vides efface toute sa répartition mensuelle, en conservant son objectif annuel.
 - Un compte absent du fichier conserve intégralement ses objectifs actuels.
 
-Cochez la confirmation après vérification, puis **Remplacer les répartitions vérifiées**. Le rapport du même budget s’ouvre sur sa première période. La sélection d’un autre fichier, le changement de format ou de langue, ou l’actualisation du snapshot impose une nouvelle confirmation. Télécharger le modèle laisse le consentement intact.
+Cochez la confirmation après vérification, puis **Remplacer les répartitions vérifiées**. Le rapport du même budget s’ouvre sur sa première période. La sélection d’un autre fichier, le changement de format ou de langue, ou l’actualisation du snapshot impose une nouvelle confirmation. Revenir à la langue initiale ne rétablit pas un ancien accord. Télécharger le modèle laisse le consentement intact.
 
 ## Aperçu périmé, permissions et sécurité
 
