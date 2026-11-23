@@ -64,3 +64,7 @@ L’import et le modèle exigent **Comptabilité en écriture**. Les utilisateur
 Aucune migration ni nouvelle configuration. Cet import concerne des objectifs annuels CAD : pas de ventilation mensuelle, de devise étrangère, d’écriture financière ou de remplacement d’un budget existant. Les captures utilisent une entreprise fictive dans Chromium et son émulation mobile; les essais physiques Safari iOS restent ouverts.
 
 Voir [[Budgets-annuels]], [[Duplication-des-budgets]], [[Exercices-et-periodes]], [[Utilisateurs-et-permissions]] et [[Mise-a-jour]].
+
+Pour mettre à jour les douze périodes des comptes d’un budget existant en conservant ses annuels, voir [[Import-CSV-des-budgets-mensuels]]. Ce parcours emploie un modèle distinct à treize colonnes et un aperçu actuel/proposé.
+
+Un changement de langue invalide la confirmation de revue. Revenir à la langue initiale ne rétablit pas l’ancien accord : cochez de nouveau après vérification.

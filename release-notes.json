@@ -982,5 +982,65 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.85": {
+    "fr-CA": {
+      "title": "Importer les répartitions mensuelles d’un budget",
+      "added": [
+        {
+          "text": "Importez les douze périodes fiscales des comptes d’un budget existant après aperçu local des montants actuels et proposés, puis confirmation.",
+          "guide": "Import-CSV-des-budgets-mensuels"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Les objectifs annuels et les comptes absents du CSV sont conservés. Une cellule vide retire l’objectif de la période; un zéro reste défini."
+        },
+        {
+          "text": "Le serveur relit le fichier, contrôle les permissions et l’aperçu, puis remplace les seuls comptes listés dans une transaction auditée, avec rollback intégral."
+        }
+      ],
+      "fixed": [
+        {
+          "text": "Un aller-retour entre les langues ne réactive plus une ancienne confirmation dans les imports CSV annuel et mensuel.",
+          "guide": "Import-CSV-des-budgets-mensuels"
+        }
+      ],
+      "installation": [
+        {
+          "text": "Aucune migration ni nouvelle configuration. CSV UTF-8 de 256 Kio, 250 comptes / 3 000 montants par lot. La fenêtre bornée de 120 secondes conserve les gardes SQL; les autres limites restent inchangées.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Import monthly budget allocations",
+      "added": [
+        {
+          "text": "Import the twelve fiscal periods for accounts in an existing budget after locally reviewing current and proposed amounts, then confirming the replacement.",
+          "guide": "Import-CSV-des-budgets-mensuels"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Annual targets and accounts absent from the CSV stay unchanged. An empty cell removes that period’s target; an explicit zero stays defined."
+        },
+        {
+          "text": "The server rereads the file, checks permissions and the preview, and replaces only listed accounts in one audited transaction with full rollback."
+        }
+      ],
+      "fixed": [
+        {
+          "text": "Switching languages and returning no longer restores an old approval in annual or monthly CSV imports.",
+          "guide": "Import-CSV-des-budgets-mensuels"
+        }
+      ],
+      "installation": [
+        {
+          "text": "No migration or new configuration. UTF-8 CSV up to 256 KiB, 250 accounts / 3,000 monthly amounts per batch. The bounded 120-second window retains all SQL guards; other limits stay unchanged.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

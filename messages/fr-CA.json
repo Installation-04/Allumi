@@ -849,7 +849,11 @@
       "monthlyInUse": "Retirez d’abord les objectifs mensuels avant de retirer cet objectif annuel, y compris les montants zéro.",
       "monthlyPeriods": "L’exercice doit contenir ses 12 périodes pour la planification mensuelle. Aucun résultat partiel n’est affiché.",
       "monthlyPeriod": "Cette période n’appartient pas à l’exercice du budget.",
-      "monthlyCopyConfirm": "Confirmez la correspondance des périodes avant de créer la copie."
+      "monthlyCopyConfirm": "Confirmez la correspondance des périodes avant de créer la copie.",
+      "monthlyImportInvalid": "Le CSV mensuel ou ses options sont invalides. Vérifiez le fichier et ses douze colonnes fiscales.",
+      "monthlyImportChanged": "Le fichier diffère des montants vérifiés. Sélectionnez-le de nouveau et vérifiez la proposition.",
+      "monthlyImportStale": "Le budget, ses comptes ou ses périodes ont changé. Rechargez l’aperçu et vérifiez les montants actuels avant de réessayer.",
+      "monthlyImportConfirm": "Confirmez le remplacement des répartitions vérifiées, y compris les retraits par cellules vides."
     },
     "migration": {
       "invalid": "Fichier, associations ou options invalides. Aucun changement enregistré.",
@@ -3406,7 +3410,39 @@
     "monthlyCopyConsent": "J’ai vérifié la destination et les douze périodes. Je confirme la copie des objectifs annuels et des répartitions définies, sans écriture réelle, prorata ou création de valeurs pour les mois absents.",
     "monthlyCopyTarget": "Annuel : {annual} · réparti : {allocated} · reste : {remaining} · {count}/12 périodes définies.",
     "monthlyCopyAmount": "Période {number} : {amount}",
-    "monthlyCopyWorking": "Copie des objectifs en cours…"
+    "monthlyCopyWorking": "Copie des objectifs en cours…",
+    "monthlyImportTitle": "Importer les répartitions mensuelles",
+    "monthlyImportLink": "Importer les répartitions mensuelles",
+    "monthlyImportIntro": "Vérifiez un CSV localement avant de remplacer les répartitions de ce budget existant. Les objectifs annuels et les comptes absents du fichier restent inchangés. Aucun réel ni mouvement comptable n’est importé.",
+    "monthlyImportDestination": "Budget à mettre à jour",
+    "monthlyImportScope": "Les colonnes suivent les numéros de périodes fiscales, pas les mois civils. Chaque compte listé remplace ses douze objectifs mensuels : une cellule vide retire un objectif et un zéro explicite reste défini.",
+    "monthlyImportPeriods": "Vérifier les dates des douze colonnes fiscales",
+    "monthlyImportFileHint": "CSV UTF-8, au plus 256 Kio et 250 comptes. Exactement treize colonnes : account_code, puis period_1 à period_12. Uniquement des comptes actifs de revenus/charges ayant déjà un objectif annuel dans ce budget.",
+    "monthlyImportPreview": "Vérifier les répartitions actuelles et proposées",
+    "monthlyImportCounts": "{accounts} comptes · {defined} objectifs mensuels définis après import · {changed} périodes modifiées · {removed} objectifs retirés par les cellules vides.",
+    "monthlyImportAccount": "Annuel : {annual} · total proposé : {allocated} · reste : {remaining} · {count}/12 périodes définies.",
+    "monthlyImportBefore": "Actuel",
+    "monthlyImportAfter": "Proposé",
+    "monthlyImportConfirm": "J’ai vérifié les douze périodes de ces {count} comptes. Je confirme le remplacement de leurs répartitions, y compris les retraits par cellules vides. Les objectifs annuels et les comptes absents du fichier restent inchangés.",
+    "monthlyImportSubmit": "Remplacer les répartitions vérifiées",
+    "monthlyImportWorking": "Import des répartitions en cours…",
+    "monthlyImportStaleHint": "Si le budget, ses comptes ou ses périodes changent, la confirmation est refusée. Rechargez l’aperçu, sélectionnez de nouveau le fichier et vérifiez les montants actuels avant de confirmer.",
+    "monthlyImportErrors": {
+      "encoding": "Le fichier doit être un CSV UTF-8 valide.",
+      "tooLarge": "Le fichier dépasse 256 Kio.",
+      "syntax": "CSV mal formé à la ligne {row}; vérifiez les guillemets et les cellules.",
+      "header": "Ligne {row} : account_code puis period_1 à period_12 sont requis, dans cet ordre.",
+      "empty": "Le fichier ne contient aucun objectif.",
+      "tooMany": "Au plus 250 comptes par fichier. Le fichier entier a été refusé.",
+      "columns": "Ligne {row} : exactement treize colonnes sont requises, y compris les cellules mensuelles vides.",
+      "code": "Code de compte invalide à la ligne {row}.",
+      "amount": "Montant invalide à la ligne {row}; utilisez le séparateur décimal choisi, au plus deux décimales et un montant entre zéro et 1 000 milliards de dollars.",
+      "duplicate": "Le compte de la ligne {row} apparaît plusieurs fois dans le fichier.",
+      "account": "La ligne {row} doit désigner un compte local existant de revenu ou de charge.",
+      "inactive": "Le compte de la ligne {row} est inactif. Réactivez-le puis rechargez l’aperçu, ou corrigez le fichier.",
+      "annual": "Ligne {row} : ce code doit désigner un compte de revenus/charges ayant un objectif annuel dans ce budget.",
+      "excess": "Ligne {row} : la somme mensuelle dépasse l’objectif annuel existant de ce compte."
+    }
   },
   "migration": {
     "title": "Migrer depuis QuickBooks",

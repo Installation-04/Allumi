@@ -19,6 +19,9 @@ export function ImportBudgetForm({companyId,accounts,years,initialFormat}:{compa
   const rows=read?.ok?read.rows:null,issue=fileError?new BudgetCsvError(fileError):read&&!read.ok?read.error:null;
   const reviewJson=useMemo(()=>JSON.stringify(rows?budgetImportReview(rows):[]),[rows]);
   const confirmationKey=JSON.stringify([name,year,format,locale])+":"+reviewJson;
+  // Forget the old acknowledgement permanently, even when a language change is reversed.
+  const [observedKey,setObservedKey]=useState(confirmationKey);
+  if(observedKey!==confirmationKey){setObservedKey(confirmationKey);setReviewedKey(null);}
   const confirmed=rows!==null&&reviewedKey===confirmationKey;
   const totals=useMemo(()=>rows?.reduce((s,r)=>({revenue:s.revenue+(r.type==="REVENUE"?r.amountCents:0n),expenses:s.expenses+(r.type==="EXPENSE"?r.amountCents:0n)}),{revenue:0n,expenses:0n}),[rows]);
   async function onFile(file:File|undefined){

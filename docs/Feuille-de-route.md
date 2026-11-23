@@ -53,7 +53,7 @@ Annulation des factures validées disponible avec contre-passation et historique
 
 Lot 4.5 : encaissements sur facture et [[Encaissements-au-compte]] disponibles, avec affectations partielles sur plusieurs factures du même client et désaffectations datées. Dépôts groupés disponibles : [[Depots-bancaires]]. Remboursements liés aux avoirs disponibles : [[Avoirs-disponibles-et-remboursements]]. Paiements fournisseurs disponibles : [[Factures-fournisseurs]]. Ces parcours comptabilisent les fonds reçus ou envoyés séparément; ils ne transmettent aucun ordre bancaire.
 
-Budgets annuels par exercice et compte, comparaison au réel et CSV disponibles : [[Budgets-annuels]]. La répartition sur douze périodes fiscales et le rapport mensuel sont disponibles : [[Budgets-mensuels]]. La [[Duplication-des-budgets-mensuels]] reprend aussi les répartitions définies selon les douze périodes vérifiées. Prévisions de trésorerie et import CSV des répartitions mensuelles restent hors périmètre.
+Budgets annuels par exercice et compte, comparaison au réel et CSV disponibles : [[Budgets-annuels]]. La répartition sur douze périodes fiscales et le rapport mensuel sont disponibles : [[Budgets-mensuels]]. La [[Duplication-des-budgets-mensuels]] reprend aussi les répartitions définies selon les douze périodes vérifiées. L’[[Import-CSV-des-budgets-mensuels]] remplace les répartitions des comptes listés après aperçu, en conservant les annuels et les autres comptes. Les prévisions de trésorerie restent hors périmètre.
 
 [[Duplication-des-budgets]] : reprise des objectifs vers un scénario/exercice de la même entreprise, aperçu, exclusions explicites des comptes inactifs et refus des aperçus périmés. Aucune écriture financière.
 
