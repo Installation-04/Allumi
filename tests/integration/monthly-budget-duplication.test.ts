@@ -138,9 +138,19 @@ it("copies 1,000 annual accounts and 12,000 monthly rows, and refuses oversized 
   const p=await getMonthlyBudgetCopyPreview(actor,id,destinationYear);expect(p).toMatchObject({activeCount:1000,monthlyCount:12000});
   const copied=await duplicateMonthlyBudget(actor,id,{name:'Capacity monthly copy',fiscalYearId:destinationYear,sourceRevision:p.source.revision,stateToken:p.stateToken,skipInactive:false,confirmed:true});
   expect((await getMonthlyBudgetCopyPreview(actor,copied.id,destinationYear)).monthlyCount).toBe(12000);
+  // Fail after half the copied accounts: earlier monthly batches must also disappear.
+  const lateAccount=p.targets[500]!.accountId;
+  expect(lateAccount).toMatch(/^[0-9a-f-]{36}$/);
+  const counts=[];for(const table of ['budget','budget_line','budget_monthly_target','audit_log'])counts.push(await count(table));
+  await db.query("CREATE FUNCTION fixture_late_month_copy_failure() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF EXISTS(SELECT 1 FROM budget_line WHERE id=NEW.budget_line_id AND account_id=TG_ARGV[0]::uuid) THEN RAISE EXCEPTION 'fixture late monthly copy failure' USING ERRCODE='AL004'; END IF; RETURN NEW; END $$");
+  await db.query(`CREATE TRIGGER fixture_late_month_copy_failure BEFORE INSERT ON budget_monthly_target FOR EACH ROW EXECUTE FUNCTION fixture_late_month_copy_failure('${lateAccount}')`);
+  try {
+    await expect(duplicateMonthlyBudget(actor,id,{name:'Capacity late rollback',fiscalYearId:destinationYear,sourceRevision:p.source.revision,stateToken:p.stateToken,skipInactive:false,confirmed:true})).rejects.toThrow();
+    const after=[];for(const table of ['budget','budget_line','budget_monthly_target','audit_log'])after.push(await count(table));expect(after).toEqual(counts);
+  } finally {await db.query('DROP TRIGGER fixture_late_month_copy_failure ON budget_monthly_target; DROP FUNCTION fixture_late_month_copy_failure()');}
   // The existing sales activity also occupies a report row in the source year.
   await expect(getMonthlyBudgetCopyPreview(actor,id,W.fiscalYearA)).rejects.toMatchObject({key:'budgets.tooMany'});
   const n=await count('budget');await expect(duplicateMonthlyBudget(actor,id,{name:'Coverage overflow',fiscalYearId:W.fiscalYearA,sourceRevision:p.source.revision,stateToken:p.stateToken,skipInactive:false,confirmed:true})).rejects.toMatchObject({key:'budgets.tooMany'});expect(await count('budget')).toBe(n);
   await inContext(db,asOwnerA,()=>db.query("INSERT INTO budget_line(id,company_id,budget_id,account_id,amount_cents,updated_at) SELECT gen_random_uuid(),$1,$2,id,12,now() FROM account WHERE company_id=$1 AND code='MCP81-1001'",[W.companyA,id]),{commit:true});
   await expect(getMonthlyBudgetCopyPreview(actor,id,destinationYear)).rejects.toMatchObject({key:'budgets.tooMany'});
-},90000);
+},180000);

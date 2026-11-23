@@ -10,7 +10,7 @@ export type CompanyContext = UserContext & { companyId: string };
 const TX_OPTIONS = { maxWait: 5_000, timeout: 20_000 } as const;
 // Opt-in for reviewed, bounded bulk writes (at most 1,000 annual + 12,000 monthly
 // budget targets). Keep SQL guards and audit enabled without relaxing ordinary requests.
-const BULK_TX_OPTIONS = { ...TX_OPTIONS, timeout: 60_000 } as const;
+const BULK_TX_OPTIONS = { ...TX_OPTIONS, timeout: 120_000 } as const;
 
 async function setContext(tx: Tx, ctx: { userId?: string; companyId?: string; requestId?: string }): Promise<void> {
   // is_local = true: the setting dies with the transaction, so a pooled connection never leaks it.

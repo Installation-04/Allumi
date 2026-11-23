@@ -933,7 +933,7 @@
       ]
     }
   },
-  "0.4.0-alpha.82": {
+  "0.4.0-alpha.83": {
     "fr-CA": {
       "title": "Reprendre les répartitions mensuelles des budgets",
       "added": [
@@ -953,7 +953,7 @@
       "fixed": [],
       "installation": [
         {
-          "text": "Aucune migration ni nouvelle configuration. La copie bornée dispose de 60 secondes; les autres transactions gardent leur limite actuelle.",
+          "text": "Aucune migration ni nouvelle configuration. La copie bornée dispose de 120 secondes; les autres transactions gardent leur limite actuelle.",
           "guide": "Mise-a-jour"
         }
       ]
@@ -977,7 +977,7 @@
       "fixed": [],
       "installation": [
         {
-          "text": "No migration or new configuration. The bounded copy has a 60-second transaction window; other transactions retain their current limit.",
+          "text": "No migration or new configuration. The bounded copy has a 120-second transaction window; other transactions retain their current limit.",
           "guide": "Mise-a-jour"
         }
       ]

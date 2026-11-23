@@ -110,7 +110,11 @@ export async function duplicateMonthlyBudget(actor: CompanyContext, sourceId: st
     if (lines.length !== active.length) throw new AppError("budgets.invalid");
     const lineIds = new Map(lines.map(l => [l.accountId,l.id]));
     const monthly = active.flatMap(r => r.months.map(m => ({ companyId: actor.companyId, budgetLineId: lineIds.get(r.accountId)!, fiscalPeriodId: fresh.mapping[m.number - 1]!.destination.id, amountCents: m.amountCents })));
-    if (monthly.length) await tx.budgetMonthlyTarget.createMany({ data: monthly });
+    // Bound each statement while keeping every SQL guard, revision and audit trigger.
+    // All batches remain inside this transaction, including the final audit event.
+    for (let offset = 0; offset < monthly.length; offset += 500) {
+      await tx.budgetMonthlyTarget.createMany({ data: monthly.slice(offset,offset + 500) });
+    }
     await recordEvent(tx,{ action: "budget.duplicate_monthly", entityType: "budget", entityId: destination.id, data: {
       sourceBudgetId: sourceId, sourceRevision: source.revision, sourceFiscalYearId: source.fiscal_year_id, destinationFiscalYearId: data.fiscalYearId,
       copiedTargetCount: active.length, copiedMonthlyCount: monthly.length,
