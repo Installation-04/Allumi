@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.81] - 2026-11-23
+
 - Nouveautés : duplication des objectifs annuels et répartitions mensuelles dans un nouveau scénario/exercice de la même entreprise, après aperçu des douze correspondances fiscales.
 - Budgets : cents et zéros explicites conservés, mois absents non définis, exclusions des comptes inactifs confirmées, source indépendante et aucun mouvement réel copié.
 - Sécurité : permissions revérifiées, verrouillages et empreinte d’aperçu, copie atomique auditée avec refus des modifications concurrentes et aucune création partielle.
