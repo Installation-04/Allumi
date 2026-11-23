@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.86] - 2026-11-23
+
 - Nouveautés : prévision de trésorerie par échéances sur 7, 30, 60 ou 90 jours, soldes initiaux banque/caisse et factures clients/fournisseurs ouvertes à la référence.
 - Comptabilité : historique des affectations et contre-passations, retards reportés, soldes négatifs et écarts de contrôle; crédits non affectés et écritures futures exclus explicitement.
 - Interface : navigation Trésorerie, recherche de rapports, graphique et tableau quotidien, détail paginé, FR/EN, thème sombre et mobile.
