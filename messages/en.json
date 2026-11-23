@@ -849,7 +849,11 @@
       "monthlyInUse": "Remove monthly targets before removing this annual target, including zero amounts.",
       "monthlyPeriods": "The fiscal year needs its 12 periods for monthly planning. No partial results are shown.",
       "monthlyPeriod": "This period does not belong to the budget fiscal year.",
-      "monthlyCopyConfirm": "Confirm the period mapping before creating the copy."
+      "monthlyCopyConfirm": "Confirm the period mapping before creating the copy.",
+      "monthlyImportInvalid": "The monthly CSV or its options are invalid. Review the file and its twelve fiscal columns.",
+      "monthlyImportChanged": "The file differs from the reviewed amounts. Select it again and review the proposal.",
+      "monthlyImportStale": "The budget, its accounts or fiscal periods have changed. Reload the preview and review the current amounts before trying again.",
+      "monthlyImportConfirm": "Confirm the replacement of the reviewed monthly allocations, including removals from empty cells."
     },
     "migration": {
       "invalid": "Invalid file, mapping or options. No changes saved.",
@@ -3406,7 +3410,39 @@
     "monthlyCopyConsent": "I reviewed the destination and all twelve periods. I confirm copying annual targets and defined allocations, with no actual entries, proration or generated values for undefined months.",
     "monthlyCopyTarget": "Annual: {annual} · allocated: {allocated} · remaining: {remaining} · {count}/12 periods defined.",
     "monthlyCopyAmount": "Period {number}: {amount}",
-    "monthlyCopyWorking": "Copying budget targets…"
+    "monthlyCopyWorking": "Copying budget targets…",
+    "monthlyImportTitle": "Import monthly budget allocations",
+    "monthlyImportLink": "Import monthly allocations",
+    "monthlyImportIntro": "Review a CSV locally before replacing monthly allocations in this existing budget. Annual targets and accounts absent from the file stay unchanged. No journal entries or actual activity are imported.",
+    "monthlyImportDestination": "Budget to update",
+    "monthlyImportScope": "Columns follow fiscal period numbers, not calendar months. Each listed account replaces all twelve of its monthly targets; an empty cell removes a target and an explicit zero remains defined.",
+    "monthlyImportPeriods": "Check the twelve fiscal column dates",
+    "monthlyImportFileHint": "UTF-8 CSV, up to 256 KiB and 250 accounts. Exactly thirteen columns: account_code, then period_1 through period_12. Only active revenue/expense accounts already carrying an annual target in this budget.",
+    "monthlyImportPreview": "Review current and proposed allocations",
+    "monthlyImportCounts": "{accounts} accounts · {defined} defined monthly targets after import · {changed} changed periods · {removed} targets removed by empty cells.",
+    "monthlyImportAccount": "Annual: {annual} · proposed total: {allocated} · remaining: {remaining} · {count}/12 periods defined.",
+    "monthlyImportBefore": "Current",
+    "monthlyImportAfter": "Proposed",
+    "monthlyImportConfirm": "I reviewed all twelve periods for these {count} accounts. I confirm replacing their monthly allocations, including removals from empty cells. Annual targets and accounts absent from this file stay unchanged.",
+    "monthlyImportSubmit": "Replace the reviewed allocations",
+    "monthlyImportWorking": "Importing monthly allocations…",
+    "monthlyImportStaleHint": "If this budget, its accounts or fiscal periods change, confirmation is refused. Reload the preview, select the file again and review the current amounts before confirming.",
+    "monthlyImportErrors": {
+      "encoding": "The file must be valid UTF-8 CSV.",
+      "tooLarge": "The file exceeds 256 KiB.",
+      "syntax": "Malformed CSV at row {row}; check quotes and cells.",
+      "header": "Row {row}: expected account_code followed by period_1 through period_12, in this order.",
+      "empty": "The file has no targets.",
+      "tooMany": "At most 250 accounts per file. The entire file was refused.",
+      "columns": "Row {row}: exactly thirteen columns are required, including empty monthly cells.",
+      "code": "Invalid account code at row {row}.",
+      "amount": "Invalid amount at row {row}; use the selected decimal separator, up to two decimal places and an amount from zero to $1 trillion.",
+      "duplicate": "The account at row {row} appears more than once in the file.",
+      "account": "Row {row} must reference an existing local revenue or expense account.",
+      "inactive": "The account at row {row} is inactive. Reactivate it and reload the preview, or fix the file.",
+      "annual": "Row {row}: this code must identify a revenue/expense account with an annual target in this budget.",
+      "excess": "Row {row}: the monthly total exceeds this account’s existing annual target."
+    }
   },
   "migration": {
     "title": "Migrate from QuickBooks",

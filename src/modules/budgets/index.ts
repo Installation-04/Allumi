@@ -7,4 +7,6 @@ export * from "./service/import-csv";
 export * from "./domain/monthly";
 export * from "./service/monthly";
 export * from "./domain/monthly-csv";
-export * from "./service/duplicate-monthly";
+export { getMonthlyBudgetCopyPreview, duplicateMonthlyBudget, type MonthlyBudgetCopyPreview } from "./service/duplicate-monthly";
+export * from "./domain/import-monthly-csv";
+export * from "./service/import-monthly-csv";

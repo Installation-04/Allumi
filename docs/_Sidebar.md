@@ -136,3 +136,5 @@
 - [[Budgets-mensuels]] — répartition exacte des objectifs annuels, comparaison par période fiscale et CSV.
 
 - [[Duplication-des-budgets-mensuels]] — reprendre l’annuel et les répartitions après vérification des douze périodes.
+
+- [[Import-CSV-des-budgets-mensuels]] — aperçu actuel/proposé, remplacement des seuls comptes listés et annuels conservés.

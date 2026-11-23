@@ -25,7 +25,7 @@ function validPeriods(periods: Period[]) {
   return periods.length === 12 && new Set(periods.map(p => p.id)).size === 12 && periods.every((p, i) => p.number === i + 1);
 }
 /** One SQL snapshot, bounded to 1,001 accounts and 13 periods/targets per account for validation. */
-async function readPreview(tx: Tx, actor: CompanyContext, sourceId: string, yearId: string | null) {
+export async function readMonthlyBudgetSnapshot(tx: Tx, actor: CompanyContext, sourceId: string, yearId: string | null) {
   const [raw] = await tx.$queryRaw<Snapshot[]>`
     SELECT jsonb_build_object('id',b.id,'name',b.name,'revision',b.revision,'fiscalYearId',f.id,'from',to_char(f.start_date,'YYYY-MM-DD'),'to',to_char(f.end_date,'YYYY-MM-DD')) AS source,
     CASE WHEN d.id IS NULL THEN NULL ELSE jsonb_build_object('id',d.id,'from',to_char(d.start_date,'YYYY-MM-DD'),'to',to_char(d.end_date,'YYYY-MM-DD')) END AS destination,
@@ -74,7 +74,7 @@ async function readPreview(tx: Tx, actor: CompanyContext, sourceId: string, year
   ])).digest("hex");
   const active = targets.filter(r => r.isActive), inactive = targets.filter(r => !r.isActive);
   const sum = (type: RawTarget["type"], monthly: boolean) => active.filter(r => r.type === type).reduce((s, r) => s + (monthly ? r.allocatedCents : r.amountCents), 0n);
-  return { source: raw.source, destination: raw.destination, targets, stateToken,
+  return { periods: raw.sourcePeriods, source: raw.source, destination: raw.destination, targets, stateToken,
     mapping: raw.destination ? raw.sourcePeriods.map((source, i) => ({ number: source.number, source, destination: raw.destinationPeriods[i]! })) : [],
     activeCount: active.length, inactiveCount: inactive.length,
     monthlyCount: active.reduce((n,r) => n+r.months.length,0), excludedMonthlyCount: inactive.reduce((n,r) => n+r.months.length,0),
@@ -83,7 +83,7 @@ async function readPreview(tx: Tx, actor: CompanyContext, sourceId: string, year
 }
 export async function getMonthlyBudgetCopyPreview(actor: CompanyContext, sourceId: string, yearId?: string) {
   if (!uuid.safeParse(sourceId).success || (yearId !== undefined && !uuid.safeParse(yearId).success)) throw new AppError("budgets.invalid");
-  return withCompany(actor, async tx => { await requireRole(tx,"budget.manage"); return readPreview(tx,actor,sourceId,yearId ?? null); });
+  return withCompany(actor, async tx => { await requireRole(tx,"budget.manage"); return readMonthlyBudgetSnapshot(tx,actor,sourceId,yearId ?? null); });
 }
 export type MonthlyBudgetCopyPreview = Awaited<ReturnType<typeof getMonthlyBudgetCopyPreview>>;
 
@@ -100,7 +100,7 @@ export async function duplicateMonthlyBudget(actor: CompanyContext, sourceId: st
     await tx.$queryRaw`SELECT a.id FROM account a JOIN budget_line l ON l.company_id=a.company_id AND l.account_id=a.id WHERE l.company_id=${actor.companyId}::uuid AND l.budget_id=${sourceId}::uuid ORDER BY a.id LIMIT ${MAX_BUDGET_ACCOUNTS + 1} FOR SHARE OF a`;
     await tx.$queryRaw`SELECT id FROM fiscal_year WHERE company_id=${actor.companyId}::uuid AND id IN (${source.fiscal_year_id}::uuid,${data.fiscalYearId}::uuid) ORDER BY id FOR SHARE`;
     await tx.$queryRaw`SELECT id FROM fiscal_period WHERE company_id=${actor.companyId}::uuid AND fiscal_year_id IN (${source.fiscal_year_id}::uuid,${data.fiscalYearId}::uuid) ORDER BY id FOR SHARE`;
-    const fresh = await readPreview(tx,actor,sourceId,data.fiscalYearId);
+    const fresh = await readMonthlyBudgetSnapshot(tx,actor,sourceId,data.fiscalYearId);
     if (fresh.stateToken !== data.stateToken) throw new AppError("budgets.copyStale");
     if (fresh.inactiveCount && !data.skipInactive) throw new AppError("budgets.copyInactive");
     const destination = await tx.budget.create({ data: { companyId: actor.companyId, fiscalYearId: data.fiscalYearId, name: data.name }, select: { id: true } });

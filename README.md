@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.83
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.84
 ```
 
 **Docker Engine and Compose v2 already installed:**
@@ -170,6 +170,14 @@ Create a new budget from a UTF-8 CSV after reviewing every target locally. Engli
 ![Annual target import in English with dark theme](docs/images/import-budget-csv-en-dark-desktop.png)
 
 [Mobile reference](docs/images/import-budget-csv-en-dark-mobile.png)
+
+### Import monthly budget allocations
+
+Review current and proposed amounts locally before replacing allocations for the accounts listed in a CSV. Annual targets and unlisted accounts stay intact; blank cells remove targets and explicit zeros stay defined. Exact cents, annual caps, stale-preview checks and atomic audit protect the import. [Guide](https://github.com/Installation-04/Allumi/wiki/Import-CSV-des-budgets-mensuels).
+
+![Monthly import in English with dark theme](docs/images/import-budget-mensuel-en-dark-desktop.png)
+
+[Mobile reference](docs/images/import-budget-mensuel-en-dark-mobile.png)
 
 ### Copy monthly budget allocations
 

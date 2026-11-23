@@ -600,3 +600,15 @@ Codes importés ou manuels, taux datés et écarts par composante : [[Comparaiso
 ![Correspondance mobile](images/duplication-budget-mensuel-mobile.png)
 
 ![Correspondance anglaise sombre mobile](images/duplication-budget-mensuel-en-dark-mobile.png)
+
+## Importer les répartitions mensuelles
+
+[[Import-CSV-des-budgets-mensuels]] : aperçu actuel/proposé des douze périodes, annuels et comptes absents conservés, zéros distincts des cellules vides et consentement explicite. Entreprise fictive, Chromium et émulation mobile.
+
+![Aperçu actuel et proposé](images/import-budget-mensuel-desktop.png)
+
+![Aperçu anglais sombre](images/import-budget-mensuel-en-dark-desktop.png)
+
+![Aperçu mobile](images/import-budget-mensuel-mobile.png)
+
+![Aperçu anglais sombre mobile](images/import-budget-mensuel-en-dark-mobile.png)

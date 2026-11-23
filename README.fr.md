@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts
 **Installer une version précise :**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.83
+curl -fsSL https://raw.githubusercontent.com/Installation-04/Allumi/main/scripts/get.sh | sh -s -- --version v0.4.0-alpha.84
 ```
 
 **Docker Engine et Compose v2 déjà disponibles :**
@@ -169,6 +169,14 @@ Créez un nouveau budget depuis un CSV UTF-8 après aperçu local des objectifs.
 ![Import des objectifs annuels](docs/images/import-budget-csv-desktop.png)
 
 [Référence mobile](docs/images/import-budget-csv-mobile.png)
+
+### Importer les répartitions mensuelles
+
+Vérifiez les montants actuels et proposés localement avant de remplacer les comptes listés dans un CSV. Annuels et comptes absents restent intacts; les cellules vides retirent un objectif et les zéros restent définis. Cents exacts, plafonds annuels, aperçu périmé refusé et audit atomique. [Guide](https://github.com/Installation-04/Allumi/wiki/Import-CSV-des-budgets-mensuels).
+
+![Import des répartitions mensuelles](docs/images/import-budget-mensuel-desktop.png)
+
+[Référence mobile](docs/images/import-budget-mensuel-mobile.png)
 
 ### Reprendre les répartitions mensuelles
 

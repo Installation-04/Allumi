@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { requireSession } from "@/app/_lib/session";
 import { safeAction } from "@/app/_lib/safe-action";
 import { textValues, type FormState } from "@/app/_lib/form-state";
-import { createBudget, saveBudgetTarget, removeBudgetTarget, duplicateBudget, duplicateMonthlyBudget, importBudgetCsv, decodeBudgetCsv, MAX_BUDGET_CSV_BYTES, saveMonthlyAllocation } from "@/modules/budgets";
+import { createBudget, saveBudgetTarget, removeBudgetTarget, duplicateBudget, duplicateMonthlyBudget, importBudgetCsv, decodeBudgetCsv, MAX_BUDGET_CSV_BYTES, saveMonthlyAllocation, importMonthlyBudgetCsv } from "@/modules/budgets";
 import { parseMoney } from "@/modules/ledger";
 import { AppError } from "@/platform/errors";
 function unique(form:FormData,names:string[]) { if(names.some(n=>form.getAll(n).length!==1 || typeof form.get(n)!=="string")) throw new AppError("budgets.invalid"); }
@@ -84,4 +84,18 @@ export async function duplicateMonthlyAction(companyId:string,sourceId:string,fi
     const copied=await duplicateMonthlyBudget({userId,companyId},sourceId,{name:values.name??"",fiscalYearId,sourceRevision,stateToken,skipInactive:flags.length===1,confirmed:true});
     revalidatePath(`/c/${companyId}`,"layout");redirect(`/c/${companyId}/budgets/${copied.id}/mensuel?periode=${copied.firstPeriodId}`);
   },values);
+}
+
+export async function importMonthsCsvAction(companyId:string,budgetId:string,revision:number,stateToken:string,_previous:FormState,form:FormData):Promise<FormState>{
+ return safeAction(async()=>{
+  unique(form,["format","review","confirmed"]);
+  const {userId}=await requireSession();
+  if(form.get("confirmed")!=="yes")throw new AppError("budgets.monthlyImportConfirm");
+  if(form.getAll("file").length!==1)throw new AppError("budgets.monthlyImportInvalid");
+  const file=form.get("file"),raw=form.get("review"),format=form.get("format");
+  if(!(file instanceof File)||!file.size||file.size>MAX_BUDGET_CSV_BYTES||typeof raw!=="string"||raw.length>MAX_BUDGET_CSV_BYTES||(format!=="en"&&format!=="fr-CA"))throw new AppError("budgets.monthlyImportInvalid");
+  let review,text;try{review=JSON.parse(raw);text=decodeBudgetCsv(new Uint8Array(await file.arrayBuffer()));}catch{throw new AppError("budgets.monthlyImportInvalid");}
+  const firstPeriodId=await importMonthlyBudgetCsv({userId,companyId},budgetId,{revision,stateToken,format,text,review,confirmed:true});
+  revalidatePath(`/c/${companyId}`,"layout");redirect(`/c/${companyId}/budgets/${budgetId}/mensuel?periode=${firstPeriodId}`);
+ });
 }

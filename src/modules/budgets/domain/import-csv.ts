@@ -17,14 +17,14 @@ export function decodeBudgetCsv(bytes:Uint8Array):string {
   if(bytes.byteLength>MAX_BUDGET_CSV_BYTES)throw new BudgetCsvError("tooLarge");
   try{return new TextDecoder("utf-8",{fatal:true}).decode(bytes);}catch{throw new BudgetCsvError("encoding");}
 }
-/** Two-column RFC 4180 subset: quoted fields/escaped quotes, CRLF/LF/CR. Junk after quotes is refused. */
-export function readBudgetCsv(input:string,format:BudgetCsvFormat):CsvTarget[]{
+/** Bounded RFC 4180 subset shared by the annual and monthly import grids. */
+export function readBudgetCsvRecords(input:string,format:BudgetCsvFormat,limits={columns:2,rows:MAX_BUDGET_ACCOUNTS}):{line:number;cells:string[]}[]{
   if(new TextEncoder().encode(input).byteLength>MAX_BUDGET_CSV_BYTES)throw new BudgetCsvError("tooLarge");
   const text=input.replace(/^\uFEFF/u,""),delimiter=format==="en"?",":";";
   const records:{line:number;cells:string[]}[]=[];
   let cells:string[]=[],cell="",mode:"start"|"plain"|"quoted"|"closed"="start",line=1,start=1;
-  const endCell=()=>{cells.push(cell.trim());cell="";mode="start";if(cells.length>2)throw new BudgetCsvError("columns",start);};
-  const endRow=()=>{endCell();if(cells.some(c=>c!=="")){records.push({line:start,cells});if(records.length>MAX_BUDGET_ACCOUNTS+1)throw new BudgetCsvError("tooMany",start);}cells=[];};
+  const endCell=()=>{cells.push(cell.trim());cell="";mode="start";if(cells.length>limits.columns)throw new BudgetCsvError("columns",start);};
+  const endRow=()=>{endCell();if(cells.some(c=>c!=="")){records.push({line:start,cells});if(records.length>limits.rows+1)throw new BudgetCsvError("tooMany",start);}cells=[];};
   for(let i=0;i<text.length;i++){
     const c=text[i]!;
     if(mode==="quoted"){
@@ -39,6 +39,10 @@ export function readBudgetCsv(input:string,format:BudgetCsvFormat):CsvTarget[]{
   }
   if(mode==="quoted")throw new BudgetCsvError("syntax",start);
   if(cell!==""||cells.length||mode==="closed")endRow();
+  return records;
+}
+export function readBudgetCsv(input:string,format:BudgetCsvFormat):CsvTarget[]{
+  const records=readBudgetCsvRecords(input,format);
   const header=records.shift();
   if(!header||header.cells.length!==2||header.cells[0]!=="account_code"||header.cells[1]!=="annual_target")throw new BudgetCsvError("header",header?.line??1);
   if(!records.length)throw new BudgetCsvError("empty");
@@ -48,13 +52,18 @@ export function readBudgetCsv(input:string,format:BudgetCsvFormat):CsvTarget[]{
     const [code,amount]=r.cells as [string,string];
     if(!ACCOUNT_CODE.test(code))throw new BudgetCsvError("code",r.line);
     if(codes.has(code))throw new BudgetCsvError("duplicate",r.line);codes.add(code);
-    const pattern=format==="en"?/^\d+(?:\.\d{1,2})?$/:/^\d+(?:,\d{1,2})?$/;
-    if(!pattern.test(amount))throw new BudgetCsvError("amount",r.line);
-    const [whole,fraction=""]=amount.split(format==="en"?".":",");
-    const cents=BigInt(whole!)*100n+BigInt(fraction.padEnd(2,"0"));
-    if(cents>MAX_LINE_CENTS)throw new BudgetCsvError("amount",r.line);
+    const cents=readBudgetCsvAmount(amount,format,r.line);
     return {row:r.line,accountCode:code,amountCents:cents};
   });
+}
+/** Strict non-negative decimal input, without grouping, currencies, exponents or rounding. */
+export function readBudgetCsvAmount(amount:string,format:BudgetCsvFormat,row:number):bigint {
+  const pattern=format==="en"?/^\d+(?:\.\d{1,2})?$/:/^\d+(?:,\d{1,2})?$/;
+  if(!pattern.test(amount))throw new BudgetCsvError("amount",row);
+  const [whole,fraction=""]=amount.split(format==="en"?".":",");
+  const cents=BigInt(whole!)*100n+BigInt(fraction.padEnd(2,"0"));
+  if(cents>MAX_LINE_CENTS)throw new BudgetCsvError("amount",row);
+  return cents;
 }
 export function previewBudgetCsv(text:string,format:BudgetCsvFormat,accounts:readonly ImportAccount[]):ImportPreviewTarget[]{
   const byCode=new Map(accounts.map(a=>[a.code,a]));

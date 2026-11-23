@@ -36,7 +36,7 @@ Le serveur verrouille le budget source, les comptes et les références fiscales
 
 La limite est de **1 000 objectifs annuels et 12 000 montants mensuels**, sans troncature. L’ensemble des comptes à objectif actif et des comptes avec activité réelle dans l’exercice destination doit aussi rester sous la limite de 1 000 comptes du rapport. Une grande copie peut prendre jusqu’à deux minutes; le bouton annonce l’opération en cours. Cette seule transaction bornée dispose de 120 secondes, puis est annulée en cas de dépassement. Les transactions ordinaires gardent leur limite de 20 secondes.
 
-Aucune migration ni nouvelle configuration. La duplication annuelle seule reste disponible dans [[Duplication-des-budgets]]. L’[[Import-CSV-des-budgets]] concerne encore les objectifs annuels uniquement. Pas de copie entre entreprises, de conversion de devise ni de prévision automatique de trésorerie.
+Aucune migration ni nouvelle configuration. La duplication annuelle seule reste disponible dans [[Duplication-des-budgets]]. L’[[Import-CSV-des-budgets]] crée un scénario annuel; l’[[Import-CSV-des-budgets-mensuels]] met à jour les répartitions d’un scénario existant après aperçu actuel/proposé. Pas de copie entre entreprises, de conversion de devise ni de prévision automatique de trésorerie.
 
 ![Correspondance sur téléphone](images/duplication-budget-mensuel-mobile.png)
 
