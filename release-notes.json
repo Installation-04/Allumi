@@ -846,5 +846,39 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.79": {
+    "fr-CA": {
+      "title": "Correctif de sécurité des outils de base de données",
+      "added": [],
+      "improved": [],
+      "fixed": [
+        {
+          "text": "Prisma passe en 7.10.1 et utilise Effect 3.22.1 pour corriger GHSA-7589-6fvf-x4pw. Les contrôles d’audit restent actifs."
+        }
+      ],
+      "installation": [
+        {
+          "text": "Aucune nouvelle migration ni configuration par rapport à alpha.77. Depuis alpha.76, les deux migrations de l’assistant QuickBooks sont appliquées normalement.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Database tooling security update",
+      "added": [],
+      "improved": [],
+      "fixed": [
+        {
+          "text": "Prisma is updated to 7.10.1 with patched Effect 3.22.1 to address GHSA-7589-6fvf-x4pw. Dependency audit checks remain enabled."
+        }
+      ],
+      "installation": [
+        {
+          "text": "No new migration or configuration compared with alpha.77. Updating from alpha.76 applies the two QuickBooks assistant migrations normally.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

@@ -15,7 +15,7 @@ test.afterAll(async()=>{
 });
 
 const VERSION = (JSON.parse(readFileSync("package.json", "utf8")) as { version: string }).version;
-const RELEASE_NOTES = JSON.parse(readFileSync("release-notes.json", "utf8")) as Record<string, Record<"fr-CA" | "en", { fixed: { text: string }[] }>>;
+const RELEASE_NOTES = JSON.parse(readFileSync("release-notes.json", "utf8")) as Record<string, Record<"fr-CA" | "en", Record<"added" | "improved" | "fixed" | "installation", { text: string }[]>>>;
 
 const EMAIL = "admin@exemple.test";
 const PASSWORD = "une phrase de passe très longue 2026";
@@ -240,11 +240,21 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   await expectNoPageOverflow(page);
   await captureReference(page, 'versions');
   const news=page.getByRole("region",{name:`Nouveautés de la version ${VERSION}`,exact:true});
-  await expect(news.getByRole("heading",{name:"Nouveautés",exact:true})).toBeVisible();await expect(news.getByRole("heading",{name:"Installation",exact:true})).toBeVisible();const frenchFixes=RELEASE_NOTES[VERSION]?.["fr-CA"].fixed??[];await expect(news.getByRole("heading",{name:"Corrections",exact:true})).toHaveCount(frenchFixes.length?1:0);for(const fix of frenchFixes)await expect(news.getByText(fix.text,{exact:true})).toBeVisible();
+  expect(RELEASE_NOTES[VERSION]).toBeDefined();
+  for (const [category, heading] of [["added", "Nouveautés"], ["improved", "Améliorations"], ["fixed", "Corrections"], ["installation", "Installation"]] as const) {
+    const items = RELEASE_NOTES[VERSION]!["fr-CA"][category];
+    await expect(news.getByRole("heading", { name: heading, exact: true })).toHaveCount(items.length ? 1 : 0);
+    for (const item of items) await expect(news.getByText(item.text, { exact: true })).toBeVisible();
+  }
   await expect(news.getByRole("link",{name:"Notes complètes de la release sur GitHub",exact:true})).toHaveAttribute("href",`https://github.com/Installation-04/Allumi/releases/tag/v${VERSION}`);
   await expectNoPageOverflow(page);await captureReference(page,"nouveautes-versions",`Nouveautés de la version ${VERSION}`);
   await page.getByRole("button",{name:"English",exact:true}).click();await expect(page.locator("html")).toHaveAttribute("lang","en");await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("dark");await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
-  const englishNews=page.getByRole("region",{name:`What’s new in version ${VERSION}`,exact:true});await expect(englishNews.getByRole("heading",{name:"New features",exact:true})).toBeVisible();await expect(englishNews.getByRole("heading",{name:"Installation",exact:true})).toBeVisible();const englishFixes=RELEASE_NOTES[VERSION]?.en.fixed??[];await expect(englishNews.getByRole("heading",{name:"Fixes",exact:true})).toHaveCount(englishFixes.length?1:0);for(const fix of englishFixes)await expect(englishNews.getByText(fix.text,{exact:true})).toBeVisible();
+  const englishNews=page.getByRole("region",{name:`What’s new in version ${VERSION}`,exact:true});
+  for (const [category, heading] of [["added", "New features"], ["improved", "Improvements"], ["fixed", "Fixes"], ["installation", "Installation"]] as const) {
+    const items = RELEASE_NOTES[VERSION]!.en[category];
+    await expect(englishNews.getByRole("heading", { name: heading, exact: true })).toHaveCount(items.length ? 1 : 0);
+    for (const item of items) await expect(englishNews.getByText(item.text, { exact: true })).toBeVisible();
+  }
   if(VERSION==="0.4.0-alpha.62"){await englishNews.locator("summary",{hasText:"Earlier documented versions"}).click();await expect(englishNews.getByText("Version 0.4.0-alpha.61",{exact:true})).toBeVisible();}
   await expectNoPageOverflow(page);await captureReference(page,"nouveautes-versions-en-dark",`What’s new in version ${VERSION}`);
   await page.getByRole("combobox",{name:"Appearance",exact:true}).selectOption("light");await expect(page.locator("html")).toHaveAttribute("data-theme","light");await page.getByRole("button",{name:"Français",exact:true}).click();await expect(page.locator("html")).toHaveAttribute("lang","fr-CA");
