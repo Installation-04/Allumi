@@ -7,14 +7,14 @@ sudo ./scripts/update.sh
 ```
 Le script : sauvegarde, récupère la nouvelle version (`git pull --ff-only` sur une branche), complète ton `.env` des variables ajoutées depuis (sans toucher aux existantes), reconstruit les images, applique les migrations (service `migrate`) et vérifie le healthcheck. Lis le `CHANGELOG.md` avant, surtout pour les versions majeures.
 
-Options : `--no-backup` (déconseillé) et une version, par exemple `sudo ./scripts/update.sh v0.4.0-alpha.78` (voir ci-dessous).
+Options : `--no-backup` (déconseillé) et une version, par exemple `sudo ./scripts/update.sh v0.4.0-alpha.79` (voir ci-dessous).
 
 ## Épingler une version
 Les numéros et le processus de publication sont décrits dans [[Versions-et-releases]].
 
 Pour la production, utilise une version étiquetée plutôt que `main` :
 ```bash
-sudo ./scripts/update.sh v0.4.0-alpha.78
+sudo ./scripts/update.sh v0.4.0-alpha.79
 ```
 Le script sauvegarde, se place sur l'étiquette, **télécharge les images publiées de cette version** (aucune compilation; repli automatique sur la construction si elles sont introuvables, ou avec `--build`) et vérifie le healthcheck. Sur une version épinglée (HEAD détachée), lancer `update.sh` sans version ne tire rien : il redémarre seulement avec les images de la version courante. Voir [[Installation-Docker]], « Images déjà construites ». La première mise à jour depuis une version antérieure à ce changement construit encore sur place : c’est l’ancien script qui s’exécute.
 
@@ -82,8 +82,8 @@ En mode HTTPS local, les scripts vérifient la configuration Compose rendue avan
 L’agent hôte récent effectue ce contrôle avant d’arrêter l’application ou d’entreprendre la sauvegarde. Un échec est présenté comme une erreur de validation et laisse le service existant fonctionner; il ne remplace ni la version ni l’autorité locale. Une ancienne copie de l’agent ne reçoit pas cette protection simplement parce que le site a été mis à jour : l’actualiser explicitement selon la procédure ci-dessus.
 
 
-## Correctif de sécurité alpha.78
+## Correctif de sécurité alpha.79
 
-La version alpha.78 conserve la migration QuickBooks livrée dans alpha.77 et corrige l’avis [GHSA-7589-6fvf-x4pw](https://github.com/advisories/GHSA-7589-6fvf-x4pw) dans la chaîne d’outils Prisma. Les paquets Prisma client, adaptateur PostgreSQL et CLI sont alignés en 7.10.1. Leur dépendance Effect, encore épinglée en 3.20.0 par la configuration amont, est résolue explicitement en **3.22.1**, la correction de la même version majeure. Le verrou npm fixe réellement ce paquet corrigé; les contrôles d’audit restent actifs. Il ne s’agit ni d’une exclusion d’avis ni d’une rétrogradation du moteur Prisma.
+La version alpha.79 conserve la migration QuickBooks livrée dans alpha.77 et corrige l’avis [GHSA-7589-6fvf-x4pw](https://github.com/advisories/GHSA-7589-6fvf-x4pw) dans la chaîne d’outils Prisma. Les paquets Prisma client, adaptateur PostgreSQL et CLI sont alignés en 7.10.1. Leur dépendance Effect, encore épinglée en 3.20.0 par la configuration amont, est résolue explicitement en **3.22.1**, la correction de la même version majeure. Le verrou npm fixe réellement ce paquet corrigé; les contrôles d’audit restent actifs. Il ne s’agit ni d’une exclusion d’avis ni d’une rétrogradation du moteur Prisma.
 
-Aucune nouvelle migration ou variable n’est ajoutée par ce correctif. Depuis alpha.76, la procédure applique les deux migrations additives alpha.77 de l’assistant [[Migration-QuickBooks]]. Les écritures, limites de reprise et permissions de l’assistant sont inchangées. Préférer alpha.78 à alpha.77 pour les nouvelles installations et mises à jour.
+Aucune nouvelle migration ou variable n’est ajoutée par ce correctif. Depuis alpha.76, la procédure applique les deux migrations additives alpha.77 de l’assistant [[Migration-QuickBooks]]. Les écritures, limites de reprise et permissions de l’assistant sont inchangées. Préférer alpha.79 à alpha.77 pour les nouvelles installations et mises à jour.

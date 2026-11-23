@@ -4,9 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
-## [0.4.0-alpha.78] - 2026-11-22
-
 - Sécurité : famille Prisma en 7.10.1 et dépendance Effect corrigée en 3.22.1 contre GHSA-7589-6fvf-x4pw; audit de production conservé, sans rétrogradation de Prisma ni adoption de sa préversion majeure.
+- Tests : les catégories de notes de version et leurs textes sont vérifiés selon leur présence en français et en anglais, y compris les versions contenant seulement des corrections.
 - Installation : aucune nouvelle migration ni configuration par rapport à alpha.77; depuis alpha.76, les deux migrations de l’assistant QuickBooks s’appliquent par la procédure habituelle. Les listes et la bascule rapprochée restent disponibles.
 
 ## [0.4.0-alpha.77] - 2026-11-17
