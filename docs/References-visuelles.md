@@ -622,3 +622,13 @@ Voir [[Previsions-de-tresorerie]] pour les hypothèses et contrôles.
 ![Cash forecast EN dark](images/previsions-tresorerie-en-dark-desktop.png)
 
 [Mobile FR](images/previsions-tresorerie-mobile.png) · [Mobile EN sombre](images/previsions-tresorerie-en-dark-mobile.png)
+
+## Prévision de trésorerie — impression complète
+
+[[Previsions-de-tresorerie]] : copie de toutes les échéances, hypothèses et contrôles; impression paysage / PDF navigateur.
+
+![Impression FR](images/previsions-tresorerie-impression-desktop.png)
+
+![Complete print view EN dark](images/previsions-tresorerie-impression-en-dark-desktop.png)
+
+[Mobile FR](images/previsions-tresorerie-impression-mobile.png) · [Mobile EN sombre](images/previsions-tresorerie-impression-en-dark-mobile.png)

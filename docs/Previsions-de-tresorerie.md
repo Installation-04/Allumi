@@ -30,6 +30,26 @@ Le détail pagine **100 factures** et conserve les filtres; les totaux et la sé
 
 Limites : **1 000 comptes banque/caisse** et **5 000 éléments ouverts** en tout, incluant crédits, paiements, remboursements et factures après l’horizon. Au-delà, le rapport entier est refusé; aucune projection tronquée n’est affichée ou exportée. Aucune migration ni nouvelle variable de configuration n’est nécessaire.
 
+## Impression et PDF complets
+
+Depuis le rapport, ouvre **Impression / PDF complet**, puis **Imprimer / PDF**. Les dates et l’horizon sont conservés. La copie inclut **toutes les échéances projetées**, même en l’ouvrant depuis la deuxième page du détail, ainsi que les hypothèses, exclusions, contrôles, série quotidienne et soldes initiaux par compte. Le lien de retour retrouve la page du rapport.
+
+Les données sont relues dans un nouvel instantané à l’ouverture de la copie : un mouvement comptabilisé entre les deux chargements peut donc changer les montants. Le dialogue d’impression utilise ensuite les valeurs déjà affichées; recharge la copie pour actualiser les données. Les mêmes droits Comptabilité + Ventes en lecture, règles de date et limites de 1 000 comptes / 5 000 éléments s’appliquent. Une erreur de filtre ou un refus de permission ne produit pas de copie partielle.
+
+La mise en page papier est **paysage**, noire sur fond blanc, même depuis le thème sombre ou un écran mobile. Les en-têtes de tableau se répètent et les noms longs restent dans les colonnes. La navigation, les boutons et les liens internes vers les pièces sont retirés du papier. Le document contient le nom de l’entreprise, la date de référence, la période projetée et la devise CAD. Les notes privées et descriptions de lignes des pièces sources ne sont pas incluses.
+
+Choisis **Enregistrer en PDF** dans le navigateur pour conserver une copie. Désactive ses en-têtes et pieds de page pour omettre l’adresse de la page. Il n’y a pas de génération PDF côté serveur ni de création d’écriture comptable. Les références sont produites avec Chromium et émulation mobile; les essais physiques Safari iOS restent à effectuer.
+
+Les captures ordinateur montrent le rendu papier; les captures mobiles montrent l’aperçu à l’écran.
+
+![Copie complète pour impression, français](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/previsions-tresorerie-impression-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/previsions-tresorerie-impression-mobile.png" alt="Copie complète sur téléphone" width="412">
+
+![Paper output from the English dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/previsions-tresorerie-impression-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/previsions-tresorerie-impression-en-dark-mobile.png" alt="Complete forecast print view, English dark theme, mobile" width="412">
+
 ## Références visuelles
 
 Données fictives uniquement. Version française, ordinateur et téléphone :

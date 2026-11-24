@@ -194,6 +194,12 @@ Projetez les liquidités sur 7, 30, 60 ou 90 jours selon les soldes banque/caiss
 
 [Référence mobile](docs/images/previsions-tresorerie-mobile.png)
 
+Imprimez la prévision complète ou enregistrez un PDF, avec toutes les échéances, hypothèses et contrôles, même après la première page. Le papier reste clair en paysage depuis les deux thèmes.
+
+![Copie complète de la prévision pour impression](docs/images/previsions-tresorerie-impression-desktop.png)
+
+[Copie sur mobile](docs/images/previsions-tresorerie-impression-mobile.png)
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

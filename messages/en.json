@@ -3576,7 +3576,7 @@
     "intro": "Due-date projection from posted open customer invoices and supplier bills. Amounts are assumed to move through bank or cash accounts on their due dates; this report does not initiate payments.",
     "scope": "Reference balance is the end-of-day total of all bank and cash asset accounts, including inactive accounts. Credit cards and undeposited funds are excluded. Past-due items are carried to the first projected day. Applied payments and credits reduce balances as of the reference date.",
     "rules": "Unapplied credits, payments and refunds are not scheduled or netted automatically. Future posted cash entries are excluded to avoid double counting. Payroll, tax remittances, drafts, recurring transactions and manual scenarios are not predicted. Dates after the horizon are excluded. This is an assumption-based projection, not a guarantee of available cash.",
-    "limits": "Up to 1,000 bank/cash accounts and 5,000 open source items, including exclusions. The whole report is refused above these limits. Detail shows 100 items per page; CSV includes all projected items.",
+    "limits": "Up to 1,000 bank/cash accounts and 5,000 open source items, including exclusions. The whole report is refused above these limits. Detail shows 100 items per page; CSV and the complete print view include all projected items.",
     "rulesTitle": "Assumptions and limits",
     "asOf": "Reference date",
     "horizon": "Horizon (days)",
@@ -3617,7 +3617,7 @@
     "noAccounts": "No bank or cash asset accounts found.",
     "firstNegative": "First negative balance: {date}",
     "period": "From {from} to {to}, based on balances at {asOf}.",
-    "count": "{count} projected invoices and bills.",
+    "count": "Projected invoices and bills: {count}",
     "warning": "Review the exclusions and control differences below before relying on this projection.",
     "agrees": "Receivable and payable control balances agree with the dated open items.",
     "chart": "Projected closing cash by day",
@@ -3629,6 +3629,10 @@
     "file": "cash_forecast",
     "cash": "Recorded cash movements",
     "receivables": "Receivable aging",
-    "payables": "Payable aging"
+    "payables": "Payable aging",
+    "printView": "Complete print / PDF",
+    "backReport": "Back to forecast",
+    "printHint": "This copy includes all projected items for these filters. Use landscape orientation; turn off browser headers and footers to omit the page address. Your browser can print or save a PDF.",
+    "printLimits": "Up to 1,000 bank/cash accounts and 5,000 open source items, including exclusions. The whole report is refused above these limits. This copy includes all projected invoices and bills, beyond the 100-row screen pages."
   }
 }
