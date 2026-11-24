@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.88] - 2026-11-23
+
 - Nouveautés : copie complète de la prévision de trésorerie avec impression et enregistrement PDF depuis le navigateur, en conservant dates et horizon.
 - Rapports : toutes les échéances des filtres choisis, même depuis une page suivante; hypothèses, exclusions, contrôles, série quotidienne et soldes initiaux inclus.
 - Interface : document FR/EN en paysage, noir sur fond blanc depuis les deux thèmes, en-têtes répétés, noms longs contenus et retour à la page du rapport.
