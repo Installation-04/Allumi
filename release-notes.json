@@ -1088,5 +1088,51 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.87": {
+    "fr-CA": {
+      "title": "Prévision de trésorerie : impression et PDF complets",
+      "added": [
+        {
+          "text": "Ouvrez Impression / PDF complet pour inclure toutes les échéances, hypothèses, exclusions et contrôles des filtres choisis.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Papier paysage clair depuis les deux thèmes et le mobile, en-têtes répétés, données privées des pièces sources exclues et retour à la page du rapport.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration ni nouvelle configuration. Utilisez l’impression ou l’enregistrement PDF du navigateur; mêmes permissions et limites que le rapport, sans génération PDF serveur.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ]
+    },
+    "en": {
+      "title": "Cash forecast: complete printing and PDF",
+      "added": [
+        {
+          "text": "Open Complete print / PDF to include all due items, assumptions, exclusions and controls for your filters.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Light landscape paper from either theme or mobile, repeated headers, source-document private notes excluded and a return to the report page.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration or new configuration. Use browser printing or Save as PDF; the report’s permissions and limits apply, without a server PDF renderer.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ]
+    }
   }
 }

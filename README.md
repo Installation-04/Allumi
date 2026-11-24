@@ -195,6 +195,12 @@ Project cash over 7, 30, 60 or 90 days from posted bank/cash balances and open i
 
 [Mobile reference](docs/images/previsions-tresorerie-en-dark-mobile.png)
 
+Print the complete forecast or save a PDF with all due items, assumptions and controls, including rows beyond the first page. Landscape paper stays light from either theme.
+
+![Complete cash forecast print view](docs/images/previsions-tresorerie-impression-en-dark-desktop.png)
+
+[Mobile print view](docs/images/previsions-tresorerie-impression-en-dark-mobile.png)
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

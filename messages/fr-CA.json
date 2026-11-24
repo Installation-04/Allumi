@@ -3576,7 +3576,7 @@
     "intro": "Projection par échéances des factures clients et fournisseurs comptabilisées et ouvertes. Les montants sont supposés transiter par la banque ou la caisse aux dates d’échéance; ce rapport ne déclenche aucun paiement.",
     "scope": "Le solde de référence est le total en fin de journée des comptes d’actif banque et caisse, même inactifs. Les cartes de crédit et fonds non déposés sont exclus. Les retards sont reportés au premier jour projeté. Les paiements et crédits affectés réduisent les soldes à la date de référence.",
     "rules": "Les crédits, paiements et remboursements non affectés ne sont ni planifiés ni compensés automatiquement. Les écritures de trésorerie futures sont exclues pour éviter les doublons. La paie, les remises fiscales, les brouillons, les récurrences et les scénarios manuels ne sont pas prédits. Les échéances après l’horizon sont exclues. Cette projection repose sur des hypothèses et ne garantit pas les liquidités disponibles.",
-    "limits": "Maximum de 1 000 comptes banque/caisse et de 5 000 éléments ouverts, exclusions comprises. Le rapport entier est refusé au-delà. Détail de 100 éléments par page; le CSV inclut toutes les échéances projetées.",
+    "limits": "Maximum de 1 000 comptes banque/caisse et de 5 000 éléments ouverts, exclusions comprises. Le rapport entier est refusé au-delà. Détail de 100 éléments par page; le CSV et la copie imprimable incluent toutes les échéances projetées.",
     "rulesTitle": "Hypothèses et limites",
     "asOf": "Date de référence",
     "horizon": "Horizon (jours)",
@@ -3617,7 +3617,7 @@
     "noAccounts": "Aucun compte d’actif banque ou caisse trouvé.",
     "firstNegative": "Premier solde négatif : {date}",
     "period": "Du {from} au {to}, selon les soldes au {asOf}.",
-    "count": "{count} factures clients et fournisseurs projetées.",
+    "count": "Nombre de factures projetées : {count}",
     "warning": "Vérifiez les exclusions et les écarts de contrôle ci-dessous avant d’utiliser cette projection.",
     "agrees": "Les comptes de contrôle clients et fournisseurs concordent avec les éléments ouverts à la date choisie.",
     "chart": "Trésorerie finale projetée par jour",
@@ -3629,6 +3629,10 @@
     "file": "prevision_tresorerie",
     "cash": "Suivi de trésorerie comptabilisée",
     "receivables": "Âge des comptes clients",
-    "payables": "Âge des comptes fournisseurs"
+    "payables": "Âge des comptes fournisseurs",
+    "printView": "Impression / PDF complet",
+    "backReport": "Retour à la prévision",
+    "printHint": "Cette copie inclut toutes les échéances projetées des filtres choisis. Utilisez le format paysage; désactivez les en-têtes et pieds de page du navigateur pour omettre l’adresse. Le navigateur permet d’imprimer ou d’enregistrer un PDF.",
+    "printLimits": "Maximum de 1 000 comptes banque/caisse et de 5 000 éléments ouverts, exclusions comprises. Le rapport entier est refusé au-delà. Cette copie inclut toutes les factures projetées, même au-delà des pages de 100 lignes de l’écran."
   }
 }

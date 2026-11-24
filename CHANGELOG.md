@@ -4,6 +4,12 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Nouveautés : copie complète de la prévision de trésorerie avec impression et enregistrement PDF depuis le navigateur, en conservant dates et horizon.
+- Rapports : toutes les échéances des filtres choisis, même depuis une page suivante; hypothèses, exclusions, contrôles, série quotidienne et soldes initiaux inclus.
+- Interface : document FR/EN en paysage, noir sur fond blanc depuis les deux thèmes, en-têtes répétés, noms longs contenus et retour à la page du rapport.
+- Confidentialité : mêmes droits Comptabilité et Ventes en lecture, filtres stricts et limites intégrales; aucun lien interne, note privée ou description de ligne des pièces sur papier, aucune écriture déclenchée.
+- Installation : aucune migration ni configuration et aucun moteur PDF serveur; guide, captures et essais du détail au-delà de 100 factures et du PDF multipage.
+
 ## [0.4.0-alpha.86] - 2026-11-23
 
 - Nouveautés : prévision de trésorerie par échéances sur 7, 30, 60 ou 90 jours, soldes initiaux banque/caisse et factures clients/fournisseurs ouvertes à la référence.

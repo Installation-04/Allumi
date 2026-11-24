@@ -160,3 +160,12 @@ main:has(> .company-workspace) { max-width: none; padding: 0; }
   .statement-print tr { break-inside: avoid; }
   .statement-print h1, .statement-print h2 { break-after: avoid; }
 }
+
+/* A complete cash forecast keeps long names and exact amounts inside the printed sheet. */
+@media print {
+  .cash-forecast-print { overflow-wrap: anywhere; }
+  .cash-forecast-print table { table-layout: fixed; }
+  .cash-forecast-print th, .cash-forecast-print td { overflow-wrap: anywhere; white-space: normal; }
+  .cash-forecast-print > dl:first-of-type { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .cash-forecast-print figure, .cash-forecast-print dl { break-inside: avoid; }
+}
