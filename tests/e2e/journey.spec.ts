@@ -4067,7 +4067,10 @@ test("cash forecast shows due-date assumptions, exact CSV and modular read-only 
   expect((await db.query('SELECT (SELECT count(*) FROM journal_entry WHERE company_id=$1)::text AS entries,(SELECT count(*) FROM audit_log WHERE company_id=$1)::text AS audits',[companyId])).rows).toEqual(before);
   const revenue=(await db.query("SELECT id FROM account WHERE company_id=$1 AND code='4000'",[companyId])).rows[0].id,urls=e2eUrls();
   await db.query('UPDATE contact SET display_name=$3 WHERE company_id=$1 AND id=$2',[companyId,customer,'Client Prévision Exemple '+'X'.repeat(170)]);
-  const seeded=JSON.parse(execFileSync(process.execPath,['--conditions=react-server','--import=tsx','tests/e2e/seed-forecast-print.ts',userId,companyId!,customer,revenue,tax],{encoding:'utf8',env:{...process.env,DATABASE_URL:urls.owner,APP_DATABASE_URL:urls.app,LOG_LEVEL:'silent'},timeout:90_000})) as {first:string;last:string;count:number};expect(seeded.count).toBe(101);
+  const fixtureEnv:NodeJS.ProcessEnv={...process.env,DATABASE_URL:urls.owner,APP_DATABASE_URL:urls.app,LOG_LEVEL:'silent'};
+  // Reproduce CI: only Playwright's server receives these values; the child configures its own fake values.
+  for(const key of ['APP_URL','AUTH_SECRET','ENCRYPTION_KEY'])delete fixtureEnv[key];
+  const seeded=JSON.parse(execFileSync(process.execPath,['--conditions=react-server','--import=tsx','tests/e2e/seed-forecast-print.ts',userId,companyId!,customer,revenue,tax],{encoding:'utf8',env:fixtureEnv,timeout:90_000})) as {first:string;last:string;count:number};expect(seeded.count).toBe(101);
   before=(await db.query('SELECT (SELECT count(*) FROM journal_entry WHERE company_id=$1)::text AS entries,(SELECT count(*) FROM audit_log WHERE company_id=$1)::text AS audits',[companyId])).rows;
   await page.goto(url+'&page=2');const paged=page.getByRole('table',{name:'Factures clients et fournisseurs projetées',exact:true});await expect(page.getByRole('navigation',{name:'Pages de la prévision',exact:true})).toBeVisible();expect(await paged.getByRole('row').count()).toBeGreaterThan(1);expect(await paged.getByRole('row').count()).toBeLessThanOrEqual(101);
   await forecastPrintJourney(page,false,false,seeded.last);await expect(page).toHaveURL(url+'&page=2');
