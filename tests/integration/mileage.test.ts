@@ -51,3 +51,18 @@ it('returns complete exports across pages and refuses more than 5,000 filtered t
  await inContext(app,asOwnerA,()=>insert([W.companyA,'2026-07-01','Capacity','Visit','PERSONAL',1]),{commit:true});await expect(getMileageLog(actor,range,{allRows:true})).rejects.toMatchObject({key:'mileage.exportLimit'});expect((await getMileageLog(actor,range)).count).toBe(5001);
  await expect(getMileageTrip(actor,randomUUID())).rejects.toMatchObject({key:'mileage.notFound'});
 });
+it('prints all filtered trips from any page up to 1,000 and refuses 1,001 without mutations',async()=>{
+ await inContext(db,asOwnerA,()=>db.query("INSERT INTO mileage_trip(id,company_id,trip_date,vehicle,origin,destination,purpose,usage,distance_meters,updated_at) SELECT gen_random_uuid(),$1,'2026-08-01','Print capacity','Office','Client','Visit','BUSINESS',10000000,now() FROM generate_series(1,1000)",[W.companyA]),{commit:true});
+ const range={...filters,from:'2026-08-01',to:'2026-08-31',page:2};
+ const audit=async()=>(await db.query("SELECT count(*)::text AS n FROM audit_log WHERE company_id=$1",[W.companyA])).rows;
+ const before=await audit();
+ const report=await getMileageLog(reader,range,{forPrint:true});
+ expect(report.rows).toHaveLength(1000);expect(report.count).toBe(1000);expect(report.businessMeters).toBe(10000000000n);expect(report.page).toBe(2);expect(await audit()).toEqual(before);
+ await inContext(app,asOwnerA,()=>insert([W.companyA,'2026-08-31','Print capacity','','PERSONAL',1]),{commit:true});
+ await expect(getMileageLog(actor,range,{forPrint:true})).rejects.toMatchObject({key:'mileage.printLimit'});
+ expect((await getMileageLog(actor,range,{allRows:true})).rows).toHaveLength(1001);
+ expect((await getMileageLog(actor,{...range,usage:'PERSONAL'},{forPrint:true})).personalMeters).toBe(1n);
+ expect((await getMileageLog(actor,{...range,vehicle:'Not present'},{forPrint:true})).rows).toEqual([]);
+ await db.query("UPDATE membership SET module_access='{\"accounting\":\"none\"}' WHERE company_id=$1 AND user_id=$2",[W.companyA,W.userReader]);
+ await expect(getMileageLog(reader,range,{forPrint:true})).rejects.toMatchObject({key:'forbidden'});
+});

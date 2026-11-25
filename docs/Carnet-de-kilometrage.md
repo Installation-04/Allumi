@@ -23,6 +23,10 @@ Les totaux professionnels, personnels et globaux portent sur **tous les résulta
 
 La recherche globale retrouve la page du carnet par « kilométrage », « mileage » ou « trajets » pour les membres autorisés. Elle ne recherche pas le contenu des trajets; les filtres du carnet servent à consulter les enregistrements.
 
+## Imprimer ou enregistrer en PDF
+
+**Impression / PDF complet** ouvre une copie dédiée de tous les résultats filtrés, jusqu’à 1 000 trajets, avec les mêmes totaux et droits. Le papier est paysage clair depuis les deux thèmes; le retour conserve la page et les filtres. Voir [[Impression-du-kilometrage]].
+
 ## Modifier, supprimer et partager
 
 **Voir le trajet** ouvre son détail. Un membre autorisé peut ouvrir **Modifier le trajet** puis enregistrer les changements. Si une autre personne a modifié la fiche depuis son ouverture, le remplacement est refusé et ta saisie est conservée : recharge le trajet avant de réessayer. La suppression demande une confirmation et refuse aussi une fiche devenue périmée.

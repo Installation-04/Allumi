@@ -884,7 +884,8 @@
       "confirm": "Confirme la suppression du trajet.",
       "filters": "Choisis une période valide d’au plus 366 jours, se terminant au plus tard aujourd’hui, un usage autorisé et un véhicule d’au plus 80 caractères. Les filtres et pages répétés ou mal formés sont refusés.",
       "exportLimit": "Plus de 5 000 trajets correspondent aux filtres. Réduis la période ou précise le véhicule et l’usage avant d’exporter.",
-      "limit": "Le nombre de trajets dépasse la capacité de ce rapport."
+      "limit": "Le nombre de trajets dépasse la capacité de ce rapport.",
+      "printLimit": "La copie imprimable est limitée à 1 000 trajets. Réduis les filtres; aucune copie partielle n’est fournie."
     }
   },
   "settingsPage": {
@@ -3743,6 +3744,11 @@
     "previous": "Précédente",
     "next": "Suivante",
     "limits": "Distances saisies manuellement et conservées au mètre. Filtres sur au plus 366 jours; totaux sur tous les résultats, 50 trajets par page et CSV jusqu’à 5 000 trajets. Aucun GPS, calcul de trajet, taux d’indemnité ou écriture comptable automatique.",
-    "locationHint": "Au plus 160 caractères, sans saut de ligne."
+    "locationHint": "Au plus 160 caractères, sans saut de ligne.",
+    "print": "Impression / PDF complet",
+    "printTitle": "Carnet de kilométrage — copie imprimable",
+    "printHint": "Copie complète des filtres affichés, relue à l’ouverture. Utilise la boîte d’impression du navigateur pour imprimer ou enregistrer en PDF; paysage clair depuis les deux thèmes.",
+    "allVehicles": "Tous les véhicules",
+    "printLimits": "Jusqu’à 1 000 trajets, même depuis une autre page du carnet. Kilomètres exacts à trois décimales. Aucun calcul d’indemnité ou de déduction fiscale; la copie n’enregistre ni modification ni PDF côté serveur."
   }
 }

@@ -1374,5 +1374,51 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.95": {
+    "fr-CA": {
+      "title": "Le carnet de kilométrage en impression et PDF",
+      "added": [
+        {
+          "text": "Ouvrez une copie complète des trajets filtrés, même depuis une autre page du carnet, avec les totaux professionnels/personnels et les distances exactes.",
+          "guide": "Impression-du-kilometrage"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Papier paysage clair depuis FR/EN sombre/mobile, en-têtes répétés et textes longs contenus. Même accès Comptabilité en lecture; limite de 1 000 trajets sans copie partielle, CSV inchangé jusqu’à 5 000.",
+          "guide": "Impression-du-kilometrage"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration ni nouvelle configuration. Mettez à jour le serveur, puis rechargez l’application. Le PDF est enregistré par le navigateur.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Print and PDF copies of the mileage log",
+      "added": [
+        {
+          "text": "Open a complete copy of filtered trips from any log page, with business/personal totals and exact distances.",
+          "guide": "Impression-du-kilometrage"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Light landscape paper from FR/EN dark/mobile interfaces, repeating headers and wrapped long text. Same Accounting read access; limit of 1,000 trips without partial copies, CSV unchanged up to 5,000.",
+          "guide": "Impression-du-kilometrage"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration or new configuration. Update the server and reload the app. The browser saves the PDF.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

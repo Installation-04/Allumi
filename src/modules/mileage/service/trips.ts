@@ -3,7 +3,7 @@ import { requireRole } from "@/modules/companies";
 import { todayIso } from "@/modules/ledger";
 import { AppError } from "@/platform/errors";
 import { withCompany, type CompanyContext, type Tx } from "@/platform/tenant";
-import { tripInput, mileageFilters, mileageQuery, MILEAGE_PAGE_SIZE, MILEAGE_EXPORT_LIMIT, type TripInput, type MileageTrip, type MileageFilters, type MileageReport } from "../domain/trips";
+import { tripInput, mileageFilters, mileageQuery, MILEAGE_PAGE_SIZE, MILEAGE_EXPORT_LIMIT, MILEAGE_PRINT_LIMIT, type TripInput, type MileageTrip, type MileageFilters, type MileageReport } from "../domain/trips";
 
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const select={id:true,tripDate:true,vehicle:true,origin:true,destination:true,purpose:true,usage:true,distanceMeters:true,revision:true} as const;
@@ -36,7 +36,8 @@ export async function deleteMileageTrip(actor:CompanyContext,id:string,revision:
   if(confirmed!==true)throw new AppError("mileage.confirm");
   return withCompany(actor,async tx=>{await requireRole(tx,"mileage.manage");const r=await lock(tx,actor,id,revision);if((await tx.mileageTrip.deleteMany({where:{companyId:actor.companyId,id}})).count!==1)throw new AppError("forbidden");return r.date;});
 }
-export async function getMileageLog(actor:CompanyContext,input:MileageFilters,options:{allRows?:boolean}={}):Promise<MileageReport> {
+export async function getMileageLog(actor:CompanyContext,input:MileageFilters,options:{allRows?:boolean;forPrint?:boolean}={}):Promise<MileageReport> {
+  const complete=!!options.allRows||!!options.forPrint,limit=options.forPrint?MILEAGE_PRINT_LIMIT:MILEAGE_EXPORT_LIMIT;
   let filters:MileageFilters;try{filters=mileageFilters(Object.fromEntries(new URLSearchParams(mileageQuery(input,input.page))),todayIso());}catch{throw new AppError("mileage.filters");}
   return withCompany(actor,async tx=>{
     await requireRole(tx,"mileage.read");
@@ -45,9 +46,9 @@ export async function getMileageLog(actor:CompanyContext,input:MileageFilters,op
       summary AS(SELECT count(*) AS n,coalesce(sum(distance_meters) FILTER(WHERE usage='BUSINESS'),0) AS business,coalesce(sum(distance_meters) FILTER(WHERE usage='PERSONAL'),0) AS personal FROM filtered),
       paging AS(SELECT *,least(${filters.page}::bigint,greatest(1,(n+${MILEAGE_PAGE_SIZE-1})/${MILEAGE_PAGE_SIZE})) AS page,greatest(1,(n+${MILEAGE_PAGE_SIZE-1})/${MILEAGE_PAGE_SIZE}) AS pages FROM summary)
       SELECT n::text AS count,page::text,pages::text,business::text,personal::text,
-       coalesce((SELECT jsonb_agg(detail ORDER BY detail.date DESC,detail.created DESC,detail.id DESC) FROM(SELECT id,to_char(trip_date,'YYYY-MM-DD') AS date,created_at AS created,vehicle,origin,destination,purpose,usage,distance_meters AS "distanceMeters",revision FROM filtered ORDER BY trip_date DESC,created_at DESC,id DESC LIMIT ${options.allRows?MILEAGE_EXPORT_LIMIT+1:MILEAGE_PAGE_SIZE} OFFSET (CASE WHEN ${!!options.allRows} THEN 0 ELSE (page-1)*${MILEAGE_PAGE_SIZE} END))detail),'[]'::jsonb) AS rows FROM paging`;
+       coalesce((SELECT jsonb_agg(detail ORDER BY detail.date DESC,detail.created DESC,detail.id DESC) FROM(SELECT id,to_char(trip_date,'YYYY-MM-DD') AS date,created_at AS created,vehicle,origin,destination,purpose,usage,distance_meters AS "distanceMeters",revision FROM filtered ORDER BY trip_date DESC,created_at DESC,id DESC LIMIT ${complete?limit+1:MILEAGE_PAGE_SIZE} OFFSET (CASE WHEN ${complete} THEN 0 ELSE (page-1)*${MILEAGE_PAGE_SIZE} END))detail),'[]'::jsonb) AS rows FROM paging`;
     if(!r||![r.count,r.page,r.pages].every(v=>Number.isSafeInteger(Number(v))))throw new AppError("mileage.limit");
-    if(options.allRows&&Number(r.count)>MILEAGE_EXPORT_LIMIT)throw new AppError("mileage.exportLimit");
+    if(complete&&Number(r.count)>limit)throw new AppError(options.forPrint?"mileage.printLimit":"mileage.exportLimit");
     return {filters,rows:r.rows.map(row=>({id:row.id,date:row.date,vehicle:row.vehicle,origin:row.origin,destination:row.destination,purpose:row.purpose,usage:row.usage,distanceMeters:row.distanceMeters,revision:row.revision})),count:Number(r.count),page:Number(r.page),pageCount:Number(r.pages),businessMeters:BigInt(r.business),personalMeters:BigInt(r.personal)};
   });
 }

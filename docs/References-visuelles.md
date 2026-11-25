@@ -678,3 +678,15 @@ Trajets manuels, totaux et filtres : [[Carnet-de-kilometrage]].
 ![Mileage log, English dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/kilometrage-en-dark-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/kilometrage-en-dark-mobile.png" alt="Mileage log on mobile, English dark theme" width="412">
+
+## Impression du kilométrage
+
+Références réelles sur ordinateur/papier et téléphone, en français et en anglais sombre. Voir [[Impression-du-kilometrage]].
+
+![Papier français](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/kilometrage-impression-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/kilometrage-impression-mobile.png" alt="Impression du carnet sur téléphone" width="412">
+
+![English paper copy](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/kilometrage-impression-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/kilometrage-impression-en-dark-mobile.png" alt="Mileage print controls in English dark theme" width="412">

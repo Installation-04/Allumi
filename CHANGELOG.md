@@ -4,6 +4,13 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.95] - 2026-11-25
+
+- Impression : copie dédiée du carnet de kilométrage avec filtres, tous les trajets jusqu’à 1 000, totaux et distances exactes; accès depuis toute page et retour aux mêmes filtres/page.
+- Fiabilité : lecture complète bornée dans le même instantané, refus de 1 001 trajets sans copie partielle, permissions Comptabilité en lecture et aucune mutation; CSV inchangé jusqu’à 5 000.
+- Interface : papier paysage clair depuis FR/EN sombre/mobile, en-têtes répétés et textes longs contenus; commandes et navigation retirées du papier, guides et captures.
+- Installation : aucune migration ni nouvelle configuration; PDF produit dans le navigateur, aucun fichier conservé côté serveur ni calcul d’indemnité/déduction fiscale.
+
 ## [0.4.0-alpha.94] - 2026-11-25
 
 - Nouveautés : carnet partagé de kilométrage avec trajets professionnels/personnels, véhicule, origine/destination, motif et distance conservée au mètre; création, modification et suppression confirmée.

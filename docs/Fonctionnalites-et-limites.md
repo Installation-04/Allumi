@@ -60,3 +60,5 @@ Les [[Configurations-de-prevision]] partagent jusqu’à 20 réglages nommés d�
 ## Kilométrage manuel
 
 Le [[Carnet-de-kilometrage]] partagé est disponible : trajets professionnels/personnels, véhicule, motif et distance précise au mètre; filtres, totaux, pagination et CSV complet, modification protégée par révision et suppression confirmée auditée. Droits du module Comptabilité. GPS, itinéraires, indemnités, déductions fiscales et comptabilisation automatique restent hors de ce lot.
+
+La copie [[Impression-du-kilometrage]] reprend tous les résultats du carnet jusqu’à 1 000 trajets, avec filtres, totaux et droits identiques. Papier paysage clair, retour aux filtres/page; PDF via le navigateur uniquement. CSV inchangé jusqu’à 5 000; aucun calcul d’indemnité ou de déduction fiscale.

@@ -224,6 +224,12 @@ Consignez les trajets professionnels/personnels dans un **carnet de kilométrage
 
 [Vue mobile](docs/images/kilometrage-mobile.png)
 
+Imprimez ou enregistrez un **PDF complet du carnet de kilométrage**, avec les mêmes filtres, totaux exacts et droits Comptabilité en lecture. Jusqu’à 1 000 trajets, même depuis la page 2; papier paysage clair depuis les deux thèmes. [Guide](https://github.com/Installation-04/Allumi/wiki/Impression-du-kilometrage).
+
+![Copie imprimable du carnet](docs/images/kilometrage-impression-desktop.png)
+
+[Référence d’impression mobile](docs/images/kilometrage-impression-mobile.png)
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

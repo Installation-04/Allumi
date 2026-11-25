@@ -225,6 +225,12 @@ Record business and personal trips in a **shared mileage log**: vehicle, purpose
 
 [Mobile reference](docs/images/kilometrage-en-dark-mobile.png)
 
+Print or save a complete **mileage log PDF** with the same filters, exact totals and Accounting read permissions. Includes every matching trip up to 1,000, even from page 2; clear landscape paper from either theme. [Guide](https://github.com/Installation-04/Allumi/wiki/Impression-du-kilometrage).
+
+![Mileage print copy](docs/images/kilometrage-impression-en-dark-desktop.png)
+
+[Mobile print reference](docs/images/kilometrage-impression-en-dark-mobile.png)
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).
