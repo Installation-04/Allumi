@@ -680,7 +680,7 @@
       "period": "La période n’est pas valide : les deux jours doivent exister et le début précède la fin.",
       "account": "Choisissez un compte de cette entreprise.",
       "tooManyLines": "La période contient trop d’écritures pour un seul fichier (200 000 lignes au plus) : choisissez une période plus courte ou un seul compte.",
-      "forecastDate": "Choisissez une date de référence valide au plus tard aujourd’hui et un horizon de 7, 30, 60 ou 90 jours. Chaque filtre doit être unique; la page doit être un entier positif.",
+      "forecastDate": "Choisissez une date de référence valide au plus tard aujourd’hui et un horizon de 7, 30, 60 ou 90 jours. Chaque filtre doit être unique; la page doit être un entier positif. Les délais additionnels doivent être de 0, 7, 14 ou 30 jours.",
       "forecastSource": "Les sources de la prévision n’ont pas pu être rapprochées. Vérifiez les éléments ouverts comptabilisés avant de réessayer.",
       "forecastLimit": "La prévision dépasse 1 000 comptes banque/caisse ou 5 000 éléments ouverts. Aucune projection partielle n’est affichée."
     },
@@ -3573,9 +3573,9 @@
   },
   "cashForecast": {
     "title": "Prévision de trésorerie",
-    "intro": "Projection par échéances des factures clients et fournisseurs comptabilisées et ouvertes. Les montants sont supposés transiter par la banque ou la caisse aux dates d’échéance; ce rapport ne déclenche aucun paiement.",
-    "scope": "Le solde de référence est le total en fin de journée des comptes d’actif banque et caisse, même inactifs. Les cartes de crédit et fonds non déposés sont exclus. Les retards sont reportés au premier jour projeté. Les paiements et crédits affectés réduisent les soldes à la date de référence.",
-    "rules": "Les crédits, paiements et remboursements non affectés ne sont ni planifiés ni compensés automatiquement. Les écritures de trésorerie futures sont exclues pour éviter les doublons. La paie, les remises fiscales, les brouillons, les récurrences et les scénarios manuels ne sont pas prédits. Les échéances après l’horizon sont exclues. Cette projection repose sur des hypothèses et ne garantit pas les liquidités disponibles.",
+    "intro": "Projection par échéances des factures clients et fournisseurs comptabilisées et ouvertes. Les montants sont supposés transiter par la banque ou la caisse aux dates d’échéance ajustées selon les délais choisis; ce rapport ne déclenche aucun paiement.",
+    "scope": "Le solde de référence est le total en fin de journée des comptes d’actif banque et caisse, même inactifs. Les cartes de crédit et fonds non déposés sont exclus. Les retards sont reportés au premier jour projeté avant application des délais additionnels. Les paiements et crédits affectés réduisent les soldes à la date de référence.",
+    "rules": "Les crédits, paiements et remboursements non affectés ne sont ni planifiés ni compensés automatiquement. Les écritures de trésorerie futures sont exclues pour éviter les doublons. La paie, les remises fiscales, les brouillons, les récurrences et les autres mouvements manuels ne sont pas prédits. Les échéances après l’horizon sont exclues. Cette projection repose sur des hypothèses et ne garantit pas les liquidités disponibles.",
     "limits": "Maximum de 1 000 comptes banque/caisse et de 5 000 éléments ouverts, exclusions comprises. Le rapport entier est refusé au-delà. Détail de 100 éléments par page; le CSV et la copie imprimable incluent toutes les échéances projetées.",
     "rulesTitle": "Hypothèses et limites",
     "asOf": "Date de référence",
@@ -3613,7 +3613,7 @@
     "accounts": "Soldes initiaux banque et caisse",
     "code": "Code",
     "account": "Compte",
-    "empty": "Aucune facture ouverte dans cet horizon.",
+    "empty": "Aucune facture projetée dans cet horizon.",
     "noAccounts": "Aucun compte d’actif banque ou caisse trouvé.",
     "firstNegative": "Premier solde négatif : {date}",
     "period": "Du {from} au {to}, selon les soldes au {asOf}.",
@@ -3633,6 +3633,19 @@
     "printView": "Impression / PDF complet",
     "backReport": "Retour à la prévision",
     "printHint": "Cette copie inclut toutes les échéances projetées des filtres choisis. Utilisez le format paysage; désactivez les en-têtes et pieds de page du navigateur pour omettre l’adresse. Le navigateur permet d’imprimer ou d’enregistrer un PDF.",
-    "printLimits": "Maximum de 1 000 comptes banque/caisse et de 5 000 éléments ouverts, exclusions comprises. Le rapport entier est refusé au-delà. Cette copie inclut toutes les factures projetées, même au-delà des pages de 100 lignes de l’écran."
+    "printLimits": "Maximum de 1 000 comptes banque/caisse et de 5 000 éléments ouverts, exclusions comprises. Le rapport entier est refusé au-delà. Cette copie inclut toutes les factures projetées, même au-delà des pages de 100 lignes de l’écran.",
+    "timingTitle": "Simuler les délais de règlement",
+    "receiptDelay": "Délai additionnel clients (jours)",
+    "paymentDelay": "Délai additionnel fournisseurs (jours)",
+    "timingRules": "Hypothèse uniforme en jours calendaires, après report des échéances déjà atteintes au premier jour projeté. Aucun changement aux échéances contractuelles ni aux règlements; ce choix ne programme pas de paiement. Les factures déjà au-delà de l’horizon restent exclues. Les scénarios ne sont pas enregistrés.",
+    "timingApplied": "Délais additionnels : clients {receipt} jours, fournisseurs {payment} jours.",
+    "comparison": "Comparaison des hypothèses de règlement",
+    "baseline": "Sans délai additionnel",
+    "selected": "Hypothèses sélectionnées",
+    "deferredIncoming": "Encaissements reportés après l’horizon",
+    "deferredOutgoing": "Décaissements reportés après l’horizon",
+    "deferredDetail": "{count} factures · {amount}",
+    "resetTiming": "Retirer les délais additionnels",
+    "minimumDate": "Date du minimum"
   }
 }

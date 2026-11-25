@@ -1134,5 +1134,51 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.89": {
+    "fr-CA": {
+      "title": "Simuler les délais d’encaissement et de paiement",
+      "added": [
+        {
+          "text": "Comparez la prévision aux échéances avec des délais additionnels clients et fournisseurs de 0, 7, 14 ou 30 jours, sans modifier les écritures.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Montants reportés après l’horizon chiffrés, comparaison du minimum et des jours négatifs, hypothèses conservées dans le CSV et le PDF.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration ni configuration. Simulation en lecture seule, sans scénario enregistré ni programmation de paiement; jours calendaires et permissions du rapport.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ]
+    },
+    "en": {
+      "title": "Simulate receipt and payment delays",
+      "added": [
+        {
+          "text": "Compare the due-date forecast with additional customer and supplier delays of 0, 7, 14 or 30 days, without changing accounting entries.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Amounts shifted beyond the horizon are disclosed, minimum balances and negative days compared, and assumptions preserved in CSV and PDF.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration or configuration. Read-only simulation without saved scenarios or scheduled payments; calendar days and the report’s permissions apply.",
+          "guide": "Previsions-de-tresorerie"
+        }
+      ]
+    }
   }
 }

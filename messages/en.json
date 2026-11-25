@@ -680,7 +680,7 @@
       "period": "The period is not valid: both days must exist and the start must come before the end.",
       "account": "Choose an account of this company.",
       "tooManyLines": "The period has too many entries for one file (200,000 lines at most): choose a shorter period or a single account.",
-      "forecastDate": "Choose a valid reference date up to today and a horizon of 7, 30, 60 or 90 days. Each filter must appear once; the page must be a positive integer.",
+      "forecastDate": "Choose a valid reference date up to today and a horizon of 7, 30, 60 or 90 days. Each filter must appear once; the page must be a positive integer. Additional delays must be 0, 7, 14 or 30 days.",
       "forecastSource": "The forecast sources could not be reconciled. Check the posted open items before trying again.",
       "forecastLimit": "The forecast exceeds 1,000 bank/cash accounts or 5,000 open source items. No partial projection is displayed."
     },
@@ -3573,9 +3573,9 @@
   },
   "cashForecast": {
     "title": "Cash flow forecast",
-    "intro": "Due-date projection from posted open customer invoices and supplier bills. Amounts are assumed to move through bank or cash accounts on their due dates; this report does not initiate payments.",
-    "scope": "Reference balance is the end-of-day total of all bank and cash asset accounts, including inactive accounts. Credit cards and undeposited funds are excluded. Past-due items are carried to the first projected day. Applied payments and credits reduce balances as of the reference date.",
-    "rules": "Unapplied credits, payments and refunds are not scheduled or netted automatically. Future posted cash entries are excluded to avoid double counting. Payroll, tax remittances, drafts, recurring transactions and manual scenarios are not predicted. Dates after the horizon are excluded. This is an assumption-based projection, not a guarantee of available cash.",
+    "intro": "Due-date projection from posted open customer invoices and supplier bills. Amounts are assumed to move through bank or cash accounts on their due dates adjusted by the selected delays; this report does not initiate payments.",
+    "scope": "Reference balance is the end-of-day total of all bank and cash asset accounts, including inactive accounts. Credit cards and undeposited funds are excluded. Past-due items are carried to the first projected day before additional delays are applied. Applied payments and credits reduce balances as of the reference date.",
+    "rules": "Unapplied credits, payments and refunds are not scheduled or netted automatically. Future posted cash entries are excluded to avoid double counting. Payroll, tax remittances, drafts, recurring transactions and additional manual cash movements are not predicted. Dates after the horizon are excluded. This is an assumption-based projection, not a guarantee of available cash.",
     "limits": "Up to 1,000 bank/cash accounts and 5,000 open source items, including exclusions. The whole report is refused above these limits. Detail shows 100 items per page; CSV and the complete print view include all projected items.",
     "rulesTitle": "Assumptions and limits",
     "asOf": "Reference date",
@@ -3613,7 +3613,7 @@
     "accounts": "Opening bank and cash balances",
     "code": "Code",
     "account": "Account",
-    "empty": "No open invoices or bills within this horizon.",
+    "empty": "No projected invoices or bills within this horizon.",
     "noAccounts": "No bank or cash asset accounts found.",
     "firstNegative": "First negative balance: {date}",
     "period": "From {from} to {to}, based on balances at {asOf}.",
@@ -3633,6 +3633,19 @@
     "printView": "Complete print / PDF",
     "backReport": "Back to forecast",
     "printHint": "This copy includes all projected items for these filters. Use landscape orientation; turn off browser headers and footers to omit the page address. Your browser can print or save a PDF.",
-    "printLimits": "Up to 1,000 bank/cash accounts and 5,000 open source items, including exclusions. The whole report is refused above these limits. This copy includes all projected invoices and bills, beyond the 100-row screen pages."
+    "printLimits": "Up to 1,000 bank/cash accounts and 5,000 open source items, including exclusions. The whole report is refused above these limits. This copy includes all projected invoices and bills, beyond the 100-row screen pages.",
+    "timingTitle": "Simulate settlement timing",
+    "receiptDelay": "Additional customer delay (days)",
+    "paymentDelay": "Additional supplier delay (days)",
+    "timingRules": "A uniform assumption in calendar days, after carrying already-due items to the first projected day. Contractual due dates and settlements stay unchanged; this choice does not schedule payments. Invoices already beyond the horizon remain excluded. Scenarios are not saved.",
+    "timingApplied": "Additional delays: customers {receipt} days, suppliers {payment} days.",
+    "comparison": "Settlement assumption comparison",
+    "baseline": "No additional delay",
+    "selected": "Selected assumptions",
+    "deferredIncoming": "Receipts shifted beyond the horizon",
+    "deferredOutgoing": "Payments shifted beyond the horizon",
+    "deferredDetail": "{count} invoices / bills · {amount}",
+    "resetTiming": "Remove additional delays",
+    "minimumDate": "Minimum date"
   }
 }
