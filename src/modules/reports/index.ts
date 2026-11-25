@@ -32,3 +32,6 @@ export { getTaxComparison } from "./service/tax-comparison";
 
 export * from "./domain/cash-forecast";
 export { getCashForecast } from "./service/cash-forecast";
+
+export * from "./domain/forecast-presets";
+export { listForecastPresets, createForecastPreset, deleteForecastPreset } from "./service/forecast-presets";

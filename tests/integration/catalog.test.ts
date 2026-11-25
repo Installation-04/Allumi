@@ -376,6 +376,16 @@ it("isolates annual budgets with composite scope, audit, bounded cents and autom
  }
  expect((await q<{ok:boolean}>("SELECT has_table_privilege('allumi_app','budget','DELETE') AS ok"))[0]?.ok).toBe(false);
 });
+it("keeps saved forecast settings immutable, bounded, audited and gated by both modules",async()=>{
+ expect(await q("SELECT conname FROM pg_constraint WHERE conname IN ('cash_forecast_preset_name','cash_forecast_preset_days','cash_forecast_preset_delays','cash_forecast_preset_company_id_name_key')")).toHaveLength(4);
+ expect(await q("SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('cash_forecast_preset_guard','cash_forecast_preset_audit')")).toHaveLength(2);
+ const policies=await q<{cmd:string;qual:string|null;with_check:string|null}>("SELECT cmd,qual,with_check FROM pg_policies WHERE tablename='cash_forecast_preset' AND permissive='RESTRICTIVE'");
+ expect(policies.map(p=>p.cmd).sort()).toEqual(['DELETE','INSERT','SELECT']);
+ for(const p of policies){expect(`${p.qual}${p.with_check}`).toContain('accounting');expect(`${p.qual}${p.with_check}`).toContain('sales');}
+ expect((await q("SELECT has_table_privilege('allumi_app','cash_forecast_preset','UPDATE') AS upd,has_table_privilege('allumi_app','cash_forecast_preset','TRUNCATE') AS trunc"))[0]).toEqual({upd:false,trunc:false});
+ const [guard]=await q<{definer:boolean;public_execute:boolean;definition:string}>("SELECT prosecdef AS definer,has_function_privilege('public',oid,'EXECUTE') AS public_execute,pg_get_functiondef(oid) AS definition FROM pg_proc WHERE proname='cash_forecast_preset_guard'");
+ expect(guard?.definer).toBe(false);expect(guard?.public_execute).toBe(false);expect(guard?.definition).toContain('pg_advisory_xact_lock');expect(guard?.definition).toContain('read committed');
+});
 it('guards monthly targets with same-year scope, bounded sums, revision/audit and restricted execution',async()=>{
  expect(await q("SELECT conname FROM pg_constraint WHERE conname IN ('budget_monthly_target_line_fkey','budget_monthly_target_period_fkey','budget_monthly_target_amount','budget_line_company_id_id_key')")).toHaveLength(4);
  expect(await q("SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('budget_monthly_target_guard','budget_line_monthly_guard','budget_monthly_target_revision','budget_monthly_target_audit')")).toHaveLength(4);

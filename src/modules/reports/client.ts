@@ -8,3 +8,5 @@ export * from "./domain/tax-comparison";
 export { toCsv,csvFormatFor,type CsvCell } from "./domain/csv";
 
 export * from "./domain/cash-forecast";
+
+export * from "./domain/forecast-presets";

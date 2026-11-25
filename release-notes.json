@@ -1180,5 +1180,51 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.90": {
+    "fr-CA": {
+      "title": "Retrouver les configurations de prévision",
+      "added": [
+        {
+          "text": "Conservez jusqu’à 20 configurations nommées d’horizon et de délais clients/fournisseurs, partagées dans votre entreprise.",
+          "guide": "Configurations-de-prevision"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Appliquez une configuration à la référence affichée avec des données recalculées; formulaires FR/EN, mobile/sombre, saisie conservée et suppression confirmée.",
+          "guide": "Configurations-de-prevision"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Migration additive cash_forecast_presets par le service migrate; aucune nouvelle configuration. Aucun montant enregistré ni paiement programmé; gestion avec Comptabilité en écriture et Ventes en lecture.",
+          "guide": "Configurations-de-prevision"
+        }
+      ]
+    },
+    "en": {
+      "title": "Reuse saved forecast configurations",
+      "added": [
+        {
+          "text": "Save up to 20 named horizon and customer/supplier delay configurations shared within your company.",
+          "guide": "Configurations-de-prevision"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Apply a configuration at the displayed reference date with recalculated data; FR/EN, mobile/dark views, retained input and confirmed deletion.",
+          "guide": "Configurations-de-prevision"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Additive cash_forecast_presets migration through the migrate service; no new configuration. No saved amounts or scheduled payments; management requires Accounting write and Sales read access.",
+          "guide": "Configurations-de-prevision"
+        }
+      ]
+    }
   }
 }

@@ -207,6 +207,12 @@ Simulate additional customer and supplier delays of 0, 7, 14 or 30 calendar days
 
 [Mobile comparison](docs/images/previsions-tresorerie-delais-en-dark-mobile.png)
 
+Save up to 20 named **forecast configurations** per company: horizon and settlement delays, shared with authorized readers and recalculated at the displayed reference date. Creation/deletion requires Accounting write access and Sales read access. No amounts or accounting snapshots are stored. [Guide](https://github.com/Installation-04/Allumi/wiki/Configurations-de-prevision).
+
+![Saved forecast configurations](docs/images/configurations-prevision-en-dark-desktop.png)
+
+[Mobile configurations](docs/images/configurations-prevision-en-dark-mobile.png)
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

@@ -33,6 +33,10 @@ Les liens de pagination, le CSV et **Impression / PDF complet** conservent les h
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/previsions-tresorerie-delais-en-dark-mobile.png" alt="Settlement assumptions, mobile dark theme" width="412">
 
+## Réutiliser des réglages
+
+**Configurations enregistrées** conserve un nom, un horizon et les deux délais pour les membres de la même entreprise. Au plus 20 configurations; la réouverture recalcule les données à la référence affichée, sans enregistrer de montant. Voir [[Configurations-de-prevision]] pour les droits, la création et la suppression confirmée.
+
 ## Exclusions et contrôles
 
 Cette projection repose sur les échéances, **sans garantie de règlement ni de liquidités disponibles**. Elle ne déclenche aucun paiement et ne modifie aucune écriture, période ou piste d’audit.

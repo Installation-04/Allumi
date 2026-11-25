@@ -642,3 +642,15 @@ Voir [[Previsions-de-tresorerie]] pour les hypothèses et contrôles.
 ![Timing EN dark](images/previsions-tresorerie-delais-en-dark-desktop.png)
 
 [Mobile FR](images/previsions-tresorerie-delais-mobile.png) · [Mobile EN sombre](images/previsions-tresorerie-delais-en-dark-mobile.png)
+
+## Configurations de prévision enregistrées
+
+Réglages partagés d’horizon/délais, création et suppression confirmée : [[Configurations-de-prevision]].
+
+![Configurations enregistrées](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/configurations-prevision-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/configurations-prevision-mobile.png" alt="Configurations enregistrées sur mobile" width="412">
+
+![Saved configurations, English dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/configurations-prevision-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/configurations-prevision-en-dark-mobile.png" alt="Saved configurations on mobile in dark theme" width="412">
