@@ -5,6 +5,7 @@ import { AppError, toAppError } from "@/platform/errors";
 import { withCompany, type CompanyContext, type Tx } from "@/platform/tenant";
 import { ESTIMATE_STATUSES, estimateSchema, estimateTaxSchema, estimateTransitionAllowed, snapshotSchema, type EstimateStatus } from "../domain/estimate";
 import { prepareSalesDraft, saveDraftWithin } from "./drafts";
+import { parseHourlyRate, renderDocumentTemplate } from "../domain/document-template";
 const iso = (date: Date) => date.toISOString().slice(0, 10);
 async function run<T>(actor: CompanyContext, write: boolean, fn: (tx: Tx) => Promise<T>) {
   try { return await withCompany(actor, async tx => { await requireRole(tx, write ? "sales.manage" : "sales.read"); return fn(tx); }); }
@@ -40,7 +41,11 @@ export async function saveEstimate(actor: CompanyContext, input: unknown, id?: s
     const { company, rounding, calculated, amounts, total } = await prepareSalesDraft(tx, actor, data, previous?.row.taxRounding);
     const taxes = await tx.tax.findMany({ where: { companyId: actor.companyId, id: { in: total.taxes.map(t => t.id) } }, select: { id: true, code: true } });
     const taxSummary = total.taxes.map(t => ({ id: t.id, code: taxes.find(tax => tax.id === t.id)!.code, rate: t.rate, baseCents: t.baseCents.toString(), amountCents: t.amountCents.toString() }));
-    const values = { contactId: data.contactId, issueDate: new Date(`${data.issueDate}T00:00:00Z`), validUntil: new Date(`${data.dueDate}T00:00:00Z`), reference: data.reference || null, memo: data.memo || null, terms: data.terms || null, subtotalCents: total.subtotalCents, taxTotalCents: total.taxCents, totalCents: total.totalCents, taxSummary };
+    const hourlyRateCents=data.hourlyRate.trim()?parseHourlyRate(data.hourlyRate):null;
+    if(data.hourlyRate.trim()&&hourlyRateCents===null)throw new AppError("contracts.rate");
+    const customer=await tx.contact.findFirstOrThrow({where:{companyId:actor.companyId,id:data.contactId},select:{displayName:true}});
+    let terms:string;try{terms=renderDocumentTemplate(data.terms,hourlyRateCents,previous?.row.locale??company.defaultLocale,customer.displayName,company.name);}catch{throw new AppError("contracts.variables");}
+    const values = { termsTemplate:data.terms||null,hourlyRateCents, contactId: data.contactId, issueDate: new Date(`${data.issueDate}T00:00:00Z`), validUntil: new Date(`${data.dueDate}T00:00:00Z`), reference: data.reference || null, memo: data.memo || null, terms: terms || null, subtotalCents: total.subtotalCents, taxTotalCents: total.taxCents, totalCents: total.totalCents, taxSummary };
     const row = previous
       ? await tx.salesEstimate.update({ where: { id, companyId: actor.companyId }, data: values })
       : await tx.salesEstimate.create({ data: { ...values, companyId: actor.companyId, taxRounding: rounding, locale: company.defaultLocale, createdById: actor.userId } });
@@ -61,7 +66,7 @@ export async function getEstimate(actor: CompanyContext, id: string) {
       const linkedInvoice = row.convertedInvoiceId ? await tx.salesDocument.findFirst({ where: { companyId: actor.companyId, id: row.convertedInvoiceId }, select: { status: true } }) : null;
       const live = customer ? null : await tx.contact.findFirst({ where: { companyId: actor.companyId, id: row.contactId }, select: { displayName: true } });
       if (await version(tx, actor, id) !== revision) continue;
-      return { id: row.id, revision, status: row.status as EstimateStatus, number: row.number, customer: customer?.name ?? live?.displayName ?? null, customerSnapshot: customer, issuerSnapshot: row.issuerSnapshot ? snapshotSchema.parse(row.issuerSnapshot) : null, contactId: row.contactId, issueDate: iso(row.issueDate), dueDate: iso(row.validUntil), expired: row.status === "SENT" && iso(row.validUntil) < todayIso(), reference: row.reference ?? "", memo: row.memo ?? "", terms: row.terms ?? "", decisionNote: row.decisionNote ?? "", taxRounding: row.taxRounding, subtotalCents: row.subtotalCents, taxTotalCents: row.taxTotalCents, totalCents: row.totalCents, convertedInvoiceId: row.convertedInvoiceId, convertedInvoiceStatus: linkedInvoice?.status ?? null, taxes: estimateTaxSchema.parse(row.taxSummary).map(t => ({ ...t, baseCents: BigInt(t.baseCents), amountCents: BigInt(t.amountCents) })), lines: row.lines.map(l => ({ itemId: l.itemId ?? "", description: l.description, quantity: l.quantity.toString(), unitPrice: l.unitPrice.toString(), accountId: l.accountId, taxCodeId: l.taxCodeId, amountCents: l.amountCents })) };
+      return { id: row.id, revision, status: row.status as EstimateStatus, number: row.number, customer: customer?.name ?? live?.displayName ?? null, customerSnapshot: customer, issuerSnapshot: row.issuerSnapshot ? snapshotSchema.parse(row.issuerSnapshot) : null, contactId: row.contactId, issueDate: iso(row.issueDate), dueDate: iso(row.validUntil), expired: row.status === "SENT" && iso(row.validUntil) < todayIso(), reference: row.reference ?? "", memo: row.memo ?? "", terms: row.terms ?? "", termsTemplate:row.termsTemplate??row.terms??"", hourlyRate:row.hourlyRateCents===null?"":`${row.hourlyRateCents/100n}.${(row.hourlyRateCents%100n).toString().padStart(2,"0")}`, decisionNote: row.decisionNote ?? "", taxRounding: row.taxRounding, subtotalCents: row.subtotalCents, taxTotalCents: row.taxTotalCents, totalCents: row.totalCents, convertedInvoiceId: row.convertedInvoiceId, convertedInvoiceStatus: linkedInvoice?.status ?? null, taxes: estimateTaxSchema.parse(row.taxSummary).map(t => ({ ...t, baseCents: BigInt(t.baseCents), amountCents: BigInt(t.amountCents) })), lines: row.lines.map(l => ({ itemId: l.itemId ?? "", description: l.description, quantity: l.quantity.toString(), unitPrice: l.unitPrice.toString(), accountId: l.accountId, taxCodeId: l.taxCodeId, amountCents: l.amountCents })) };
     }
     throw new AppError("estimates.stale");
   });

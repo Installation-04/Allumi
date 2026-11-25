@@ -186,3 +186,5 @@ main:has(> .company-workspace) { max-width: none; padding: 0; }
   .mileage-print th, .mileage-print td { overflow-wrap: anywhere; white-space: normal; }
   .mileage-print-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); break-inside: avoid; }
 }
+
+@media print { .client-document-print { overflow-wrap:anywhere; } .client-document-print header, .client-document-print section { break-inside:avoid; } }

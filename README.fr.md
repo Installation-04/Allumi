@@ -93,7 +93,7 @@ Ce mode utilise Docker et Compose déjà installés, sans configurer le pare-feu
 
 La comptabilité utilise la **partie double**, des montants exacts en cents ou Decimal, et des écritures validées immuables corrigées par contre-passation. Les accès sont contrôlés côté application et en base, avec isolation par entreprise.
 
-Les flux bancaires directs, le suivi des stocks, la paie, la multidevise, la signature électronique et l’exécution planifiée des récurrences/relances restent à développer. Les fonctionnalités fiscales ne constituent pas un dépôt de déclaration. [Disponibilités et limites détaillées](docs/Fonctionnalites-et-limites.md).
+Les flux bancaires directs, le suivi des stocks, la paie, la multidevise, les intégrations de signature qualifiée et l’exécution planifiée des récurrences/relances restent à développer. Les fonctionnalités fiscales ne constituent pas un dépôt de déclaration. [Disponibilités et limites détaillées](docs/Fonctionnalites-et-limites.md).
 
 ### Migrer depuis QuickBooks
 
@@ -229,6 +229,12 @@ Imprimez ou enregistrez un **PDF complet du carnet de kilométrage**, avec les m
 ![Copie imprimable du carnet](docs/images/kilometrage-impression-desktop.png)
 
 [Référence d’impression mobile](docs/images/kilometrage-impression-mobile.png)
+
+Créez des **contrats avec conditions longues et tarif horaire réutilisable**, publiez un lien privé et suivez l’ouverture explicite du document et sa signature par nom saisi/consentement, avec date et empreinte. Partage des soumissions/factures existantes; note publique de facture incluse, notes internes de soumission exclues. Aucun paiement ou mouvement comptable automatique. [Guide](https://github.com/Installation-04/Allumi/wiki/Contrats-et-signatures).
+
+![Éditeur de contrat](docs/images/contrats-editeur-desktop.png)
+
+[Éditeur mobile](docs/images/contrats-editeur-mobile.png) · [Formulaire client](docs/images/contrats-portail-mobile.png) · [Preuve de signature](docs/images/contrats-signature-en-dark-desktop.png)
 
 ### Budgets mensuels
 

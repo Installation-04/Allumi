@@ -59,7 +59,7 @@ it("permits only one concurrent draft edit and protects stale revisions", async 
   await expect(deleteEstimate(actor, id, d.revision)).rejects.toThrow("estimates.stale");
 });
 it("rejects malformed, foreign, future, expired and inactive inputs without partial documents", async () => {
-  for (const bad of [{ ...input, contactId: W.supplier }, { ...input, issueDate: "2999-01-01" }, { ...input, dueDate: "2020-01-01" }, { ...input, terms: "x".repeat(4001) }, { ...input, lines: [{ ...line, accountId: W.bankB }] }]) await expect(saveEstimate(actor, bad)).rejects.toThrow();
+  for (const bad of [{ ...input, contactId: W.supplier }, { ...input, issueDate: "2999-01-01" }, { ...input, dueDate: "2020-01-01" }, { ...input, terms: "x".repeat(50001) }, { ...input, lines: [{ ...line, accountId: W.bankB }] }]) await expect(saveEstimate(actor, bad)).rejects.toThrow();
   const id = await saveEstimate(actor, { ...input, dueDate: "2026-06-02" });
   await expect(transitionEstimate(actor, id, (await getEstimate(actor, id))!.revision, "SENT")).rejects.toThrow("estimates.transition");
   const draftId = await saveEstimate(actor, input);

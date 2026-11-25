@@ -3,7 +3,7 @@ import { sessionCookieName } from "@/app/_lib/cookie-name";
 import { contentSecurityPolicy, newNonce } from "@/platform/csp";
 
 // Paths reachable without a session cookie. The real check (database lookup) happens in the pages.
-const PUBLIC_PREFIXES = ["/invitation", "/connexion", "/setup", "/api/health", "/manifest.webmanifest"];
+const PUBLIC_PREFIXES = ["/document", "/invitation", "/connexion", "/setup", "/api/health", "/manifest.webmanifest"];
 
 export function proxy(request: NextRequest) {
   const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();
@@ -36,6 +36,7 @@ export function proxy(request: NextRequest) {
   const response = NextResponse.next({ request: { headers } });
   response.headers.set("x-request-id", requestId);
   response.headers.set("Content-Security-Policy", policy);
+  if(pathname==="/document"||pathname.startsWith("/document/")){response.headers.set("Referrer-Policy","no-referrer");response.headers.set("X-Robots-Tag","noindex, nofollow, noarchive");response.headers.set("Cache-Control","private, no-store");}
   return response;
 }
 

@@ -4,6 +4,12 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Contrats : modèle partagé jusqu’à 50 000 caractères, boutons d’insertion et tarif horaire exact répercuté dans les variables, aperçu FR/EN sombre/mobile; conditions longues et tarif aussi dans les soumissions.
+- Portail client : liens privés de 90 jours pour contrats/soumissions/factures, ouverture explicite suivie et envoi SMTP confirmé avec historique, idempotence et limites de renvoi.
+- Signature : nom/courriel déclarés, consentement explicite, empreinte et date serveur; contenu publié immuable, signatures concurrentes protégées, révocation conservant la preuve et impression/PDF.
+- Confidentialité : instantané SQL des champs publics des sources, référence/note imprimée de facture incluses, notes internes de soumission exclues; RLS Ventes, rôle lecture seule plafonné et audit externe sans usurper un employé.
+- Installation : six migrations additives par migrate, aucune nouvelle configuration; client Windows connecté au serveur existant. Aucun paiement, conversion de soumission ou mouvement comptable automatique; liens accessibles à l’adresse APP_URL configurée.
+
 ## [0.4.0-alpha.95] - 2026-11-25
 
 - Impression : copie dédiée du carnet de kilométrage avec filtres, tous les trajets jusqu’à 1 000, totaux et distances exactes; accès depuis toute page et retour aux mêmes filtres/page.

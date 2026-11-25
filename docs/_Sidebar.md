@@ -144,3 +144,5 @@
 - [[Carnet-de-kilometrage]] — trajets professionnels/personnels partagés, filtres, totaux et CSV complet.
 
 - [[Impression-du-kilometrage]] — copie complète des filtres, distances exactes et papier paysage.
+
+- [[Contrats-et-signatures]] — conditions longues, tarif réutilisable, liens clients, consultation et signature déclarée.

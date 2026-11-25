@@ -414,3 +414,15 @@ it("keeps migration batches tenant-scoped, immutable and linked to one cutover e
  const [grant] = await q<{ upd: boolean; del: boolean; trunc: boolean }>("SELECT has_table_privilege('allumi_app','migration_batch','UPDATE') AS upd,has_table_privilege('allumi_app','migration_batch','DELETE') AS del,has_table_privilege('allumi_app','migration_batch','TRUNCATE') AS trunc");expect(grant).toEqual({upd:false,del:false,trunc:false});
  const [guard] = await q<{ def: string }>("SELECT pg_get_functiondef('migration_batch_guard()'::regprocedure) AS def");expect(guard?.def).toMatch(/app_current_user_id/);expect(guard?.def).toMatch(/read committed/);expect(guard?.def).toMatch(/immutable/);
 });
+
+it("protects client document capabilities, signed metadata and external audit with forced Sales RLS",async()=>{
+ for(const table of ['contract_template','client_document','client_document_delivery']){
+  const [row]=await q<{relrowsecurity:boolean;relforcerowsecurity:boolean}>("SELECT relrowsecurity,relforcerowsecurity FROM pg_class WHERE oid=$1::regclass",[table]);expect(row).toEqual({relrowsecurity:true,relforcerowsecurity:true});
+  const policies=await q<{qual:string|null;with_check:string|null}>("SELECT qual,with_check FROM pg_policies WHERE tablename=$1 AND permissive='RESTRICTIVE'",[table]);expect(policies).toHaveLength(4);for(const p of policies)expect(`${p.qual}${p.with_check}`).toContain('sales');
+  expect((await q<{ok:boolean}>("SELECT has_table_privilege('allumi_app',$1,'TRUNCATE') AS ok",[table]))[0]?.ok).toBe(false);
+ }
+ for(const column of ['first_viewed_at','signed_at','signer_name','signer_email','consent_text'])expect((await q<{ok:boolean}>("SELECT has_column_privilege('allumi_app','client_document',$1,'UPDATE') AS ok",[column]))[0]?.ok).toBe(false);
+ const functions=await q<{name:string;definer:boolean;config:string[];public_execute:boolean}>("SELECT proname AS name,prosecdef AS definer,proconfig AS config,has_function_privilege('public',oid,'EXECUTE') AS public_execute FROM pg_proc WHERE proname IN ('client_document_public','client_document_audit_record','client_document_guard','client_document_delivery_guard','contract_template_guard','estimate_terms_guard')");
+ expect(functions).toHaveLength(6);for(const f of functions){expect(f.public_execute).toBe(false);expect(f.config).toContain('search_path=pg_catalog, public');expect(f.definer).toBe(['client_document_public','client_document_audit_record'].includes(f.name));}
+ expect(await q("SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('client_document_guard','client_document_audit','client_document_delivery_guard','client_document_delivery_audit','contract_template_guard','contract_template_audit','estimate_terms_guard')")).toHaveLength(7);
+});

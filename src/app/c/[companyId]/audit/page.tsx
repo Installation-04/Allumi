@@ -76,7 +76,7 @@ export default async function AuditPage({ params, searchParams }: { params: Prom
                           {entry.actorUserId ? <span className="block break-all text-xs text-stone-600 dark:text-stone-400">{entry.actorUserId}</span> : null}
                         </>
                       ) : (
-                        t("system")
+                        entry.entityType==="client_document"&&["client.view","client.sign"].includes(entry.action)?t("externalActor"):t("system")
                       ))}
                   </td>
                   <td className={`${TD_CLASS} font-mono`}>{entry.action}</td>

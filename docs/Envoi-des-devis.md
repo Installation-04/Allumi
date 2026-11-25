@@ -44,4 +44,4 @@ Le serveur utilise la même configuration SMTP que l’[[Envoi-des-factures]] : 
 
 Ventes en lecture suffit pour l’aperçu et l’historique d’un devis finalisé, même sans Contacts, Comptabilité ou Taxes. Ventes en écriture est nécessaire pour envoyer. La finalisation conserve ses droits de validation des références : [[Utilisateurs-et-permissions]]. Les tentatives sont immuables, auditées et isolées par entreprise.
 
-Aucun envoi planifié ou groupé, suivi d’ouverture, preuve de livraison, signature électronique ni acceptation par lien public. Les captures utilisent des données fictives et un relais SMTP local de test.
+Ce parcours SMTP direct ne fournit pas de suivi d’ouverture ni de signature. Le partage distinct via [[Contrats-et-signatures]] propose une ouverture explicite du document et une signature déclarée, sans accepter/convertir automatiquement le devis source. Aucun envoi planifié ou groupé ni preuve de livraison. Les captures utilisent des données fictives et un relais SMTP local de test.

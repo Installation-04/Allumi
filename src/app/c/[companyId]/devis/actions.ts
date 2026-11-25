@@ -7,7 +7,7 @@ import { textValues, type FormState } from "@/app/_lib/form-state";
 import { AppError } from "@/platform/errors";
 import { saveEstimate, transitionEstimate, convertEstimate, deleteEstimate } from "@/modules/sales";
 export async function saveEstimateAction(companyId: string, id: string | null, _previous: FormState, form: FormData): Promise<FormState> {
-  const values = textValues(form, ["contactId", "issueDate", "dueDate", "reference", "memo", "terms", "revision", "lines"]);
+  const values = textValues(form, ["contactId", "issueDate", "dueDate", "reference", "memo", "terms", "hourlyRate", "revision", "lines"]);
   return safeAction(async () => {
     let lines: unknown;
     try { lines = JSON.parse(values.lines ?? ""); } catch { throw new AppError("estimates.invalid"); }

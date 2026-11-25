@@ -14,7 +14,7 @@ Un brouillon reste modifiable et peut être supprimé. Deux modifications simult
 
 **Finaliser et numéroter** fige le document avant sa remise. Cette action n’envoie aucun courriel et ne prouve aucune livraison. Elle attribue un numéro `DEV-00001`, puis fige les lignes, les montants et les coordonnées du client et de l’émetteur. Le numéro est propre à l’entreprise, distinct de la séquence des factures.
 
-Consignez ensuite l’acceptation ou le refus reçu du client. Ces opérations internes ne constituent ni un portail client ni une signature électronique. Un devis expiré ne peut plus être émis ou accepté. Un devis accepté pendant sa validité reste convertible après cette date.
+Consignez ensuite l’acceptation ou le refus reçu du client. Ces opérations internes restent distinctes de la signature de la copie partagée via [[Contrats-et-signatures]]. Un devis expiré ne peut plus être émis ou accepté. Un devis accepté pendant sa validité reste convertible après cette date.
 
 Un devis brouillon, émis ou accepté peut être annulé sans écriture comptable. Les devis émis et leurs réponses restent dans l’historique; ils ne sont plus supprimables. Utilisez **Copier en nouveau devis** pour préparer une autre proposition, avec des dates et des références actives vérifiées à l’enregistrement.
 
@@ -46,4 +46,6 @@ La consultation exige Ventes en lecture. La création, la modification, la final
 
 Les coordonnées figées d’un devis émis restent lisibles avec le droit Ventes, même sans lecture du répertoire Contacts. Les coordonnées actuelles d’un brouillon ne sont pas révélées sans ce droit. Les politiques PostgreSQL, clés étrangères composites, transitions et contrôles différés des totaux appliquent aussi ces limites en base; les changements sont audités.
 
-L’[[Envoi-des-devis]] manuel SMTP est disponible avec aperçu et historique. L’acceptation par lien public, la signature électronique, les acomptes, les révisions d’un devis émis ou la facturation progressive ne sont pas disponibles. Les devis ne constituent pas une validation complète de tous les parcours QuickBooks.
+L’[[Envoi-des-devis]] manuel SMTP est disponible avec aperçu et historique. Le partage par lien et la signature déclarée d’une copie sont disponibles : [[Contrats-et-signatures]]. L’acceptation/conversion comptable reste manuelle. Les acomptes, révisions d’un devis émis et facturation progressive ne sont pas disponibles. Les devis ne constituent pas une validation complète de tous les parcours QuickBooks.
+
+Les conditions acceptent jusqu’à 50 000 caractères avec paragraphes. Le tarif horaire remplace chaque variable de tarif dans les conditions; les prix/taxes des lignes restent indépendants. Les variables de client et entreprise sont aussi disponibles. Le texte publié reste figé; voir [[Contrats-et-signatures]].

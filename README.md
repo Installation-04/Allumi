@@ -93,7 +93,7 @@ This mode uses your existing Docker and Compose installation without configuring
 
 The accounting system uses **double-entry bookkeeping**, exact amounts in cents or Decimal, and immutable posted entries corrected through reversals. Access is enforced in the application and database, with isolation between companies.
 
-Direct bank feeds, inventory tracking, payroll, multiple currencies, electronic signatures and scheduled execution of recurring invoices/reminders remain under development. Tax features do not file returns. [Detailed availability and limitations](docs/Fonctionnalites-et-limites.md).
+Direct bank feeds, inventory tracking, payroll, multiple currencies, qualified signature integrations and scheduled execution of recurring invoices/reminders remain under development. Tax features do not file returns. [Detailed availability and limitations](docs/Fonctionnalites-et-limites.md).
 
 
 ### Move from QuickBooks
@@ -230,6 +230,12 @@ Print or save a complete **mileage log PDF** with the same filters, exact totals
 ![Mileage print copy](docs/images/kilometrage-impression-en-dark-desktop.png)
 
 [Mobile print reference](docs/images/kilometrage-impression-en-dark-mobile.png)
+
+Create **contracts with long terms and reusable hourly rates**, publish private client links, and record explicit document views and typed signatures with consent, timestamps and content fingerprints. Share existing estimates/invoices; invoice public notes stay visible and internal estimate notes stay private. No automatic payment or accounting posting. [Guide](https://github.com/Installation-04/Allumi/wiki/Contrats-et-signatures).
+
+![Contract editor in English dark theme](docs/images/contrats-editeur-en-dark-desktop.png)
+
+[Mobile editor](docs/images/contrats-editeur-en-dark-mobile.png) · [Client signature form](docs/images/contrats-portail-mobile.png) · [Signature evidence](docs/images/contrats-signature-en-dark-desktop.png)
 
 ### Monthly budgets
 

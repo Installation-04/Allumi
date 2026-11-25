@@ -73,6 +73,11 @@ export function Field(props: {
   );
 }
 
+export function TextAreaField({name,label,defaultValue,required=true,hint,rows=12}:{name:string;label:string;defaultValue?:string;required?:boolean;hint?:string;rows?:number}) {
+  const id=useId(),scope=useContext(FormScope);
+  return <div><label htmlFor={id} className="mb-1 block text-sm font-medium">{label}</label><textarea id={id} name={name} defaultValue={scope.values?.[name]??defaultValue} required={required} rows={rows} aria-describedby={hint?`${id}-hint`:undefined} className={`min-h-32 min-w-0 w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-base dark:border-stone-700 dark:bg-stone-900 ${FOCUS}`}/>{hint&&<p id={`${id}-hint`} className="mt-1 text-xs text-stone-600 dark:text-stone-400">{hint}</p>}</div>;
+}
+
 export function SubmitButton({ children, variant = "primary", ariaLabel, pendingLabel }: { children: React.ReactNode; variant?: "primary" | "secondary"; ariaLabel?: string; pendingLabel?: string }) {
   const { pending } = useFormStatus();
   const styles =

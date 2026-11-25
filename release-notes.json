@@ -1420,5 +1420,59 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.96": {
+    "fr-CA": {
+      "title": "Contrats, conditions longues et signature par lien client",
+      "added": [
+        {
+          "text": "Collez vos conditions longues, insérez les variables et modifiez le tarif une fois pour le répercuter partout dans les conditions du contrat ou de la soumission.",
+          "guide": "Contrats-et-signatures"
+        },
+        {
+          "text": "Partagez un contrat, une soumission ou une facture via un lien privé; suivez l’ouverture explicite et recueillez une signature par nom saisi et consentement avec date et empreinte.",
+          "guide": "Contrats-et-signatures"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Contenu publié figé, révocation conservant les preuves, SMTP confirmé, permissions Ventes modulaires, audit externe et copies publiques sans notes internes de soumission. Pas de vérification d’identité ni de conversion/paiement automatique.",
+          "guide": "Contrats-et-signatures"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Six migrations additives, aucune nouvelle variable. Le client Windows reste connecté au serveur. Les liens nécessitent une adresse APP_URL accessible au client avec HTTPS approuvé.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Contracts, long terms and client-link signatures",
+      "added": [
+        {
+          "text": "Paste long terms, insert variables and edit the hourly rate once to update every occurrence in contract or estimate terms.",
+          "guide": "Contrats-et-signatures"
+        },
+        {
+          "text": "Share a contract, estimate or invoice through a private link; track explicit opening and collect typed signatures with consent, timestamp and fingerprint.",
+          "guide": "Contrats-et-signatures"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Frozen published content, retained evidence after revocation, confirmed SMTP, modular Sales permissions, external audit and public copies without internal estimate notes. No identity verification or automatic conversion/payment.",
+          "guide": "Contrats-et-signatures"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Six additive migrations, no new variables. Windows remains a client of your existing server. Links require an APP_URL reachable by the client with trusted HTTPS.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }
