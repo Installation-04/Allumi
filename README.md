@@ -219,6 +219,12 @@ Annual and monthly budgets offer **complete print/PDF copies** with targets, pos
 
 [Mobile print controls](docs/images/budget-mensuel-impression-en-dark-mobile.png)
 
+Record business and personal trips in a **shared mileage log**: vehicle, purpose, exact kilometre distances, filters, totals and complete CSV. Accounting permissions control access; edits use revisions and deletions are confirmed and audited. [Guide](https://github.com/Installation-04/Allumi/wiki/Carnet-de-kilometrage).
+
+![Mileage log](docs/images/kilometrage-en-dark-desktop.png)
+
+[Mobile reference](docs/images/kilometrage-en-dark-mobile.png)
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

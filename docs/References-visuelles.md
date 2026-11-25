@@ -666,3 +666,15 @@ Extraits des copies papier et commandes sur téléphone : [[Impression-des-budge
 ![Monthly print excerpt, English](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/budget-mensuel-impression-en-dark-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/budget-mensuel-impression-en-dark-mobile.png" alt="Monthly copy on mobile, English dark theme" width="412">
+
+## Carnet de kilométrage
+
+Trajets manuels, totaux et filtres : [[Carnet-de-kilometrage]].
+
+![Carnet en français](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/kilometrage-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/kilometrage-mobile.png" alt="Carnet et totaux sur mobile" width="412">
+
+![Mileage log, English dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/kilometrage-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/kilometrage-en-dark-mobile.png" alt="Mileage log on mobile, English dark theme" width="412">

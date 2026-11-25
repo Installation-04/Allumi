@@ -218,6 +218,12 @@ Les budgets annuels et mensuels proposent une **copie imprimable/PDF complète**
 
 [Commandes sur mobile](docs/images/budget-annuel-impression-mobile.png)
 
+Consignez les trajets professionnels/personnels dans un **carnet de kilométrage partagé** : véhicule, motif, distance précise, filtres, totaux et CSV complet. Droits Comptabilité, révisions et suppression confirmée auditée. [Guide](https://github.com/Installation-04/Allumi/wiki/Carnet-de-kilometrage).
+
+![Carnet de kilométrage](docs/images/kilometrage-desktop.png)
+
+[Vue mobile](docs/images/kilometrage-mobile.png)
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

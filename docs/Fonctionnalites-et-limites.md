@@ -56,3 +56,7 @@ Cycle commercial livré : [[Devis]]. Finalisation et réponse consignées manuel
 Les [[Configurations-de-prevision]] partagent jusqu’à 20 réglages nommés d’horizon et de délais par entreprise, avec création/suppression auditées. Elles ne conservent aucun montant ni instantané; les scénarios avec nouveaux mouvements manuels restent hors périmètre.
 
 [[Impression-des-budgets]] : copies paysage annuelles/mensuelles, période fiscale conservée, objectifs/réel/écarts, couverture et état d’allocation, toutes les lignes jusqu’à 1 000 comptes; lecture comptable sans accès aux autres modules, aucune modification.
+
+## Kilométrage manuel
+
+Le [[Carnet-de-kilometrage]] partagé est disponible : trajets professionnels/personnels, véhicule, motif et distance précise au mètre; filtres, totaux, pagination et CSV complet, modification protégée par révision et suppression confirmée auditée. Droits du module Comptabilité. GPS, itinéraires, indemnités, déductions fiscales et comptabilisation automatique restent hors de ce lot.

@@ -8,6 +8,7 @@ export const SEARCH_REPORTS = [
   { id: "bilan", fr: "Bilan", en: "Balance sheet", aliases: "assets liabilities equity actifs passifs capitaux" },
   { id: "bilan/comparer", fr: "Comparaison des bilans", en: "Balance sheet comparison", aliases: "compare assets liabilities bilan" },
   { id: "grand-livre", fr: "Grand livre", en: "General ledger", aliases: "grand livre ledger compte account" },
+  { id: "kilometrage", fr: "Carnet de kilométrage", en: "Mileage log", aliases: "kilometrage kilométrage mileage trips trajets vehicule distance" },
   { id: "flux-tresorerie", fr: "Suivi de trésorerie comptabilisée", en: "Recorded cash movements", aliases: "tresorerie cash movements liquidity liquidites" },
   { id: "previsions-tresorerie", fr: "Prévision de trésorerie", en: "Cash flow forecast", aliases: "cash flow forecast projection due date prevision tresorerie echeances liquidites", sales: true },
   { id: "age-clients", fr: "Âge des comptes clients", en: "Accounts receivable aging", aliases: "receivables overdue unpaid clients impayes", sales: true },

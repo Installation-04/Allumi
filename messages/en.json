@@ -874,6 +874,17 @@
       "confirm": "Review the batch and check the confirmation before importing.",
       "stale": "The preview expired or data changed. Check the file and options again before confirming.",
       "conflicts": "The batch has conflicts, records not explicitly skipped, or no adjustment is needed. No changes saved."
+    },
+    "mileage": {
+      "invalid": "Check the date, vehicle, locations, use and required business purpose. Text must fit on one line within the stated lengths.",
+      "distance": "Enter a positive distance up to 10,000 km with at most 3 decimals, without thousands separators.",
+      "future": "A trip cannot be dated in the future.",
+      "notFound": "This trip was not found or has been deleted.",
+      "stale": "This trip changed after you opened it. Reload before trying again; your input is retained.",
+      "confirm": "Confirm deletion of the trip.",
+      "filters": "Choose a valid range of at most 366 days ending today or earlier, an allowed use and a vehicle of at most 80 characters. Repeated or malformed filters/pages are refused.",
+      "exportLimit": "More than 5,000 trips match these filters. Narrow the dates, vehicle or use before exporting.",
+      "limit": "The trip count exceeds this report’s capacity."
     }
   },
   "settingsPage": {
@@ -1318,8 +1329,8 @@
     },
     "kilometrage": {
       "title": "Mileage",
-      "description": "Travel tracking is a possible future addition.",
-      "planned": "Scope to be defined; no trip log or allowance calculation currently."
+      "description": "View the shared log of business and personal trips.",
+      "planned": "GPS, route calculations, reimbursements and automatic postings remain planned."
     },
     "applications": {
       "title": "Apps",
@@ -1364,7 +1375,8 @@
       "relances": "Customer reminders",
       "remboursements-fournisseurs": "Supplier refunds",
       "budgets": "Annual budgets",
-      "previsions-tresorerie": "Cash flow forecast"
+      "previsions-tresorerie": "Cash flow forecast",
+      "kilometrage": "Mileage log"
     }
   },
   "updates": {
@@ -3684,5 +3696,53 @@
     "revision": "Target revision: {revision}.",
     "rowCount": "Included accounts: {count}.",
     "limits": "All accounts in the authorized report are included, up to the 1,000-account limit. Undefined targets remain distinct from zero; target totals include only defined amounts. This copy creates no accounting entries or budget allocations."
+  },
+  "mileage": {
+    "title": "Mileage log",
+    "create": "New trip",
+    "save": "Save trip",
+    "detail": "Trip details",
+    "edit": "Edit trip",
+    "update": "Save changes",
+    "delete": "Delete trip",
+    "deleteButton": "Confirm deletion",
+    "deleteConfirm": "I confirm deleting this shared trip. Its history stays in the audit trail.",
+    "back": "Back to mileage log",
+    "backYear": "View trips for this year",
+    "reload": "Reload trip",
+    "shared": "Shared company log: members with Accounting read access can view and export every recorded trip, including personal trips. Management requires Accounting write access.",
+    "date": "Trip date",
+    "vehicle": "Vehicle",
+    "usage": "Use",
+    "origin": "From location",
+    "destination": "To location",
+    "purpose": "Trip purpose",
+    "distance": "Distance (km)",
+    "dateHint": "Today or a past date, using the calendar format.",
+    "vehicleHint": "A shared vehicle name or identifier, up to 80 characters.",
+    "purposeHint": "Required for business trips; up to 200 characters.",
+    "distanceHint": "0.001 to 10,000 km, up to 3 decimals. Use a decimal point, without thousands separators.",
+    "BUSINESS": "Business",
+    "PERSONAL": "Personal",
+    "ALL": "All uses",
+    "from": "From date",
+    "to": "To date",
+    "vehicleFilter": "Search vehicle",
+    "apply": "Apply filters",
+    "reset": "Reset filters",
+    "export": "Export complete CSV",
+    "period": "From {from} through {to}: {count, plural, one {# trip} other {# trips}}.",
+    "total": "Total distance",
+    "count": "Trip count",
+    "empty": "No trips match these filters.",
+    "route": "Trip",
+    "actions": "Actions",
+    "open": "View trip",
+    "pages": "Mileage log pages",
+    "page": "Page {page} of {pages}",
+    "previous": "Previous",
+    "next": "Next",
+    "limits": "Manually entered distances stored as integer metres. Filters span at most 366 days; totals cover all results, with 50 trips per page and CSV up to 5,000 trips. No GPS, route calculation, mileage reimbursement rates or automatic accounting entries.",
+    "locationHint": "Up to 160 characters, without line breaks."
   }
 }
