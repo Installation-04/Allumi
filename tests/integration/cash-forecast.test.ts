@@ -38,11 +38,20 @@ it('excludes an unapplied credit and ignores pure cash transfers',async()=>{
  await postManualEntry(actor,{date:'2026-07-12',kind:'MANUAL',memo:'Internal cash transfer',lines:[{accountId:cash,debitCents:100n,creditCents:0n},{accountId:W.bank,debitCents:0n,creditCents:100n}]});
  const next=await report();expect(next.futureCashCount).toBe(1);expect(next.futureCashCents).toBe(-2000n);expect(next.openingCents).toBe(5000n);
 });
+it('compares both delays from a single dated snapshot without mutations or changing contractual dates',async()=>{
+ const counts=(await db.query('SELECT (SELECT count(*) FROM journal_entry)::text AS entries,(SELECT count(*) FROM audit_log)::text AS audit')).rows;
+ const r=await getCashForecast(actor,{asOf:'2026-06-30',days:30,receiptDelay:7,paymentDelay:14});
+ expect(r.baseline).toMatchObject({closingCents:0n,minimumCents:-6498n,minimumDate:'2026-07-01'});expect(r).toMatchObject({openingCents:5000n,closingCents:0n,minimumCents:0n,minimumDate:'2026-07-15',negativeDays:0,receivableDifferenceCents:0n,payableDifferenceCents:0n});
+ expect(r.items.find(i=>i.id===invoice)).toMatchObject({projectedDate:'2026-07-12',dueDate:'2026-07-05',cents:6498n});expect(r.items.find(i=>i.id===bill)).toMatchObject({projectedDate:'2026-07-15',dueDate:'2026-06-20',cents:11498n});
+ const deferred=await getCashForecast(actor,{asOf:'2026-06-30',days:30,receiptDelay:30});expect(deferred).toMatchObject({closingCents:-6498n,deferredIncomingCount:1,deferredIncomingCents:6498n,beyondCount:2});expect(deferred.baseline).toMatchObject({incomingCents:6498n,closingCents:0n});
+ expect((await db.query('SELECT (SELECT count(*) FROM journal_entry)::text AS entries,(SELECT count(*) FROM audit_log)::text AS audit')).rows).toEqual(counts);
+ for(const receiptDelay of [-1,1,NaN])await expect(getCashForecast(actor,{asOf:'2026-06-30',days:30,receiptDelay})).rejects.toMatchObject({key:'reports.forecastDate'});
+});
 it('retains inactive bank balances, frozen names and access without contacts or taxes',async()=>{
  await db.query('UPDATE account SET is_active=false WHERE id=$1',[W.bank]);await db.query("UPDATE contact SET display_name='Renamed after posting' WHERE id=$1",[W.customer]);
  const reader={...actor,userId:W.userReader};await db.query('UPDATE membership SET module_access=$3::jsonb WHERE company_id=$1 AND user_id=$2',[W.companyA,W.userReader,JSON.stringify({accounting:'read',sales:'read',contacts:'none',taxes:'none'})]);
  const r=await getCashForecast(reader,{asOf:'2026-06-30',days:30});expect(r.openingCents).toBe(5000n);expect(r.accounts[0]!.isActive).toBe(false);expect(r.items.find(i=>i.id===invoice)!.party).toBe('Client Fictif');
- for(const access of [{accounting:'none',sales:'read'},{accounting:'read',sales:'none'}]){await db.query('UPDATE membership SET module_access=$3::jsonb WHERE company_id=$1 AND user_id=$2',[W.companyA,W.userReader,JSON.stringify(access)]);await expect(getCashForecast(reader,{asOf:'2026-06-30',days:30})).rejects.toThrow();}
+ for(const access of [{accounting:'none',sales:'read'},{accounting:'read',sales:'none'}]){await db.query('UPDATE membership SET module_access=$3::jsonb WHERE company_id=$1 AND user_id=$2',[W.companyA,W.userReader,JSON.stringify(access)]);await expect(getCashForecast(reader,{asOf:'2026-06-30',days:30,receiptDelay:7,paymentDelay:14})).rejects.toThrow();}
 });
 it('isolates companies and refuses invalid dates and horizons',async()=>{
  expect((await getCashForecast({userId:W.userOwnerB,companyId:W.companyB},{asOf:'2026-06-30',days:30})).items).toEqual([]);await expect(getCashForecast({...actor,userId:W.userOwnerB},{asOf:'2026-06-30',days:30})).rejects.toThrow();

@@ -4,6 +4,12 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Nouveautés : simulation en lecture seule de délais additionnels clients et fournisseurs de 0, 7, 14 ou 30 jours calendaires dans la prévision de trésorerie.
+- Comparaison : référence sans délai et hypothèses sélectionnées issues du même instantané, avec encaissements, décaissements, clôture, minimum et jours négatifs; montants sortant de l’horizon explicités.
+- Exports : hypothèses conservées dans les liens, le CSV et la copie PDF complète; dates contractuelles et soldes comptables inchangés.
+- Sécurité : valeurs et doublons contrôlés côté serveur, mêmes permissions et limites de sources, cents exacts, aucune écriture ni programmation bancaire.
+- Installation : aucune migration ou configuration; FR/EN, thème sombre et mobile documentés avec captures; scénarios enregistrés et autres mouvements manuels hors périmètre.
+
 ## [0.4.0-alpha.88] - 2026-11-23
 
 - Nouveautés : copie complète de la prévision de trésorerie avec impression et enregistrement PDF depuis le navigateur, en conservant dates et horizon.

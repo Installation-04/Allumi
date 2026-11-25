@@ -8,10 +8,30 @@ Choisis une **date de référence au plus tard aujourd’hui**, puis un horizon 
 
 1. Addition des soldes comptabilisés de tous les comptes d’**actif BANK/CASH**, même inactifs, jusqu’à la date de référence incluse. Les cartes de crédit et fonds non déposés restent exclus. Un découvert conserve son signe négatif.
 2. Lecture des factures clients et fournisseurs comptabilisées au plus tard à cette date, avec leur solde encore ouvert. Les affectations de paiements et crédits, leurs retraits et les contre-passations suivent leur propre date; une annulation ultérieure ne supprime pas la pièce de son historique.
-3. Encaissement supposé des factures clients et paiement supposé des factures fournisseurs à l’échéance. Sans échéance, la date du document est utilisée. Les échéances déjà atteintes sont reportées au premier jour projeté; celles après le dernier jour sont exclues et dénombrées.
+3. Encaissement supposé des factures clients et paiement supposé des factures fournisseurs à l’échéance. Sans échéance, la date du document est utilisée. Les échéances déjà atteintes sont reportées au premier jour projeté avant les délais additionnels éventuels; celles après le dernier jour sont exclues et dénombrées.
 4. Pour chaque jour : **clôture = ouverture + encaissements prévus − décaissements prévus**. Le graphique accompagne le tableau exact, le minimum, sa date et les jours terminant sous zéro. Le minimum tient aussi compte du solde initial; le premier solde négatif peut donc être celui de référence.
 
 Exemple : au 30 juin, la banque contient 50,00 $. Une facture fournisseur échue de 114,98 $ est reportée au 1er juillet et une facture client ouverte de 64,98 $ arrive le 5 juillet. La projection descend à −64,98 $, puis revient à 0,00 $ le 5 juillet. Elle suppose que ces montants transitent par banque/caisse; elle ne prédit pas leur compte bancaire précis.
+
+## Simuler les délais de règlement
+
+Ouvre **Simuler les délais de règlement**, choisis séparément un **délai additionnel clients** et un **délai additionnel fournisseurs** de **0, 7, 14 ou 30 jours calendaires**, puis **Appliquer**. Zéro conserve la projection aux échéances. Les échéances déjà atteintes sont d’abord reportées au lendemain de la référence; le délai est ajouté ensuite. Les fins de semaine et jours fériés ne sont pas ajustés.
+
+La comparaison montre les encaissements, décaissements, solde final, minimum et jours terminant sous zéro **sans délai additionnel** et **selon les hypothèses sélectionnées**. Les deux résultats utilisent le même solde initial et le même instantané des éléments ouverts. Les dates contractuelles, les affectations et les écritures restent inchangées; aucun ordre bancaire n’est envoyé et aucun scénario n’est enregistré.
+
+Un montant déplacé après le dernier jour est exclu de la série sélectionnée, mais son **nombre et son total** sont indiqués séparément pour les encaissements et les décaissements reportés. Les factures déjà au-delà de l’horizon restent exclues. Le compteur général après l’horizon comprend les deux groupes; les comptes de contrôle restent rapprochés avec tous les éléments ouverts à la référence.
+
+Exemple sur 30 jours au 30 juin : avec 50,00 $ en banque, une facture fournisseur échue de 114,98 $ et une facture client de 64,98 $ due le 5 juillet, la projection de référence descend à −64,98 $. Une hypothèse clients +7 jours et fournisseurs +14 jours place les mouvements aux 12 et 15 juillet : le solde final reste 0,00 $, avec un minimum de 0,00 $. Cela ne change pas l’obligation de payer le fournisseur à son échéance contractuelle.
+
+Les liens de pagination, le CSV et **Impression / PDF complet** conservent les hypothèses. L’export contient les délais, la comparaison et les montants sortant de l’horizon, puis le détail de la projection sélectionnée avec les dates d’origine. **Retirer les délais additionnels** revient à la référence. Les paramètres `delai_clients` et `delai_fournisseurs` de l’adresse n’acceptent que les quatre valeurs autorisées; les valeurs vides, répétées ou mal formées sont refusées, y compris en CSV et impression.
+
+![Comparaison des délais en français](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/previsions-tresorerie-delais-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/previsions-tresorerie-delais-mobile.png" alt="Comparaison des hypothèses sur mobile" width="412">
+
+![Settlement assumptions in English dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/previsions-tresorerie-delais-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/previsions-tresorerie-delais-en-dark-mobile.png" alt="Settlement assumptions, mobile dark theme" width="412">
 
 ## Exclusions et contrôles
 

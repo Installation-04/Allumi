@@ -3,11 +3,11 @@ import { requireRole } from "@/modules/companies";
 import { todayIso } from "@/modules/ledger";
 import { AppError } from "@/platform/errors";
 import { withCompany,type CompanyContext } from "@/platform/tenant";
-import { buildCashForecast,cashForecastRange,FORECAST_ACCOUNT_LIMIT,FORECAST_ITEM_LIMIT,FORECAST_PAGE_SIZE,type ForecastCashAccount,type ForecastOpenItem } from "../domain/cash-forecast";
+import { buildCashForecast,cashForecastRange,forecastDelays,FORECAST_ACCOUNT_LIMIT,FORECAST_ITEM_LIMIT,FORECAST_PAGE_SIZE,type ForecastCashAccount,type ForecastOpenItem } from "../domain/cash-forecast";
 type Raw={accounts:(Omit<ForecastCashAccount,'cents'>&{cents:string})[];items:(Omit<ForecastOpenItem,'cents'>&{cents:string})[];receivable:string;payable:string;future_count:number;future_cents:string};
 /** All opening balances, dated open items, controls and exclusions share one SQL snapshot. */
-export async function getCashForecast(actor:CompanyContext,input:{asOf:string;days:number;page?:number},options:{allRows?:boolean}={}){
- try{cashForecastRange(input.asOf,input.days);if(input.asOf>todayIso())throw new RangeError('future reference');}catch{throw new AppError('reports.forecastDate');}
+export async function getCashForecast(actor:CompanyContext,input:{asOf:string;days:number;receiptDelay?:number;paymentDelay?:number;page?:number},options:{allRows?:boolean}={}){
+ try{cashForecastRange(input.asOf,input.days);forecastDelays(input.receiptDelay,input.paymentDelay);if(input.asOf>todayIso())throw new RangeError('future reference');}catch{throw new AppError('reports.forecastDate');}
  return withCompany(actor,async tx=>{
   await requireRole(tx,'ledger.read');await requireRole(tx,'sales.read');
   const period=cashForecastRange(input.asOf,input.days);
@@ -30,7 +30,7 @@ export async function getCashForecast(actor:CompanyContext,input:{asOf:string;da
   if(!r)throw new AppError('reports.forecastSource');
   if(r.accounts.length>FORECAST_ACCOUNT_LIMIT||r.items.length>FORECAST_ITEM_LIMIT)throw new AppError('reports.forecastLimit');
   let report;
-  try{report=buildCashForecast({asOf:input.asOf,days:input.days,accounts:r.accounts.map(a=>({...a,cents:BigInt(a.cents)})),items:r.items.map(i=>({...i,cents:BigInt(i.cents)})),receivableControlCents:BigInt(r.receivable),payableControlCents:BigInt(r.payable),futureCashCount:r.future_count,futureCashCents:BigInt(r.future_cents)});}catch{throw new AppError('reports.forecastSource');}
+  try{report=buildCashForecast({asOf:input.asOf,days:input.days,receiptDelay:input.receiptDelay,paymentDelay:input.paymentDelay,accounts:r.accounts.map(a=>({...a,cents:BigInt(a.cents)})),items:r.items.map(i=>({...i,cents:BigInt(i.cents)})),receivableControlCents:BigInt(r.receivable),payableControlCents:BigInt(r.payable),futureCashCount:r.future_count,futureCashCents:BigInt(r.future_cents)});}catch{throw new AppError('reports.forecastSource');}
   const pageCount=Math.max(1,Math.ceil(report.items.length/FORECAST_PAGE_SIZE)),page=options.allRows?1:Math.min(pageCount,Number.isSafeInteger(input.page)&&input.page!>0?input.page!:1);
   return {...report,items:options.allRows?report.items:report.items.slice((page-1)*FORECAST_PAGE_SIZE,page*FORECAST_PAGE_SIZE),itemCount:report.items.length,page,pageCount:options.allRows?1:pageCount};
  });

@@ -28,11 +28,33 @@ it('refuses oversized or inconsistent sources without returning a partial projec
  const r=build();expect(()=>buildCashForecast({...r,items:[],accounts:Array.from({length:1001},()=>account),receivableControlCents:0n,payableControlCents:0n})).toThrow();expect(build()).toMatchObject({closingCents:10000n,items:[],firstNegativeDate:null});
 });
 it('rejects duplicate, malformed and future filters identically for page and export',()=>{
- expect(forecastFilters({},'2026-07-01')).toEqual({asOf:'2026-07-01',days:30,page:1});
+ expect(forecastFilters({},'2026-07-01')).toEqual({asOf:'2026-07-01',days:30,page:1,receiptDelay:0,paymentDelay:0});
  for(const q of [{date:['2026-01-01']},{date:'2026-07-02'},{date:''},{date:'2026-02-30'},{jours:['7','30']},{jours:'007'},{page:'0'},{page:'1e2'},{page:'9007199254740993'}])expect(()=>forecastFilters(q,'2026-07-01')).toThrow();
- expect(forecastFilters({date:'2026-06-30',jours:'90',page:'2'},'2026-07-01')).toEqual({asOf:'2026-06-30',days:90,page:2});
+ expect(forecastFilters({date:'2026-06-30',jours:'90',page:'2'},'2026-07-01')).toEqual({asOf:'2026-06-30',days:90,page:2,receiptDelay:0,paymentDelay:0});
 });
 it('exports exact bilingual numeric values and neutralizes formulas in all text sources',()=>{
  const r=build([item('=FORMULA','RECEIVABLE',12345n,'2026-07-01')]),labels=en.cashForecast as ForecastCsvLabels;
  expect(cashForecastCsv(r,labels,'en')).toContain("2026-07-01,Customer invoice,'=FORMULA,'=2+2,2026-06-01,2026-07-01,No,123.45\r\n");expect(cashForecastCsv(r,labels,'fr-CA')).toContain(';123,45\r\n');expect(cashForecastCsv(r,labels,'en')).toContain("1000,'@Bank,100.00");
+});
+it('compares delays from the same opening and sources without losing amounts beyond the horizon',()=>{
+ const source=[item('bill','PAYABLE',15000n,'2026-06-20'),item('invoice','RECEIVABLE',7000n,'2026-07-07'),item('later','RECEIVABLE',900n,'2026-08-01')],original=structuredClone(source);
+ const r=buildCashForecast({asOf:'2026-06-30',days:7,receiptDelay:7,paymentDelay:14,accounts:[account],items:source,receivableControlCents:7900n,payableControlCents:15000n,futureCashCount:0,futureCashCents:0n});
+ expect(r.baseline).toMatchObject({closingCents:2000n,minimumCents:-5000n,negativeDays:6});expect(r).toMatchObject({closingCents:10000n,minimumCents:10000n,negativeDays:0,deferredIncomingCount:1,deferredIncomingCents:7000n,deferredOutgoingCount:1,deferredOutgoingCents:15000n,beyondCount:3,receivableDifferenceCents:0n,payableDifferenceCents:0n});expect(r.items).toEqual([]);expect(source).toEqual(original);
+});
+it('shifts overdue items after carrying them forward and keeps original due dates intact',()=>{
+ const r=buildCashForecast({asOf:'2026-06-30',days:30,receiptDelay:7,paymentDelay:14,accounts:[account],items:[item('client','RECEIVABLE',9007199254740993n,'2026-06-01'),item('supplier','PAYABLE',12000n,'2026-07-01')],receivableControlCents:0n,payableControlCents:0n,futureCashCount:0,futureCashCents:0n});
+ expect(r.items.map(i=>[i.id,i.projectedDate,i.dueDate,i.carried])).toEqual([['client','2026-07-08','2026-06-01',true],['supplier','2026-07-15','2026-07-01',false]]);expect(r.daily[7]!.incomingCents).toBe(9007199254740993n);expect(r.daily[14]!.outgoingCents).toBe(12000n);expect(r.closingCents).toBe(r.baseline.closingCents);expect(r.deferredIncomingCount).toBe(0);
+});
+it('uses calendar dates across year boundaries and excludes an out-of-range shifted date safely',()=>{
+ const r=buildCashForecast({asOf:'2026-12-15',days:30,receiptDelay:14,accounts:[],items:[{...item('year','RECEIVABLE',1n,'2026-12-20'),date:'2026-12-15'}],receivableControlCents:1n,payableControlCents:0n,futureCashCount:0,futureCashCents:0n});expect(r.items[0]!.projectedDate).toBe('2027-01-03');
+ const end=buildCashForecast({asOf:'2999-12-05',days:7,receiptDelay:30,accounts:[],items:[{...item('end','RECEIVABLE',1n,'2999-12-06'),date:'2999-12-01'}],receivableControlCents:1n,payableControlCents:0n,futureCashCount:0,futureCashCents:0n});expect(end.deferredIncomingCents).toBe(1n);expect(end.items).toEqual([]);
+});
+it('refuses unsupported and duplicated delay assumptions instead of silently using zero',()=>{
+ for(const q of [{delai_clients:'1'},{delai_clients:'07'},{delai_clients:''},{delai_clients:['7','7']},{delai_fournisseurs:'-7'},{delai_fournisseurs:'7.0'}])expect(()=>forecastFilters(q,'2026-07-01')).toThrow();
+ expect(forecastFilters({delai_clients:'7',delai_fournisseurs:'30'},'2026-07-01')).toMatchObject({receiptDelay:7,paymentDelay:30});
+ for(const delay of [-1,1,7.5,NaN,Infinity])expect(()=>buildCashForecast({...build(),receiptDelay:delay,receivableControlCents:0n,payableControlCents:0n})).toThrow();
+});
+it('exports the selected assumptions, reference comparison and deferred amounts with original source dates',()=>{
+ const r=buildCashForecast({asOf:'2026-06-30',days:7,receiptDelay:7,accounts:[],items:[item('delay','RECEIVABLE',12345n,'2026-07-02')],receivableControlCents:12345n,payableControlCents:0n,futureCashCount:0,futureCashCents:0n});const csv=cashForecastCsv(r,en.cashForecast as ForecastCsvLabels,'en');
+ expect(csv).toContain('Additional customer delay (days),7\r\n');expect(csv).toContain('No additional delay,123.45,0.00,123.45,0.00,2026-06-30,0\r\n');expect(csv).toContain('Receipts shifted beyond the horizon,1,123.45\r\n');expect(csv).not.toContain(',delay,');
 });

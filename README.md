@@ -201,6 +201,12 @@ Print the complete forecast or save a PDF with all due items, assumptions and co
 
 [Mobile print view](docs/images/previsions-tresorerie-impression-en-dark-mobile.png)
 
+Simulate additional customer and supplier delays of 0, 7, 14 or 30 calendar days. Compare the same snapshot with the due-date baseline; amounts shifted beyond the horizon stay visible. Assumptions follow CSV and PDF exports, with no accounting writes or saved scenarios.
+
+![Settlement assumptions in English dark theme](docs/images/previsions-tresorerie-delais-en-dark-desktop.png)
+
+[Mobile comparison](docs/images/previsions-tresorerie-delais-en-dark-mobile.png)
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

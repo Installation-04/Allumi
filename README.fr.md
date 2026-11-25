@@ -200,6 +200,12 @@ Imprimez la prévision complète ou enregistrez un PDF, avec toutes les échéan
 
 [Copie sur mobile](docs/images/previsions-tresorerie-impression-mobile.png)
 
+Simulez des délais additionnels clients et fournisseurs de 0, 7, 14 ou 30 jours calendaires. Comparez le même instantané à la référence aux échéances; les montants reportés après l’horizon restent visibles. Les hypothèses suivent le CSV et le PDF, sans écriture ni scénario enregistré.
+
+![Comparaison des délais de règlement](docs/images/previsions-tresorerie-delais-desktop.png)
+
+[Comparaison mobile](docs/images/previsions-tresorerie-delais-mobile.png)
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

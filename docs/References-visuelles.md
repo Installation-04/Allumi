@@ -632,3 +632,13 @@ Voir [[Previsions-de-tresorerie]] pour les hypothèses et contrôles.
 ![Complete print view EN dark](images/previsions-tresorerie-impression-en-dark-desktop.png)
 
 [Mobile FR](images/previsions-tresorerie-impression-mobile.png) · [Mobile EN sombre](images/previsions-tresorerie-impression-en-dark-mobile.png)
+
+## Simulation des délais de règlement
+
+[[Previsions-de-tresorerie]] : comparaison sans délai et avec hypothèses, montants reportés après l’horizon explicités.
+
+![Délais FR](images/previsions-tresorerie-delais-desktop.png)
+
+![Timing EN dark](images/previsions-tresorerie-delais-en-dark-desktop.png)
+
+[Mobile FR](images/previsions-tresorerie-delais-mobile.png) · [Mobile EN sombre](images/previsions-tresorerie-delais-en-dark-mobile.png)
