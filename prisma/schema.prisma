@@ -407,6 +407,9 @@ model RateLimit {
 // ─────────────────────── Entreprise, membres (RLS) ───────────────────────
 
 model Company {
+  contractTemplate ContractTemplate?
+  clientDocuments ClientDocument[]
+  clientDocumentDeliveries ClientDocumentDelivery[]
   id                   String          @id @default(uuid(7)) @db.Uuid
   name                 String
   legalName            String?         @map("legal_name")
@@ -864,6 +867,7 @@ model TaxCodeComponent {
 // ─────────────────────── Ventes : factures et avoirs ───────────────────────
 
 model SalesDocument {
+  clientDocuments ClientDocument[]
   id                 String            @id @default(uuid(7)) @db.Uuid
   companyId          String            @map("company_id") @db.Uuid
   kind               SalesDocumentKind
@@ -1717,6 +1721,9 @@ model SalesEstimateCounter {
 }
 
 model SalesEstimate {
+  clientDocuments ClientDocument[]
+  termsTemplate String? @map("terms_template")
+  hourlyRateCents BigInt? @map("hourly_rate_cents")
   id                 String              @id @default(uuid(7)) @db.Uuid
   companyId          String              @map("company_id") @db.Uuid
   contactId          String              @map("contact_id") @db.Uuid
@@ -1953,4 +1960,70 @@ model MileageTrip {
   company        Company  @relation(fields:[companyId],references:[id],onDelete:Restrict)
   @@index([companyId,tripDate,createdAt,id])
   @@map("mileage_trip")
+}
+
+model ContractTemplate {
+ companyId String @id @map("company_id") @db.Uuid
+ body String
+ hourlyRateCents BigInt? @map("hourly_rate_cents")
+ revision Int @default(1)
+ updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+ company Company @relation(fields:[companyId],references:[id],onDelete:Restrict)
+ @@map("contract_template")
+}
+
+model ClientDocument {
+ id String @id @default(uuid(7)) @db.Uuid
+ companyId String @map("company_id") @db.Uuid
+ kind String
+ sourceEstimateId String? @map("source_estimate_id") @db.Uuid
+ sourceInvoiceId String? @map("source_invoice_id") @db.Uuid
+ title String
+ customerName String @map("customer_name")
+ customerEmail String @map("customer_email")
+ issuerName String @map("issuer_name")
+ locale String
+ body String
+ hourlyRateCents BigInt? @map("hourly_rate_cents")
+ status String @default("DRAFT")
+ renderedBody String? @map("rendered_body")
+ sourceSnapshot Json? @map("source_snapshot")
+ contentHash String? @map("content_hash") @db.Char(64)
+ tokenHash String? @unique @map("token_hash") @db.Char(64)
+ tokenCipher Bytes? @map("token_cipher")
+ publishedAt DateTime? @map("published_at") @db.Timestamptz(6)
+ expiresAt DateTime? @map("expires_at") @db.Timestamptz(6)
+ revokedAt DateTime? @map("revoked_at") @db.Timestamptz(6)
+ firstViewedAt DateTime? @map("first_viewed_at") @db.Timestamptz(6)
+ signedAt DateTime? @map("signed_at") @db.Timestamptz(6)
+ signerName String? @map("signer_name")
+ signerEmail String? @map("signer_email")
+ consentText String? @map("consent_text")
+ revision Int @default(1)
+ createdById String @map("created_by_id") @db.Uuid
+ createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+ updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+ company Company @relation(fields:[companyId],references:[id],onDelete:Restrict)
+ sourceEstimate SalesEstimate? @relation(fields:[companyId,sourceEstimateId],references:[companyId,id],onDelete:Restrict,map:"client_document_estimate_fkey")
+ sourceInvoice SalesDocument? @relation(fields:[companyId,sourceInvoiceId],references:[companyId,id],onDelete:Restrict,map:"client_document_invoice_fkey")
+ deliveries ClientDocumentDelivery[]
+ @@unique([companyId,id])
+ @@index([companyId,createdAt,id])
+ @@map("client_document")
+}
+
+model ClientDocumentDelivery {
+ id String @id @default(uuid(7)) @db.Uuid
+ companyId String @map("company_id") @db.Uuid
+ documentId String @map("document_id") @db.Uuid
+ recipient String
+ locale String
+ status String @default("PENDING")
+ createdById String @map("created_by_id") @db.Uuid
+ createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+ completedAt DateTime? @map("completed_at") @db.Timestamptz(6)
+ company Company @relation(fields:[companyId],references:[id],onDelete:Restrict)
+ document ClientDocument @relation(fields:[companyId,documentId],references:[companyId,id],onDelete:Restrict,map:"client_document_delivery_document_fkey")
+ @@index([companyId,documentId,createdAt])
+ @@map("client_document_delivery")
 }

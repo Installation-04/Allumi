@@ -60,3 +60,5 @@ Voir [[Configuration]], [[Validation-des-factures]], [[Justificatifs]] et [[Depa
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/courriel-facture-mobile.png" alt="Courriel de facture — téléphone" width="412">
 
 Les [[Relances-clients]] proposent un message de rappel distinct, avec aperçu et contrôle du solde actuel. Leur historique partage ce panneau et les mêmes limites de fréquence; le montant rappelé est conservé.
+
+Pour suivre l’ouverture d’une copie via un lien, utilise le panneau Contrats et liens clients : [[Contrats-et-signatures]]. Le SMTP direct reste disponible sans suivi de lecture du courriel. La copie inclut la note publique imprimée de la facture et ne déclenche aucun paiement.

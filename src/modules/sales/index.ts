@@ -13,3 +13,5 @@ export { saveEstimate, getEstimate, listEstimates, transitionEstimate, convertEs
 export { ESTIMATE_STATUSES, type EstimateStatus } from "./domain/estimate";
 export { recurringSources, createRecurringPlan, getRecurringPlan, listRecurringPlans, changeRecurringStatus, generateRecurringDraft } from "./service/recurring";
 export { recurringDate, recurringDueDate, RECURRING_INTERVALS } from "./domain/recurring";
+
+export { DOCUMENT_TEXT_LIMIT, templateText, parseHourlyRate, hourlyRateText, renderDocumentTemplate } from "./domain/document-template";

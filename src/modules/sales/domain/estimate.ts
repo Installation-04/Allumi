@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { draftSchema } from "./draft";
+import { templateText } from "./document-template";
 export const ESTIMATE_STATUSES = ["DRAFT", "SENT", "ACCEPTED", "DECLINED", "CANCELLED", "CONVERTED"] as const;
 export type EstimateStatus = typeof ESTIMATE_STATUSES[number];
-export const estimateSchema = draftSchema.safeExtend({ terms: z.string().trim().max(4000).default("") });
+export const estimateSchema = draftSchema.safeExtend({ terms: templateText.default(""), hourlyRate: z.string().max(20).default("") });
 export function estimateTransitionAllowed(from: string, to: string, validUntil: string, today: string) {
   if (from === "DRAFT" && to === "SENT") return validUntil >= today;
   if (from === "SENT" && to === "ACCEPTED") return validUntil >= today;

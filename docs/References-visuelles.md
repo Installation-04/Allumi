@@ -690,3 +690,15 @@ Références réelles sur ordinateur/papier et téléphone, en français et en a
 ![English paper copy](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/kilometrage-impression-en-dark-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/kilometrage-impression-en-dark-mobile.png" alt="Mileage print controls in English dark theme" width="412">
+
+## Contrats et portail client
+
+Les références de l’éditeur FR/EN, du formulaire client et de la preuve figurent dans [[Contrats-et-signatures]].
+
+![Éditeur de contrat](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-editeur-desktop.png)
+
+![English contract editor](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-editeur-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-portail-mobile.png" alt="Signature client sur téléphone" width="412">
+
+![English signature evidence](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-signature-en-dark-desktop.png)

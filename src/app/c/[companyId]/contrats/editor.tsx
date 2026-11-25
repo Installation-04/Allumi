@@ -1,0 +1,16 @@
+"use client";
+import { useState,useRef } from "react";
+import { useTranslations } from "@/platform/i18n/client";
+import { Field,TextAreaField,SelectField,FormScopeProvider,StateError,SubmitButton,useScopedAction } from "@/app/_components/ui";
+import { parseHourlyRate,renderDocumentTemplate } from "@/modules/sales/client";
+import type { FormState } from "@/app/_lib/form-state";
+export function ContractEditor({action,initial,companyName,template=false}:{action:(previous:FormState,form:FormData)=>Promise<FormState>;initial:Record<string,string>;companyName:string;template?:boolean}){
+ const formRef=useRef<HTMLFormElement>(null);
+ const insert=(marker:string)=>{const form=formRef.current,area=form?.elements.namedItem('body');if(!form||!(area instanceof HTMLTextAreaElement))return;area.setRangeText(marker,area.selectionStart,area.selectionEnd,'end');area.focus();const f=new FormData(form);setPreview(Object.fromEntries(['body','hourlyRate','customerName','locale'].map(k=>[k,String(f.get(k)??initial[k]??'')])));};
+ const t=useTranslations('contracts'),{state,formAction,scope}=useScopedAction(action),[preview,setPreview]=useState(initial);
+ let rendered='';try{rendered=renderDocumentTemplate(preview.body??'',parseHourlyRate(preview.hourlyRate??''),preview.locale??'fr-CA',preview.customerName??'',companyName);}catch{rendered=t('variablesHint');}
+ return <form ref={formRef} action={formAction} className="space-y-4" onChange={event=>{const f=new FormData(event.currentTarget);setPreview(Object.fromEntries(['body','hourlyRate','customerName','locale'].map(k=>[k,String(f.get(k)??initial[k]??'')])));}}><StateError state={state}/>{state?.notice==='saved'&&<p role="status">{t('saved')}</p>}<div className="grid items-start gap-6 lg:grid-cols-2"><div className="space-y-4"><FormScopeProvider scope={scope}>
+ {!template&&<><Field name="title" label={t('documentTitle')} defaultValue={initial.title}/><Field name="customerName" label={t('customer')} defaultValue={initial.customerName}/><Field name="customerEmail" label={t('email')} type="email" defaultValue={initial.customerEmail}/><SelectField name="locale" label={t('language')} defaultValue={initial.locale} options={[{value:'fr-CA',label:'Français'},{value:'en',label:'English'}]}/></>}
+ <Field name="hourlyRate" label={t('hourlyRate')} defaultValue={initial.hourlyRate} required={false} inputMode="decimal" hint={t('rateHint')}/><TextAreaField name="body" label={t('terms')} defaultValue={initial.body} required={!template} rows={18} hint={t('variablesHint')}/>
+ <p className="flex flex-wrap gap-3 text-sm">{([['{{hourly_rate}}','insertRate'],['{{client_name}}','insertClient'],['{{company_name}}','insertCompany']] as const).map(([value,key])=><button type="button" key={key} onClick={()=>insert(value)} className="min-h-11 rounded border px-3">{t(key)}</button>)}</p></FormScopeProvider><SubmitButton>{t('save')}</SubmitButton></div><section aria-label={t('preview')} tabIndex={0} className="max-h-[44rem] overflow-y-auto space-y-3 rounded border border-stone-300 p-4 dark:border-stone-700"><h2 className="text-lg font-semibold">{t('preview')}</h2><p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{rendered||t('emptyPreview')}</p></section></div></form>;
+}
