@@ -682,7 +682,12 @@
       "tooManyLines": "The period has too many entries for one file (200,000 lines at most): choose a shorter period or a single account.",
       "forecastDate": "Choose a valid reference date up to today and a horizon of 7, 30, 60 or 90 days. Each filter must appear once; the page must be a positive integer. Additional delays must be 0, 7, 14 or 30 days.",
       "forecastSource": "The forecast sources could not be reconciled. Check the posted open items before trying again.",
-      "forecastLimit": "The forecast exceeds 1,000 bank/cash accounts or 5,000 open source items. No partial projection is displayed."
+      "forecastLimit": "The forecast exceeds 1,000 bank/cash accounts or 5,000 open source items. No partial projection is displayed.",
+      "presetInvalid": "Enter a name of 1 to 80 characters without control characters, an allowed horizon and allowed delays.",
+      "presetDuplicate": "A configuration with this name already exists in this company.",
+      "presetLimit": "This company has reached the maximum of 20 configurations.",
+      "presetNotFound": "This configuration was not found or has already been deleted.",
+      "presetConfirm": "Confirm deletion of this shared configuration."
     },
     "bankRules": {
       "invalid": "Invalid rule. Check the text, accounts, priority and amount limits.",
@@ -3646,6 +3651,27 @@
     "deferredOutgoing": "Payments shifted beyond the horizon",
     "deferredDetail": "{count} invoices / bills · {amount}",
     "resetTiming": "Remove additional delays",
-    "minimumDate": "Minimum date"
+    "minimumDate": "Minimum date",
+    "presets": "Saved configurations"
+  },
+  "forecastPresets": {
+    "title": "Saved forecast configurations",
+    "intro": "Save a horizon and customer/supplier delays to reuse within the company. Each opening recalculates amounts from current data at the displayed reference date.",
+    "back": "Back to forecast",
+    "reference": "Configurations will use the reference date: {date}.",
+    "create": "New configuration",
+    "name": "Configuration name",
+    "nameHint": "1 to 80 characters, without line breaks. Names are unique within this company (case-sensitive).",
+    "save": "Save configuration",
+    "list": "Shared configurations ({count}/{max})",
+    "empty": "No saved configurations.",
+    "summary": "Horizon: {days} days · customer delay: {receipt} days · supplier delay: {payment} days.",
+    "apply": "Apply “{name}”",
+    "delete": "Delete “{name}”",
+    "deleteButton": "Delete configuration",
+    "confirm": "I confirm deleting “{name}” for all members of this company.",
+    "deleted": "Configuration deleted.",
+    "limit": "The maximum of 20 configurations has been reached. Delete a configuration before creating another.",
+    "limits": "Only the name, horizon and two delays are stored. No amounts, reference date, results or accounting snapshot are saved. Settings are immutable: delete and recreate a configuration to replace them. No accounting entries or scheduled payments."
   }
 }

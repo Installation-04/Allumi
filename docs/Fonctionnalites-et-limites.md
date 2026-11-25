@@ -52,3 +52,5 @@ Cycle commercial livré : [[Devis]]. Finalisation et réponse consignées manuel
 [[Duplication-des-budgets]] : reprise des objectifs vers un scénario/exercice de la même entreprise, aperçu, exclusions explicites des comptes inactifs et refus des aperçus périmés. Aucune écriture financière.
 
 [[Import-CSV-des-budgets]] : objectifs annuels importés dans un nouveau scénario depuis un CSV UTF-8 français/anglais, aperçu local, confirmation, comptes locaux actifs et création atomique auditée. Aucun budget existant écrasé ni mouvement financier importé.
+
+Les [[Configurations-de-prevision]] partagent jusqu’à 20 réglages nommés d’horizon et de délais par entreprise, avec création/suppression auditées. Elles ne conservent aucun montant ni instantané; les scénarios avec nouveaux mouvements manuels restent hors périmètre.

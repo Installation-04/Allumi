@@ -682,7 +682,12 @@
       "tooManyLines": "La période contient trop d’écritures pour un seul fichier (200 000 lignes au plus) : choisissez une période plus courte ou un seul compte.",
       "forecastDate": "Choisissez une date de référence valide au plus tard aujourd’hui et un horizon de 7, 30, 60 ou 90 jours. Chaque filtre doit être unique; la page doit être un entier positif. Les délais additionnels doivent être de 0, 7, 14 ou 30 jours.",
       "forecastSource": "Les sources de la prévision n’ont pas pu être rapprochées. Vérifiez les éléments ouverts comptabilisés avant de réessayer.",
-      "forecastLimit": "La prévision dépasse 1 000 comptes banque/caisse ou 5 000 éléments ouverts. Aucune projection partielle n’est affichée."
+      "forecastLimit": "La prévision dépasse 1 000 comptes banque/caisse ou 5 000 éléments ouverts. Aucune projection partielle n’est affichée.",
+      "presetInvalid": "Saisis un nom de 1 à 80 caractères sans caractères de contrôle, un horizon et des délais autorisés.",
+      "presetDuplicate": "Une configuration porte déjà ce nom dans cette entreprise.",
+      "presetLimit": "Le maximum de 20 configurations est atteint pour cette entreprise.",
+      "presetNotFound": "Cette configuration est introuvable ou a déjà été supprimée.",
+      "presetConfirm": "Confirme la suppression de cette configuration partagée."
     },
     "bankRules": {
       "invalid": "Règle invalide. Vérifiez le texte, les comptes, la priorité et les limites de montant.",
@@ -3646,6 +3651,27 @@
     "deferredOutgoing": "Décaissements reportés après l’horizon",
     "deferredDetail": "{count} factures · {amount}",
     "resetTiming": "Retirer les délais additionnels",
-    "minimumDate": "Date du minimum"
+    "minimumDate": "Date du minimum",
+    "presets": "Configurations enregistrées"
+  },
+  "forecastPresets": {
+    "title": "Configurations de prévision enregistrées",
+    "intro": "Conservez un horizon et des délais clients/fournisseurs pour les réutiliser dans l’entreprise. Chaque ouverture recalcule les montants avec les données actuelles à la date de référence affichée.",
+    "back": "Retour à la prévision",
+    "reference": "Les configurations seront appliquées à la date de référence : {date}.",
+    "create": "Nouvelle configuration",
+    "name": "Nom de la configuration",
+    "nameHint": "De 1 à 80 caractères, sans saut de ligne. Nom unique dans cette entreprise (majuscules et minuscules distinguées).",
+    "save": "Enregistrer la configuration",
+    "list": "Configurations partagées ({count}/{max})",
+    "empty": "Aucune configuration enregistrée.",
+    "summary": "Horizon : {days} jours · délai clients : {receipt} jours · délai fournisseurs : {payment} jours.",
+    "apply": "Appliquer « {name} »",
+    "delete": "Supprimer « {name} »",
+    "deleteButton": "Supprimer la configuration",
+    "confirm": "Je confirme la suppression de « {name} » pour tous les membres de cette entreprise.",
+    "deleted": "Configuration supprimée.",
+    "limit": "Le maximum de 20 configurations est atteint. Supprimez une configuration avant d’en créer une autre.",
+    "limits": "Seuls le nom, l’horizon et les deux délais sont conservés. Aucun montant, date de référence, résultat ou instantané comptable n’est enregistré. Les réglages sont immuables : supprimez puis recréez une configuration pour les remplacer. Aucune écriture ni programmation de paiement."
   }
 }

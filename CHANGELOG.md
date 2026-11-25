@@ -4,6 +4,14 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.90] - 2026-11-24
+
+- Nouveautés : configurations de prévision nommées et partagées par entreprise, avec horizon et délais clients/fournisseurs réutilisables sans enregistrer de montants.
+- Interface : création FR/EN, saisie conservée après refus, application à la référence affichée et suppression confirmée; thème sombre et mobile illustrés.
+- Sécurité : RLS Comptabilité + Ventes, écriture comptable pour gérer, audit, réglages immuables et plafond SQL de 20 sérialisé même en concurrence.
+- Exports : application des filtres aux données recalculées; CSV/PDF conservent les hypothèses, sans nom de configuration ni instantané comptable.
+- Installation : migration additive `20261125000000_cash_forecast_presets`, appliquée par le service migrate; aucune nouvelle configuration, aucun mouvement financier ni paiement programmé.
+
 ## [0.4.0-alpha.89] - 2026-11-24
 
 - Nouveautés : simulation en lecture seule de délais additionnels clients et fournisseurs de 0, 7, 14 ou 30 jours calendaires dans la prévision de trésorerie.

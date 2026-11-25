@@ -461,6 +461,7 @@ model Company {
   salesEstimates         SalesEstimate[]
   estimateCounter        SalesEstimateCounter?
   budgets                Budget[]
+  cashForecastPresets    CashForecastPreset[]
   budgetLines            BudgetLine[]
   budgetMonthlyTargets   BudgetMonthlyTarget[]
 
@@ -1917,4 +1918,19 @@ model MigrationBatch {
   @@unique([companyId], map: "migration_batch_one_cutover", where: raw("kind = 'BALANCES'"))
   @@index([companyId, createdAt])
   @@map("migration_batch")
+}
+
+
+model CashForecastPreset {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  companyId    String   @map("company_id") @db.Uuid
+  name         String
+  days         Int
+  receiptDelay Int      @map("receipt_delay")
+  paymentDelay Int      @map("payment_delay")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Restrict)
+
+  @@unique([companyId, name])
+  @@map("cash_forecast_preset")
 }

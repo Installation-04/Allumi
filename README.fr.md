@@ -206,6 +206,12 @@ Simulez des délais additionnels clients et fournisseurs de 0, 7, 14 ou 30 jours
 
 [Comparaison mobile](docs/images/previsions-tresorerie-delais-mobile.png)
 
+Enregistrez jusqu’à 20 **configurations de prévision** nommées par entreprise : horizon et délais, partagés avec les lecteurs autorisés et recalculés à la date de référence affichée. Création/suppression avec Comptabilité en écriture et Ventes en lecture. Aucun montant ni instantané stocké. [Guide](https://github.com/Installation-04/Allumi/wiki/Configurations-de-prevision).
+
+![Configurations de prévision enregistrées](docs/images/configurations-prevision-desktop.png)
+
+[Configurations sur mobile](docs/images/configurations-prevision-mobile.png)
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).
