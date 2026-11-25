@@ -212,6 +212,12 @@ Enregistrez jusqu’à 20 **configurations de prévision** nommées par entrepri
 
 [Configurations sur mobile](docs/images/configurations-prevision-mobile.png)
 
+Les budgets annuels et mensuels proposent une **copie imprimable/PDF complète** : objectifs, réel, écarts et couverture; période fiscale et état d’allocation conservés pour le mensuel. Papier paysage clair depuis les deux thèmes et le mobile. [Guide](https://github.com/Installation-04/Allumi/wiki/Impression-des-budgets).
+
+![Extrait de la copie annuelle](docs/images/budget-annuel-impression-desktop.png)
+
+[Commandes sur mobile](docs/images/budget-annuel-impression-mobile.png)
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

@@ -23,3 +23,11 @@ it('exports exact monthly targets, missing values and safe text in both locales'
  const r:MonthlyBudget={id:'b',name:'=FORMULA',revision:1,from:'2026-04-01',to:'2027-03-31',periods:[period],selected:period,rows:[{accountId:'a',code:'=CMD',nameFr:'@Nom',nameEn:'+Name',type:'REVENUE',isActive:false,annualCents:100n,targetCents:null,actualCents:-1n,hasActivity:true,differenceCents:null,allocation:{allocatedCents:0n,remainingCents:100n,definedCount:0,complete:false}}],revenue:{targetCents:0n,actualCents:-1n,unbudgeted:1},expenses:{targetCents:0n,actualCents:0n,unbudgeted:0}};
  const t=(s:string)=>s,en=monthlyBudgetCsv(r,'en',t),fr=monthlyBudgetCsv(r,'fr-CA',t);expect(en).toContain("'=CMD,'+Name,revenue,notSet,-0.01,,1.00,0.00,1.00,0");expect(fr).toContain("'=CMD;'@Nom;revenue;notSet;-0,01;;1,00;0,00;1,00;0");expect(en).toContain('2026-04-01,2026-04-30');
 });
+
+
+it('uses only an omitted fiscal period as the default and refuses ambiguous filters',async()=>{
+ const {budgetPeriod}=await import('@/app/_lib/budget-period');
+ const id='00000000-0000-7000-8000-000000000001';
+ expect(budgetPeriod(undefined)).toBeUndefined();expect(budgetPeriod(id)).toBe(id);
+ for(const value of ['',[],[id],[id,id],'1',' '+id,id+' '])expect(()=>budgetPeriod(value)).toThrow();
+});

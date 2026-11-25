@@ -1226,5 +1226,61 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.91": {
+    "fr-CA": {
+      "title": "Imprimer les budgets annuels et mensuels",
+      "added": [
+        {
+          "text": "Ouvrez une copie imprimable/PDF complète des objectifs, du réel et des écarts, avec couverture et comptes inactifs.",
+          "guide": "Impression-des-budgets"
+        }
+      ],
+      "improved": [
+        {
+          "text": "La copie mensuelle conserve la période fiscale et l’état d’allocation annuel; papier paysage clair, en-têtes répétés et toutes les lignes autorisées.",
+          "guide": "Impression-des-budgets"
+        }
+      ],
+      "fixed": [
+        {
+          "text": "Les périodes vides, mal formées ou répétées sont refusées de façon cohérente sur le rapport mensuel, son CSV et sa copie.",
+          "guide": "Impression-des-budgets"
+        }
+      ],
+      "installation": [
+        {
+          "text": "Aucune migration ni nouvelle configuration. Comptabilité en lecture, pas d’écriture ni de PDF serveur; plafond inchangé de 1 000 comptes.",
+          "guide": "Impression-des-budgets"
+        }
+      ]
+    },
+    "en": {
+      "title": "Print annual and monthly budgets",
+      "added": [
+        {
+          "text": "Open a complete print/PDF copy of targets, posted actuals and differences, including coverage and inactive accounts.",
+          "guide": "Impression-des-budgets"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Monthly copies preserve the fiscal period and annual allocation status; light landscape paper, repeated headers and every authorized row.",
+          "guide": "Impression-des-budgets"
+        }
+      ],
+      "fixed": [
+        {
+          "text": "Empty, malformed or repeated periods are consistently refused on the monthly report, CSV and print copy.",
+          "guide": "Impression-des-budgets"
+        }
+      ],
+      "installation": [
+        {
+          "text": "No migration or new configuration. Accounting read access, no writes or server PDF storage; the 1,000-account limit stays unchanged.",
+          "guide": "Impression-des-budgets"
+        }
+      ]
+    }
   }
 }

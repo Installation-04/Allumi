@@ -51,3 +51,7 @@ Voir [[Etats-financiers]], [[Exercices-et-periodes]], [[Utilisateurs-et-permissi
 La reprise des objectifs dans un nouveau scénario est disponible avec aperçu et exclusions explicites : [[Duplication-des-budgets]].
 
 L’ajout d’objectifs depuis un fichier, après aperçu local et confirmation, est disponible : [[Import-CSV-des-budgets]].
+
+## Impression et PDF
+
+**Impression / PDF complet** ouvre une copie comptable dédiée, sans formulaire de modification, avec toutes les lignes autorisées. Le mensuel conserve la période fiscale sélectionnée. Papier paysage clair, même depuis le thème sombre et le mobile; retour au rapport et aucune écriture. Voir [[Impression-des-budgets]] pour le contenu, les limites et les captures.
