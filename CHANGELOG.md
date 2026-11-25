@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.90] - 2026-11-24
+
 - Nouveautés : configurations de prévision nommées et partagées par entreprise, avec horizon et délais clients/fournisseurs réutilisables sans enregistrer de montants.
 - Interface : création FR/EN, saisie conservée après refus, application à la référence affichée et suppression confirmée; thème sombre et mobile illustrés.
 - Sécurité : RLS Comptabilité + Ventes, écriture comptable pour gérer, audit, réglages immuables et plafond SQL de 20 sérialisé même en concurrence.
