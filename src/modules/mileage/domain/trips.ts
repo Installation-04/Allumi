@@ -4,6 +4,7 @@ import { toCsv, csvFormatFor, type CsvCell } from "@/modules/reports/client";
 
 export const MILEAGE_PAGE_SIZE = 50;
 export const MILEAGE_EXPORT_LIMIT = 5000;
+export const MILEAGE_PRINT_LIMIT = 1000;
 export const MAX_TRIP_METERS = 10000000;
 export const TRIP_USES = ["BUSINESS", "PERSONAL"] as const;
 const line = (min: number, max: number) => z.string().refine(s => !/[\p{Cc}\p{Zl}\p{Zp}]/u.test(s)).transform(s => s.trim()).refine(s => [...s].length >= min && [...s].length <= max);

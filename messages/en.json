@@ -884,7 +884,8 @@
       "confirm": "Confirm deletion of the trip.",
       "filters": "Choose a valid range of at most 366 days ending today or earlier, an allowed use and a vehicle of at most 80 characters. Repeated or malformed filters/pages are refused.",
       "exportLimit": "More than 5,000 trips match these filters. Narrow the dates, vehicle or use before exporting.",
-      "limit": "The trip count exceeds this report’s capacity."
+      "limit": "The trip count exceeds this report’s capacity.",
+      "printLimit": "The print copy is limited to 1,000 trips. Narrow the filters; no partial copy is provided."
     }
   },
   "settingsPage": {
@@ -3743,6 +3744,11 @@
     "previous": "Previous",
     "next": "Next",
     "limits": "Manually entered distances stored as integer metres. Filters span at most 366 days; totals cover all results, with 50 trips per page and CSV up to 5,000 trips. No GPS, route calculation, mileage reimbursement rates or automatic accounting entries.",
-    "locationHint": "Up to 160 characters, without line breaks."
+    "locationHint": "Up to 160 characters, without line breaks.",
+    "print": "Complete print / PDF",
+    "printTitle": "Mileage log — print copy",
+    "printHint": "Complete copy of the displayed filters, read again on opening. Use your browser’s print dialog to print or save as PDF; light landscape paper from either theme.",
+    "allVehicles": "All vehicles",
+    "printLimits": "Up to 1,000 trips, including when opened from another log page. Exact kilometres with three decimal places. No reimbursement or tax deduction calculation; the copy saves no changes or PDF on the server."
   }
 }

@@ -178,3 +178,11 @@ main:has(> .company-workspace) { max-width: none; padding: 0; }
   .budget-print th, .budget-print td { overflow-wrap: anywhere; white-space: normal; }
   .budget-print-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); break-inside: avoid; }
 }
+
+/* All trip fields wrap within landscape paper, including long identifiers and purposes. */
+@media print {
+  .mileage-print { overflow-wrap: anywhere; }
+  .mileage-print table { table-layout: fixed; }
+  .mileage-print th, .mileage-print td { overflow-wrap: anywhere; white-space: normal; }
+  .mileage-print-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); break-inside: avoid; }
+}

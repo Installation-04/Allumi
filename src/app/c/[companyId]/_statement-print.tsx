@@ -4,12 +4,12 @@ import { useTranslations } from "@/platform/i18n/client";
 import { FOCUS } from "@/app/_components/focus";
 
 /** Print the already authorized report, without fetching or recalculating its balances. */
-export function StatementPrint({ companyName }: { companyName: string }) {
+export function StatementPrint({ companyName, showCurrency = true }: { companyName: string; showCurrency?: boolean }) {
   const t = useTranslations("statementPrint");
   return <>
     <div className="statement-print-heading hidden">
       <p className="text-lg font-semibold">{companyName}</p>
-      <p className="text-sm">{t("currency")}</p>
+      {showCurrency && <p className="text-sm">{t("currency")}</p>}
     </div>
     <div className="print-controls flex flex-wrap items-start gap-3">
       <button type="button" onClick={() => window.print()} className={`inline-flex min-h-11 items-center rounded-md border border-stone-300 px-4 text-sm font-medium hover:bg-stone-100 dark:border-stone-700 dark:hover:bg-stone-800 ${FOCUS}`}>{t("print")}</button>
