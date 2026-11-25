@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.96] - 2026-11-25
+
 - Contrats : modèle partagé jusqu’à 50 000 caractères, boutons d’insertion et tarif horaire exact répercuté dans les variables, aperçu FR/EN sombre/mobile; conditions longues et tarif aussi dans les soumissions.
 - Portail client : liens privés de 90 jours pour contrats/soumissions/factures, ouverture explicite suivie et envoi SMTP confirmé avec historique, idempotence et limites de renvoi.
 - Signature : nom/courriel déclarés, consentement explicite, empreinte et date serveur; contenu publié immuable, signatures concurrentes protégées, révocation conservant la preuve et impression/PDF.
