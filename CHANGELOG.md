@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.91] - 2026-11-25
+
 - Nouveautés : copies imprimables/PDF complètes des budgets annuels et mensuels, avec objectifs, réel comptabilisé, écarts, couverture et comptes inactifs.
 - Périodes : copie mensuelle liée à la période fiscale affichée, avec objectif annuel et état de répartition; période vide, mal formée ou répétée refusée sur page, CSV et copie.
 - Impression : document paysage clair depuis FR/EN, thème sombre et mobile, en-têtes répétés et noms longs contenus; toutes les lignes jusqu’au plafond de 1 000 comptes, sans copie partielle au-delà.
