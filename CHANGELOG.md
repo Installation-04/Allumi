@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.93] - 2026-11-25
+
 - Nouveautés : carnet partagé de kilométrage avec trajets professionnels/personnels, véhicule, origine/destination, motif et distance conservée au mètre; création, modification et suppression confirmée.
 - Rapports : filtres inclusifs sur 366 jours, véhicule littéral et usage, totaux de tous les résultats avec pagination de 50; CSV privé complet jusqu’à 5 000 trajets et kilomètres exacts avec protection des formules.
 - Sécurité : RLS Comptabilité, rôle lecture seule plafonné, contraintes SQL, dates futures refusées, révisions contre les écrasements concurrents et audit; aucune écriture financière automatique.
