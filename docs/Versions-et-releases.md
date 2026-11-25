@@ -60,3 +60,5 @@ Avant publication des fichiers, deux runners natifs AMD64/ARM64 installent les i
 ## Nouveautés intégrées à l’application
 
 [[Nouveautes-des-versions]] présente les changements de la version serveur installée et au maximum cinq versions antérieures documentées, en français/anglais. Les notes sont intégrées au build, sans lecture disque ni appel GitHub pour leur contenu. Le script officiel refuse une version sans notes bilingues ou avec un guide introuvable avant de modifier le changelog, les manifestes ou les tags. Le workflow Release répète la vérification avant de créer un brouillon ou de construire les paquets. Les catégories vides sont masquées; les exigences d’installation sont obligatoires.
+
+Avant la préparation officielle et la publication, les guides référencés par la version cible sont aussi contrôlés : les liens wiki doivent utiliser la forme simple `[[Page]]` et viser une page locale existante. Les alias avec barre verticale, fragments, chemins et URL dans cette syntaxe sont refusés. Cela évite de publier un guide dont les libellés et les cibles seraient inversés par le rendu du wiki GitHub. Le contrôle n’effectue aucune requête réseau.

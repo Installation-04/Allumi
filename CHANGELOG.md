@@ -4,6 +4,12 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.92] - 2026-11-25
+
+- Documentation : liens du guide d’impression des budgets corrigés vers les pages annuelles et mensuelles, avec la syntaxe wiki simple `[[Page]]`.
+- Publication : contrôle des liens internes des guides de la version cible avant préparation et publication; refus des alias ambigus et des cibles absentes ou non canoniques.
+- Installation : aucune migration ni configuration; copies PDF et calculs de l’alpha.91 conservés, correction et consignes incluses dans les nouveautés FR/EN.
+
 ## [0.4.0-alpha.91] - 2026-11-25
 
 - Nouveautés : copies imprimables/PDF complètes des budgets annuels et mensuels, avec objectifs, réel comptabilisé, écarts, couverture et comptes inactifs.
