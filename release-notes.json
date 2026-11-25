@@ -1282,5 +1282,51 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.92": {
+    "fr-CA": {
+      "title": "Liens des guides budgétaires vérifiés",
+      "added": [],
+      "improved": [
+        {
+          "text": "Le contrôle de publication vérifie les liens wiki simples et leurs cibles dans les guides de la version à publier.",
+          "guide": "Versions-et-releases"
+        }
+      ],
+      "fixed": [
+        {
+          "text": "Les liens du guide d’impression pointent correctement vers les budgets annuels et mensuels.",
+          "guide": "Impression-des-budgets"
+        }
+      ],
+      "installation": [
+        {
+          "text": "Aucune migration ni configuration. Les copies PDF et calculs de l’alpha.91 restent disponibles; ce correctif concerne les guides et leur validation avant publication.",
+          "guide": "Impression-des-budgets"
+        }
+      ]
+    },
+    "en": {
+      "title": "Verified budget guide links",
+      "added": [],
+      "improved": [
+        {
+          "text": "Release validation checks plain wiki links and their local targets in guides referenced by the version being published.",
+          "guide": "Versions-et-releases"
+        }
+      ],
+      "fixed": [
+        {
+          "text": "Print-guide links now point correctly to annual and monthly budgets.",
+          "guide": "Impression-des-budgets"
+        }
+      ],
+      "installation": [
+        {
+          "text": "No migration or configuration. Alpha.91 print copies and calculations remain available; this fix covers guides and validation before publication.",
+          "guide": "Impression-des-budgets"
+        }
+      ]
+    }
   }
 }

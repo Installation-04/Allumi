@@ -1,6 +1,6 @@
 # Impression et PDF des budgets
 
-Depuis un [[Budgets-annuels|budget annuel]] ou le [[Budgets-mensuels|rapport mensuel]], clique **Impression / PDF complet**, puis **Imprimer / PDF**. Dans la fenêtre du navigateur, choisis une imprimante ou **Enregistrer en PDF**. Sur téléphone, utilise les options d’impression ou de partage proposées par le navigateur.
+Depuis un [[Budgets-annuels]] ou le [[Budgets-mensuels]], clique **Impression / PDF complet**, puis **Imprimer / PDF**. Dans la fenêtre du navigateur, choisis une imprimante ou **Enregistrer en PDF**. Sur téléphone, utilise les options d’impression ou de partage proposées par le navigateur.
 
 ## Contenu de la copie
 

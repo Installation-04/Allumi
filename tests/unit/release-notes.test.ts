@@ -11,9 +11,9 @@ const fixture = () => { const root = mkdtempSync(join(tmpdir(), "allumi-release-
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 const catalog = () => JSON.parse(readFileSync("release-notes.json", "utf8"));
 const checker = resolve("scripts/check-release-notes.mjs");
-function check(value: unknown, version = "0.4.0-alpha.62") {
+function check(value: unknown, version = "0.4.0-alpha.62", docs = resolve("docs")) {
  const root = fixture(), source = join(root, "notes.json");writeFileSync(source, JSON.stringify(value));
- return spawnSync(process.execPath, [checker, version, source, resolve("docs")], { encoding: "utf8" });
+ return spawnSync(process.execPath, [checker, version, source, docs], { encoding: "utf8" });
 }
 
 it("looks up the exact installed version in the chosen language without substituting another release", () => {
@@ -53,4 +53,19 @@ it("blocks the official release before changing files or creating commits/tags w
  const result=spawnSync("bash",["scripts/release.sh","0.4.0-alpha.62"],{cwd:root,encoding:"utf8"});
  expect(result.status).toBe(1);expect(result.stderr,JSON.stringify(result)).toContain("Missing bilingual release notes");
  expect(readFileSync(join(root,"CHANGELOG.md"),"utf8")).toBe(changelog);expect(git("rev-parse","HEAD")).toBe(head);expect(git("tag","--list")).toBe("");expect(git("status","--porcelain")).toBe("");
+});
+
+
+it("refuses ambiguous wiki aliases and missing or unsafe targets before publishing a referenced guide",()=>{
+ const root=fixture(),docs=join(root,"docs");mkdirSync(docs);
+ const note={title:"Print budgets",added:[{text:"Print copies",guide:"Guide"}],improved:[],fixed:[],installation:[{text:"No migration"}]};
+ const version="0.4.0-alpha.92",notes={[version]:{"fr-CA":note,en:note}};
+ writeFileSync(join(docs,"Annual.md"),"# Annual\n");writeFileSync(join(docs,"Guide.md"),"See [[Annual]].\n");
+ expect(check(notes,version,docs).status).toBe(0);
+ for(const example of ['`[[Missing]]`','``[[Annual|label]]``','```md\n[[Missing]]\n```','~~~md\n[[Annual|label]]\n~~~~']){
+  writeFileSync(join(docs,"Guide.md"),`Example: \n${example}\nSee [[Annual]].\n`);expect(check(notes,version,docs).status).toBe(0);
+ }
+ for(const link of ["Annual|annual budget","annual budget|Annual","Missing","../README","Annual#Heading","https://example.test"]){
+  writeFileSync(join(docs,"Guide.md"),`See [[${link}]].\n`);const result=check(notes,version,docs);expect(result.status).toBe(1);expect(result.stderr).toMatch(/plain \[\[Page\]\]|wiki target does not exist/);
+ }
 });
