@@ -874,6 +874,17 @@
       "confirm": "Vérifiez le lot et cochez la confirmation avant d’importer.",
       "stale": "L’aperçu a expiré ou les données ont changé. Vérifiez à nouveau le fichier et les options avant de confirmer.",
       "conflicts": "Le lot contient des conflits, des fiches non ignorées ou aucun ajustement nécessaire. Aucun changement enregistré."
+    },
+    "mileage": {
+      "invalid": "Vérifie la date, le véhicule, les lieux, l’usage et le motif obligatoire pour un trajet professionnel. Les textes doivent tenir sur une ligne et respecter les longueurs indiquées.",
+      "distance": "Saisis une distance positive d’au plus 10 000 km avec au plus 3 décimales, sans séparateur de milliers.",
+      "future": "La date du trajet ne peut pas être dans le futur.",
+      "notFound": "Ce trajet est introuvable ou a été supprimé.",
+      "stale": "Ce trajet a été modifié depuis son ouverture. Recharge-le avant de réessayer; ta saisie est conservée.",
+      "confirm": "Confirme la suppression du trajet.",
+      "filters": "Choisis une période valide d’au plus 366 jours, se terminant au plus tard aujourd’hui, un usage autorisé et un véhicule d’au plus 80 caractères. Les filtres et pages répétés ou mal formés sont refusés.",
+      "exportLimit": "Plus de 5 000 trajets correspondent aux filtres. Réduis la période ou précise le véhicule et l’usage avant d’exporter.",
+      "limit": "Le nombre de trajets dépasse la capacité de ce rapport."
     }
   },
   "settingsPage": {
@@ -1318,8 +1329,8 @@
     },
     "kilometrage": {
       "title": "Kilométrage",
-      "description": "Le suivi des déplacements est une évolution envisagée.",
-      "planned": "Périmètre à définir; aucun journal de déplacements ni calcul d’indemnité actuellement."
+      "description": "Consultez le carnet partagé des trajets professionnels et personnels.",
+      "planned": "GPS, calcul des itinéraires, indemnités et écritures automatiques restent à venir."
     },
     "applications": {
       "title": "Applications",
@@ -1364,7 +1375,8 @@
       "relances": "Relances clients",
       "remboursements-fournisseurs": "Remboursements fournisseurs",
       "budgets": "Budgets annuels",
-      "previsions-tresorerie": "Prévision de trésorerie"
+      "previsions-tresorerie": "Prévision de trésorerie",
+      "kilometrage": "Carnet de kilométrage"
     }
   },
   "updates": {
@@ -3684,5 +3696,53 @@
     "revision": "Révision des objectifs : {revision}.",
     "rowCount": "Comptes inclus : {count}.",
     "limits": "Tous les comptes du rapport autorisé sont inclus, jusqu’au plafond de 1 000 comptes. Les objectifs non définis restent distincts de zéro; les totaux d’objectifs ne comprennent que les valeurs définies. Cette copie ne crée ni écriture comptable ni affectation budgétaire."
+  },
+  "mileage": {
+    "title": "Carnet de kilométrage",
+    "create": "Nouveau trajet",
+    "save": "Enregistrer le trajet",
+    "detail": "Détail du trajet",
+    "edit": "Modifier le trajet",
+    "update": "Enregistrer les modifications",
+    "delete": "Supprimer le trajet",
+    "deleteButton": "Confirmer la suppression",
+    "deleteConfirm": "Je confirme la suppression de ce trajet partagé. Son historique reste dans l’audit.",
+    "back": "Retour au carnet",
+    "backYear": "Voir les trajets de cette année",
+    "reload": "Recharger le trajet",
+    "shared": "Carnet partagé de l’entreprise : les membres disposant de Comptabilité en lecture peuvent consulter et exporter tous les trajets saisis, y compris ceux marqués personnels. La gestion exige Comptabilité en écriture.",
+    "date": "Date du trajet",
+    "vehicle": "Véhicule",
+    "usage": "Usage",
+    "origin": "Départ",
+    "destination": "Arrivée",
+    "purpose": "Motif du déplacement",
+    "distance": "Distance (km)",
+    "dateHint": "Aujourd’hui ou une date passée, au format du calendrier.",
+    "vehicleHint": "Nom ou identifiant de véhicule partagé, au plus 80 caractères.",
+    "purposeHint": "Obligatoire pour un trajet professionnel; au plus 200 caractères.",
+    "distanceHint": "De 0,001 à 10 000 km, au plus 3 décimales. Virgule ou point, sans séparateur de milliers.",
+    "BUSINESS": "Professionnel",
+    "PERSONAL": "Personnel",
+    "ALL": "Tous les usages",
+    "from": "Du",
+    "to": "Au",
+    "vehicleFilter": "Rechercher un véhicule",
+    "apply": "Appliquer les filtres",
+    "reset": "Réinitialiser les filtres",
+    "export": "Exporter le CSV complet",
+    "period": "Du {from} au {to} inclus : {count, plural, one {# trajet} other {# trajets}}.",
+    "total": "Distance totale",
+    "count": "Nombre de trajets",
+    "empty": "Aucun trajet pour ces filtres.",
+    "route": "Trajet",
+    "actions": "Actions",
+    "open": "Voir le trajet",
+    "pages": "Pages du carnet de kilométrage",
+    "page": "Page {page} sur {pages}",
+    "previous": "Précédente",
+    "next": "Suivante",
+    "limits": "Distances saisies manuellement et conservées au mètre. Filtres sur au plus 366 jours; totaux sur tous les résultats, 50 trajets par page et CSV jusqu’à 5 000 trajets. Aucun GPS, calcul de trajet, taux d’indemnité ou écriture comptable automatique.",
+    "locationHint": "Au plus 160 caractères, sans saut de ligne."
   }
 }

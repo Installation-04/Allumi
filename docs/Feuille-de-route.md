@@ -64,3 +64,7 @@ Budgets annuels par exercice et compte, comparaison au réel et CSV disponibles 
 
 
 Des modèles CSV/TSV vierges des cinq types de lots, dans les deux langues et trois séparateurs, complètent la préparation de [[Migration-QuickBooks]]. Ils ne contiennent aucune donnée d’entreprise et ne créent aucun import lors du téléchargement.
+
+## Carnet manuel de kilométrage
+
+Le [[Carnet-de-kilometrage]] remplace la rubrique de prévision : saisie partagée, usages professionnel/personnel, précision au mètre, historique audité, filtres et CSV. Les trajets ne créent pas d’écriture. Le GPS, les itinéraires, indemnités et déductions automatiques restent à définir; la paie reste non livrée.

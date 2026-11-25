@@ -461,6 +461,7 @@ model Company {
   salesEstimates         SalesEstimate[]
   estimateCounter        SalesEstimateCounter?
   budgets                Budget[]
+  mileageTrips           MileageTrip[]
   cashForecastPresets    CashForecastPreset[]
   budgetLines            BudgetLine[]
   budgetMonthlyTargets   BudgetMonthlyTarget[]
@@ -1933,4 +1934,23 @@ model CashForecastPreset {
 
   @@unique([companyId, name])
   @@map("cash_forecast_preset")
+}
+
+
+model MileageTrip {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  companyId      String   @map("company_id") @db.Uuid
+  tripDate       DateTime @map("trip_date") @db.Date
+  vehicle        String
+  origin         String
+  destination    String
+  purpose        String
+  usage          String
+  distanceMeters Int      @map("distance_meters")
+  revision       Int      @default(1)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  company        Company  @relation(fields:[companyId],references:[id],onDelete:Restrict)
+  @@index([companyId,tripDate,createdAt,id])
+  @@map("mileage_trip")
 }

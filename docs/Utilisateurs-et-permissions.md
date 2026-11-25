@@ -81,3 +81,5 @@ L’[[Envoi-des-devis]] utilise les coordonnées, lignes et taxes figées. Aper�
 ## Migration QuickBooks
 
 L’action `migration.manage` est réservée à `OWNER`, l’administrateur d’entreprise; elle ne peut pas être accordée aux autres profils par une simple permission de module. Les actions Contacts, Catalogue ou Comptabilité et la lecture des références sont aussi contrôlées selon le lot. L’historique suit la même restriction. Voir [[Migration-QuickBooks]].
+
+Le [[Carnet-de-kilometrage]] utilise les droits du module **Comptabilité** : lecture pour consulter/exporter tous les trajets partagés, y compris personnels, écriture pour créer/modifier/supprimer. Aucun accès Contacts/Ventes/Taxes n’est requis. Les rôles en lecture seule restent plafonnés même si une surcharge demande l’écriture; une autorisation retirée est revérifiée à chaque action.

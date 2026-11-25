@@ -4810,3 +4810,13 @@ La migration additive `20261125000000_cash_forecast_presets` crée `cash_forecas
 RLS forcée : lecture avec Comptabilité + Ventes en lecture, insertion/suppression avec Comptabilité en écriture et Ventes en lecture, sous les droits du membre actif. Le rôle applicatif reçoit SELECT/INSERT/DELETE, sans UPDATE ni TRUNCATE. La garde refuse aussi toute mise à jour par le propriétaire SQL. Les créations/suppressions utilisent l’audit standard; les écritures financières restent inchangées.
 
 La capacité de 20 configurations par entreprise est sérialisée par verrou consultatif transactionnel commun au service et à la garde SQL, sous READ COMMITTED obligatoire. La garde VOLATILE relit le nombre après acquisition du verrou dans un instantané frais; les insertions directes et les lots sont également contrôlés. Fonction sous les privilèges de l’appelant, search_path fixé et exécution PUBLIC révoquée. Voir [[Configurations-de-prevision]].
+
+## Carnet de kilométrage
+
+La migration additive `20261125010000_mileage_log` crée `mileage_trip` : entreprise, date, véhicule, origine/destination, motif, usage BUSINESS/PERSONAL, distance en mètres, révision et horodatages. Les distances sont des INTEGER de 1 à 10 000 000 mètres, sans flottants en kilomètres. Les sommes de rapport passent en BIGINT puis sont formatées en kilomètres avec trois décimales. Un index `(company_id,trip_date,created_at,id)` soutient les filtres et l’ordre stable. Aucun lien aux écritures ou exercices.
+
+La fonction pure `mileage_text_valid` impose les longueurs et la normalisation des textes, rejette les contrôles C0/C1 et séparateurs de ligne Unicode. La date est valide entre 1900 et 2999 et ne peut dépasser le jour UTC de la commande. Le motif professionnel est obligatoire. La garde fige identité, entreprise et création; chaque mise à jour doit avancer la révision exactement d’un. Les services verrouillent la fiche avant de vérifier la révision pour modifier/supprimer et refusent un changement concurrent.
+
+RLS forcée et politiques restrictives Comptabilité : lecture avec accès read/write, mutations avec écriture et rôle autorisé. Pas de TRUNCATE. Audit standard après insertion/modification/suppression. Les fonctions ne sont pas SECURITY DEFINER; search_path fixé, exécution PUBLIC révoquée, fonction de validation pure exécutable par allumi_app pour les contraintes.
+
+Le rapport lit détail paginé, nombre et sommes professionnels/personnels dans une requête SQL unique, sur la même portée d’entreprise et les mêmes filtres. Recherche de véhicule littérale par position, période inclusive jusqu’à 366 jours, 50 lignes par page; CSV intégral plafonné à 5 000, sans résultat partiel. Toutes les réponses sont privées/sans cache. Voir [[Carnet-de-kilometrage]].

@@ -117,3 +117,5 @@ Suggestions : [[Suggestions-de-recherche]] — résultats autorisés pendant la 
 - [[Import-CSV-des-budgets-mensuels]] — aperçu actuel/proposé, remplacement des seuls comptes listés et annuels conservés.
 
 - [[Previsions-de-tresorerie]] — projection par échéances sur 7, 30, 60 ou 90 jours, hypothèses et exclusions explicites.
+
+- [[Carnet-de-kilometrage]] — trajets professionnels/personnels partagés, filtres, totaux et CSV complet.

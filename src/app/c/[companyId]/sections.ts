@@ -9,7 +9,7 @@ export const AREAS = {
   comptabilite: { icon: "accounts", links: ["comptes", "journal", "grand-livre", "balance", "resultats", "bilan", "exercices"] },
   projets: { icon: "overview", links: [] },
   paie: { icon: "contacts", links: [] },
-  kilometrage: { icon: "arrow", links: [] },
+  kilometrage: { icon: "arrow", links: ["kilometrage"] },
   applications: { icon: "overview", links: [] },
 } as const;
 export type Area = keyof typeof AREAS;

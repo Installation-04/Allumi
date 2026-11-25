@@ -26,6 +26,7 @@ export const ROUTE_ACCESS: Record<string, readonly Action[]> = {
   catalogue: ["catalog.read"],
   comptes: ["ledger.read"],
   budgets: ["ledger.read"],
+  kilometrage: ["mileage.read"],
   balance: ["ledger.read"],
   exercices: ["ledger.read"],
   taxes: ["taxes.read"],
@@ -54,6 +55,7 @@ const AREA_ACCESS: Partial<Record<Area, readonly Action[]>> = {
   rapports: ["ledger.read"],
   taxes: ["taxes.read"],
   comptabilite: ["ledger.read"],
+  kilometrage: ["mileage.read"],
 };
 
 export function canAccessRoute(company: AccessContext, route: string): boolean {

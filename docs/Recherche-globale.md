@@ -60,3 +60,5 @@ Voir [[Interface-et-navigation]], [[Recherche-des-paiements-clients]] et [[Utili
 [[Suggestions-de-recherche]] propose huit résultats maximum après deux caractères, avec navigation clavier/tactile et réponse privée sans cache. Le formulaire complet reste utilisable, y compris sans JavaScript.
 
 Le catalogue de rapports inclut [[Previsions-de-tresorerie]] : Comptabilité et Ventes en lecture sont toutes deux requises; aucune permission Contacts n’est nécessaire.
+
+Le catalogue de formulaires inclut aussi le [[Carnet-de-kilometrage]], retrouvable par « kilométrage », « mileage » ou « trajets » avec Comptabilité en lecture. Il ouvre le carnet; les véhicules et motifs des trajets ne sont pas recherchés globalement. Utilise les filtres du carnet pour les consulter.

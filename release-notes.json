@@ -1328,5 +1328,51 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.93": {
+    "fr-CA": {
+      "title": "Carnet de kilométrage partagé",
+      "added": [
+        {
+          "text": "Consignez les trajets professionnels/personnels, véhicules, motifs et distances exactes; modification protégée par révision et suppression confirmée auditée.",
+          "guide": "Carnet-de-kilometrage"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Filtres et totaux sur tous les résultats, pagination, CSV complet jusqu’à 5 000 trajets; navigation/recherche, FR/EN, sombre et mobile.",
+          "guide": "Carnet-de-kilometrage"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Migration additive mileage_log par migrate, aucune nouvelle configuration. Droits Comptabilité; les trajets personnels sont aussi partagés avec les lecteurs autorisés. Aucun GPS ni écriture, indemnité ou déduction automatique.",
+          "guide": "Carnet-de-kilometrage"
+        }
+      ]
+    },
+    "en": {
+      "title": "Shared mileage log",
+      "added": [
+        {
+          "text": "Record business/personal trips, vehicles, purposes and exact distances; revision-protected edits and confirmed, audited deletion.",
+          "guide": "Carnet-de-kilometrage"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Filtered totals across all results, pagination and complete CSV up to 5,000 trips; navigation/search, FR/EN, dark theme and mobile.",
+          "guide": "Carnet-de-kilometrage"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Additive mileage_log migration through migrate, no new configuration. Accounting permissions; personal trips are shared with authorized readers too. No GPS, automatic accounting entries, reimbursement rates or tax deductions.",
+          "guide": "Carnet-de-kilometrage"
+        }
+      ]
+    }
   }
 }

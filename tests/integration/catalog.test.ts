@@ -15,6 +15,16 @@ const q = async <T extends Record<string, unknown>>(sql: string, params: unknown
 // Tables that hold no tenant data and are read before any context exists.
 const WITHOUT_RLS = ["instance", "rate_limit"];
 
+it("guards mileage precision, text, dates, revisions and Accounting access with audit",async()=>{
+ expect(await q("SELECT conname FROM pg_constraint WHERE conname IN ('mileage_trip_date','mileage_trip_usage','mileage_trip_distance','mileage_trip_revision','mileage_trip_text','mileage_trip_business_purpose')")).toHaveLength(6);
+ expect(await q("SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('mileage_trip_guard','mileage_trip_audit')")).toHaveLength(2);
+ const policies=await q<{cmd:string;qual:string|null;with_check:string|null}>("SELECT cmd,qual,with_check FROM pg_policies WHERE tablename='mileage_trip' AND permissive='RESTRICTIVE'");
+ expect(policies.map(p=>p.cmd).sort()).toEqual(['DELETE','INSERT','SELECT','UPDATE']);for(const p of policies)expect(`${p.qual}${p.with_check}`).toContain('accounting');
+ const functions=await q<{name:string;definer:boolean;public_execute:boolean}>("SELECT proname AS name,prosecdef AS definer,has_function_privilege('public',oid,'EXECUTE') AS public_execute FROM pg_proc WHERE proname IN ('mileage_trip_guard','mileage_text_valid')");
+ expect(functions).toHaveLength(2);for(const f of functions){expect(f.definer).toBe(false);expect(f.public_execute).toBe(false);}
+ expect((await q("SELECT has_table_privilege('allumi_app','mileage_trip','TRUNCATE') AS ok"))[0]).toEqual({ok:false});
+});
+
 describe("database catalog (guards against a migration that forgets a table)", () => {
   it("forces row level security on every table except the two technical ones", async () => {
     const rows = await q<{ relname: string }>(

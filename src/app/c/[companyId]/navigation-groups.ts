@@ -5,6 +5,7 @@ export const NAVIGATION_GROUPS = {
   banque: ["transactions", "depots", "rapprochement", "integrations"],
   comptabilite: ["comptes", "journal", "balance", "exercices"],
   tresorerie: ["flux-tresorerie", "previsions-tresorerie"],
+  kilometrage: ["kilometrage"],
   rapports: ["budgets", "resultats", "bilan", "grand-livre", "releves-clients", "releves-fournisseurs", "age-clients", "age-fournisseurs", "sommaire-taxes"],
 } as const;
 
