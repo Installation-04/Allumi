@@ -213,6 +213,12 @@ Save up to 20 named **forecast configurations** per company: horizon and settlem
 
 [Mobile configurations](docs/images/configurations-prevision-en-dark-mobile.png)
 
+Annual and monthly budgets offer **complete print/PDF copies** with targets, posted actuals, differences and coverage warnings. Monthly copies retain the fiscal period and annual allocation status. Landscape paper stays light from dark/mobile views. [Guide](https://github.com/Installation-04/Allumi/wiki/Impression-des-budgets).
+
+![Budget print copy excerpt](docs/images/budget-mensuel-impression-en-dark-desktop.png)
+
+[Mobile print controls](docs/images/budget-mensuel-impression-en-dark-mobile.png)
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

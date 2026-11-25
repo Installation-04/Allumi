@@ -25,7 +25,7 @@ test.describe.configure({ mode: "serial" });
 let updateCookies: Awaited<ReturnType<BrowserContext["cookies"]>>;
 
 /** Optional wiki references from the isolated, fictional browser-test company only. */
-async function captureReference(page: Page, name: string, mobileHeading?: string | Locator) {
+async function captureReference(page: Page, name: string, mobileHeading?: string | Locator, fullPage?: boolean) {
   if (process.env.ALLUMI_SCREENSHOTS !== "1") return;
   // One prefix, or several separated by commas.
   if (process.env.ALLUMI_SCREENSHOT_PREFIX && !process.env.ALLUMI_SCREENSHOT_PREFIX.split(",").some((prefix) => name.startsWith(prefix))) return;
@@ -36,7 +36,7 @@ async function captureReference(page: Page, name: string, mobileHeading?: string
     await expect(heading, `reference ${name}: ${mobileHeading}`).toBeVisible();
     await heading.evaluate((element) => element.scrollIntoView({ block: "start" }));
   }
-  await page.screenshot({ scale: "css", path: `docs/images/${name}-${process.env.E2E_MOBILE === "1" ? "mobile" : "desktop"}.png`, fullPage: process.env.E2E_MOBILE !== "1", animations: "disabled" });
+  await page.screenshot({ scale: "css", path: `docs/images/${name}-${process.env.E2E_MOBILE === "1" ? "mobile" : "desktop"}.png`, fullPage: fullPage ?? process.env.E2E_MOBILE !== "1", animations: "disabled" });
 }
 
 /** The recovery codes list, in either language; the page also lists the signed-in devices. */
@@ -4163,3 +4163,69 @@ test("saved forecast configurations persist reusable filters with audited modula
   await db.end();
  }
 });
+
+
+test("budget print copies preserve complete annual and monthly reports with read-only fiscal access",async({page,browser})=>{
+ test.setTimeout(240_000);cspViolations.length=0;watchCsp(page.context());
+ if(updateCookies) await page.context().addCookies(updateCookies); await page.goto('/');
+ if(!updateCookies) {
+  await expect(page).toHaveURL(/\/setup$/); await page.locator('[name="setupToken"]').fill('e2e-setup-token-123456789'); await page.getByLabel("Nom de l'entreprise").fill('Atelier Exemple inc.'); await page.getByLabel("Premier mois de l'exercice financier").selectOption('4'); await page.getByLabel('Ton nom').fill('Alex Exemple'); await page.getByLabel('Courriel').fill(EMAIL); await page.getByLabel("Langue de l'interface").selectOption('fr-CA'); await page.getByLabel('Mot de passe',{exact:true}).fill(PASSWORD); await page.getByLabel('Confirmation du mot de passe').fill(PASSWORD); await page.getByRole('button',{name:"Créer l'entreprise et commencer",exact:true}).click(); await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
+ }
+ if(!/^\/c\/[0-9a-f-]{36}/.test(new URL(page.url()).pathname)) await page.getByRole('link',{name:'Atelier Exemple inc.',exact:true}).click();
+ await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}/);
+ const company=new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)![0],companyId=company.split('/')[2];
+
+
+ const db=new pg.Client({connectionString:e2eUrls().owner});await db.connect();let userId='',role='',access:unknown=null,backup='';
+ try{
+  const member=(await db.query('SELECT m.user_id,m.role,m.module_access FROM membership m JOIN app_user u ON u.id=m.user_id WHERE m.company_id=$1 AND u.email=$2',[companyId,EMAIL])).rows[0];userId=member.user_id;role=member.role;access=member.module_access;
+  const urls=e2eUrls(),fixtureEnv:NodeJS.ProcessEnv={...process.env,DATABASE_URL:urls.owner,APP_DATABASE_URL:urls.app,LOG_LEVEL:'silent'};for(const key of ['APP_URL','AUTH_SECRET','ENCRYPTION_KEY'])delete fixtureEnv[key];
+  const fixture=JSON.parse(execFileSync(process.execPath,['--conditions=react-server','--import=tsx','tests/e2e/seed-budget-print.ts',userId,companyId!],{encoding:'utf8',env:fixtureEnv,timeout:90_000})) as {budget:string;period:string;nextPeriod:string;year:string;count:number};expect(fixture.count).toBe(105);
+  const annual=company+'/budgets/'+fixture.budget,monthly=annual+'/mensuel?periode='+fixture.period;
+  const counts=async()=>(await db.query('SELECT (SELECT count(*) FROM journal_entry WHERE company_id=$1)::text AS entries,(SELECT count(*) FROM audit_log WHERE company_id=$1)::text AS audit,(SELECT revision FROM budget WHERE id=$2)::text AS revision',[companyId,fixture.budget])).rows;
+  const before=await counts();
+  await page.goto(annual);await budgetPrintJourney(page,false,false,fixture.count,true);
+  await page.goto(monthly);await budgetPrintJourney(page,true,false,fixture.count,false);await expect(page).toHaveURL(monthly);
+  await page.getByRole('button',{name:'English',exact:true}).click();await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption('dark');
+  await budgetPrintJourney(page,true,true,fixture.count,true);await page.goto(annual);await budgetPrintJourney(page,false,true,fixture.count,false);
+  await page.getByRole('combobox',{name:'Appearance',exact:true}).selectOption('light');await page.getByRole('button',{name:'Français',exact:true}).click();
+  for(const bad of ['',fixture.period+'&periode='+fixture.period,'not-a-period','00000000-0000-7000-8000-999999999999'])for(const suffix of ['', '/export','/imprimer'])expect((await page.request.get(annual+'/mensuel'+suffix+'?periode='+bad)).status()).toBe(404);
+  expect((await page.request.get(annual+'/imprimer')).status()).toBe(200);expect((await page.request.get(annual+'/mensuel/imprimer?periode='+fixture.nextPeriod)).status()).toBe(200);
+  expect((await page.request.get(company+'/budgets/00000000-0000-7000-8000-999999999999/imprimer')).status()).toBe(404);expect((await page.request.get('/c/00000000-0000-7000-8000-999999999999/budgets/'+fixture.budget+'/imprimer')).status()).toBe(404);
+  expect(await counts()).toEqual(before);
+  backup=(await db.query("INSERT INTO app_user(id,email,display_name,updated_at) VALUES(gen_random_uuid(),'budgetprint-'||gen_random_uuid()::text||'@example.test','Backup fixture owner',now()) RETURNING id")).rows[0].id;await db.query("INSERT INTO membership(id,company_id,user_id,role,updated_at) VALUES(gen_random_uuid(),$1,$2,'OWNER',now())",[companyId,backup]);
+  await db.query("UPDATE membership SET role='ACCOUNTANT',module_access='{\"accounting\":\"read\",\"contacts\":\"none\",\"sales\":\"none\",\"taxes\":\"none\",\"audit\":\"none\"}' WHERE company_id=$1 AND user_id=$2",[companyId,userId]);
+  const restrictedBefore=await counts();await page.goto(monthly);await budgetPrintJourney(page,true,false,fixture.count,false);await page.goto(annual);await budgetPrintJourney(page,false,false,fixture.count,false);expect(await counts()).toEqual(restrictedBefore);
+  await db.query("UPDATE membership SET module_access='{\"accounting\":\"none\"}' WHERE company_id=$1 AND user_id=$2",[companyId,userId]);for(const path of [annual+'/imprimer',annual+'/mensuel/imprimer?periode='+fixture.period])expect((await page.request.get(path)).status()).toBe(404);
+  await db.query('UPDATE membership SET role=$3::member_role,module_access=$4::jsonb WHERE company_id=$1 AND user_id=$2',[companyId,userId,role,JSON.stringify(access??{})]);
+  const guest=await browser.newContext();try{const res=await guest.request.get(new URL(annual+'/imprimer',page.url()).href,{maxRedirects:0});expect(res.status()).toBe(307);expect(res.headers()['location']).toContain('/connexion');}finally{await guest.close();}
+  await db.query('BEGIN');try{
+   await db.query("SELECT set_config('app.user_id',$1,true),set_config('app.company_id',$2,true)",[userId,companyId]);
+   await db.query("INSERT INTO account(id,company_id,code,name_fr,name_en,type,subtype,updated_at) SELECT gen_random_uuid(),$1,'BP91-LIM-'||lpad(n::text,3,'0'),'Capacité '||n,'Capacity '||n,'EXPENSE','OPERATING_EXPENSE',now() FROM generate_series(1,895) n",[companyId]);
+   await db.query("INSERT INTO budget_line(id,company_id,budget_id,account_id,amount_cents,updated_at) SELECT gen_random_uuid(),$1,$2,id,1,now() FROM account WHERE company_id=$1 AND code LIKE 'BP91-LIM-%'",[companyId,fixture.budget]);await db.query('COMMIT');
+  }catch(e){await db.query('ROLLBACK');throw e;}
+  const cappedBefore=await counts();for(const path of [annual+'/imprimer',annual+'/mensuel/imprimer?periode='+fixture.period]){await page.goto(path);await expect(page.locator('.budget-print table').getByRole('row')).toHaveCount(1001);await expect(page.locator('.budget-print table')).toContainText('BP91-LIM-895');}expect(await counts()).toEqual(cappedBefore);
+  await db.query('BEGIN');try{await db.query("SELECT set_config('app.user_id',$1,true),set_config('app.company_id',$2,true)",[userId,companyId]);const a=(await db.query("INSERT INTO account(id,company_id,code,name_fr,name_en,type,subtype,updated_at) VALUES(gen_random_uuid(),$1,'BP91-OVER','Au-delà','Over capacity','EXPENSE','OPERATING_EXPENSE',now()) RETURNING id",[companyId])).rows[0].id;await db.query('INSERT INTO budget_line(id,company_id,budget_id,account_id,amount_cents,updated_at) VALUES(gen_random_uuid(),$1,$2,$3,1,now())',[companyId,fixture.budget,a]);await db.query('COMMIT');}catch(e){await db.query('ROLLBACK');throw e;}
+  for(const path of [annual+'/imprimer',annual+'/mensuel/imprimer?periode='+fixture.period]){await page.goto(path);await expect(page.getByRole('main').getByRole('alert')).toBeVisible();await expect(page.locator('.budget-print table')).toHaveCount(0);await expect(page.getByRole('button',{name:'Imprimer / PDF',exact:true})).toHaveCount(0);}
+  expect(cspViolations).toEqual([]);
+ }finally{
+  if(userId&&role)await db.query('UPDATE membership SET role=$3::member_role,module_access=$4::jsonb WHERE company_id=$1 AND user_id=$2',[companyId,userId,role,JSON.stringify(access??{})]);
+  if(backup){await db.query('DELETE FROM membership WHERE company_id=$1 AND user_id=$2',[companyId,backup]);await db.query('UPDATE app_user SET disabled_at=now() WHERE id=$1',[backup]);}await db.end();
+ }
+});
+
+async function budgetPrintJourney(page:Page,monthly:boolean,english:boolean,count:number,capture:boolean){
+ const original=page.url();await page.getByRole('link',{name:english?'Complete print / PDF':'Impression / PDF complet',exact:true}).click();
+ const root=page.locator('.budget-print'),table=root.getByRole('table');await expect(root.getByRole('heading',{name:english?(monthly?'Monthly budget — print copy':'Annual budget — print copy'):(monthly?'Budget mensuel — copie imprimable':'Budget annuel — copie imprimable'),exact:true})).toBeVisible();
+ await expect(table.getByRole('row')).toHaveCount(count+1);await expect(table).toContainText('BP91-ZZ-100');await expect(table).toContainText('BP91-UNSET');await expect(table.getByRole('row').filter({hasText:'BP91-UNSET'})).toContainText(english?'Not set':'Non défini');
+ const revenue=table.getByRole('row').filter({hasText:'BP91-REV'}),zero=table.getByRole('row').filter({hasText:'BP91-ZERO'});await expect(revenue).toContainText(english?(monthly?'2,600.00':'2,770.00'):(monthly?'2 600,00':'2 770,00'));await expect(zero).toContainText(english?'0.00':'0,00');
+ if(monthly){await expect(root).toContainText('2024-04-01');await expect(root).toContainText('2024-04-30');await expect(revenue).toContainText(english?'5,000.00':'5 000,00');await expect(revenue).toContainText(english?'5,000.01':'5 000,01');await expect(revenue).toContainText('2 / 12');}
+ const response=await page.request.get(page.url());expect(response.status()).toBe(200);expect(response.headers()['cache-control']).toContain('private');expect(response.headers()['cache-control']).toContain('no-store');expect(await response.text()).not.toContain('BUDGET-PRINT-PRIVATE');
+ await expect(root.locator('form,input,select')).toHaveCount(0);await expect(table.getByRole('link')).toHaveCount(0);await expectNoPageOverflow(page);
+ if(capture&&process.env.E2E_MOBILE==='1')await captureReference(page,monthly?'budget-mensuel-impression-en-dark':'budget-annuel-impression',root.getByRole('button',{name:english?'Print / PDF':'Imprimer / PDF',exact:true}));
+ let posts=0;const request=(r:{method:()=>string})=>{if(r.method()==='POST')posts++;};page.on('request',request);await page.evaluate(()=>{window.print=()=>document.documentElement.setAttribute('data-budget-print','true');});await root.getByRole('button',{name:english?'Print / PDF':'Imprimer / PDF',exact:true}).click();await expect(page.locator('html')).toHaveAttribute('data-budget-print','true');expect(posts).toBe(0);page.off('request',request);
+ await page.emulateMedia({media:'print'});await expect(page.locator('.workspace-header')).toBeHidden();await expect(root.getByRole('button',{name:english?'Print / PDF':'Imprimer / PDF',exact:true})).toBeHidden();expect(await page.locator('body').evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(255, 255, 255)');expect(await table.locator('thead').evaluate(e=>getComputedStyle(e).display)).toBe('table-header-group');expect(await table.locator('th,td').evaluateAll(cells=>cells.some(c=>c.scrollWidth>c.clientWidth+1))).toBe(false);
+ if(capture&&process.env.E2E_MOBILE!=='1'&&process.env.ALLUMI_SCREENSHOTS==='1'){const viewport=page.viewportSize()!;await page.setViewportSize({width:1280,height:1280});await captureReference(page,monthly?'budget-mensuel-impression-en-dark':'budget-annuel-impression',undefined,false);await page.setViewportSize(viewport);}
+ if(process.env.E2E_MOBILE!=='1'){const pdf=await page.pdf({preferCSSPageSize:true,printBackground:true});expect(pdf.subarray(0,5).toString()).toBe('%PDF-');expect((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)??[]).length).toBeGreaterThan(1);const size=/\/MediaBox\s*\[\s*0\s+0\s+([\d.]+)\s+([\d.]+)/.exec(pdf.toString('latin1'));expect(size).not.toBeNull();expect(Number(size![1])).toBeGreaterThan(Number(size![2]));}
+ await page.emulateMedia({media:'screen'});await root.getByRole('link',{name:english?'Back to budget':'Retour au budget',exact:true}).click();await expect(page).toHaveURL(original);
+}

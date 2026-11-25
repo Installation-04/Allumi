@@ -3451,7 +3451,8 @@
       "inactive": "Le compte de la ligne {row} est inactif. Réactivez-le puis rechargez l’aperçu, ou corrigez le fichier.",
       "annual": "Ligne {row} : ce code doit désigner un compte de revenus/charges ayant un objectif annuel dans ce budget.",
       "excess": "Ligne {row} : la somme mensuelle dépasse l’objectif annuel existant de ce compte."
-    }
+    },
+    "printView": "Impression / PDF complet"
   },
   "migration": {
     "title": "Migrer depuis QuickBooks",
@@ -3673,5 +3674,15 @@
     "deleted": "Configuration supprimée.",
     "limit": "Le maximum de 20 configurations est atteint. Supprimez une configuration avant d’en créer une autre.",
     "limits": "Seuls le nom, l’horizon et les deux délais sont conservés. Aucun montant, date de référence, résultat ou instantané comptable n’est enregistré. Les réglages sont immuables : supprimez puis recréez une configuration pour les remplacer. Aucune écriture ni programmation de paiement."
+  },
+  "budgetPrint": {
+    "annualTitle": "Budget annuel — copie imprimable",
+    "monthlyTitle": "Budget mensuel — copie imprimable",
+    "back": "Retour au budget",
+    "hint": "Les données sont relues à l’ouverture de cette copie. Imprimer / PDF utilise les valeurs affichées sans nouvel enregistrement. Choisis Enregistrer en PDF dans la fenêtre du navigateur.",
+    "fiscalYear": "Exercice : {from} → {to}.",
+    "revision": "Révision des objectifs : {revision}.",
+    "rowCount": "Comptes inclus : {count}.",
+    "limits": "Tous les comptes du rapport autorisé sont inclus, jusqu’au plafond de 1 000 comptes. Les objectifs non définis restent distincts de zéro; les totaux d’objectifs ne comprennent que les valeurs définies. Cette copie ne crée ni écriture comptable ni affectation budgétaire."
   }
 }

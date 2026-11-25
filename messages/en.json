@@ -3451,7 +3451,8 @@
       "inactive": "The account at row {row} is inactive. Reactivate it and reload the preview, or fix the file.",
       "annual": "Row {row}: this code must identify a revenue/expense account with an annual target in this budget.",
       "excess": "Row {row}: the monthly total exceeds this account’s existing annual target."
-    }
+    },
+    "printView": "Complete print / PDF"
   },
   "migration": {
     "title": "Migrate from QuickBooks",
@@ -3673,5 +3674,15 @@
     "deleted": "Configuration deleted.",
     "limit": "The maximum of 20 configurations has been reached. Delete a configuration before creating another.",
     "limits": "Only the name, horizon and two delays are stored. No amounts, reference date, results or accounting snapshot are saved. Settings are immutable: delete and recreate a configuration to replace them. No accounting entries or scheduled payments."
+  },
+  "budgetPrint": {
+    "annualTitle": "Annual budget — print copy",
+    "monthlyTitle": "Monthly budget — print copy",
+    "back": "Back to budget",
+    "hint": "Data is read again when this copy opens. Print / PDF uses the displayed values without saving anything. Choose Save as PDF in the browser dialog.",
+    "fiscalYear": "Fiscal year: {from} → {to}.",
+    "revision": "Target revision: {revision}.",
+    "rowCount": "Included accounts: {count}.",
+    "limits": "All accounts in the authorized report are included, up to the 1,000-account limit. Undefined targets remain distinct from zero; target totals include only defined amounts. This copy creates no accounting entries or budget allocations."
   }
 }

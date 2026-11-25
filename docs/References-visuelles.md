@@ -654,3 +654,15 @@ Réglages partagés d’horizon/délais, création et suppression confirmée : [
 ![Saved configurations, English dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/configurations-prevision-en-dark-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/configurations-prevision-en-dark-mobile.png" alt="Saved configurations on mobile in dark theme" width="412">
+
+## Copies annuelles et mensuelles des budgets
+
+Extraits des copies papier et commandes sur téléphone : [[Impression-des-budgets]].
+
+![Extrait annuel](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/budget-annuel-impression-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/budget-annuel-impression-mobile.png" alt="Copie annuelle sur téléphone" width="412">
+
+![Monthly print excerpt, English](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/budget-mensuel-impression-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/budget-mensuel-impression-en-dark-mobile.png" alt="Monthly copy on mobile, English dark theme" width="412">

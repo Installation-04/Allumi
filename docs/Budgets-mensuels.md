@@ -50,3 +50,7 @@ Le rapport exige les **douze périodes fiscales** et limite à **1 000 comptes**
 Les six captures utilisent une entreprise fictive dans Chromium et son émulation mobile. Les essais physiques Safari iOS restent à effectuer.
 
 Voir [[Budgets-annuels]], [[Duplication-des-budgets]], [[Import-CSV-des-budgets]], [[Exercices-et-periodes]], [[Utilisateurs-et-permissions]], [[Mise-a-jour]] et [[Schema-de-donnees]].
+
+## Impression et PDF
+
+**Impression / PDF complet** ouvre une copie comptable dédiée, sans formulaire de modification, avec toutes les lignes autorisées. Le mensuel conserve la période fiscale sélectionnée. Papier paysage clair, même depuis le thème sombre et le mobile; retour au rapport et aucune écriture. Voir [[Impression-des-budgets]] pour le contenu, les limites et les captures.
