@@ -4834,3 +4834,9 @@ Les trois tables ont RLS forcée et politiques Ventes en lecture/écriture. Le r
 L’auditeur dédié conserve les modifications internes avec auteur connecté et les seuls événements externes autorisés client.view/client.sign comme événements système avec marqueur LINK_HOLDER, sans usurper un utilisateur. Jeton et copie chiffrée exclus de l’audit. Le trigger général AL011 des autres tables demeure strict. Fonctions SQL, contraintes, privilèges et rôle sans TRUNCATE vérifiés par le catalogue; révocation, concurrence, confidentialité et absence de mutations financières vérifiées en intégration.
 
 Migrations additives 20261125020000_client_documents, 20261125021000_document_template_guards, 20261125022000_document_signing_availability, 20261125023000_client_document_public_fields, 20261125024000_client_document_source_locks et 20261125025000_client_document_customer_names. Aucun nouveau secret ni variable : chiffrement via ENCRYPTION_KEY, limitation via AUTH_SECRET, liens via APP_URL et relais SMTP existant.
+
+## Disponibilité des sources lors de l’envoi d’un lien client
+
+La migration additive `20261125030000_client_document_delivery_source_guard` renforce `client_document_delivery_guard` sans nouvelle table ni colonne. Après verrouillage du document publié, une réservation d’envoi verrouille sa source en lecture partagée et exige une soumission SENT/ACCEPTED/CONVERTED ou une facture POSTED. Une source annulée bloque la réservation en service et en SQL. Les tentatives déjà terminées restent immuables; aucun courriel n’est rappelé après sa réservation.
+
+Le suivi lit les métadonnées sous RLS Ventes, joint les états des sources de la même entreprise et filtre avant pagination dans une seule requête SQL. Les jetons et contenus privés ne figurent pas dans cette lecture. La signature conservée et la disponibilité du lien sont deux états distincts.

@@ -4,6 +4,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Suivi des contrats : filtres combinés par type, consultation/signature et disponibilité, recherche littérale et pagination conservée; dates de publication, ouverture, signature et expiration visibles en FR/EN sombre/mobile.
+- Fiabilité : signature et accès affichés séparément; expiration, révocation et source annulée cohérentes dans la liste, la fiche et le panneau source, sans effacer les preuves ni créer de mouvement comptable.
+- Envoi : lien récupérable et commande d’envoi retirés si la source est annulée; refus en service et en SQL avec verrou contre une annulation concurrente. Révocation encore possible après expiration ou annulation.
+- Installation : migration additive de garde SQL, aucune nouvelle configuration ni dépendance; un message déjà réservé ou envoyé ne peut pas être rappelé. Guide, captures, README et nouveautés bilingues inclus.
+
 ## [0.4.0-alpha.96] - 2026-11-25
 
 - Contrats : modèle partagé jusqu’à 50 000 caractères, boutons d’insertion et tarif horaire exact répercuté dans les variables, aperçu FR/EN sombre/mobile; conditions longues et tarif aussi dans les soumissions.

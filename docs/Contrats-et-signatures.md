@@ -75,6 +75,10 @@ Le client peut imprimer le document et sa preuve ou enregistrer un PDF avec **Im
 
 Les recherches de titre/client et les listes paginées sont propres à l’entreprise. Les réponses du portail sont privées, sans cache, sans referrer et non indexables; aucun accès anonyme direct aux tables n’est accordé. Les données et clés existantes doivent être sauvegardées ensemble : [[Sauvegardes]].
 
+## Retrouver les documents et suivre les accès
+
+[[Suivi-des-contrats]] décrit les filtres par type, consultation/signature et disponibilité, les dates visibles et le blocage des nouveaux envois après annulation de la source. Une signature reste visible même si le lien expire ou est révoqué.
+
 ## Références visuelles
 
 ![Éditeur français avec tarif réutilisable](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-editeur-desktop.png)

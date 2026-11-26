@@ -72,3 +72,5 @@ Le [[Carnet-de-kilometrage]] remplace la rubrique de prévision : saisie partag�
 Disponible : copie dédiée [[Impression-du-kilometrage]] du carnet partagé, complète jusqu’à 1 000 trajets, avec les mêmes filtres, totaux et droits. PDF dans le navigateur; GPS, indemnités et paie restent hors de ce lot.
 
 Disponible : [[Contrats-et-signatures]] avec conditions longues et tarif variable, partage privé et suivi d’ouverture, signature déclarée avec preuve figée. Les intégrations de signature qualifiée, l’identité vérifiée et les signatures dessinées ne font pas partie de cette livraison.
+
+Disponible : [[Suivi-des-contrats]] avec filtres par type/étape/disponibilité, dates et contrôles d’envoi liés à l’état de la source. Aucun suivi automatique de lecture du courriel ni signature supplémentaire.
