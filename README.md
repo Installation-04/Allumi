@@ -261,6 +261,12 @@ Download a confidential [document evidence package](docs/Dossier-de-preuve-des-d
 
 <img src="docs/images/contrats-preuve-mobile.png" alt="Document evidence package, mobile" width="412">
 
+Optionally [choose an existing client](docs/Choisir-un-client-pour-un-contrat.md) when creating, copying or editing a contract draft. Search active clients, review the copied name/email, and keep your terms, hourly rate and document language. Requires Sales write and Contacts read; manual entry remains available.
+
+![Existing client selection](docs/images/contrats-client-desktop.png)
+
+<img src="docs/images/contrats-client-mobile.png" alt="Existing client selection, mobile" width="412">
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

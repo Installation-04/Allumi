@@ -91,6 +91,10 @@ Les recherches de titre/client et les listes paginées sont propres à l’entre
 
 [[Dossier-de-preuve-des-documents]] décrit le téléchargement privé du contenu publié, de son empreinte et de la signature déclarée, y compris après expiration/révocation.
 
+## Choisir un client du répertoire
+
+[[Choisir-un-client-pour-un-contrat]] décrit la recherche facultative de clients actifs pour préremplir le nom/courriel avant revue, sans changer les conditions, le tarif ou la langue.
+
 ## Références visuelles
 
 ![Éditeur français avec tarif réutilisable](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-editeur-desktop.png)

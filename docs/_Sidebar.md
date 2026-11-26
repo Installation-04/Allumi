@@ -154,3 +154,5 @@
 - [[Export-et-nettoyage-des-contrats]] : suivi CSV complet et suppression confirmée des brouillons.
 
 - [[Dossier-de-preuve-des-documents]] : téléchargement JSON privé du contenu publié et de la signature déclarée, avec empreinte contrôlée et limites explicites.
+
+- [[Choisir-un-client-pour-un-contrat]] : préremplissage facultatif du nom/courriel depuis les clients actifs, sous les droits Ventes/Contacts.

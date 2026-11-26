@@ -3881,6 +3881,19 @@
     "deleteConfirm": "I confirm deleting this unpublished draft.",
     "evidenceTitle": "Evidence package",
     "evidenceDownload": "Download evidence package (JSON)",
-    "evidenceHint": "Confidential copy of the published content and declared signature, with UTC dates and a checked hash. Contains names and email addresses. No private link is included; this file does not certify the signer’s identity and is not digitally sealed."
+    "evidenceHint": "Confidential copy of the published content and declared signature, with UTC dates and a checked hash. Contains names and email addresses. No private link is included; this file does not certify the signer’s identity and is not digitally sealed.",
+    "customerLookup": "Choose an existing client",
+    "customerLookupHint": "Optional. Search active clients by name or email, then select one to replace only the contract’s client name and email. Review the fields before saving.",
+    "customerSearch": "Name or email to search",
+    "customerFind": "Find a client",
+    "customerLoading": "Searching…",
+    "customerQueryHint": "Enter between 2 and 100 characters, without control characters.",
+    "customerUnavailable": "Search unavailable. Try again or use the manual fields below.",
+    "customerEmpty": "No active client found. You can use the manual fields.",
+    "customerMore": "More than 20 clients match. Refine the search to find the others.",
+    "customerResults": "Matching active clients",
+    "customerUse": "Use {name}",
+    "customerNoEmail": "No email — enter one in the contract",
+    "customerSelected": "Name and email copied. Review them before saving; terms, hourly rate and language are preserved."
   }
 }

@@ -738,3 +738,15 @@ Voir [[Dossier-de-preuve-des-documents]].
 ![Evidence package, English dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-preuve-en-dark-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-preuve-en-dark-mobile.png" alt="Evidence package, English mobile" width="412">
+
+## Choisir un client pour un contrat
+
+Voir [[Choisir-un-client-pour-un-contrat]].
+
+![Client existant](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-client-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-client-mobile.png" alt="Client existant sur mobile" width="412">
+
+![Client selection, English dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-client-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-client-en-dark-mobile.png" alt="Client selection, English mobile" width="412">

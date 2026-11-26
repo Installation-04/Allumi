@@ -4,6 +4,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Contrats : recherche privée de clients actifs du répertoire et sélection explicite du nom/courriel dans les nouveaux contrats, copies et brouillons; conditions, tarif et langue conservés pour revue.
+- Permissions : Ventes écriture et Contacts lecture vérifiés côté serveur; saisie manuelle maintenue sans Contacts, réponses minimales et entreprise isolée, fournisseurs seuls/archivés/anonymisés exclus.
+- Interface : recherche littérale limitée à 20 résultats, clavier, annulation des demandes périmées, reprise manuelle après erreur et valeurs conservées; FR/EN, mobile/thème sombre, guides, README et captures.
+- Installation : aucune migration, dépendance ou configuration nouvelle; aucune synchronisation permanente avec les contacts, publication, transmission ou écriture comptable par la recherche.
+
 ## [0.4.0-alpha.100] - 2026-11-26
 
 - Documents publiés : dossier JSON privé du contenu figé et de la signature déclarée, avec empreinte SHA-256 contrôlée avant téléchargement et format versionné.

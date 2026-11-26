@@ -41,6 +41,10 @@ Pour retrouver les nouveaux brouillons et suivre leurs futurs liens, voir [[Suiv
 
 [[Export-et-nettoyage-des-contrats]] décrit le suivi CSV complet sous les mêmes filtres et la suppression confirmée des seuls brouillons. Les documents publiés et leurs preuves restent conservés.
 
+## Choisir un client du répertoire
+
+[[Choisir-un-client-pour-un-contrat]] décrit la recherche facultative de clients actifs pour préremplir le nom/courriel avant revue, sans changer les conditions, le tarif ou la langue.
+
 ## Références visuelles
 
 ![Copie française d’un contrat pour revue](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-copie-desktop.png)
