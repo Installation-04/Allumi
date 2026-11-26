@@ -260,6 +260,12 @@ Télécharge un [dossier de preuve confidentiel](docs/Dossier-de-preuve-des-docu
 
 <img src="docs/images/contrats-preuve-mobile.png" alt="Dossier de preuve des documents, mobile" width="412">
 
+Tu peux [choisir un client existant](docs/Choisir-un-client-pour-un-contrat.md) lors de la création, copie ou modification d’un brouillon. Recherche les clients actifs, révise le nom/courriel repris et conserve les conditions, le tarif et la langue du contrat. Ventes écriture et Contacts lecture nécessaires; saisie manuelle toujours disponible.
+
+![Choix d’un client existant](docs/images/contrats-client-desktop.png)
+
+<img src="docs/images/contrats-client-mobile.png" alt="Choix d’un client existant, mobile" width="412">
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

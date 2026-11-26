@@ -3881,6 +3881,19 @@
     "deleteConfirm": "Je confirme la suppression de ce brouillon non publié.",
     "evidenceTitle": "Dossier de preuve",
     "evidenceDownload": "Télécharger le dossier de preuve (JSON)",
-    "evidenceHint": "Copie confidentielle du contenu publié et de la signature déclarée, avec dates UTC et empreinte contrôlée. Contient des noms et courriels. Aucun lien privé inclus; ce fichier ne certifie pas l’identité du signataire et n’est pas scellé numériquement."
+    "evidenceHint": "Copie confidentielle du contenu publié et de la signature déclarée, avec dates UTC et empreinte contrôlée. Contient des noms et courriels. Aucun lien privé inclus; ce fichier ne certifie pas l’identité du signataire et n’est pas scellé numériquement.",
+    "customerLookup": "Choisir un client existant",
+    "customerLookupHint": "Facultatif. Cherche un client actif par nom ou courriel, puis choisis-le pour remplacer seulement le nom et le courriel du contrat. Relis les champs avant d’enregistrer.",
+    "customerSearch": "Nom ou courriel à rechercher",
+    "customerFind": "Rechercher un client",
+    "customerLoading": "Recherche en cours…",
+    "customerQueryHint": "Saisis entre 2 et 100 caractères, sans caractère de contrôle.",
+    "customerUnavailable": "Recherche indisponible. Réessaie ou utilise les champs manuels ci-dessous.",
+    "customerEmpty": "Aucun client actif trouvé. Tu peux utiliser les champs manuels.",
+    "customerMore": "Plus de 20 clients correspondent. Précise la recherche pour retrouver les autres.",
+    "customerResults": "Clients actifs trouvés",
+    "customerUse": "Utiliser {name}",
+    "customerNoEmail": "Aucun courriel — à saisir dans le contrat",
+    "customerSelected": "Nom et courriel repris. Vérifie-les avant d’enregistrer; les conditions, le tarif et la langue sont conservés."
   }
 }

@@ -72,3 +72,5 @@ Disponible : [[Duplication-des-contrats]] en nouveau brouillon indépendant apr�
 Disponible : [[Export-et-nettoyage-des-contrats]], CSV complet jusqu’à 5 000 résultats filtrés sans données de lien/preuve, et suppression confirmée des seuls brouillons avec audit et révision. Aucun document publié supprimé ni mouvement financier.
 
 Disponible : [[Dossier-de-preuve-des-documents]], contenu publié et informations de signature déclarées en JSON privé, vérification de l’empreinte du contenu et conservation après expiration/révocation. Aucun scellement numérique du fichier ni contrôle d’identité.
+
+Disponible : [[Choisir-un-client-pour-un-contrat]], recherche privée de clients actifs et sélection du nom/courriel pour revue, avec Ventes écriture et Contacts lecture. Saisie manuelle conservée et aucune synchronisation permanente avec le répertoire.

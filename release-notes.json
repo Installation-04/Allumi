@@ -1684,5 +1684,51 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.103": {
+    "fr-CA": {
+      "title": "Choisir un client existant pour préparer un contrat",
+      "added": [
+        {
+          "text": "Recherchez un client actif et reprenez son nom/courriel dans un nouveau contrat, une copie ou un brouillon avant de les vérifier.",
+          "guide": "Choisir-un-client-pour-un-contrat"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Les conditions, le tarif et la langue sont conservés. Saisie manuelle disponible sans Contacts lecture; aucun remplacement avant un choix explicite.",
+          "guide": "Choisir-un-client-pour-un-contrat"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration, dépendance ou variable nouvelle. Mise à jour serveur habituelle; Windows reste un client du serveur existant.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Choose an existing client when preparing a contract",
+      "added": [
+        {
+          "text": "Search active clients and copy a name/email into a new contract, a copy or an editable draft for review.",
+          "guide": "Choisir-un-client-pour-un-contrat"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Terms, hourly rate and language are preserved. Manual entry remains available without Contacts read; nothing is replaced before an explicit selection.",
+          "guide": "Choisir-un-client-pour-un-contrat"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No new migration, dependency or environment variable. Use the usual server update process; Windows remains a client of the existing server.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }
