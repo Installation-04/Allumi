@@ -39,6 +39,10 @@ Le service et la base refusent aussi une nouvelle réservation d’envoi. Un ver
 
 Ces consultations et filtres ne changent aucun document, aucune signature et aucune écriture comptable. L’affichage ne garantit ni l’identité du visiteur ni la lecture intégrale; voir [[Contrats-et-signatures]].
 
+## Export et brouillons inutiles
+
+[[Export-et-nettoyage-des-contrats]] décrit le suivi CSV complet sous les mêmes filtres et la suppression confirmée des seuls brouillons. Les documents publiés et leurs preuves restent conservés.
+
 ## Références visuelles
 
 ![Suivi filtré des contrats signés](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-suivi-desktop.png)

@@ -898,7 +898,8 @@
       "confirm": "Confirmation required.",
       "signature": "Signature refused. Check your name, recipient email, confirmation and document version.",
       "rateLimit": "Too many requests. Try again later.",
-      "mailRate": "Wait one minute before resending; maximum 20 deliveries per day for this link."
+      "mailRate": "Wait one minute before resending; maximum 20 deliveries per day for this link.",
+      "exportLimit": "More than 5,000 documents match. Narrow the filters; no partial file was created."
     }
   },
   "settingsPage": {
@@ -3869,6 +3870,13 @@
     "copy": "Duplicate as draft",
     "copyTitle": "New contract from a copy",
     "copyHint": "The selected contract fields are copied for review. Check the client, email, title, language and rate. Variables follow these fields; literal values still need editing. Saving creates an independent draft without a signature, private link or delivery.",
-    "copySource": "Review original contract"
+    "copySource": "Review original contract",
+    "exportCsv": "Export tracking CSV",
+    "exportHint": "All filtered results, up to 5,000 documents; no private links, terms or detailed evidence. UTC dates in the file.",
+    "csvReference": "Allumi reference",
+    "csvCapturedAt": "Tracking captured at",
+    "deleteDraft": "Delete draft",
+    "deleteHint": "Only this draft will be removed. Any accounting source stays unchanged; an audit event is retained. Published documents cannot be deleted here.",
+    "deleteConfirm": "I confirm deleting this unpublished draft."
   }
 }

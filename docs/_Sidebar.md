@@ -150,3 +150,5 @@
 - [[Suivi-des-contrats]] : filtres combinables, dates et disponibilité des liens.
 
 - [[Duplication-des-contrats]] : préparer un nouveau brouillon depuis un contrat existant.
+
+- [[Export-et-nettoyage-des-contrats]] : suivi CSV complet et suppression confirmée des brouillons.

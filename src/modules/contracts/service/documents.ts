@@ -10,7 +10,7 @@ import { AppError, isConflict, toAppError } from "@/platform/errors";
 import { env } from "@/platform/env";
 import { deliverMail, mailConfigured, requireMailConfigured } from "@/platform/mail";
 import { contractInput, type ContractInput } from "../domain/document";
-import { documentStage, documentLinkState, trackingFilters } from "../domain/tracking";
+import { documentStage, documentLinkState, clientDocumentQuery, CLIENT_DOCUMENT_EXPORT_LIMIT } from "../domain/tracking";
 import { trackingRows } from "./tracking";
 
 const kindSchema=z.enum(['CONTRACT','ESTIMATE','INVOICE']),statusSchema=z.enum(['DRAFT','PUBLISHED']);
@@ -78,9 +78,18 @@ export async function getClientDocument(actor:CompanyContext,id:string){if(!z.uu
  const deliveries=await tx.clientDocumentDelivery.findMany({where:{companyId:actor.companyId,documentId:id},orderBy:[{createdAt:"desc"},{id:"desc"}],take:20,select:{id:true,recipient:true,status:true,createdAt:true,completedAt:true}});
  return {...d,kind:kindSchema.parse(d.kind),status:statusSchema.parse(d.status),url,writable,deliveries,stage:documentStage(d),linkState,sourceAvailable,mailConfigured:mailConfigured()};
 });}
+function parsedQuery(q:string,page:number,filters:{kind?:string;stage?:string;link?:string}){try{return clientDocumentQuery({q,page:String(page),kind:filters.kind,stage:filters.stage,link:filters.link});}catch{throw new AppError('contracts.invalid');}}
 export async function listClientDocuments(actor:CompanyContext,q="",page=1,filters:{kind?:string;stage?:string;link?:string}={}){
- q=q.trim();const parsed=trackingFilters.safeParse(filters);if(!parsed.success||[...q].length>120||/[\p{Cc}]/u.test(q)||!Number.isSafeInteger(page)||page<1||page>1000)throw new AppError("contracts.invalid");
- return withCompany(actor,async tx=>{await requireRole(tx,"sales.read");const rows=await trackingRows(tx,actor.companyId,q,parsed.data,51,(page-1)*50);return {rows:rows.slice(0,50),hasMore:rows.length>50,page};});
+ const parsed=parsedQuery(q,page,filters);return withCompany(actor,async tx=>{await requireRole(tx,"sales.read");const rows=await trackingRows(tx,actor.companyId,parsed.q,parsed,51,(parsed.page-1)*50);return {rows:rows.slice(0,50),hasMore:rows.length>50,page:parsed.page};});
+}
+export async function exportClientDocuments(actor:CompanyContext,input:Record<string,string|string[]|undefined>={}){
+ let parsed;try{parsed=clientDocumentQuery(input);}catch{throw new AppError('contracts.invalid');}
+ return withCompany(actor,async tx=>{await requireRole(tx,'sales.read');const rows=await trackingRows(tx,actor.companyId,parsed.q,parsed,CLIENT_DOCUMENT_EXPORT_LIMIT+1,0);if(rows.length>CLIENT_DOCUMENT_EXPORT_LIMIT)throw new AppError('contracts.exportLimit');
+ return rows.map(d=>({id:d.id,title:d.title,customerName:d.customerName,kind:d.kind,stage:d.stage,linkState:d.linkState,publishedAt:d.publishedAt?.toISOString()??'',firstViewedAt:d.firstViewedAt?.toISOString()??'',signedAt:d.signedAt?.toISOString()??'',expiresAt:d.expiresAt?.toISOString()??'',capturedAt:d.capturedAt.toISOString()}));});
+}
+export async function deleteClientDraft(actor:CompanyContext,id:string,revision:number,confirmed:boolean){
+ if(confirmed!==true)throw new AppError('contracts.confirm');if(!Number.isSafeInteger(revision)||revision<1)throw new AppError('contracts.invalid');
+ return withCompany(actor,async tx=>{await manage(tx);const d=await locked(tx,actor,id,revision);if(d.status!=='DRAFT')throw new AppError('contracts.immutable');if((await tx.clientDocument.deleteMany({where:{companyId:actor.companyId,id}})).count!==1)throw new AppError('forbidden');return {sourceEstimateId:d.sourceEstimateId,sourceInvoiceId:d.sourceInvoiceId};});
 }
 async function requireAvailableSource(tx:Tx,d:{kind:string;companyId:string;sourceEstimateId:string|null;sourceInvoiceId:string|null}){
  if(d.kind==='CONTRACT')return;

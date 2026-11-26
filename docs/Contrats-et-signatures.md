@@ -83,6 +83,10 @@ Les recherches de titre/client et les listes paginées sont propres à l’entre
 
 [[Duplication-des-contrats]] reprend les champs et variables pour revue dans un nouveau brouillon indépendant. La signature, le lien privé et les envois de l’original ne sont pas copiés.
 
+## Export et brouillons inutiles
+
+[[Export-et-nettoyage-des-contrats]] décrit le suivi CSV complet sous les mêmes filtres et la suppression confirmée des seuls brouillons. Les documents publiés et leurs preuves restent conservés.
+
 ## Références visuelles
 
 ![Éditeur français avec tarif réutilisable](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-editeur-desktop.png)
