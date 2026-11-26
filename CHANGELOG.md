@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.98] - 2026-11-25
+
 - Contrats : duplication en nouveau brouillon depuis un contrat existant, avec revue du client/courriel, du texte brut, de la langue et du tarif exact; variables et aperçu conservés.
 - Confidentialité : aucune signature, consultation, empreinte publiée, expiration, révocation, clé de lien ou tentative d’envoi copiée; lecture de préremplissage sans création, Ventes en écriture et isolation par entreprise.
 - Interface : commande disponible sur les contrats y compris signés/expirés/révoqués, aperçu FR/EN sombre/mobile et lien vers l’original; publication et envoi restent des actions séparées.
