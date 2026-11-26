@@ -152,3 +152,5 @@
 - [[Duplication-des-contrats]] : préparer un nouveau brouillon depuis un contrat existant.
 
 - [[Export-et-nettoyage-des-contrats]] : suivi CSV complet et suppression confirmée des brouillons.
+
+- [[Dossier-de-preuve-des-documents]] : téléchargement JSON privé du contenu publié et de la signature déclarée, avec empreinte contrôlée et limites explicites.

@@ -43,6 +43,10 @@ Ces consultations et filtres ne changent aucun document, aucune signature et auc
 
 [[Export-et-nettoyage-des-contrats]] décrit le suivi CSV complet sous les mêmes filtres et la suppression confirmée des seuls brouillons. Les documents publiés et leurs preuves restent conservés.
 
+## Conserver le contenu et la preuve
+
+[[Dossier-de-preuve-des-documents]] décrit le téléchargement privé du contenu publié, de son empreinte et de la signature déclarée, y compris après expiration/révocation.
+
 ## Références visuelles
 
 ![Suivi filtré des contrats signés](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-suivi-desktop.png)

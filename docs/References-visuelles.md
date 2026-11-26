@@ -726,3 +726,15 @@ Les références de l’éditeur FR/EN, du formulaire client et de la preuve fig
 ![Export du suivi](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-export-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-nettoyage-en-dark-mobile.png" alt="Draft cleanup on mobile" width="412">
+
+## Dossier de preuve des documents
+
+Voir [[Dossier-de-preuve-des-documents]].
+
+![Dossier de preuve](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-preuve-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-preuve-mobile.png" alt="Dossier de preuve sur mobile" width="412">
+
+![Evidence package, English dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-preuve-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-preuve-en-dark-mobile.png" alt="Evidence package, English mobile" width="412">

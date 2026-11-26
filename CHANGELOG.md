@@ -4,6 +4,13 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.100] - 2026-11-26
+
+- Documents publiés : dossier JSON privé du contenu figé et de la signature déclarée, avec empreinte SHA-256 contrôlée avant téléchargement et format versionné.
+- Conservation : copie disponible après expiration/révocation et annulation de la source, sans rouvrir le lien ni enregistrer une consultation; brouillons et accès étrangers refusés.
+- Interface : commande Ventes lecture, explications de confidentialité FR/EN et limites du contrôle, mobile/thème sombre, guides, README et captures.
+- Installation : aucune migration, dépendance ou configuration nouvelle; aucun mouvement comptable, courriel ou signature créé par le téléchargement.
+
 ## [0.4.0-alpha.99] - 2026-11-26
 
 - Contrats : export CSV privé de tous les résultats filtrés jusqu’à 5 000 documents, sans pagination ni fichier partiel; libellés FR/EN, dates UTC et textes de formule neutralisés, aucune condition ou donnée d’accès incluse.

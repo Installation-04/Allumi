@@ -4,3 +4,5 @@ export { signatureConsent, type ContractInput, type PublicClientDocument } from 
 export { sourceDocumentText } from "./domain/source";
 export { DOCUMENT_KINDS, DOCUMENT_STAGES, LINK_STATES, documentStage, documentLinkState, type TrackingFilters, clientDocumentQuery, CLIENT_DOCUMENT_EXPORT_LIMIT } from "./domain/tracking";
 export { clientDocumentsCsv, type ClientDocumentExportRow } from "./domain/export";
+
+export { getClientDocumentEvidence } from "./service/evidence";
