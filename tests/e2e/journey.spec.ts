@@ -246,7 +246,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   for (const [category, heading] of [["added", "Nouveautés"], ["improved", "Améliorations"], ["fixed", "Corrections"], ["installation", "Installation"]] as const) {
     const items = RELEASE_NOTES[VERSION]!["fr-CA"][category];
     await expect(news.getByRole("heading", { name: heading, exact: true })).toHaveCount(items.length ? 1 : 0);
-    for (const item of items) await expect(news.getByText(item.text, { exact: true })).toBeVisible();
+    for (const item of items) await expect(news.getByRole("listitem").getByText(item.text, { exact: true })).toBeVisible();
   }
   await expect(news.getByRole("link",{name:"Notes complètes de la release sur GitHub",exact:true})).toHaveAttribute("href",`https://github.com/Installation-04/Allumi/releases/tag/v${VERSION}`);
   await expectNoPageOverflow(page);await captureReference(page,"nouveautes-versions",`Nouveautés de la version ${VERSION}`);
@@ -255,7 +255,7 @@ test("setup, sign-in, two-factor enrollment and sign-in with a code", async ({ p
   for (const [category, heading] of [["added", "New features"], ["improved", "Improvements"], ["fixed", "Fixes"], ["installation", "Installation"]] as const) {
     const items = RELEASE_NOTES[VERSION]!.en[category];
     await expect(englishNews.getByRole("heading", { name: heading, exact: true })).toHaveCount(items.length ? 1 : 0);
-    for (const item of items) await expect(englishNews.getByText(item.text, { exact: true })).toBeVisible();
+    for (const item of items) await expect(englishNews.getByRole("listitem").getByText(item.text, { exact: true })).toBeVisible();
   }
   if(VERSION==="0.4.0-alpha.62"){await englishNews.locator("summary",{hasText:"Earlier documented versions"}).click();await expect(englishNews.getByText("Version 0.4.0-alpha.61",{exact:true})).toBeVisible();}
   await expectNoPageOverflow(page);await captureReference(page,"nouveautes-versions-en-dark",`What’s new in version ${VERSION}`);
