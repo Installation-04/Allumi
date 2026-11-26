@@ -68,3 +68,5 @@ La copie [[Impression-du-kilometrage]] reprend tous les résultats du carnet jus
 [[Suivi-des-contrats]] : recherche littérale, filtres combinés et dates; les preuves signées restent visibles après expiration/révocation. Les nouveaux envois sont bloqués lorsque la source est annulée. Un message déjà réservé ou transmis ne peut pas être rappelé.
 
 Disponible : [[Duplication-des-contrats]] en nouveau brouillon indépendant après revue; aucun lien privé, signature ou envoi repris, aucune synchronisation automatique avec l’original.
+
+Disponible : [[Export-et-nettoyage-des-contrats]], CSV complet jusqu’à 5 000 résultats filtrés sans données de lien/preuve, et suppression confirmée des seuls brouillons avec audit et révision. Aucun document publié supprimé ni mouvement financier.

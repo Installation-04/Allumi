@@ -4,6 +4,13 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.99] - 2026-11-26
+
+- Contrats : export CSV privé de tous les résultats filtrés jusqu’à 5 000 documents, sans pagination ni fichier partiel; libellés FR/EN, dates UTC et textes de formule neutralisés, aucune condition ou donnée d’accès incluse.
+- Brouillons : suppression confirmée en Ventes écriture, sous verrou et révision, avec audit; sources comptables intactes, documents publiés protégés même expirés/révoqués, publication concurrente arbitrée.
+- Interface : téléchargement depuis le suivi et nettoyage depuis la fiche, permissions modulaires et lecture seule respectées; guides, captures, README et nouveautés bilingues.
+- Installation : aucune migration, dépendance ou configuration nouvelle; aucune écriture financière, transmission de courriel ou signature par ces parcours.
+
 ## [0.4.0-alpha.98] - 2026-11-25
 
 - Contrats : duplication en nouveau brouillon depuis un contrat existant, avec revue du client/courriel, du texte brut, de la langue et du tarif exact; variables et aperçu conservés.

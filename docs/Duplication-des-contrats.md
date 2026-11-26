@@ -37,6 +37,10 @@ Seuls les **contrats autonomes** sont copiés par ce parcours. Une copie de soum
 
 Pour retrouver les nouveaux brouillons et suivre leurs futurs liens, voir [[Suivi-des-contrats]].
 
+## Export et brouillons inutiles
+
+[[Export-et-nettoyage-des-contrats]] décrit le suivi CSV complet sous les mêmes filtres et la suppression confirmée des seuls brouillons. Les documents publiés et leurs preuves restent conservés.
+
 ## Références visuelles
 
 ![Copie française d’un contrat pour revue](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-copie-desktop.png)

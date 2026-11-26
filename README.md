@@ -249,6 +249,12 @@ Reuse an existing contract as an independent draft: review the client, terms, la
 
 <img src="docs/images/contrats-copie-en-dark-mobile.png" alt="Contract copy on mobile" width="412">
 
+Export all filtered tracking results to CSV (up to 5,000 documents) and delete unused drafts with confirmation. Published documents and signed evidence stay protected. [Guide](https://github.com/Installation-04/Allumi/wiki/Export-et-nettoyage-des-contrats).
+
+![Contract tracking export](docs/images/contrats-export-desktop.png)
+
+<img src="docs/images/contrats-nettoyage-en-dark-mobile.png" alt="Confirmed draft cleanup on mobile" width="412">
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

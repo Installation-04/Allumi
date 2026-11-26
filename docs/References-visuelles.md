@@ -718,3 +718,11 @@ Les références de l’éditeur FR/EN, du formulaire client et de la preuve fig
 ![Copie de contrat](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-copie-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-copie-en-dark-mobile.png" alt="Contract copy on mobile in dark theme" width="412">
+
+## Export du suivi et brouillons
+
+[[Export-et-nettoyage-des-contrats]] : export complet du suivi filtré et suppression confirmée d’un brouillon, français/anglais, clair/sombre, ordinateur/mobile.
+
+![Export du suivi](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-export-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-nettoyage-en-dark-mobile.png" alt="Draft cleanup on mobile" width="412">

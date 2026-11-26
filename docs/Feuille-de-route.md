@@ -76,3 +76,5 @@ Disponible : [[Contrats-et-signatures]] avec conditions longues et tarif variabl
 Disponible : [[Suivi-des-contrats]] avec filtres par type/étape/disponibilité, dates et contrôles d’envoi liés à l’état de la source. Aucun suivi automatique de lecture du courriel ni signature supplémentaire.
 
 Disponible : [[Duplication-des-contrats]] en nouveau brouillon indépendant après revue; aucun lien privé, signature ou envoi repris, aucune synchronisation automatique avec l’original.
+
+Disponible : [[Export-et-nettoyage-des-contrats]], CSV complet jusqu’à 5 000 résultats filtrés sans données de lien/preuve, et suppression confirmée des seuls brouillons avec audit et révision. Aucun document publié supprimé ni mouvement financier.

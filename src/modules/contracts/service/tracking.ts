@@ -2,14 +2,14 @@ import "server-only";
 import { type Tx } from "@/platform/tenant";
 import { documentStage, type TrackingFilters, type DOCUMENT_KINDS, type LINK_STATES } from "../domain/tracking";
 
-export type TrackingRow = { id: string; kind: typeof DOCUMENT_KINDS[number]; title: string; customerName: string; status: string; firstViewedAt: Date | null; signedAt: Date | null; revokedAt: Date | null; expiresAt: Date | null; publishedAt: Date | null; createdAt: Date; linkState: typeof LINK_STATES[number] };
+export type TrackingRow = { id: string; kind: typeof DOCUMENT_KINDS[number]; title: string; customerName: string; status: string; firstViewedAt: Date | null; signedAt: Date | null; revokedAt: Date | null; expiresAt: Date | null; publishedAt: Date | null; createdAt: Date; capturedAt: Date; linkState: typeof LINK_STATES[number] };
 /** One snapshot: filter the complete result before the bounded page, never select link secrets. */
 export async function trackingRows(tx: Tx, companyId: string, q: string, filters: TrackingFilters, take: number, skip: number, sourceId: string | null = null, sourceKind: string | null = null) {
   const rows = await tx.$queryRaw<TrackingRow[]>`
     WITH tracked AS (
       SELECT d.id, d.kind, d.title, d.customer_name AS "customerName", d.status,
         d.first_viewed_at AS "firstViewedAt", d.signed_at AS "signedAt", d.revoked_at AS "revokedAt",
-        d.expires_at AS "expiresAt", d.published_at AS "publishedAt", d.created_at AS "createdAt",
+        d.expires_at AS "expiresAt", d.published_at AS "publishedAt", d.created_at AS "createdAt", statement_timestamp() AS "capturedAt",
         CASE WHEN d.status='DRAFT' THEN 'DRAFT' WHEN d.signed_at IS NOT NULL THEN 'SIGNED'
           WHEN d.first_viewed_at IS NOT NULL THEN 'VIEWED' ELSE 'PUBLISHED' END AS stage,
         CASE WHEN d.status='DRAFT' THEN 'DRAFT' WHEN d.revoked_at IS NOT NULL THEN 'REVOKED'

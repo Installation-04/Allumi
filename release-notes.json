@@ -1576,5 +1576,59 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.99": {
+    "fr-CA": {
+      "title": "Exporter le suivi et nettoyer les brouillons",
+      "added": [
+        {
+          "text": "Téléchargez tous les résultats filtrés en CSV jusqu’à 5 000 documents, avec les mêmes droits et un refus complet au-delà du plafond.",
+          "guide": "Export-et-nettoyage-des-contrats"
+        },
+        {
+          "text": "Supprimez les brouillons inutiles après confirmation, avec révision, verrou et audit. Les sources comptables restent intactes et les documents publiés ne peuvent pas être supprimés.",
+          "guide": "Export-et-nettoyage-des-contrats"
+        }
+      ],
+      "improved": [
+        {
+          "text": "CSV FR/EN avec dates UTC et textes de formule neutralisés; aucun lien privé, condition ou preuve détaillée inclus. Les filtres sont partagés avec la liste, avant pagination.",
+          "guide": "Export-et-nettoyage-des-contrats"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration, nouvelle dépendance ou variable. Windows reste un client du serveur existant; aucun mouvement financier ou envoi automatique.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Export contract tracking and clean up drafts",
+      "added": [
+        {
+          "text": "Download all filtered tracking results as CSV up to 5,000 documents, with the same permissions and no partial export above the limit.",
+          "guide": "Export-et-nettoyage-des-contrats"
+        },
+        {
+          "text": "Delete unused drafts after confirmation, with revision checks, locking and audit. Accounting sources stay unchanged and published documents cannot be deleted.",
+          "guide": "Export-et-nettoyage-des-contrats"
+        }
+      ],
+      "improved": [
+        {
+          "text": "French/English CSV with UTC dates and formula-safe text; private links, terms and detailed evidence are excluded. Filters are shared with the list and applied before pagination.",
+          "guide": "Export-et-nettoyage-des-contrats"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration, new dependencies or variables. Windows remains a client of the existing server; no financial posting or automatic delivery.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

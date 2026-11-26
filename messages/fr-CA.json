@@ -898,7 +898,8 @@
       "confirm": "Confirmation requise.",
       "signature": "Signature refusée. Vérifie le nom, le courriel du destinataire, la confirmation et la version du document.",
       "rateLimit": "Trop de demandes. Réessaie plus tard.",
-      "mailRate": "Attends une minute avant un renvoi; maximum 20 envois par jour pour ce lien."
+      "mailRate": "Attends une minute avant un renvoi; maximum 20 envois par jour pour ce lien.",
+      "exportLimit": "Plus de 5 000 documents correspondent. Réduis les filtres; aucun fichier partiel n’a été créé."
     }
   },
   "settingsPage": {
@@ -3869,6 +3870,13 @@
     "copy": "Dupliquer en brouillon",
     "copyTitle": "Nouveau contrat à partir d’une copie",
     "copyHint": "Les champs du contrat choisi sont repris pour revue. Vérifie le client, le courriel, le titre, la langue et le tarif. Les variables suivent ces champs; les valeurs écrites en dur restent à modifier. Enregistrer crée un nouveau brouillon indépendant, sans signature, lien privé ni envoi.",
-    "copySource": "Revoir le contrat d’origine"
+    "copySource": "Revoir le contrat d’origine",
+    "exportCsv": "Exporter le suivi CSV",
+    "exportHint": "Tous les résultats filtrés, jusqu’à 5 000 documents; aucun lien privé, condition ou preuve détaillée. Dates UTC dans le fichier.",
+    "csvReference": "Référence Allumi",
+    "csvCapturedAt": "Suivi extrait le",
+    "deleteDraft": "Supprimer le brouillon",
+    "deleteHint": "Seul ce brouillon sera retiré. La source comptable éventuelle reste intacte; une trace de suppression est conservée dans l’audit. Un document publié ne peut pas être supprimé ici.",
+    "deleteConfirm": "Je confirme la suppression de ce brouillon non publié."
   }
 }
