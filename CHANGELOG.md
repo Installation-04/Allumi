@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.100] - 2026-11-26
+
 - Documents publiés : dossier JSON privé du contenu figé et de la signature déclarée, avec empreinte SHA-256 contrôlée avant téléchargement et format versionné.
 - Conservation : copie disponible après expiration/révocation et annulation de la source, sans rouvrir le lien ni enregistrer une consultation; brouillons et accès étrangers refusés.
 - Interface : commande Ventes lecture, explications de confidentialité FR/EN et limites du contrôle, mobile/thème sombre, guides, README et captures.
