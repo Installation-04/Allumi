@@ -3856,6 +3856,15 @@
     "insertClient": "Insérer le nom du client",
     "insertCompany": "Insérer le nom de l’entreprise",
     "trackingHint": "Le suivi concerne l’ouverture du document via ce lien; les courriels envoyés sans lien ne fournissent pas ce suivi.",
-    "signatureUnavailable": "Cette soumission ne peut plus être signée. Contacte l’entreprise pour vérifier sa validité ou obtenir une nouvelle version."
+    "signatureUnavailable": "Cette soumission ne peut plus être signée. Contacte l’entreprise pour vérifier sa validité ou obtenir une nouvelle version.",
+    "kindFilter": "Type de document",
+    "stageFilter": "Consultation et signature",
+    "linkFilter": "Disponibilité du lien",
+    "all": "Tous",
+    "AVAILABLE": "Lien accessible",
+    "SOURCE_UNAVAILABLE": "Source indisponible",
+    "linkDraft": "Aucun lien publié",
+    "linkUnavailableHint": "La source est annulée ou indisponible. Ce lien ne peut plus être ouvert ni envoyé. La preuve conservée reste consultable.",
+    "datesZone": "Dates et heures : Toronto."
   }
 }

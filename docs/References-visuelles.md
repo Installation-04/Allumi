@@ -702,3 +702,11 @@ Les références de l’éditeur FR/EN, du formulaire client et de la preuve fig
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-portail-mobile.png" alt="Signature client sur téléphone" width="412">
 
 ![English signature evidence](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-signature-en-dark-desktop.png)
+
+## Suivi des contrats
+
+[[Suivi-des-contrats]] montre les filtres combinés et les dates en français/anglais, clair/sombre, ordinateur/mobile.
+
+![Suivi des contrats](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-suivi-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-suivi-en-dark-mobile.png" alt="English contract tracking on mobile" width="412">

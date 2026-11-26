@@ -64,3 +64,5 @@ Le [[Carnet-de-kilometrage]] partagé est disponible : trajets professionnels/pe
 La copie [[Impression-du-kilometrage]] reprend tous les résultats du carnet jusqu’à 1 000 trajets, avec filtres, totaux et droits identiques. Papier paysage clair, retour aux filtres/page; PDF via le navigateur uniquement. CSV inchangé jusqu’à 5 000; aucun calcul d’indemnité ou de déduction fiscale.
 
 [[Contrats-et-signatures]] : modèle jusqu’à 50 000 caractères, tarif horaire réutilisable, contrats immuables après publication, liens clients pour contrats/soumissions/factures, ouverture explicite et signature par nom saisi/consentement avec empreinte et audit externe. Factures consultables seulement. Pas de vérification d’identité, certificat qualifié, signature dessinée, acceptation/conversion automatique du devis ni suivi de lecture des anciens courriels sans lien.
+
+[[Suivi-des-contrats]] : recherche littérale, filtres combinés et dates; les preuves signées restent visibles après expiration/révocation. Les nouveaux envois sont bloqués lorsque la source est annulée. Un message déjà réservé ou transmis ne peut pas être rappelé.

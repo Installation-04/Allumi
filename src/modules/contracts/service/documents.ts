@@ -10,6 +10,8 @@ import { AppError, isConflict, toAppError } from "@/platform/errors";
 import { env } from "@/platform/env";
 import { deliverMail, mailConfigured, requireMailConfigured } from "@/platform/mail";
 import { contractInput, type ContractInput } from "../domain/document";
+import { documentStage, documentLinkState, trackingFilters } from "../domain/tracking";
+import { trackingRows } from "./tracking";
 
 const kindSchema=z.enum(['CONTRACT','ESTIMATE','INVOICE']),statusSchema=z.enum(['DRAFT','PUBLISHED']);
 const uuid=(id:string)=>{if(!z.uuid().safeParse(id).success)throw new AppError("contracts.invalid");};
@@ -62,19 +64,26 @@ export async function revokeClientDocument(actor:CompanyContext,id:string,revisi
 }
 export async function getClientDocument(actor:CompanyContext,id:string){if(!z.uuid().safeParse(id).success)return null;return withCompany(actor,async tx=>{
  await requireRole(tx,"sales.read");let writable=false;try{await manage(tx);writable=true;}catch(e){if(!(e instanceof AppError&&e.key==="forbidden"))throw e;}
- const d=await tx.clientDocument.findFirst({where:{companyId:actor.companyId,id},select:{id:true,kind:true,sourceEstimateId:true,sourceInvoiceId:true,title:true,customerName:true,customerEmail:true,issuerName:true,locale:true,body:true,hourlyRateCents:true,status:true,renderedBody:true,sourceSnapshot:true,contentHash:true,publishedAt:true,expiresAt:true,revokedAt:true,firstViewedAt:true,signedAt:true,signerName:true,signerEmail:true,consentText:true,revision:true,createdAt:true}});if(!d)return null;
- let url:string|null=null;if(writable&&d.status==="PUBLISHED"&&!d.revokedAt&&d.expiresAt&&d.expiresAt>new Date()){const [secret]=await tx.$queryRaw<{cipher:Uint8Array}[]>`SELECT token_cipher AS cipher FROM client_document WHERE company_id=${actor.companyId}::uuid AND id=${id}::uuid AND (SELECT app_module_level('sales'))='write'`;if(secret?.cipher)url=link(decrypt(secret.cipher,binding(actor.companyId,id)));}
+ const d=await tx.clientDocument.findFirst({where:{companyId:actor.companyId,id},select:{id:true,kind:true,sourceEstimateId:true,sourceInvoiceId:true,title:true,customerName:true,customerEmail:true,issuerName:true,locale:true,body:true,hourlyRateCents:true,status:true,renderedBody:true,sourceSnapshot:true,contentHash:true,publishedAt:true,expiresAt:true,revokedAt:true,firstViewedAt:true,signedAt:true,signerName:true,signerEmail:true,consentText:true,revision:true,createdAt:true,sourceEstimate:{select:{status:true}},sourceInvoice:{select:{status:true}}}});if(!d)return null;
+ const sourceAvailable=d.kind==="CONTRACT"||d.kind==="ESTIMATE"&&!!d.sourceEstimate&&["SENT","ACCEPTED","CONVERTED"].includes(d.sourceEstimate.status)||d.kind==="INVOICE"&&d.sourceInvoice?.status==="POSTED";
+ const linkState=documentLinkState(d,sourceAvailable);
+ let url:string|null=null;if(writable&&linkState==="AVAILABLE"){const [secret]=await tx.$queryRaw<{cipher:Uint8Array}[]>`SELECT token_cipher AS cipher FROM client_document WHERE company_id=${actor.companyId}::uuid AND id=${id}::uuid AND status='PUBLISHED' AND revoked_at IS NULL AND expires_at>statement_timestamp() AND (SELECT app_module_level('sales'))='write' AND (kind='CONTRACT' OR kind='ESTIMATE' AND EXISTS(SELECT 1 FROM sales_estimate e WHERE e.company_id=client_document.company_id AND e.id=client_document.source_estimate_id AND e.status IN ('SENT','ACCEPTED','CONVERTED')) OR kind='INVOICE' AND EXISTS(SELECT 1 FROM sales_document i WHERE i.company_id=client_document.company_id AND i.id=client_document.source_invoice_id AND i.status='POSTED'))`;if(secret?.cipher)url=link(decrypt(secret.cipher,binding(actor.companyId,id)));}
  const deliveries=await tx.clientDocumentDelivery.findMany({where:{companyId:actor.companyId,documentId:id},orderBy:[{createdAt:"desc"},{id:"desc"}],take:20,select:{id:true,recipient:true,status:true,createdAt:true,completedAt:true}});
- return {...d,kind:kindSchema.parse(d.kind),status:statusSchema.parse(d.status),url,writable,deliveries,mailConfigured:mailConfigured()};
+ return {...d,kind:kindSchema.parse(d.kind),status:statusSchema.parse(d.status),url,writable,deliveries,stage:documentStage(d),linkState,sourceAvailable,mailConfigured:mailConfigured()};
 });}
-export async function listClientDocuments(actor:CompanyContext,q="",page=1){
- q=q.trim();if([...q].length>120||/[\p{Cc}]/u.test(q)||!Number.isSafeInteger(page)||page<1||page>1000)throw new AppError("contracts.invalid");const term=q.replace(/[\\%_]/g,"\\$&");
- return withCompany(actor,async tx=>{await requireRole(tx,"sales.read");const rows=await tx.clientDocument.findMany({where:{companyId:actor.companyId,...(term?{OR:[{title:{contains:term,mode:"insensitive"}},{customerName:{contains:term,mode:"insensitive"}}]}:{})},orderBy:[{createdAt:"desc"},{id:"desc"}],take:51,skip:(page-1)*50,select:{id:true,kind:true,title:true,customerName:true,status:true,firstViewedAt:true,signedAt:true,revokedAt:true,expiresAt:true}});return {rows:rows.slice(0,50).map(d=>({...d,kind:kindSchema.parse(d.kind),status:statusSchema.parse(d.status)})),hasMore:rows.length>50,page};});
+export async function listClientDocuments(actor:CompanyContext,q="",page=1,filters:{kind?:string;stage?:string;link?:string}={}){
+ q=q.trim();const parsed=trackingFilters.safeParse(filters);if(!parsed.success||[...q].length>120||/[\p{Cc}]/u.test(q)||!Number.isSafeInteger(page)||page<1||page>1000)throw new AppError("contracts.invalid");
+ return withCompany(actor,async tx=>{await requireRole(tx,"sales.read");const rows=await trackingRows(tx,actor.companyId,q,parsed.data,51,(page-1)*50);return {rows:rows.slice(0,50),hasMore:rows.length>50,page};});
+}
+async function requireAvailableSource(tx:Tx,d:{kind:string;companyId:string;sourceEstimateId:string|null;sourceInvoiceId:string|null}){
+ if(d.kind==='CONTRACT')return;
+ const rows=d.kind==='ESTIMATE'?await tx.$queryRaw<{id:string}[]>`SELECT id FROM sales_estimate WHERE company_id=${d.companyId}::uuid AND id=${d.sourceEstimateId}::uuid AND status IN ('SENT','ACCEPTED','CONVERTED') FOR SHARE`:await tx.$queryRaw<{id:string}[]>`SELECT id FROM sales_document WHERE company_id=${d.companyId}::uuid AND id=${d.sourceInvoiceId}::uuid AND status='POSTED' FOR SHARE`;
+ if(rows.length!==1)throw new AppError('contracts.unavailable');
 }
 export async function sendClientDocument(actor:CompanyContext,id:string,attemptId:string,confirmed:boolean){
  uuid(id);uuid(attemptId);if(confirmed!==true)throw new AppError("contracts.confirm");
  const reserved=await withCompany(actor,async tx=>{await manage(tx);const d=await locked(tx,actor,id);const existing=await tx.clientDocumentDelivery.findFirst({where:{companyId:actor.companyId,id:attemptId}});if(existing){if(existing.documentId!==id)throw new AppError("contracts.invalid");return {existing};}
- if(d.status!=="PUBLISHED"||d.revokedAt||!d.expiresAt||d.expiresAt<=new Date()||!d.tokenCipher)throw new AppError("contracts.unavailable");requireMailConfigured();
+ if(d.status!=="PUBLISHED"||d.revokedAt||!d.expiresAt||d.expiresAt<=new Date()||!d.tokenCipher)throw new AppError("contracts.unavailable");await requireAvailableSource(tx,d);requireMailConfigured();
  const attempts=await tx.clientDocumentDelivery.findMany({where:{companyId:actor.companyId,documentId:id},orderBy:{createdAt:'desc'},take:20});const now=Date.now();if(attempts.some(a=>a.createdAt.getTime()>now-60000)||attempts.filter(a=>a.createdAt.getTime()>now-86400000).length>=20)throw new AppError('contracts.mailRate');
  const attempt=await tx.clientDocumentDelivery.create({data:{id:attemptId,companyId:actor.companyId,documentId:id,recipient:d.customerEmail,locale:d.locale,createdById:actor.userId}});
  const url=link(decrypt(d.tokenCipher,binding(actor.companyId,id))),en=d.locale==="en",subject=(d.issuerName+" · "+d.title).replace(/[\r\n\x00-\x1f\x7f]/g," ").slice(0,200),text=[d.issuerName,d.title,"",en?"View the document using this private link. Contracts and estimates can be signed after review.":"Consultez le document avec ce lien privé. Les contrats et soumissions peuvent être signés après consultation.",url,"",en?"Anyone with this link can access the document. Please do not forward it.":"Toute personne disposant du lien peut accéder au document. Veuillez ne pas le transférer."].join("\n");
@@ -87,4 +96,4 @@ export async function sendClientDocument(actor:CompanyContext,id:string,attemptI
 }
 export const newDeliveryId=()=>randomUUID();
 
-export async function sourceClientDocuments(actor:CompanyContext,kind:'ESTIMATE'|'INVOICE',sourceId:string){uuid(sourceId);return withCompany(actor,async tx=>{await requireRole(tx,'sales.read');return tx.clientDocument.findMany({where:{companyId:actor.companyId,...(kind==='ESTIMATE'?{sourceEstimateId:sourceId}:{sourceInvoiceId:sourceId})},orderBy:[{createdAt:'desc'},{id:'desc'}],take:20,select:{id:true,title:true,status:true,firstViewedAt:true,signedAt:true,revokedAt:true,expiresAt:true}});});}
+export async function sourceClientDocuments(actor:CompanyContext,kind:'ESTIMATE'|'INVOICE',sourceId:string){uuid(sourceId);if(!['ESTIMATE','INVOICE'].includes(kind))throw new AppError('contracts.invalid');return withCompany(actor,async tx=>{await requireRole(tx,'sales.read');return trackingRows(tx,actor.companyId,"",{},20,0,sourceId,kind);});}

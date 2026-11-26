@@ -1474,5 +1474,61 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.97": {
+    "fr-CA": {
+      "title": "Suivi des contrats et disponibilité des liens",
+      "added": [
+        {
+          "text": "Retrouvez les documents par type, consultation/signature et disponibilité du lien, avec recherche littérale, filtres combinés et dates visibles.",
+          "guide": "Suivi-des-contrats"
+        }
+      ],
+      "improved": [
+        {
+          "text": "La signature conservée reste visible après expiration ou révocation du lien. Les mêmes états et dates apparaissent dans la liste, la fiche et les documents sources, en FR/EN et sur mobile.",
+          "guide": "Suivi-des-contrats"
+        }
+      ],
+      "fixed": [
+        {
+          "text": "Une source annulée retire le lien récupérable et bloque un nouvel envoi en service et en SQL avec verrou concurrent. La révocation reste possible; un courriel déjà réservé ou transmis ne peut pas être rappelé.",
+          "guide": "Suivi-des-contrats"
+        }
+      ],
+      "installation": [
+        {
+          "text": "Une migration additive renforce la garde SQL, sans nouvelle table, colonne, dépendance ou variable. Utilisez le processus habituel de mise à jour; Windows reste un client du serveur existant.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Contract tracking and link availability",
+      "added": [
+        {
+          "text": "Find documents by type, viewing/signing stage and link availability, with literal search, combined filters and visible dates.",
+          "guide": "Suivi-des-contrats"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Retained signatures remain visible after link expiry or revocation. Lists, details and source documents show consistent states and dates in French/English and on mobile.",
+          "guide": "Suivi-des-contrats"
+        }
+      ],
+      "fixed": [
+        {
+          "text": "A cancelled source hides the recoverable link and blocks new mail reservations in the service and database with a source lock. Revocation remains available; mail already reserved or sent cannot be recalled.",
+          "guide": "Suivi-des-contrats"
+        }
+      ],
+      "installation": [
+        {
+          "text": "One additive migration strengthens the SQL guard without new tables, columns, dependencies or variables. Use the usual update process; Windows remains a client of the existing server.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

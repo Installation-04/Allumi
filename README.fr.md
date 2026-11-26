@@ -236,6 +236,12 @@ Créez des **contrats avec conditions longues et tarif horaire réutilisable**, 
 
 [Éditeur mobile](docs/images/contrats-editeur-mobile.png) · [Formulaire client](docs/images/contrats-portail-mobile.png) · [Preuve de signature](docs/images/contrats-signature-en-dark-desktop.png)
 
+Le suivi combine type, consultation/signature et disponibilité du lien. Les dates de publication, ouverture, signature et expiration sont visibles; la preuve reste consultable après expiration du lien. Une source annulée bloque les nouveaux envois. [Guide](https://github.com/Installation-04/Allumi/wiki/Suivi-des-contrats).
+
+![Suivi filtré des contrats](docs/images/contrats-suivi-desktop.png)
+
+<img src="docs/images/contrats-suivi-mobile.png" alt="Suivi des contrats sur téléphone" width="412">
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

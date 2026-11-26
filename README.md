@@ -237,6 +237,12 @@ Create **contracts with long terms and reusable hourly rates**, publish private 
 
 [Mobile editor](docs/images/contrats-editeur-en-dark-mobile.png) · [Client signature form](docs/images/contrats-portail-mobile.png) · [Signature evidence](docs/images/contrats-signature-en-dark-desktop.png)
 
+Contract tracking combines type, viewing/signing and link-availability filters. Publication, opening, signature and expiry dates are visible; signed evidence remains available after a link expires. New sends are blocked when the source is cancelled. [Guide](https://github.com/Installation-04/Allumi/wiki/Suivi-des-contrats).
+
+![Contract tracking in English, dark theme](docs/images/contrats-suivi-en-dark-desktop.png)
+
+<img src="docs/images/contrats-suivi-en-dark-mobile.png" alt="Contract tracking on mobile" width="412">
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

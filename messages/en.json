@@ -3856,6 +3856,15 @@
     "insertClient": "Insert client name",
     "insertCompany": "Insert company name",
     "trackingHint": "Tracking records document opening through this link; emails sent without a link do not provide this tracking.",
-    "signatureUnavailable": "This estimate can no longer be signed. Contact the company to check its validity or request a new version."
+    "signatureUnavailable": "This estimate can no longer be signed. Contact the company to check its validity or request a new version.",
+    "kindFilter": "Document type",
+    "stageFilter": "Viewing and signing",
+    "linkFilter": "Link availability",
+    "all": "All",
+    "AVAILABLE": "Link available",
+    "SOURCE_UNAVAILABLE": "Source unavailable",
+    "linkDraft": "No published link",
+    "linkUnavailableHint": "The source is cancelled or unavailable. This link can no longer be opened or emailed. Retained evidence remains available.",
+    "datesZone": "Dates and times: Toronto."
   }
 }

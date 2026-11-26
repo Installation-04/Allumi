@@ -426,3 +426,7 @@ it("protects client document capabilities, signed metadata and external audit wi
  expect(functions).toHaveLength(6);for(const f of functions){expect(f.public_execute).toBe(false);expect(f.config).toContain('search_path=pg_catalog, public');expect(f.definer).toBe(['client_document_public','client_document_audit_record'].includes(f.name));}
  expect(await q("SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('client_document_guard','client_document_audit','client_document_delivery_guard','client_document_delivery_audit','contract_template_guard','contract_template_audit','estimate_terms_guard')")).toHaveLength(7);
 });
+
+it('locks the public source state when reserving client-document mail',async()=>{
+ const [f]=await q<{body:string}>("SELECT pg_get_functiondef(oid) AS body FROM pg_proc WHERE proname='client_document_delivery_guard'");expect(f?.body).toContain("'SENT', 'ACCEPTED', 'CONVERTED'".replaceAll(', ',','));expect(f?.body).toContain('FOR SHARE');expect(f?.body).toContain("status='POSTED'");
+});
