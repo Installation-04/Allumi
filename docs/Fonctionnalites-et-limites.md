@@ -66,3 +66,5 @@ La copie [[Impression-du-kilometrage]] reprend tous les résultats du carnet jus
 [[Contrats-et-signatures]] : modèle jusqu’à 50 000 caractères, tarif horaire réutilisable, contrats immuables après publication, liens clients pour contrats/soumissions/factures, ouverture explicite et signature par nom saisi/consentement avec empreinte et audit externe. Factures consultables seulement. Pas de vérification d’identité, certificat qualifié, signature dessinée, acceptation/conversion automatique du devis ni suivi de lecture des anciens courriels sans lien.
 
 [[Suivi-des-contrats]] : recherche littérale, filtres combinés et dates; les preuves signées restent visibles après expiration/révocation. Les nouveaux envois sont bloqués lorsque la source est annulée. Un message déjà réservé ou transmis ne peut pas être rappelé.
+
+Disponible : [[Duplication-des-contrats]] en nouveau brouillon indépendant après revue; aucun lien privé, signature ou envoi repris, aucune synchronisation automatique avec l’original.

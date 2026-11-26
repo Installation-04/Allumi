@@ -3865,6 +3865,10 @@
     "SOURCE_UNAVAILABLE": "Source indisponible",
     "linkDraft": "Aucun lien publié",
     "linkUnavailableHint": "La source est annulée ou indisponible. Ce lien ne peut plus être ouvert ni envoyé. La preuve conservée reste consultable.",
-    "datesZone": "Dates et heures : Toronto."
+    "datesZone": "Dates et heures : Toronto.",
+    "copy": "Dupliquer en brouillon",
+    "copyTitle": "Nouveau contrat à partir d’une copie",
+    "copyHint": "Les champs du contrat choisi sont repris pour revue. Vérifie le client, le courriel, le titre, la langue et le tarif. Les variables suivent ces champs; les valeurs écrites en dur restent à modifier. Enregistrer crée un nouveau brouillon indépendant, sans signature, lien privé ni envoi.",
+    "copySource": "Revoir le contrat d’origine"
   }
 }

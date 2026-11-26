@@ -125,3 +125,5 @@ Suggestions : [[Suggestions-de-recherche]] — résultats autorisés pendant la 
 - [[Contrats-et-signatures]] — conditions longues, tarif réutilisable, liens clients, consultation et signature déclarée.
 
 - [[Suivi-des-contrats]] : filtres combinables, dates et disponibilité des liens.
+
+- [[Duplication-des-contrats]] : préparer un nouveau brouillon depuis un contrat existant.
