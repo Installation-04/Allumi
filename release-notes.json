@@ -1630,5 +1630,59 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.100": {
+    "fr-CA": {
+      "title": "Un dossier de preuve à conserver pour chaque document publié",
+      "added": [
+        {
+          "text": "Téléchargez une copie JSON confidentielle du contenu publié et des informations de signature déclarées depuis la fiche.",
+          "guide": "Dossier-de-preuve-des-documents"
+        },
+        {
+          "text": "Retrouvez le contenu après expiration/révocation du lien ou annulation de la source, sans réactiver son accès public.",
+          "guide": "Dossier-de-preuve-des-documents"
+        }
+      ],
+      "improved": [
+        {
+          "text": "L’empreinte du contenu est contrôlée avant le téléchargement. Le fichier n’est pas scellé numériquement et ne vérifie pas l’identité du signataire.",
+          "guide": "Dossier-de-preuve-des-documents"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration, dépendance ou variable nouvelle. Mise à jour serveur habituelle; Windows reste un client du serveur existant.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Keep an evidence package for each published document",
+      "added": [
+        {
+          "text": "Download a confidential JSON copy of the published content and declared signature from the document page.",
+          "guide": "Dossier-de-preuve-des-documents"
+        },
+        {
+          "text": "Retrieve content after link expiry, revocation or source cancellation without restoring public access.",
+          "guide": "Dossier-de-preuve-des-documents"
+        }
+      ],
+      "improved": [
+        {
+          "text": "The content hash is checked before download. The file is not digitally sealed and does not verify the signer’s identity.",
+          "guide": "Dossier-de-preuve-des-documents"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No new migration, dependency or environment variable. Use the usual server update process; Windows remains a client of the existing server.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

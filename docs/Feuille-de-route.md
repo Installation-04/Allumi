@@ -78,3 +78,5 @@ Disponible : [[Suivi-des-contrats]] avec filtres par type/étape/disponibilité,
 Disponible : [[Duplication-des-contrats]] en nouveau brouillon indépendant après revue; aucun lien privé, signature ou envoi repris, aucune synchronisation automatique avec l’original.
 
 Disponible : [[Export-et-nettoyage-des-contrats]], CSV complet jusqu’à 5 000 résultats filtrés sans données de lien/preuve, et suppression confirmée des seuls brouillons avec audit et révision. Aucun document publié supprimé ni mouvement financier.
+
+Disponible : [[Dossier-de-preuve-des-documents]], contenu publié et informations de signature déclarées en JSON privé, vérification de l’empreinte du contenu et conservation après expiration/révocation. Aucun scellement numérique du fichier ni contrôle d’identité.

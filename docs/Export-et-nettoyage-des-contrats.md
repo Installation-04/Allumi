@@ -36,6 +36,10 @@ Un document **publié ne peut pas être supprimé ici**, même s’il est signé
 
 Ces actions ne créent aucun paiement, mouvement comptable, courriel ou signature. Pour préparer un renouvellement, utilise [[Duplication-des-contrats]].
 
+## Conserver le contenu et la preuve
+
+[[Dossier-de-preuve-des-documents]] décrit le téléchargement privé du contenu publié, de son empreinte et de la signature déclarée, y compris après expiration/révocation.
+
 ## Références visuelles
 
 ![Export du suivi filtré](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-export-desktop.png)

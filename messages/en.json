@@ -899,7 +899,8 @@
       "signature": "Signature refused. Check your name, recipient email, confirmation and document version.",
       "rateLimit": "Too many requests. Try again later.",
       "mailRate": "Wait one minute before resending; maximum 20 deliveries per day for this link.",
-      "exportLimit": "More than 5,000 documents match. Narrow the filters; no partial file was created."
+      "exportLimit": "More than 5,000 documents match. Narrow the filters; no partial file was created.",
+      "evidenceIntegrity": "The published content does not match its hash. No evidence package was downloaded; contact your administrator."
     }
   },
   "settingsPage": {
@@ -3877,6 +3878,9 @@
     "csvCapturedAt": "Tracking captured at",
     "deleteDraft": "Delete draft",
     "deleteHint": "Only this draft will be removed. Any accounting source stays unchanged; an audit event is retained. Published documents cannot be deleted here.",
-    "deleteConfirm": "I confirm deleting this unpublished draft."
+    "deleteConfirm": "I confirm deleting this unpublished draft.",
+    "evidenceTitle": "Evidence package",
+    "evidenceDownload": "Download evidence package (JSON)",
+    "evidenceHint": "Confidential copy of the published content and declared signature, with UTC dates and a checked hash. Contains names and email addresses. No private link is included; this file does not certify the signer’s identity and is not digitally sealed."
   }
 }

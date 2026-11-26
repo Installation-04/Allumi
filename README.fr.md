@@ -254,6 +254,12 @@ Exportez tous les résultats filtrés du suivi en CSV (jusqu’à 5 000 document
 
 <img src="docs/images/contrats-nettoyage-en-dark-mobile.png" alt="Suppression confirmée d’un brouillon sur téléphone" width="412">
 
+Télécharge un [dossier de preuve confidentiel](docs/Dossier-de-preuve-des-documents.md) contenant la publication figée, son SHA-256 contrôlé et la signature déclarée. Disponible après expiration ou révocation du lien, sans lien privé. Le fichier n’est pas scellé numériquement et ne vérifie pas l’identité du signataire.
+
+![Dossier de preuve des documents](docs/images/contrats-preuve-desktop.png)
+
+<img src="docs/images/contrats-preuve-mobile.png" alt="Dossier de preuve des documents, mobile" width="412">
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

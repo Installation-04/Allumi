@@ -899,7 +899,8 @@
       "signature": "Signature refusée. Vérifie le nom, le courriel du destinataire, la confirmation et la version du document.",
       "rateLimit": "Trop de demandes. Réessaie plus tard.",
       "mailRate": "Attends une minute avant un renvoi; maximum 20 envois par jour pour ce lien.",
-      "exportLimit": "Plus de 5 000 documents correspondent. Réduis les filtres; aucun fichier partiel n’a été créé."
+      "exportLimit": "Plus de 5 000 documents correspondent. Réduis les filtres; aucun fichier partiel n’a été créé.",
+      "evidenceIntegrity": "Le contenu publié ne correspond pas à son empreinte. Aucun dossier de preuve n’a été téléchargé; contactez votre administrateur."
     }
   },
   "settingsPage": {
@@ -3877,6 +3878,9 @@
     "csvCapturedAt": "Suivi extrait le",
     "deleteDraft": "Supprimer le brouillon",
     "deleteHint": "Seul ce brouillon sera retiré. La source comptable éventuelle reste intacte; une trace de suppression est conservée dans l’audit. Un document publié ne peut pas être supprimé ici.",
-    "deleteConfirm": "Je confirme la suppression de ce brouillon non publié."
+    "deleteConfirm": "Je confirme la suppression de ce brouillon non publié.",
+    "evidenceTitle": "Dossier de preuve",
+    "evidenceDownload": "Télécharger le dossier de preuve (JSON)",
+    "evidenceHint": "Copie confidentielle du contenu publié et de la signature déclarée, avec dates UTC et empreinte contrôlée. Contient des noms et courriels. Aucun lien privé inclus; ce fichier ne certifie pas l’identité du signataire et n’est pas scellé numériquement."
   }
 }

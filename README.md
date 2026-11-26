@@ -255,6 +255,12 @@ Export all filtered tracking results to CSV (up to 5,000 documents) and delete u
 
 <img src="docs/images/contrats-nettoyage-en-dark-mobile.png" alt="Confirmed draft cleanup on mobile" width="412">
 
+Download a confidential [document evidence package](docs/Dossier-de-preuve-des-documents.md) containing the frozen publication, its checked SHA-256 and any declared signature. Available after link expiration or revocation; excludes private links. The file is not digitally sealed and does not verify the signer’s identity.
+
+![Document evidence package](docs/images/contrats-preuve-desktop.png)
+
+<img src="docs/images/contrats-preuve-mobile.png" alt="Document evidence package, mobile" width="412">
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

@@ -87,6 +87,10 @@ Les recherches de titre/client et les listes paginées sont propres à l’entre
 
 [[Export-et-nettoyage-des-contrats]] décrit le suivi CSV complet sous les mêmes filtres et la suppression confirmée des seuls brouillons. Les documents publiés et leurs preuves restent conservés.
 
+## Conserver le contenu et la preuve
+
+[[Dossier-de-preuve-des-documents]] décrit le téléchargement privé du contenu publié, de son empreinte et de la signature déclarée, y compris après expiration/révocation.
+
 ## Références visuelles
 
 ![Éditeur français avec tarif réutilisable](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-editeur-desktop.png)
