@@ -32,6 +32,13 @@ export async function saveContractTemplate(actor:CompanyContext,body:string,hour
  try{return await withCompany(actor,async tx=>{await manage(tx);if(revision===0)return tx.contractTemplate.create({data:{companyId:actor.companyId,body:parsed.data,hourlyRateCents}});
  const result=await tx.contractTemplate.updateMany({where:{companyId:actor.companyId,revision},data:{body:parsed.data,hourlyRateCents,revision:revision+1}});if(result.count!==1)throw new AppError("contracts.stale");});}catch(e){if(isConflict(e))throw new AppError("contracts.stale");throw toAppError(e);}
 }
+/** Read-only prefill for a new independent draft; never select access or signature evidence. */
+export async function getContractCopy(actor:CompanyContext,id:string){
+ return withCompany(actor,async tx=>{await manage(tx);if(!z.uuid().safeParse(id).success)return null;
+ const d=await tx.clientDocument.findFirst({where:{companyId:actor.companyId,id,kind:'CONTRACT'},select:{title:true,customerName:true,customerEmail:true,locale:true,body:true,hourlyRateCents:true}});if(!d)return null;
+ return {title:d.title,customerName:d.customerName,customerEmail:d.customerEmail,locale:z.enum(['fr-CA','en']).parse(d.locale),body:d.body,hourlyRate:d.hourlyRateCents===null?'':`${d.hourlyRateCents/100n}.${(d.hourlyRateCents%100n).toString().padStart(2,'0')}`};
+ });
+}
 export async function saveContract(actor:CompanyContext,input:ContractInput,id?:string,revision?:number){
  const parsed=contractInput.safeParse(input);if(!parsed.success)throw new AppError("contracts.invalid");const data=parsed.data,hourlyRateCents=rate(data.hourlyRate);
  return withCompany(actor,async tx=>{await manage(tx);const company=await tx.company.findFirstOrThrow({where:{id:actor.companyId},select:{name:true}});render(data.body,hourlyRateCents,data.locale,data.customerName,company.name);

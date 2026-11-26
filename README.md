@@ -243,6 +243,12 @@ Contract tracking combines type, viewing/signing and link-availability filters. 
 
 <img src="docs/images/contrats-suivi-en-dark-mobile.png" alt="Contract tracking on mobile" width="412">
 
+Reuse an existing contract as an independent draft: review the client, terms, language and hourly rate before saving. Signatures, private links and deliveries are never copied. [Guide](https://github.com/Installation-04/Allumi/wiki/Duplication-des-contrats).
+
+![Contract copy in English and dark theme](docs/images/contrats-copie-en-dark-desktop.png)
+
+<img src="docs/images/contrats-copie-en-dark-mobile.png" alt="Contract copy on mobile" width="412">
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

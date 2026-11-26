@@ -710,3 +710,11 @@ Les références de l’éditeur FR/EN, du formulaire client et de la preuve fig
 ![Suivi des contrats](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-suivi-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-suivi-en-dark-mobile.png" alt="English contract tracking on mobile" width="412">
+
+## Duplication des contrats
+
+[[Duplication-des-contrats]] : nouveau brouillon indépendant depuis les champs d’un contrat, en français/anglais, clair/sombre, ordinateur/mobile.
+
+![Copie de contrat](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-copie-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-copie-en-dark-mobile.png" alt="Contract copy on mobile in dark theme" width="412">

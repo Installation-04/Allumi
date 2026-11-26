@@ -3865,6 +3865,10 @@
     "SOURCE_UNAVAILABLE": "Source unavailable",
     "linkDraft": "No published link",
     "linkUnavailableHint": "The source is cancelled or unavailable. This link can no longer be opened or emailed. Retained evidence remains available.",
-    "datesZone": "Dates and times: Toronto."
+    "datesZone": "Dates and times: Toronto.",
+    "copy": "Duplicate as draft",
+    "copyTitle": "New contract from a copy",
+    "copyHint": "The selected contract fields are copied for review. Check the client, email, title, language and rate. Variables follow these fields; literal values still need editing. Saving creates an independent draft without a signature, private link or delivery.",
+    "copySource": "Review original contract"
   }
 }

@@ -79,6 +79,10 @@ Les recherches de titre/client et les listes paginées sont propres à l’entre
 
 [[Suivi-des-contrats]] décrit les filtres par type, consultation/signature et disponibilité, les dates visibles et le blocage des nouveaux envois après annulation de la source. Une signature reste visible même si le lien expire ou est révoqué.
 
+## Réutiliser un contrat
+
+[[Duplication-des-contrats]] reprend les champs et variables pour revue dans un nouveau brouillon indépendant. La signature, le lien privé et les envois de l’original ne sont pas copiés.
+
 ## Références visuelles
 
 ![Éditeur français avec tarif réutilisable](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-editeur-desktop.png)

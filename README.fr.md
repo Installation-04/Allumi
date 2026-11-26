@@ -242,6 +242,12 @@ Le suivi combine type, consultation/signature et disponibilité du lien. Les dat
 
 <img src="docs/images/contrats-suivi-mobile.png" alt="Suivi des contrats sur téléphone" width="412">
 
+Réutilisez un contrat en nouveau brouillon indépendant : vérifiez le client, les conditions, la langue et le tarif avant d’enregistrer. Les signatures, liens privés et envois ne sont jamais copiés. [Guide](https://github.com/Installation-04/Allumi/wiki/Duplication-des-contrats).
+
+![Copie d’un contrat en brouillon](docs/images/contrats-copie-desktop.png)
+
+<img src="docs/images/contrats-copie-mobile.png" alt="Copie d’un contrat sur téléphone" width="412">
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

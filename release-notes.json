@@ -1530,5 +1530,51 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.98": {
+    "fr-CA": {
+      "title": "Réutiliser un contrat en nouveau brouillon",
+      "added": [
+        {
+          "text": "Dupliquez les champs d’un contrat, même signé ou expiré, pour revoir le client, les conditions, la langue et le tarif avant d’enregistrer un nouveau brouillon.",
+          "guide": "Duplication-des-contrats"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Les variables et le tarif exact sont conservés pour l’aperçu; aucun lien privé, signature, consultation ou envoi n’est repris. L’original reste intact et la nouvelle publication exige une confirmation séparée.",
+          "guide": "Duplication-des-contrats"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration ni nouvelle variable ou dépendance. Ventes en écriture requise; Windows reste un client du serveur existant. Aucun mouvement comptable ni envoi automatique.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Reuse a contract as an independent draft",
+      "added": [
+        {
+          "text": "Copy the fields of a contract, including signed or expired contracts, to review the client, terms, language and rate before saving a new draft.",
+          "guide": "Duplication-des-contrats"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Variables and the exact rate are preserved for preview; private links, signatures, views and deliveries are excluded. The original stays unchanged and publishing the new draft requires separate confirmation.",
+          "guide": "Duplication-des-contrats"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration, new variables or dependencies. Sales write access is required; Windows remains a client of the existing server. No accounting posting or automatic delivery.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

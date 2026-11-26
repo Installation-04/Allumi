@@ -4,6 +4,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Contrats : duplication en nouveau brouillon depuis un contrat existant, avec revue du client/courriel, du texte brut, de la langue et du tarif exact; variables et aperçu conservés.
+- Confidentialité : aucune signature, consultation, empreinte publiée, expiration, révocation, clé de lien ou tentative d’envoi copiée; lecture de préremplissage sans création, Ventes en écriture et isolation par entreprise.
+- Interface : commande disponible sur les contrats y compris signés/expirés/révoqués, aperçu FR/EN sombre/mobile et lien vers l’original; publication et envoi restent des actions séparées.
+- Installation : aucune migration, dépendance ou configuration nouvelle; aucun montant ni mouvement comptable créé, original intact et nouveau contrat indépendant. Guides, captures, README et nouveautés bilingues inclus.
+
 ## [0.4.0-alpha.97] - 2026-11-25
 
 - Suivi des contrats : filtres combinés par type, consultation/signature et disponibilité, recherche littérale et pagination conservée; dates de publication, ouverture, signature et expiration visibles en FR/EN sombre/mobile.
