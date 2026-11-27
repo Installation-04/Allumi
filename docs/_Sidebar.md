@@ -166,3 +166,5 @@
 - [[Copie-client-du-document-signe]] — téléchargement HTML après signature depuis le portail client.
 
 - [[Carnet-de-temps]] — heures déclarées, facturables ou non, filtres et CSV.
+
+- [[Impression-du-temps]] — copie complète filtrée et PDF navigateur.

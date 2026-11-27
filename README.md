@@ -297,6 +297,12 @@ Find [contracts and client links](docs/Recherche-des-contrats.md) in global sear
 
 <img src="docs/images/carnet-temps-mobile.png" alt="Time log, mobile" width="412">
 
+[Print a complete time-log copy](docs/Impression-du-temps.md) across all filtered pages, with exact durations and internal notes, up to 1,000 entries. Use the browser to print or save a landscape PDF.
+
+![Time print copy](docs/images/impression-temps-desktop.png)
+
+<img src="docs/images/impression-temps-mobile.png" alt="Time print copy, mobile" width="412">
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

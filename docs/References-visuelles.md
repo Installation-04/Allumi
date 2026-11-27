@@ -814,3 +814,15 @@ Voir [[Carnet-de-temps]].
 ![Time log, dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/carnet-temps-en-dark-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/carnet-temps-en-dark-mobile.png" alt="Time log, mobile dark theme" width="412">
+
+## Impression du carnet de temps
+
+Voir [[Impression-du-temps]].
+
+![Impression du temps](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/impression-temps-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/impression-temps-mobile.png" alt="Impression du temps mobile" width="412">
+
+![Time print, English dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/impression-temps-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/impression-temps-en-dark-mobile.png" alt="Time print, mobile dark theme" width="412">

@@ -92,3 +92,5 @@ Revue des soumissions signées : acceptation interne confirmée, contrôle d’i
 [[Copie-client-du-document-signe]] : contrat ou soumission signé téléchargeable en HTML autonome depuis un lien actif, sous contrôle d’intégrité. Aucun compte employé, nouvelle consultation ou mouvement financier; PDF via navigateur et identité déclarative.
 
 [[Carnet-de-temps]] : saisie manuelle partagée, libellés de projet/intervenant, durées exactes en minutes, suivi facturable/non facturable, révisions/audit et CSV complet. Registre de projets, tarifs, facturation, paie et rentabilité restent distincts.
+
+[[Impression-du-temps]] : copie filtrée complète jusqu’à 1 000 saisies, toutes pages et notes internes incluses, durées exactes, papier paysage clair et PDF navigateur. Les données sont relues à l’ouverture, sous Comptabilité lecture.

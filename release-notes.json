@@ -1980,5 +1980,51 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.111": {
+    "fr-CA": {
+      "title": "Imprimer le carnet de temps complet",
+      "added": [
+        {
+          "text": "Ouvrez une copie complète du temps filtré sur toutes les pages, avec notes internes et totaux exacts en h:mm, jusqu’à 1 000 saisies. Le retour conserve les filtres et la page.",
+          "guide": "Impression-du-temps"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Imprimez en paysage clair depuis les deux thèmes ou enregistrez un PDF dans le navigateur. Comptabilité lecture et isolation appliquées, sans modification métier ou opération financière.",
+          "guide": "Impression-du-temps"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration, dépendance ou configuration nouvelle. Mettez le serveur à jour par le processus habituel puis rechargez l’application.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Print complete time-log copies",
+      "added": [
+        {
+          "text": "Open a complete filtered time copy across all pages, with internal notes and exact h:mm totals, up to 1,000 entries. The return link keeps your filters and page.",
+          "guide": "Impression-du-temps"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Print light landscape paper from either theme or save a PDF in your browser. Accounting read permission and tenant isolation apply; no business changes or financial operation.",
+          "guide": "Impression-du-temps"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No migration, dependency or new setting. Update the server through the usual process and reload the app.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }
