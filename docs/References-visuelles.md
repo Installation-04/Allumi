@@ -776,3 +776,17 @@ Voir [[Recherche-des-contrats]].
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/copie-imprimable-contrats-en-dark-mobile.png" alt="Printable copy on mobile in English" width="412">
 
 Toutes les captures utilisent des données fictives. Les liens de ces documents de démonstration sont révoqués avant les captures.
+
+## Revue d’une soumission signée
+
+[[Acceptation-des-soumissions-signees]] : confirmation interne avant la conversion habituelle.
+
+![Revue et confirmation d’une soumission signée](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/revue-soumission-signee-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/revue-soumission-signee-mobile.png" alt="Confirmation de revue sur téléphone" width="412">
+
+![Signed estimate review in English and dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/revue-soumission-signee-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/revue-soumission-signee-en-dark-mobile.png" alt="Signed estimate review on mobile in English" width="412">
+
+Toutes les captures utilisent des données fictives.

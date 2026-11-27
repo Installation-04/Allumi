@@ -2,7 +2,7 @@ import "server-only";
 import { z } from "zod";
 import { requireRole } from "@/modules/companies";
 import { sha256Hex } from "@/modules/auth";
-import { withCompany, type CompanyContext } from "@/platform/tenant";
+import { withCompany, type CompanyContext, type Tx } from "@/platform/tenant";
 import { AppError } from "@/platform/errors";
 import { sourceDocumentText } from "../domain/source";
 
@@ -18,7 +18,11 @@ type EvidenceRow = {
 /** Read one publication/proof snapshot without decrypting a link or recording a client view. */
 export async function getClientDocumentEvidence(actor: CompanyContext, id: string) {
   if (!z.uuid().safeParse(id).success) return null;
-  return withCompany(actor, async tx => {
+  return withCompany(actor, tx => getClientDocumentEvidenceWithin(tx, actor.companyId, id));
+}
+
+/** Reuse the same verified proof inside a caller-owned company transaction. */
+export async function getClientDocumentEvidenceWithin(tx: Tx, companyId: string, id: string) {
     await requireRole(tx, "sales.read");
     const [d] = await tx.$queryRaw<EvidenceRow[]>`
       SELECT id, company_id AS "companyId", kind, title, issuer_name AS issuer,
@@ -29,7 +33,7 @@ export async function getClientDocumentEvidence(actor: CompanyContext, id: strin
         published_at AS "publishedAt", expires_at AS "expiresAt", first_viewed_at AS "firstViewedAt",
         signed_at AS "signedAt", revoked_at AS "revokedAt", signer_name AS "signerName",
         signer_email AS "signerEmail", consent_text AS "consentText", statement_timestamp() AS "capturedAt"
-      FROM client_document WHERE company_id=${actor.companyId}::uuid AND id=${id}::uuid AND status='PUBLISHED'`;
+      FROM client_document WHERE company_id=${companyId}::uuid AND id=${id}::uuid AND status='PUBLISHED'`;
     if (!d) return null;
     if (sha256Hex(d.canonicalPayload) !== d.hash) throw new AppError("contracts.evidenceIntegrity");
     return {
@@ -54,5 +58,4 @@ export async function getClientDocumentEvidence(actor: CompanyContext, id: strin
         hashScope: "publication.canonicalPayload UTF-8 bytes only; excludes events, signature and the export file",
       },
     };
-  });
 }

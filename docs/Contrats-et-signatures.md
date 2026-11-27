@@ -122,3 +122,7 @@ Toutes les références utilisent des données fictives.
 ## Copie lisible hors ligne
 
 [[Copie-imprimable-des-documents]] décrit le téléchargement HTML autonome du texte publié et de la signature déclarée, sa lecture hors ligne et son impression en PDF depuis le navigateur.
+
+## Accepter une soumission signée après revue
+
+[[Acceptation-des-soumissions-signees]] relie la preuve à une acceptation interne confirmée, sous Ventes écriture et contrôle d’intégrité/révision. La signature seule ne change pas la source; la conversion en facture reste séparée.

@@ -1832,5 +1832,51 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.107": {
+    "fr-CA": {
+      "title": "Revoir et accepter les soumissions signées",
+      "added": [
+        {
+          "text": "Depuis une copie de soumission signée, revoyez la preuve et l’état actuel de la source, puis confirmez explicitement son acceptation interne avec une note facultative.",
+          "guide": "Acceptation-des-soumissions-signees"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Les droits Ventes écriture, l’intégrité et la révision revue sont contrôlés. Acceptation et référence à la preuve sont auditées ensemble; la conversion en facture reste séparée.",
+          "guide": "Acceptation-des-soumissions-signees"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration de base, dépendance ou variable nouvelle. Mettez le serveur à jour par le processus habituel puis rechargez l’application.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Review and accept signed estimates",
+      "added": [
+        {
+          "text": "From a signed estimate share, review the evidence and current source status, then explicitly confirm internal acceptance with an optional note.",
+          "guide": "Acceptation-des-soumissions-signees"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Sales write access, integrity and the reviewed revision are checked. Acceptance and its evidence reference are audited together; invoice conversion remains separate.",
+          "guide": "Acceptation-des-soumissions-signees"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No database migration, dependency or new configuration variable. Update the server through the usual process, then reload the app.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

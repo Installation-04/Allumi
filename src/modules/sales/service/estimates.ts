@@ -88,6 +88,7 @@ export async function listEstimates(actor: CompanyContext, options: { q?: string
 export async function transitionEstimate(actor: CompanyContext, id: string, revision: string, status: "SENT" | "ACCEPTED" | "DECLINED" | "CANCELLED", note = "") {
   if (note.length > 500 || (!["ACCEPTED", "DECLINED"].includes(status) && note.trim())) throw new AppError("estimates.invalid");
   return run(actor, true, async tx => {
+    if (status === "ACCEPTED") return acceptEstimateWithin(tx, actor, id, revision, note);
     const { row, revision: actual } = await locked(tx, actor, id);
     current(actual, revision);
     if (!estimateTransitionAllowed(row.status, status, iso(row.validUntil), todayIso())) throw new AppError("estimates.transition");
@@ -106,6 +107,17 @@ export async function transitionEstimate(actor: CompanyContext, id: string, revi
     await tx.$executeRaw`SET CONSTRAINTS ALL IMMEDIATE`;
     return id;
   });
+}
+/** Shared acceptance guard: callers may add proof checks in the same transaction before invoking it. */
+export async function acceptEstimateWithin(tx: Tx, actor: CompanyContext, id: string, revision: string, note = "") {
+  await requireRole(tx, "sales.manage");
+  if (note.length > 500) throw new AppError("estimates.invalid");
+  const { row, revision: actual } = await locked(tx, actor, id);
+  current(actual, revision);
+  if (!estimateTransitionAllowed(row.status, "ACCEPTED", iso(row.validUntil), todayIso())) throw new AppError("estimates.transition");
+  await tx.salesEstimate.update({ where: { companyId: actor.companyId, id }, data: { status: "ACCEPTED", decisionNote: note.trim() || null, respondedAt: new Date() } });
+  await tx.$executeRaw`SET CONSTRAINTS ALL IMMEDIATE`;
+  return id;
 }
 export async function convertEstimate(actor: CompanyContext, id: string, revision: string, issueDate: string, dueDate: string) {
   if (!isValidIsoDate(issueDate) || !isValidIsoDate(dueDate) || issueDate > todayIso() || dueDate < issueDate) throw new AppError("estimates.invalid");

@@ -9,7 +9,7 @@ export { previewEstimateEmail, getEstimateEmails, sendEstimateEmail } from "./se
 export { listInvoiceReminders, getInvoiceReminder, sendInvoiceReminder, remindersMailConfigured } from "./service/reminders";
 export { applyCustomerCredit, unapplyCustomerCredit, listCreditApplicationTargets, listCreditApplications, APPLICATIONS_PER_PAGE, CREDIT_APPLICATION_TARGET_LIMIT } from "./service/credit-applications";
 export { customerCreditApplicationSchema, customerCreditUnapplicationSchema, type CustomerCreditApplicationInput, type CustomerCreditUnapplicationInput } from "./domain/application";
-export { saveEstimate, getEstimate, listEstimates, transitionEstimate, convertEstimate, deleteEstimate } from "./service/estimates";
+export { saveEstimate, getEstimate, listEstimates, transitionEstimate, acceptEstimateWithin, convertEstimate, deleteEstimate } from "./service/estimates";
 export { ESTIMATE_STATUSES, type EstimateStatus } from "./domain/estimate";
 export { recurringSources, createRecurringPlan, getRecurringPlan, listRecurringPlans, changeRecurringStatus, generateRecurringDraft } from "./service/recurring";
 export { recurringDate, recurringDueDate, RECURRING_INTERVALS } from "./domain/recurring";
