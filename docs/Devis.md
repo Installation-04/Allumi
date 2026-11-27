@@ -49,3 +49,7 @@ Les coordonnées figées d’un devis émis restent lisibles avec le droit Vente
 L’[[Envoi-des-devis]] manuel SMTP est disponible avec aperçu et historique. Le partage par lien et la signature déclarée d’une copie sont disponibles : [[Contrats-et-signatures]]. L’acceptation/conversion comptable reste manuelle. Les acomptes, révisions d’un devis émis et facturation progressive ne sont pas disponibles. Les devis ne constituent pas une validation complète de tous les parcours QuickBooks.
 
 Les conditions acceptent jusqu’à 50 000 caractères avec paragraphes. Le tarif horaire remplace chaque variable de tarif dans les conditions; les prix/taxes des lignes restent indépendants. Les variables de client et entreprise sont aussi disponibles. Le texte publié reste figé; voir [[Contrats-et-signatures]].
+
+## Accepter une soumission signée après revue
+
+[[Acceptation-des-soumissions-signees]] relie la preuve à une acceptation interne confirmée, sous Ventes écriture et contrôle d’intégrité/révision. La signature seule ne change pas la source; la conversion en facture reste séparée.

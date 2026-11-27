@@ -7,6 +7,7 @@ export { clientDocumentsCsv, type ClientDocumentExportRow } from "./domain/expor
 
 export { getClientDocumentEvidence } from "./service/evidence";
 export { getClientDocumentPrintCopy } from "./service/print-copy";
+export { getSignedEstimateReview, acceptSignedEstimate } from "./service/estimate-acceptance";
 export { CLIENT_DOCUMENT_COPY_CSP } from "./domain/print-copy";
 
 export { searchContractCustomers } from "./service/customers";

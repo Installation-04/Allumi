@@ -86,3 +86,5 @@ Disponible : [[Choisir-un-client-pour-un-contrat]], recherche privée de clients
 Disponible : [[Recherche-des-contrats]], recherche globale par titre/client/référence complète, étapes de consultation/signature, date de création à Toronto et suggestions internes. Ventes lecture, sans contenu ni donnée de lien et sans montant financier associé aux copies.
 
 Copie imprimable des contrats et partages publiés : téléchargement HTML autonome, lecture hors ligne et impression PDF via le navigateur, contenu et signature déclarée, contrôle d’intégrité et permissions Ventes. Voir [[Copie-imprimable-des-documents]].
+
+Revue des soumissions signées : acceptation interne confirmée, contrôle d’intégrité et de révision, audit lié à la preuve, permissions Ventes modulaires. Conversion en facture et identité du signataire restent distinctes. Voir [[Acceptation-des-soumissions-signees]].

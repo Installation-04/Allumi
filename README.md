@@ -279,6 +279,12 @@ Find [contracts and client links](docs/Recherche-des-contrats.md) in global sear
 
 <img src="docs/images/copie-imprimable-contrats-mobile.png" alt="Printable client-document copy, mobile" width="412">
 
+[Review signed estimates](docs/Acceptation-des-soumissions-signees.md) and explicitly confirm internal acceptance, with current-state and integrity checks and an audited proof reference. Invoice conversion remains a separate step.
+
+![Signed estimate review](docs/images/revue-soumission-signee-desktop.png)
+
+<img src="docs/images/revue-soumission-signee-mobile.png" alt="Signed estimate review, mobile" width="412">
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

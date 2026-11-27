@@ -137,3 +137,5 @@ Suggestions : [[Suggestions-de-recherche]] — résultats autorisés pendant la 
 - [[Recherche-des-contrats]] : contrats et liens clients dans la recherche globale et les suggestions.
 
 - [[Copie-imprimable-des-documents]] : copie HTML autonome, lecture hors ligne et impression en PDF.
+
+- [[Acceptation-des-soumissions-signees]] : revue de la preuve, décision interne et référence d’audit.

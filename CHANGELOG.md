@@ -4,6 +4,11 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Soumissions signées : écran de revue FR/EN du contenu publié et de la signature déclarée, source et validité actuelles, acceptation interne explicitement confirmée avec note facultative.
+- Sécurité et traçabilité : Ventes écriture/RLS, contrôle de l’empreinte et de la révision, sérialisation des décisions de source et référence d’audit atomique vers la preuve; source périmée/concurrente et contenu incohérent refusés.
+- Parcours : aucune facture, écriture, paiement, consultation client ou envoi créé; signature publique et conversion habituelle restent distinctes. Guides, README et captures ordinateur/mobile, anglais et thème sombre.
+- Installation : aucune migration, dépendance ni variable nouvelle; gardes d’acceptation du module Ventes et lecture de preuve réutilisées dans la même transaction.
+
 ## [0.4.0-alpha.106] - 2026-11-27
 
 - Documents clients : copie HTML autonome téléchargeable du contenu publié, de l’empreinte et des événements/signature déclarée, dans la langue du document; lecture hors ligne et impression en PDF via le navigateur.

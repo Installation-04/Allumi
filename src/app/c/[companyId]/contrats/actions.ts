@@ -5,7 +5,7 @@ import { requireSession } from "@/app/_lib/session";
 import { safeAction } from "@/app/_lib/safe-action";
 import { textValues, type FormState } from "@/app/_lib/form-state";
 import { AppError } from "@/platform/errors";
-import { deleteClientDraft,saveContract, saveContractTemplate, publishClientDocument, revokeClientDocument, sendClientDocument, prepareSourceDocument } from "@/modules/contracts";
+import { acceptSignedEstimate,deleteClientDraft,saveContract, saveContractTemplate, publishClientDocument, revokeClientDocument, sendClientDocument, prepareSourceDocument } from "@/modules/contracts";
 const fields=['title','customerName','customerEmail','body','hourlyRate','locale'];
 const confirm=(f:FormData)=>{if(f.getAll('confirm').length!==1||f.get('confirm')!=='yes')throw new AppError('contracts.confirm');};
 export async function saveContractAction(companyId:string,id:string|null,revision:number,_previous:FormState,form:FormData):Promise<FormState>{const values=textValues(form,fields);return safeAction(async()=>{if(fields.some(n=>form.getAll(n).length!==1||typeof form.get(n)!=='string'))throw new AppError('contracts.invalid');const {userId}=await requireSession();const documentId=await saveContract({userId,companyId},{title:values.title??'',customerName:values.customerName??'',customerEmail:values.customerEmail??'',body:values.body??'',hourlyRate:values.hourlyRate??'',locale:values.locale==='en'?'en':'fr-CA'},id??undefined,id?revision:undefined);revalidatePath(`/c/${companyId}/contrats`);redirect(`/c/${companyId}/contrats/${documentId}`);},values);}
@@ -16,3 +16,8 @@ export async function sendAction(companyId:string,id:string,attemptId:string,_pr
 export async function sourceLinkAction(companyId:string,kind:'ESTIMATE'|'INVOICE',sourceId:string,_previous:FormState,form:FormData):Promise<FormState>{const values=textValues(form,['recipient','locale']);return safeAction(async()=>{confirm(form);const {userId}=await requireSession();const id=await prepareSourceDocument({userId,companyId},kind,sourceId,values.recipient??'',values.locale==='en'?'en':'fr-CA');revalidatePath(`/c/${companyId}/contrats`);redirect(`/c/${companyId}/contrats/${id}`);},values);}
 
 export async function deleteDraftAction(companyId:string,id:string,revision:number,_previous:FormState,form:FormData):Promise<FormState>{return safeAction(async()=>{confirm(form);const {userId}=await requireSession();const source=await deleteClientDraft({userId,companyId},id,revision,true);revalidatePath(`/c/${companyId}/contrats`);if(source.sourceEstimateId)revalidatePath(`/c/${companyId}/devis/${source.sourceEstimateId}`);if(source.sourceInvoiceId)revalidatePath(`/c/${companyId}/factures/validees/${source.sourceInvoiceId}`);redirect(`/c/${companyId}/contrats`);});}
+
+export async function acceptSignedEstimateAction(companyId:string,id:string,revision:string,hash:string,_previous:FormState,form:FormData):Promise<FormState>{
+ const values=textValues(form,['note']);
+ return safeAction(async()=>{confirm(form);if(form.getAll('note').length!==1||typeof form.get('note')!=='string')throw new AppError('contracts.invalid');const {userId}=await requireSession();const source=await acceptSignedEstimate({userId,companyId},id,revision,hash,true,values.note??'');revalidatePath(`/c/${companyId}`,'layout');redirect(`/c/${companyId}/devis/${source}`);},values);
+}
