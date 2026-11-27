@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
 import { proxy } from "@/proxy";
 import { contentSecurityPolicy, newNonce } from "@/platform/csp";
+import { CLIENT_DOCUMENT_COPY_CSP } from "@/modules/contracts/client";
+import { sessionCookieName } from "@/app/_lib/cookie-name";
 
 const directive = (policy: string, name: string) => policy.split(";").map((part) => part.trim()).find((part) => part === name || part.startsWith(`${name} `)) ?? "";
 
@@ -73,5 +75,16 @@ describe("proxy", () => {
     const response = proxy(new NextRequest("http://localhost/compte/securite"));
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toBe("http://localhost/connexion");
+  });
+
+  it("keeps download CSP restrictive while allowing the standalone stylesheet and preserving page nonces",()=>{
+    for(const path of ["/document/"+"a".repeat(43)+"/copie","/c/company/contrats/document/copie"]){
+      const response=proxy(new NextRequest("http://localhost"+path,{headers:{cookie:`${sessionCookieName()}=fixture`}}));
+      expect(response.headers.get("content-security-policy")).toBe(CLIENT_DOCUMENT_COPY_CSP+"; frame-ancestors 'none'");
+      expect(response.headers.get("referrer-policy")).toBe("no-referrer");expect(response.headers.get("cache-control")).toBe("private, no-store");
+      expect(response.headers.get("x-middleware-request-content-security-policy")).toContain("'strict-dynamic'");
+    }
+    const page=proxy(new NextRequest("http://localhost/document/"+"a".repeat(43)));
+    expect(page.headers.get("content-security-policy")).toContain("'strict-dynamic'");expect(page.headers.get("content-security-policy")).not.toContain("style-src 'unsafe-inline'");
   });
 });

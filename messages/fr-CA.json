@@ -3910,6 +3910,8 @@
     "customerResults": "Clients actifs trouvés",
     "customerUse": "Utiliser {name}",
     "customerNoEmail": "Aucun courriel — à saisir dans le contrat",
-    "customerSelected": "Nom et courriel repris. Vérifie-les avant d’enregistrer; les conditions, le tarif et la langue sont conservés."
+    "customerSelected": "Nom et courriel repris. Vérifie-les avant d’enregistrer; les conditions, le tarif et la langue sont conservés.",
+    "downloadSignedCopy": "Télécharger la copie signée",
+    "signedCopyHint": "Conserve ce fichier HTML confidentiel et imprime-le en PDF dans ton navigateur. La signature déclarée ne vérifie pas l’identité; le fichier exporté n’est pas scellé numériquement."
   }
 }

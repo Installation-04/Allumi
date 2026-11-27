@@ -430,3 +430,8 @@ it("protects client document capabilities, signed metadata and external audit wi
 it('locks the public source state when reserving client-document mail',async()=>{
  const [f]=await q<{body:string}>("SELECT pg_get_functiondef(oid) AS body FROM pg_proc WHERE proname='client_document_delivery_guard'");expect(f?.body).toContain("'SENT', 'ACCEPTED', 'CONVERTED'".replaceAll(', ',','));expect(f?.body).toContain('FOR SHARE');expect(f?.body).toContain("status='POSTED'");
 });
+
+it('restricts signed-copy capabilities to a stable read-only function with fixed search path',async()=>{
+ const [f]=await q<{definer:boolean;volatility:string;config:string[];public_execute:boolean;app_execute:boolean;body:string}>("SELECT prosecdef AS definer,provolatile AS volatility,proconfig AS config,has_function_privilege('public',oid,'EXECUTE') AS public_execute,has_function_privilege('allumi_app',oid,'EXECUTE') AS app_execute,pg_get_functiondef(oid) AS body FROM pg_proc WHERE oid='client_document_public_copy(text)'::regprocedure");
+ expect(f).toMatchObject({definer:true,volatility:'s',public_execute:false,app_execute:true});expect(f?.config).toContain('search_path=pg_catalog, public');expect(f?.body).toContain('statement_timestamp()');expect(f?.body).toContain('sha256');expect(f?.body).not.toMatch(/\b(UPDATE|INSERT|DELETE|EXECUTE)\b/);
+});

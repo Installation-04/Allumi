@@ -790,3 +790,15 @@ Toutes les captures utilisent des données fictives. Les liens de ces documents 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/revue-soumission-signee-en-dark-mobile.png" alt="Signed estimate review on mobile in English" width="412">
 
 Toutes les captures utilisent des données fictives.
+
+## Copie client du document signé
+
+Voir [[Copie-client-du-document-signe]].
+
+![Copie client signée](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/copie-client-signee-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/copie-client-signee-mobile.png" alt="Copie client sur téléphone" width="412">
+
+![Signed client copy, English dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/copie-client-signee-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/copie-client-signee-en-dark-mobile.png" alt="Signed client copy, mobile dark theme" width="412">

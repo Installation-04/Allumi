@@ -88,3 +88,5 @@ Disponible : [[Recherche-des-contrats]], recherche globale par titre/client/réf
 Copie imprimable des contrats et partages publiés : téléchargement HTML autonome, lecture hors ligne et impression PDF via le navigateur, contenu et signature déclarée, contrôle d’intégrité et permissions Ventes. Voir [[Copie-imprimable-des-documents]].
 
 Revue des soumissions signées : acceptation interne confirmée, contrôle d’intégrité et de révision, audit lié à la preuve, permissions Ventes modulaires. Conversion en facture et identité du signataire restent distinctes. Voir [[Acceptation-des-soumissions-signees]].
+
+[[Copie-client-du-document-signe]] : contrat ou soumission signé téléchargeable en HTML autonome depuis un lien actif, sous contrôle d’intégrité. Aucun compte employé, nouvelle consultation ou mouvement financier; PDF via navigateur et identité déclarative.

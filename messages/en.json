@@ -3910,6 +3910,8 @@
     "customerResults": "Matching active clients",
     "customerUse": "Use {name}",
     "customerNoEmail": "No email — enter one in the contract",
-    "customerSelected": "Name and email copied. Review them before saving; terms, hourly rate and language are preserved."
+    "customerSelected": "Name and email copied. Review them before saving; terms, hourly rate and language are preserved.",
+    "downloadSignedCopy": "Download signed copy",
+    "signedCopyHint": "Keep this confidential HTML file and print it to PDF in your browser. The declared signature does not verify identity; the exported file is not digitally sealed."
   }
 }

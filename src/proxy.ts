@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { sessionCookieName } from "@/app/_lib/cookie-name";
 import { contentSecurityPolicy, newNonce } from "@/platform/csp";
+import { CLIENT_DOCUMENT_COPY_CSP } from "@/modules/contracts/client";
 
 // Paths reachable without a session cookie. The real check (database lookup) happens in the pages.
 const PUBLIC_PREFIXES = ["/document", "/invitation", "/connexion", "/setup", "/api/health", "/manifest.webmanifest"];
@@ -41,7 +42,9 @@ export function proxy(request: NextRequest) {
 
   const response = NextResponse.next({ request: { headers } });
   response.headers.set("x-request-id", requestId);
-  response.headers.set("Content-Security-Policy", policy);
+  const isDocumentCopy = /^\/c\/[^/]+\/contrats\/[^/]+\/copie\/?$/.test(pathname) || /^\/document\/[^/]+\/copie\/?$/.test(pathname);
+  // Proxy response headers take precedence over route headers in Next. Preserve the self-contained file policy.
+  response.headers.set("Content-Security-Policy", isDocumentCopy ? CLIENT_DOCUMENT_COPY_CSP + "; frame-ancestors 'none'" : policy);
   if(isPrivateDocumentExport||pathname==="/document"||pathname.startsWith("/document/")){response.headers.set("Referrer-Policy","no-referrer");response.headers.set("X-Robots-Tag","noindex, nofollow, noarchive");response.headers.set("Cache-Control","private, no-store");}
   return response;
 }

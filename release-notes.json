@@ -1878,5 +1878,61 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.108": {
+    "fr-CA": {
+      "title": "Une copie signée à conserver pour vos clients",
+      "added": [
+        {
+          "text": "Après signature, le client peut télécharger une copie HTML autonome de son contrat ou de sa soumission depuis le portail, puis la lire hors ligne ou l’imprimer en PDF.",
+          "guide": "Copie-client-du-document-signe"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Intégrité, lien actif et état de source sont vérifiés à chaque téléchargement, avec quota partagé. Aucune nouvelle consultation, signature ou opération financière créée.",
+          "guide": "Copie-client-du-document-signe"
+        }
+      ],
+      "fixed": [
+        {
+          "text": "La politique CSP dédiée aux fichiers imprimables est conservée par le proxy; les styles autonomes restent lisibles sans autoriser de scripts.",
+          "guide": "Copie-imprimable-des-documents"
+        }
+      ],
+      "installation": [
+        {
+          "text": "Une migration ajoute une fonction SQL de lecture seule, sans nouvelle table ou variable. Le processus habituel de mise à jour serveur applique cette migration.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "A signed copy your clients can keep",
+      "added": [
+        {
+          "text": "After signing, clients can download a standalone HTML copy of their contract or estimate from the portal, then read it offline or print it to PDF.",
+          "guide": "Copie-client-du-document-signe"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Integrity, live-link availability and source status are checked on every download, with a shared quota. No additional view, signature or financial operation is created.",
+          "guide": "Copie-client-du-document-signe"
+        }
+      ],
+      "fixed": [
+        {
+          "text": "The proxy preserves the dedicated CSP for printable downloads, keeping standalone styles readable without allowing scripts.",
+          "guide": "Copie-imprimable-des-documents"
+        }
+      ],
+      "installation": [
+        {
+          "text": "A migration adds a read-only SQL function, with no new table or configuration variable. The usual server update process applies it.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }
