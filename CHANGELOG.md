@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.110] - 2026-11-27
+
 
 - Projets : carnet de temps partagé, saisie exacte h:mm ou minutes, facturable/non facturable, libellés projet/intervenant/activité, notes et filtres avec totaux complets.
 - Contrôles : droits Comptabilité modulaires, RLS forcée, révisions concurrentes, confirmation de suppression et audit; aucun mouvement financier, facture ou paie créé.
