@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.108] - 2026-11-27
+
 - Portail client : téléchargement HTML autonome des contrats et soumissions signés depuis un lien actif, avec signature déclarée et impression PDF dans le navigateur, en français et en anglais.
 - Sécurité : capacité SQL de lecture seule, vérification d’intégrité et de disponibilité dans un instantané; refus des liens expirés/révoqués et sources annulées, quota partagé et réponse privée sans referrer. Le proxy conserve la CSP autonome des copies publiques et internes sans autoriser de scripts.
 - Conservation : téléchargement sans nouvelle consultation ni mutation métier, sans jeton ou script dans la copie; guides, README et quatre captures fictives ordinateur/mobile.
