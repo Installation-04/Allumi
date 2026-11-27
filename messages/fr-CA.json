@@ -2885,7 +2885,8 @@
       "ACCOUNT": "Compte comptable",
       "JOURNAL_ENTRY": "Écriture manuelle ou d’ouverture",
       "BANK_TRANSACTION": "Transaction bancaire",
-      "REPORT": "Rapport"
+      "REPORT": "Rapport",
+      "CLIENT_DOCUMENT": "Contrats et liens clients"
     },
     "statuses": {
       "DRAFT": "Brouillon",
@@ -2903,7 +2904,10 @@
       "UNMATCHED": "Non appariée",
       "MATCHED": "Appariée",
       "EXCLUDED": "Exclue",
-      "AVAILABLE": "Disponible"
+      "AVAILABLE": "Disponible",
+      "PUBLISHED": "Publié",
+      "VIEWED": "Ouvert via le lien",
+      "SIGNED": "Signé électroniquement"
     },
     "entrySources": {
       "MANUAL": "Saisie manuelle",
@@ -2919,7 +2923,8 @@
     "suggestionsError": "Suggestions indisponibles. Validez pour ouvrir la recherche complète.",
     "suggestionsEmpty": "Aucune suggestion. Validez pour ouvrir la recherche complète.",
     "suggestionsHint": "Jusqu’à 8 résultats. Utilisez les flèches et Entrée, ou validez pour la recherche complète.",
-    "suggestionsStart": "Saisissez au moins deux caractères pour les suggestions. Validez pour rechercher tous les résultats."
+    "suggestionsStart": "Saisissez au moins deux caractères pour les suggestions. Validez pour rechercher tous les résultats.",
+    "clientDocumentScope": "Date de création à l’heure de Toronto. Le statut décrit la consultation/signature; la disponibilité du lien se vérifie sur la fiche. Ces copies n’ont pas de montant financier et sont recherchées par titre, nom du client ou référence Allumi complète."
   },
   "officialTaxes": {
     "audit": "Voir la provenance des imports",

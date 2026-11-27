@@ -65,6 +65,13 @@ export async function searchCompany(actor: CompanyContext, params: Record<string
         LEFT JOIN contact c ON a.contacts AND c.company_id=e.company_id AND c.id=e.contact_id
         WHERE e.company_id=${actor.companyId}::uuid AND a.sales
         UNION ALL
+        SELECT d.id::text,'CLIENT_DOCUMENT',d.title,d.customer_name,
+          (d.created_at AT TIME ZONE 'America/Toronto')::date,NULL::bigint,
+          CASE WHEN d.status='DRAFT' THEN 'DRAFT' WHEN d.signed_at IS NOT NULL THEN 'SIGNED'
+            WHEN d.first_viewed_at IS NOT NULL THEN 'VIEWED' ELSE 'PUBLISHED' END,
+          concat_ws(' ',d.title,d.customer_name),NULL::uuid
+        FROM client_document d CROSS JOIN access a WHERE d.company_id=${actor.companyId}::uuid AND a.sales
+        UNION ALL
         SELECT d.id::text,d.kind::text,d.number,
           coalesce(d.supplier_snapshot->>'name',d.payee_name,CASE WHEN a.contacts THEN c.display_name END),d.document_date,d.total_cents,d.status::text,
           concat_ws(' ',d.number,d.supplier_reference,d.supplier_snapshot->>'name',d.payee_name,CASE WHEN a.contacts THEN c.display_name END),d.journal_entry_id
@@ -89,7 +96,7 @@ export async function searchCompany(actor: CompanyContext, params: Record<string
         AND (${filters.from}::date IS NULL OR date>=${filters.from}::date)
         AND (${filters.to}::date IS NULL OR date<=${filters.to}::date)
         AND (${filters.amountCents?.toString() ?? null}::bigint IS NULL OR (CASE WHEN kind='BANK_TRANSACTION' THEN abs(amount::numeric) ELSE amount END)=${filters.amountCents?.toString() ?? null}::bigint)
-        AND (${filters.query}='' OR terms ILIKE ${pattern} OR amount=${filters.queryCents?.toString() ?? null}::bigint OR (kind='BANK_TRANSACTION' AND abs(amount::numeric)=${filters.queryCents?.toString() ?? null}::bigint) OR to_char(date,'YYYY-MM-DD')=${filters.query})
+        AND (${filters.query}='' OR terms ILIKE ${pattern} OR (kind='CLIENT_DOCUMENT' AND id=lower(${filters.query})) OR amount=${filters.queryCents?.toString() ?? null}::bigint OR (kind='BANK_TRANSACTION' AND abs(amount::numeric)=${filters.queryCents?.toString() ?? null}::bigint) OR to_char(date,'YYYY-MM-DD')=${filters.query})
       ORDER BY date DESC NULLS LAST,kind,id LIMIT ${SEARCH_PAGE_SIZE + 1} OFFSET ${(filters.page - 1) * SEARCH_PAGE_SIZE}`;
     const base = `/c/${actor.companyId}`;
     const mapped = rows.slice(0, SEARCH_PAGE_SIZE).map((row): SearchRow => {
@@ -98,6 +105,7 @@ export async function searchCompany(actor: CompanyContext, params: Record<string
         : row.kind === "BANK_TRANSACTION" ? `transactions/${row.id}`
         : row.kind === "ACCOUNT" ? `grand-livre?${new URLSearchParams({ compte: row.id })}`
         : row.kind === "JOURNAL_ENTRY" ? `journal/${row.id}`
+        : row.kind === "CLIENT_DOCUMENT" ? `contrats/${row.id}`
         : row.kind === "ESTIMATE" ? `devis/${row.id}`
         : row.kind === "INVOICE" ? `factures/${draft ? "" : "validees/"}${row.id}`
         : row.kind === "CREDIT_NOTE" ? `avoirs/${draft ? "" : "valides/"}${row.id}`

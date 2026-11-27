@@ -267,6 +267,12 @@ Optionally [choose an existing client](docs/Choisir-un-client-pour-un-contrat.md
 
 <img src="docs/images/contrats-client-mobile.png" alt="Existing client selection, mobile" width="412">
 
+Find [contracts and client links](docs/Recherche-des-contrats.md) in global search and header suggestions by title, client name or full Allumi reference. Filter by document stage and Toronto creation date; open the authorized internal page even after link expiry/revocation. Contents, signer details and private links stay outside search metadata.
+
+![Client-document global search](docs/images/recherche-contrats-desktop.png)
+
+<img src="docs/images/recherche-contrats-mobile.png" alt="Client-document global search, mobile" width="412">
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

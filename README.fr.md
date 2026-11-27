@@ -266,6 +266,12 @@ Tu peux [choisir un client existant](docs/Choisir-un-client-pour-un-contrat.md) 
 
 <img src="docs/images/contrats-client-mobile.png" alt="Choix d’un client existant, mobile" width="412">
 
+Retrouve les [contrats et liens clients](docs/Recherche-des-contrats.md) dans la recherche globale et les suggestions, par titre, client ou référence Allumi complète. Filtre par étape et date de création à Toronto; ouvre la fiche interne autorisée, même après expiration/révocation. Contenu, détails de signature et liens privés restent hors des métadonnées.
+
+![Recherche globale des contrats](docs/images/recherche-contrats-desktop.png)
+
+<img src="docs/images/recherche-contrats-mobile.png" alt="Recherche globale des contrats, mobile" width="412">
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

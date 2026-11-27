@@ -2885,7 +2885,8 @@
       "ACCOUNT": "Ledger account",
       "JOURNAL_ENTRY": "Manual or opening journal entry",
       "BANK_TRANSACTION": "Bank transaction",
-      "REPORT": "Report"
+      "REPORT": "Report",
+      "CLIENT_DOCUMENT": "Contracts and client links"
     },
     "statuses": {
       "DRAFT": "Draft",
@@ -2903,7 +2904,10 @@
       "UNMATCHED": "Unmatched",
       "MATCHED": "Matched",
       "EXCLUDED": "Excluded",
-      "AVAILABLE": "Available"
+      "AVAILABLE": "Available",
+      "PUBLISHED": "Published",
+      "VIEWED": "Opened through link",
+      "SIGNED": "Electronically signed"
     },
     "entrySources": {
       "MANUAL": "Manual entry",
@@ -2919,7 +2923,8 @@
     "suggestionsError": "Suggestions are unavailable. Submit to open full search.",
     "suggestionsEmpty": "No suggestions. Submit to open full search.",
     "suggestionsHint": "Up to 8 matches. Use arrow keys and Enter, or submit for full search.",
-    "suggestionsStart": "Type at least two characters for suggestions. Submit to search all results."
+    "suggestionsStart": "Type at least two characters for suggestions. Submit to search all results.",
+    "clientDocumentScope": "Creation date in Toronto time. Status describes views/signature; check link availability on the document page. These copies have no financial amount and are searched by title, client name or full Allumi reference."
   },
   "officialTaxes": {
     "audit": "View import provenance",

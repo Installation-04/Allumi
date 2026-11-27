@@ -114,3 +114,7 @@ Les recherches de titre/client et les listes paginées sont propres à l’entre
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-signature-en-dark-mobile.png" alt="Recorded signature evidence on mobile" width="412">
 
 Toutes les références utilisent des données fictives.
+
+## Contrats et liens clients dans la recherche globale
+
+[[Recherche-des-contrats]] décrit le titre, nom du client et référence complète, les étapes de consultation/signature, les dates de création à Toronto et les suggestions vers la fiche interne, sous Ventes lecture.

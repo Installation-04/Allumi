@@ -750,3 +750,15 @@ Voir [[Choisir-un-client-pour-un-contrat]].
 ![Client selection, English dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-client-en-dark-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-client-en-dark-mobile.png" alt="Client selection, English mobile" width="412">
+
+## Recherche globale des contrats
+
+Voir [[Recherche-des-contrats]].
+
+![Recherche des contrats](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/recherche-contrats-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/recherche-contrats-mobile.png" alt="Recherche des contrats sur mobile" width="412">
+
+![Contract search, English dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/recherche-contrats-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/recherche-contrats-en-dark-mobile.png" alt="Contract search, English mobile" width="412">
