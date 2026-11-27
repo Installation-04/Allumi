@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.104] - 2026-11-26
+
 - Recherche globale : contrats et copies de liens clients retrouvés par titre, nom du client ou référence Allumi complète; filtres de type, étapes de consultation/signature et date de création à Toronto, pagination conservée.
 - Suggestions : métadonnées minimales vers la fiche interne, Ventes lecture et isolation d’entreprise; documents retrouvables après expiration/révocation ou annulation de source, sans réactiver le lien.
 - Confidentialité : aucun contenu, courriel, preuve détaillée, empreinte ou jeton recherché/retourné; aucun montant financier associé aux copies, aucune consultation client ou écriture créée. Interface et guides FR/EN, mobile/thème sombre, captures et README.
