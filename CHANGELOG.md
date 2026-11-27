@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Validation : attendre la langue et le thème confirmés dans le parcours de preuve des contrats avant de vérifier les réponses françaises.
+
 ## [0.4.0-alpha.111] - 2026-11-27
 
 - Carnet de temps : copie imprimable complète des filtres jusqu’à 1 000 saisies, au-delà de la pagination, avec totaux exacts en h:mm et page de retour conservée.
