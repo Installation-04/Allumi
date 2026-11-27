@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.105] - 2026-11-27
+
 - Documents clients : copie HTML autonome téléchargeable du contenu publié, de l’empreinte et des événements/signature déclarée, dans la langue du document; lecture hors ligne et impression en PDF via le navigateur.
 - Sécurité : Ventes lecture et isolation d’entreprise, contrôle d’intégrité réutilisé, refus des brouillons et conservation après expiration/révocation ou annulation de source; aucun effet sur le document, les consultations ou la comptabilité.
 - Confidentialité : valeurs échappées, aucune ressource réseau ni script, aucun lien privé généré ou preuve canonique brute ajouté; réponse privée sans cache et sans referrer effectif pour les copies/dossiers de preuve, guides et captures FR/EN mobile/thème sombre.
