@@ -62,3 +62,7 @@ Voir [[Interface-et-navigation]], [[Recherche-des-paiements-clients]] et [[Utili
 Le catalogue de rapports inclut [[Previsions-de-tresorerie]] : Comptabilité et Ventes en lecture sont toutes deux requises; aucune permission Contacts n’est nécessaire.
 
 Le catalogue de formulaires inclut aussi le [[Carnet-de-kilometrage]], retrouvable par « kilométrage », « mileage » ou « trajets » avec Comptabilité en lecture. Il ouvre le carnet; les véhicules et motifs des trajets ne sont pas recherchés globalement. Utilise les filtres du carnet pour les consulter.
+
+## Contrats et liens clients dans la recherche globale
+
+[[Recherche-des-contrats]] décrit le titre, nom du client et référence complète, les étapes de consultation/signature, les dates de création à Toronto et les suggestions vers la fiche interne, sous Ventes lecture.

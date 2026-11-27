@@ -74,3 +74,5 @@ Disponible : [[Export-et-nettoyage-des-contrats]], CSV complet jusqu’à 5 000 
 Disponible : [[Dossier-de-preuve-des-documents]], contenu publié et informations de signature déclarées en JSON privé, vérification de l’empreinte du contenu et conservation après expiration/révocation. Aucun scellement numérique du fichier ni contrôle d’identité.
 
 Disponible : [[Choisir-un-client-pour-un-contrat]], recherche privée de clients actifs et sélection du nom/courriel pour revue, avec Ventes écriture et Contacts lecture. Saisie manuelle conservée et aucune synchronisation permanente avec le répertoire.
+
+Disponible : [[Recherche-des-contrats]], recherche globale par titre/client/référence complète, étapes de consultation/signature, date de création à Toronto et suggestions internes. Ventes lecture, sans contenu ni donnée de lien et sans montant financier associé aux copies.

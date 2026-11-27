@@ -1730,5 +1730,51 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.104": {
+    "fr-CA": {
+      "title": "Retrouver les contrats depuis la recherche globale",
+      "added": [
+        {
+          "text": "Recherchez les contrats et copies de liens clients par titre, nom du client ou référence complète, avec étapes et dates de création à Toronto.",
+          "guide": "Recherche-des-contrats"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Les suggestions ouvrent la fiche interne autorisée. Ventes lecture suffit; aucun contenu, lien privé ou montant financier de copie n’est repris dans les résultats.",
+          "guide": "Recherche-des-contrats"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration, dépendance ou variable nouvelle. Mise à jour serveur habituelle; Windows reste un client du serveur existant.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Find client documents in global search",
+      "added": [
+        {
+          "text": "Search contracts and client-link copies by title, client name or full reference, with document stages and Toronto creation dates.",
+          "guide": "Recherche-des-contrats"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Header suggestions open the authorized internal page. Sales read is sufficient; document contents, private links and copy financial amounts stay outside results.",
+          "guide": "Recherche-des-contrats"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No new migration, dependency or environment variable. Use the usual server update process; Windows remains a client of the existing server.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

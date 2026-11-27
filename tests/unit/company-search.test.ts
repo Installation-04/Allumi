@@ -33,3 +33,8 @@ it("searches aggregate journal amounts beyond one-line limits without changing p
 it("accepts bank states while preserving signed query amounts and positive exact filters",()=>{
  for(const statut of ["UNMATCHED","MATCHED","EXCLUDED"])expect(parseSearchFilters({type:"BANK_TRANSACTION",statut,q:"-17.23",montant:"17,23"},"en")).toMatchObject({kind:"BANK_TRANSACTION",status:statut,queryCents:-1723n,amountCents:1723n});
 });
+
+it("accepts client-document stages without interpreting link expiry as a global signature status",()=>{
+ for(const statut of ['DRAFT','PUBLISHED','VIEWED','SIGNED'])expect(parseSearchFilters({type:'CLIENT_DOCUMENT',statut},'fr-CA')).toMatchObject({kind:'CLIENT_DOCUMENT',status:statut});
+ expect(()=>parseSearchFilters({type:'CLIENT_DOCUMENT',statut:'EXPIRED'},'en')).toThrow(RangeError);
+});

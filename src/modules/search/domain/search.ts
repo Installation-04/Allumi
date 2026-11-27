@@ -1,8 +1,8 @@
 import { isValidIsoDate, parseMoney, MAX_LINE_CENTS, MAX_ENTRY_LINES, type Locale } from "@/modules/ledger/client";
 
-export const SEARCH_KINDS = ["CONTACT", "ITEM", "ESTIMATE", "INVOICE", "CREDIT_NOTE", "BILL", "SUPPLIER_CREDIT", "EXPENSE", "RECEIPT", "REFUND", "DISBURSEMENT", "SUPPLIER_REFUND", "ACCOUNT", "JOURNAL_ENTRY", "BANK_TRANSACTION", "REPORT"] as const;
+export const SEARCH_KINDS = ["CONTACT", "ITEM", "CLIENT_DOCUMENT", "ESTIMATE", "INVOICE", "CREDIT_NOTE", "BILL", "SUPPLIER_CREDIT", "EXPENSE", "RECEIPT", "REFUND", "DISBURSEMENT", "SUPPLIER_REFUND", "ACCOUNT", "JOURNAL_ENTRY", "BANK_TRANSACTION", "REPORT"] as const;
 export type SearchKind = (typeof SEARCH_KINDS)[number];
-export const SEARCH_STATUSES = ["DRAFT", "SENT", "ACCEPTED", "DECLINED", "CANCELLED", "CONVERTED", "POSTED", "VOID", "ACTIVE", "ARCHIVED", "INACTIVE", "REVERSED", "UNMATCHED", "MATCHED", "EXCLUDED", "AVAILABLE"] as const;
+export const SEARCH_STATUSES = ["DRAFT", "PUBLISHED", "VIEWED", "SIGNED", "SENT", "ACCEPTED", "DECLINED", "CANCELLED", "CONVERTED", "POSTED", "VOID", "ACTIVE", "ARCHIVED", "INACTIVE", "REVERSED", "UNMATCHED", "MATCHED", "EXCLUDED", "AVAILABLE"] as const;
 // A balanced journal can contain several maximum-sized debit lines. Posting limits stay unchanged.
 export const SEARCH_MAX_CENTS = MAX_LINE_CENTS * (BigInt(MAX_ENTRY_LINES) / 2n);
 export type SearchStatus = (typeof SEARCH_STATUSES)[number];

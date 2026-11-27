@@ -133,3 +133,5 @@ Suggestions : [[Suggestions-de-recherche]] — résultats autorisés pendant la 
 - [[Dossier-de-preuve-des-documents]] : téléchargement JSON privé du contenu publié et de la signature déclarée, avec empreinte contrôlée et limites explicites.
 
 - [[Choisir-un-client-pour-un-contrat]] : préremplissage facultatif du nom/courriel depuis les clients actifs, sous les droits Ventes/Contacts.
+
+- [[Recherche-des-contrats]] : contrats et liens clients dans la recherche globale et les suggestions.

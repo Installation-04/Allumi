@@ -41,3 +41,7 @@ La liste est utilisable au clavier et au toucher, avec rôles combobox/listbox, 
 Les captures utilisent une entreprise fictive dans Chromium en émulation mobile. Les essais physiques Safari iOS restent ouverts. Aucune migration ni nouvelle configuration. L’historique, l’interprétation de phrases et les types de données encore absents de la recherche globale ne sont pas ajoutés.
 
 Voir [[Recherche-des-rapports]], [[Recherche-comptable]], [[Recherche-bancaire]] et [[Utilisateurs-et-permissions]].
+
+## Contrats et liens clients dans la recherche globale
+
+[[Recherche-des-contrats]] décrit le titre, nom du client et référence complète, les étapes de consultation/signature, les dates de création à Toronto et les suggestions vers la fiche interne, sous Ventes lecture.

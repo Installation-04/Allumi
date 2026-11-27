@@ -58,3 +58,7 @@ Ces consultations et filtres ne changent aucun document, aucune signature et auc
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-suivi-en-dark-mobile.png" alt="English contract tracking on mobile in dark theme" width="412">
 
 Les captures utilisent des données fictives.
+
+## Contrats et liens clients dans la recherche globale
+
+[[Recherche-des-contrats]] décrit le titre, nom du client et référence complète, les étapes de consultation/signature, les dates de création à Toronto et les suggestions vers la fiche interne, sous Ventes lecture.
