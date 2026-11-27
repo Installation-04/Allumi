@@ -28,6 +28,7 @@ export const ROUTE_ACCESS: Record<string, readonly Action[]> = {
   comptes: ["ledger.read"],
   budgets: ["ledger.read"],
   kilometrage: ["mileage.read"],
+  temps: ["time.read"],
   balance: ["ledger.read"],
   exercices: ["ledger.read"],
   taxes: ["taxes.read"],
@@ -50,6 +51,7 @@ export const ROUTE_ACCESS: Record<string, readonly Action[]> = {
 };
 
 const AREA_ACCESS: Partial<Record<Area, readonly Action[]>> = {
+  projets: ["time.read"],
   ventes: ["sales.read"],
   banque: ["bank.read"],
   tresorerie: ["ledger.read"],

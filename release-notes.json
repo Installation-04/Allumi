@@ -1934,5 +1934,51 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.110": {
+    "fr-CA": {
+      "title": "Suivre le temps facturable et non facturable",
+      "added": [
+        {
+          "text": "Ouvrez Projets → Carnet de temps pour saisir le travail déclaré par date, libellé de projet, intervenant et activité, avec minutes exactes et CSV complet filtré.",
+          "guide": "Carnet-de-temps"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Les permissions Comptabilité, révisions, confirmations et audit protègent les modifications. Aucune facture, écriture ou paie créée.",
+          "guide": "Carnet-de-temps"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Une migration ajoute la table du carnet et ses gardes, sans nouvelle dépendance ou configuration. Le processus habituel de mise à jour serveur l’applique.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Track billable and non-billable time",
+      "added": [
+        {
+          "text": "Open Projects → Time log to record declared work by date, project label, person and activity, with exact minutes and a full filtered CSV.",
+          "guide": "Carnet-de-temps"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Accounting permissions, revision checks, confirmation and audit protect edits. No invoice, journal entry or payroll is created.",
+          "guide": "Carnet-de-temps"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "A migration adds the time-log table and guards, without new dependencies or configuration. The usual server update process applies it.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

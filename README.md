@@ -291,6 +291,12 @@ Find [contracts and client links](docs/Recherche-des-contrats.md) in global sear
 
 <img src="docs/images/copie-client-signee-mobile.png" alt="Signed client copy, mobile" width="412">
 
+[Track declared work time](docs/Carnet-de-temps.md) by project label and person, with exact billable/non-billable minutes, revisions, audit and full filtered CSV. Billing and payroll remain separate.
+
+![Time log](docs/images/carnet-temps-desktop.png)
+
+<img src="docs/images/carnet-temps-mobile.png" alt="Time log, mobile" width="412">
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

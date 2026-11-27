@@ -427,6 +427,14 @@ it("protects client document capabilities, signed metadata and external audit wi
  expect(await q("SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('client_document_guard','client_document_audit','client_document_delivery_guard','client_document_delivery_audit','contract_template_guard','contract_template_audit','estimate_terms_guard')")).toHaveLength(7);
 });
 
+it('keeps time entries tenant-scoped, audited, revisioned and restricted to Accounting',async()=>{
+ const [table]=await q<{enabled:boolean;forced:boolean}>("SELECT relrowsecurity AS enabled,relforcerowsecurity AS forced FROM pg_class WHERE oid='time_entry'::regclass");expect(table).toEqual({enabled:true,forced:true});
+ const policies=await q<{qual:string|null;with_check:string|null}>("SELECT qual,with_check FROM pg_policies WHERE tablename='time_entry' AND permissive='RESTRICTIVE'");expect(policies).toHaveLength(4);for(const p of policies)expect(`${p.qual}${p.with_check}`).toContain('accounting');
+ expect(await q("SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgrelid='time_entry'::regclass")).toHaveLength(2);
+ expect((await q<{ok:boolean}>("SELECT has_table_privilege('allumi_app','time_entry','TRUNCATE') AS ok"))[0]?.ok).toBe(false);
+ const [guard]=await q<{definer:boolean;public_execute:boolean;config:string[]}>("SELECT prosecdef AS definer,has_function_privilege('public',oid,'EXECUTE') AS public_execute,proconfig AS config FROM pg_proc WHERE oid='time_entry_guard()'::regprocedure");expect(guard).toMatchObject({definer:false,public_execute:false});expect(guard?.config).toContain('search_path=pg_catalog, public');
+});
+
 it('locks the public source state when reserving client-document mail',async()=>{
  const [f]=await q<{body:string}>("SELECT pg_get_functiondef(oid) AS body FROM pg_proc WHERE proname='client_document_delivery_guard'");expect(f?.body).toContain("'SENT', 'ACCEPTED', 'CONVERTED'".replaceAll(', ',','));expect(f?.body).toContain('FOR SHARE');expect(f?.body).toContain("status='POSTED'");
 });

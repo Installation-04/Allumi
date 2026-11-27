@@ -901,6 +901,17 @@
       "mailRate": "Attends une minute avant un renvoi; maximum 20 envois par jour pour ce lien.",
       "exportLimit": "Plus de 5 000 documents correspondent. Réduis les filtres; aucun fichier partiel n’a été créé.",
       "evidenceIntegrity": "Le contenu publié ne correspond pas à son empreinte. Aucun dossier de preuve n’a été téléchargé; contactez votre administrateur."
+    },
+    "time": {
+      "invalid": "Vérifie la date, les libellés et la durée.",
+      "duration": "Saisis une durée de 1 minute à 24:00, en h:mm ou minutes entières.",
+      "future": "La date du travail ne peut pas être future à Toronto.",
+      "notFound": "Saisie introuvable.",
+      "stale": "Cette saisie a été modifiée. Recharge la page avant de continuer.",
+      "confirm": "Confirme la suppression.",
+      "filters": "Vérifie les filtres et une période de 366 jours maximum jusqu’à aujourd’hui.",
+      "limit": "Le résultat est trop grand. Réduis les filtres.",
+      "exportLimit": "Réduis les filtres à 5 000 saisies maximum pour exporter."
     }
   },
   "settingsPage": {
@@ -1336,8 +1347,8 @@
     },
     "projets": {
       "title": "Projets",
-      "description": "Le suivi comptable par projet est une évolution envisagée.",
-      "planned": "Périmètre et priorité à définir; aucun suivi par projet disponible actuellement."
+      "description": "Suivi manuel du temps partagé par projet ou dossier.",
+      "planned": "Registre de projets, coûts, tarifs, facturation et rentabilité restent à venir."
     },
     "paie": {
       "title": "Paie",
@@ -1394,7 +1405,8 @@
       "budgets": "Budgets annuels",
       "previsions-tresorerie": "Prévision de trésorerie",
       "kilometrage": "Carnet de kilométrage",
-      "contrats": "Contrats et liens clients"
+      "contrats": "Contrats et liens clients",
+      "temps": "Carnet de temps"
     }
   },
   "updates": {
@@ -3913,5 +3925,56 @@
     "customerSelected": "Nom et courriel repris. Vérifie-les avant d’enregistrer; les conditions, le tarif et la langue sont conservés.",
     "downloadSignedCopy": "Télécharger la copie signée",
     "signedCopyHint": "Conserve ce fichier HTML confidentiel et imprime-le en PDF dans ton navigateur. La signature déclarée ne vérifie pas l’identité; le fichier exporté n’est pas scellé numériquement."
+  },
+  "time": {
+    "title": "Carnet de temps",
+    "create": "Nouvelle saisie de temps",
+    "save": "Enregistrer le temps",
+    "detail": "Détail du temps",
+    "edit": "Modifier le temps",
+    "update": "Enregistrer les modifications",
+    "delete": "Supprimer la saisie",
+    "deleteButton": "Confirmer la suppression",
+    "deleteConfirm": "Je confirme la suppression de cette saisie. La piste d’audit sera conservée.",
+    "back": "Retour au carnet",
+    "backYear": "Voir les saisies de cette année",
+    "reload": "Recharger la saisie",
+    "shared": "Carnet partagé de l’entreprise. Les intervenants et projets sont des libellés déclarés; aucune facture ou paie n’est créée.",
+    "date": "Date du travail",
+    "project": "Projet ou dossier",
+    "usage": "Facturation",
+    "person": "Intervenant déclaré",
+    "task": "Activité",
+    "notes": "Note interne",
+    "duration": "Durée (h:mm ou minutes)",
+    "dateHint": "Date du travail, jusqu’à aujourd’hui à Toronto.",
+    "projectHint": "Libellé libre, 120 caractères maximum. Aucun projet distinct n’est créé.",
+    "notesHint": "Facultative, 200 caractères maximum.",
+    "durationHint": "Exemples : 1:30 ou 90. De 1 minute à 24:00 par saisie; pas d’heures décimales.",
+    "BILLABLE": "Facturable",
+    "NON_BILLABLE": "Non facturable",
+    "ALL": "Tous les temps",
+    "from": "Du",
+    "to": "Au",
+    "projectFilter": "Rechercher un projet",
+    "apply": "Appliquer les filtres",
+    "reset": "Réinitialiser les filtres",
+    "export": "Exporter le CSV complet",
+    "period": "Du {from} au {to} inclus : {count} saisies.",
+    "total": "Temps total (h:mm)",
+    "count": "Nombre de saisies",
+    "empty": "Aucune saisie pour ces filtres.",
+    "route": "Intervenant et activité",
+    "actions": "Actions",
+    "open": "Voir la saisie",
+    "pages": "Pages du carnet de temps",
+    "page": "Page {page} sur {pages}",
+    "previous": "Précédente",
+    "next": "Suivante",
+    "limits": "Saisie manuelle sans chronomètre ni contrôle de chevauchement ou de total quotidien par personne. Aucun registre de projets, tarif, facture, validation des heures ou paie. CSV complet limité à 5 000 saisies par export.",
+    "personHint": "Nom déclaré, 80 caractères maximum; sans lien à un compte employé.",
+    "taskHint": "Description de l’activité, 200 caractères maximum.",
+    "minutes": "Durée en minutes",
+    "totalMinutes": "Total en minutes"
   }
 }

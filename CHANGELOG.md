@@ -4,6 +4,14 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.110] - 2026-11-27
+
+
+- Projets : carnet de temps partagé, saisie exacte h:mm ou minutes, facturable/non facturable, libellés projet/intervenant/activité, notes et filtres avec totaux complets.
+- Contrôles : droits Comptabilité modulaires, RLS forcée, révisions concurrentes, confirmation de suppression et audit; aucun mouvement financier, facture ou paie créé.
+- Export et interface : CSV privé complet jusqu’à 5 000 saisies, pagination, français/anglais, thème sombre, mobile, guide et quatre captures fictives.
+- Installation : migration additive de table et gardes, sans nouvelle dépendance ni variable; mise à jour serveur habituelle.
+
 ## [0.4.0-alpha.108] - 2026-11-27
 
 - Portail client : téléchargement HTML autonome des contrats et soumissions signés depuis un lien actif, avec signature déclarée et impression PDF dans le navigateur, en français et en anglais.
