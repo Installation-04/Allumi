@@ -465,6 +465,7 @@ model Company {
   estimateCounter        SalesEstimateCounter?
   budgets                Budget[]
   mileageTrips           MileageTrip[]
+  timeEntries            TimeEntry[]
   cashForecastPresets    CashForecastPreset[]
   budgetLines            BudgetLine[]
   budgetMonthlyTargets   BudgetMonthlyTarget[]
@@ -2026,4 +2027,22 @@ model ClientDocumentDelivery {
  document ClientDocument @relation(fields:[companyId,documentId],references:[companyId,id],onDelete:Restrict,map:"client_document_delivery_document_fkey")
  @@index([companyId,documentId,createdAt])
  @@map("client_document_delivery")
+}
+
+model TimeEntry {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  companyId      String   @map("company_id") @db.Uuid
+  workDate       DateTime @map("work_date") @db.Date
+  project        String
+  person         String
+  task           String
+  notes          String
+  usage          String
+  minutes        Int
+  revision       Int      @default(1)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  company        Company  @relation(fields:[companyId],references:[id],onDelete:Restrict)
+  @@index([companyId,workDate,createdAt,id])
+  @@map("time_entry")
 }

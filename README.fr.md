@@ -290,6 +290,12 @@ Retrouve les [contrats et liens clients](docs/Recherche-des-contrats.md) dans la
 
 <img src="docs/images/copie-client-signee-mobile.png" alt="Signed client copy, mobile" width="412">
 
+[Suis le temps de travail déclaré](docs/Carnet-de-temps.md) par libellé de projet et intervenant : minutes facturables/non facturables exactes, révisions, audit et CSV complet filtré. Facturation et paie restent séparées.
+
+![Time log](docs/images/carnet-temps-desktop.png)
+
+<img src="docs/images/carnet-temps-mobile.png" alt="Time log, mobile" width="412">
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

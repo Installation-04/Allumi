@@ -82,3 +82,5 @@ La [[Copie-imprimable-des-documents]] télécharge le contenu publié et la sign
 [[Acceptation-des-soumissions-signees]] : un gestionnaire Ventes peut revoir une copie de soumission signée et confirmer l’acceptation de sa source encore envoyée et valide. Révision/empreinte vérifiées et référence d’audit atomique; aucune acceptation publique automatique ni facture/écriture créée.
 
 [[Copie-client-du-document-signe]] : contrat ou soumission signé téléchargeable en HTML autonome depuis un lien actif, sous contrôle d’intégrité. Aucun compte employé, nouvelle consultation ou mouvement financier; PDF via navigateur et identité déclarative.
+
+[[Carnet-de-temps]] : saisie manuelle partagée, libellés de projet/intervenant, durées exactes en minutes, suivi facturable/non facturable, révisions/audit et CSV complet. Registre de projets, tarifs, facturation, paie et rentabilité restent distincts.

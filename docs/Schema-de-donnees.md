@@ -4844,3 +4844,7 @@ Le suivi lit les métadonnées sous RLS Ventes, joint les états des sources de 
 ## Copie client du document signé
 
 La migration additive `20261127020000_public_signed_document_copy` ajoute uniquement `client_document_public_copy(text)`, fonction STABLE SECURITY DEFINER à chemin de recherche fixe et EXECUTE limité à `allumi_app`. Elle reçoit le hash du jeton; une seule lecture contrôle publication signée, lien actif et source de soumission SENT/ACCEPTED/CONVERTED. L’empreinte est recalculée avant retour des seuls champs nécessaires au rendu. Aucun OPEN/SIGN, verrou ou UPDATE : aucune nouvelle consultation/signature/audit métier. Factures, brouillons, non signés, liens expirés/révoqués et sources annulées sont refusés. Aucune table, colonne ou variable ajoutée. Voir [[Copie-client-du-document-signe]].
+
+## Carnet de temps
+
+La migration `20261127030000_time_log` ajoute `time_entry` : entreprise, date, libellés projet/intervenant/activité, note, facturable/non facturable, minutes entières de 1 à 1 440, révision et horodatages. RLS forcée et politiques restrictives Comptabilité; droits lecture/écriture modulaires. Gardes SQL sur texte, date Toronto, révision initiale et incrémentale, scope/id/création immuables. Audit des créations/modifications/suppressions. Index de pagination par entreprise/date/création/id. Aucun lien automatique à un compte utilisateur, client, projet, facture ou écriture; aucun mouvement financier. Voir [[Carnet-de-temps]].

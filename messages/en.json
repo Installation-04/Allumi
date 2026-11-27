@@ -901,6 +901,17 @@
       "mailRate": "Wait one minute before resending; maximum 20 deliveries per day for this link.",
       "exportLimit": "More than 5,000 documents match. Narrow the filters; no partial file was created.",
       "evidenceIntegrity": "The published content does not match its hash. No evidence package was downloaded; contact your administrator."
+    },
+    "time": {
+      "invalid": "Check the date, labels and duration.",
+      "duration": "Enter a duration from 1 minute to 24:00, as h:mm or whole minutes.",
+      "future": "The work date cannot be in the future in Toronto.",
+      "notFound": "Time entry not found.",
+      "stale": "This entry changed. Reload before continuing.",
+      "confirm": "Confirm deletion.",
+      "filters": "Check filters and a period of at most 366 days ending no later than today.",
+      "limit": "The result is too large. Narrow the filters.",
+      "exportLimit": "Narrow the filters to at most 5,000 entries for export."
     }
   },
   "settingsPage": {
@@ -1336,8 +1347,8 @@
     },
     "projets": {
       "title": "Projects",
-      "description": "Project accounting is a possible future addition.",
-      "planned": "Scope and priority to be defined; project tracking is not available currently."
+      "description": "Shared manual time tracking by project or job.",
+      "planned": "Project registry, costs, rates, billing and profitability are still planned."
     },
     "paie": {
       "title": "Payroll",
@@ -1394,7 +1405,8 @@
       "budgets": "Annual budgets",
       "previsions-tresorerie": "Cash flow forecast",
       "kilometrage": "Mileage log",
-      "contrats": "Contracts and client links"
+      "contrats": "Contracts and client links",
+      "temps": "Time log"
     }
   },
   "updates": {
@@ -3913,5 +3925,56 @@
     "customerSelected": "Name and email copied. Review them before saving; terms, hourly rate and language are preserved.",
     "downloadSignedCopy": "Download signed copy",
     "signedCopyHint": "Keep this confidential HTML file and print it to PDF in your browser. The declared signature does not verify identity; the exported file is not digitally sealed."
+  },
+  "time": {
+    "title": "Time log",
+    "create": "New time entry",
+    "save": "Save time",
+    "detail": "Time entry details",
+    "edit": "Edit time",
+    "update": "Save changes",
+    "delete": "Delete time entry",
+    "deleteButton": "Confirm deletion",
+    "deleteConfirm": "I confirm deletion of this entry. The audit trail will be preserved.",
+    "back": "Back to time log",
+    "backYear": "View entries for this year",
+    "reload": "Reload entry",
+    "shared": "Shared company log. People and projects are declared labels; no invoice or payroll is created.",
+    "date": "Work date",
+    "project": "Project or job",
+    "usage": "Billing",
+    "person": "Declared person",
+    "task": "Activity",
+    "notes": "Internal note",
+    "duration": "Duration (h:mm or minutes)",
+    "dateHint": "Work date, no later than today in Toronto.",
+    "projectHint": "Free label, up to 120 characters. No separate project is created.",
+    "notesHint": "Optional, up to 200 characters.",
+    "durationHint": "Examples: 1:30 or 90. From 1 minute to 24:00 per entry; no decimal hours.",
+    "BILLABLE": "Billable",
+    "NON_BILLABLE": "Non-billable",
+    "ALL": "All time",
+    "from": "From date",
+    "to": "To date",
+    "projectFilter": "Find a project",
+    "apply": "Apply filters",
+    "reset": "Reset filters",
+    "export": "Export full CSV",
+    "period": "From {from} through {to}, inclusive: {count} entries.",
+    "total": "Total time (h:mm)",
+    "count": "Entry count",
+    "empty": "No entries match these filters.",
+    "route": "Person and activity",
+    "actions": "Actions",
+    "open": "View entry",
+    "pages": "Time log pages",
+    "page": "Page {page} of {pages}",
+    "previous": "Previous",
+    "next": "Next",
+    "limits": "Manual entries without a timer, overlap checks or daily total checks per person. No project registry, rate, invoice, timesheet approval or payroll. Complete CSV limited to 5,000 entries per export.",
+    "personHint": "Declared name, up to 80 characters; not linked to an employee account.",
+    "taskHint": "Activity description, up to 200 characters.",
+    "minutes": "Duration in minutes",
+    "totalMinutes": "Total minutes"
   }
 }

@@ -802,3 +802,15 @@ Voir [[Copie-client-du-document-signe]].
 ![Signed client copy, English dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/copie-client-signee-en-dark-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/copie-client-signee-en-dark-mobile.png" alt="Signed client copy, mobile dark theme" width="412">
+
+## Carnet de temps
+
+Voir [[Carnet-de-temps]].
+
+![Carnet de temps](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/carnet-temps-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/carnet-temps-mobile.png" alt="Carnet de temps mobile" width="412">
+
+![Time log, dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/carnet-temps-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/carnet-temps-en-dark-mobile.png" alt="Time log, mobile dark theme" width="412">
