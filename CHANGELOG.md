@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+- Tests navigateur : la vérification des modifications concurrentes d’un budget mensuel attend l’éditeur avant d’ouvrir la seconde session; le rapport ne peut plus être copié pendant la navigation. Aucun changement fonctionnel ni délai accru.
+
 ## [0.4.0-alpha.104] - 2026-11-26
 
 - Recherche globale : contrats et copies de liens clients retrouvés par titre, nom du client ou référence Allumi complète; filtres de type, étapes de consultation/signature et date de création à Toronto, pagination conservée.

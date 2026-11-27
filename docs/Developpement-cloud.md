@@ -25,6 +25,10 @@ Les sessions cloud n'ont généralement pas de démon Docker. On utilise donc un
 - La CI valide le build Docker : ne fusionne pas une PR dont le job `docker` est rouge.
 - Tu relis le diff et fusionnes. Les migrations Prisma et le moteur comptable méritent une relecture attentive.
 
+## Synchroniser les parcours navigateur
+
+Après un clic qui déclenche une navigation Next.js, attends explicitement l’URL cible et les champs attendus avant de lire l’adresse ou d’ouvrir une seconde session. Pour tester un éditeur concurrent périmé, ouvre l’URL d’éditeur déjà vérifiée dans la seconde page, puis enregistre la première avant de soumettre la seconde. Le refus de révision périmée doit rester vérifié; augmenter les délais ou ajouter des reprises ne corrige pas une page cible incorrecte.
+
 ## Limites
 - Les sessions sont éphémères : tout ce qui compte doit être commité et poussé.
 - Ne mets jamais de vraies données comptables ni de vrais secrets dans une session de dev.
