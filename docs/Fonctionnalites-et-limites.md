@@ -76,3 +76,5 @@ Disponible : [[Dossier-de-preuve-des-documents]], contenu publié et information
 Disponible : [[Choisir-un-client-pour-un-contrat]], recherche privée de clients actifs et sélection du nom/courriel pour revue, avec Ventes écriture et Contacts lecture. Saisie manuelle conservée et aucune synchronisation permanente avec le répertoire.
 
 Disponible : [[Recherche-des-contrats]], recherche globale par titre/client/référence complète, étapes de consultation/signature, date de création à Toronto et suggestions internes. Ventes lecture, sans contenu ni donnée de lien et sans montant financier associé aux copies.
+
+La [[Copie-imprimable-des-documents]] télécharge le contenu publié et la signature déclarée en HTML autonome, sous Ventes lecture et contrôle d’intégrité. Lecture hors ligne et impression en PDF via le navigateur, sans PDF généré côté serveur ni scellement numérique du fichier.

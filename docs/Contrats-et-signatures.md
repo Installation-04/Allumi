@@ -118,3 +118,7 @@ Toutes les références utilisent des données fictives.
 ## Contrats et liens clients dans la recherche globale
 
 [[Recherche-des-contrats]] décrit le titre, nom du client et référence complète, les étapes de consultation/signature, les dates de création à Toronto et les suggestions vers la fiche interne, sous Ventes lecture.
+
+## Copie lisible hors ligne
+
+[[Copie-imprimable-des-documents]] décrit le téléchargement HTML autonome du texte publié et de la signature déclarée, sa lecture hors ligne et son impression en PDF depuis le navigateur.

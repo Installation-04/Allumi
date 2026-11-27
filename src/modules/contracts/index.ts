@@ -6,5 +6,7 @@ export { DOCUMENT_KINDS, DOCUMENT_STAGES, LINK_STATES, documentStage, documentLi
 export { clientDocumentsCsv, type ClientDocumentExportRow } from "./domain/export";
 
 export { getClientDocumentEvidence } from "./service/evidence";
+export { getClientDocumentPrintCopy } from "./service/print-copy";
+export { CLIENT_DOCUMENT_COPY_CSP } from "./domain/print-copy";
 
 export { searchContractCustomers } from "./service/customers";

@@ -273,6 +273,12 @@ Find [contracts and client links](docs/Recherche-des-contrats.md) in global sear
 
 <img src="docs/images/recherche-contrats-mobile.png" alt="Client-document global search, mobile" width="412">
 
+[Printable document copies](docs/Copie-imprimable-des-documents.md) preserve published content and declared signatures in a self-contained HTML download. Read offline or print to PDF in your browser; sales permissions and publication integrity are checked.
+
+![Printable client-document copy](docs/images/copie-imprimable-contrats-desktop.png)
+
+<img src="docs/images/copie-imprimable-contrats-mobile.png" alt="Printable client-document copy, mobile" width="412">
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

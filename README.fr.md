@@ -272,6 +272,12 @@ Retrouve les [contrats et liens clients](docs/Recherche-des-contrats.md) dans la
 
 <img src="docs/images/recherche-contrats-mobile.png" alt="Recherche globale des contrats, mobile" width="412">
 
+[Copies imprimables des documents](docs/Copie-imprimable-des-documents.md) : téléchargement HTML autonome du contenu publié et de la signature déclarée, lecture hors ligne et impression en PDF via le navigateur, sous permissions Ventes et contrôle d’intégrité.
+
+![Copie imprimable d’un document client](docs/images/copie-imprimable-contrats-desktop.png)
+
+<img src="docs/images/copie-imprimable-contrats-mobile.png" alt="Copie imprimable d’un document client, mobile" width="412">
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

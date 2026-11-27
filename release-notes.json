@@ -1776,5 +1776,61 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.106": {
+    "fr-CA": {
+      "title": "Copies imprimables des documents clients",
+      "added": [
+        {
+          "text": "Téléchargez une copie HTML autonome du contenu publié et de sa signature déclarée; lisez-la hors ligne ou imprimez-la en PDF dans votre navigateur.",
+          "guide": "Copie-imprimable-des-documents"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Les droits Ventes en lecture et l’intégrité du contenu sont vérifiés. La copie reste disponible après expiration/révocation, sans créer de consultation client ni réactiver l’accès public.",
+          "guide": "Copie-imprimable-des-documents"
+        }
+      ],
+      "fixed": [
+        {
+          "text": "Les téléchargements confidentiels et leur redirection vers la connexion utilisent désormais une politique sans referrer et sans cache privé.",
+          "guide": "Dossier-de-preuve-des-documents"
+        }
+      ],
+      "installation": [
+        {
+          "text": "Aucune migration de base, dépendance ou variable nouvelle. Mettez le serveur à jour par le processus habituel puis rechargez l’application.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Printable copies of client documents",
+      "added": [
+        {
+          "text": "Download a self-contained HTML copy of published content and its declared signature; read it offline or print to PDF in your browser.",
+          "guide": "Copie-imprimable-des-documents"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Sales read access and publication integrity are checked. Copies remain available after link expiry/revocation without creating a client view or restoring public access.",
+          "guide": "Copie-imprimable-des-documents"
+        }
+      ],
+      "fixed": [
+        {
+          "text": "Confidential document downloads and their sign-in redirects now consistently use no-referrer and private no-store response policies.",
+          "guide": "Dossier-de-preuve-des-documents"
+        }
+      ],
+      "installation": [
+        {
+          "text": "No database migration, dependency or new configuration variable. Update the server through the usual process, then reload the app.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

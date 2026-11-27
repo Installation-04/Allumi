@@ -3886,6 +3886,8 @@
     "deleteConfirm": "Je confirme la suppression de ce brouillon non publié.",
     "evidenceTitle": "Dossier de preuve",
     "evidenceDownload": "Télécharger le dossier de preuve (JSON)",
+    "printCopyDownload": "Télécharger la copie imprimable (HTML)",
+    "printCopyHint": "Fichier confidentiel autonome pour lecture hors ligne et impression en PDF depuis le navigateur. Il reprend le contenu publié et la signature déclarée, sans scellement numérique.",
     "evidenceHint": "Copie confidentielle du contenu publié et de la signature déclarée, avec dates UTC et empreinte contrôlée. Contient des noms et courriels. Aucun lien privé inclus; ce fichier ne certifie pas l’identité du signataire et n’est pas scellé numériquement.",
     "customerLookup": "Choisir un client existant",
     "customerLookupHint": "Facultatif. Cherche un client actif par nom ou courriel, puis choisis-le pour remplacer seulement le nom et le courriel du contrat. Relis les champs avant d’enregistrer.",

@@ -3886,6 +3886,8 @@
     "deleteConfirm": "I confirm deleting this unpublished draft.",
     "evidenceTitle": "Evidence package",
     "evidenceDownload": "Download evidence package (JSON)",
+    "printCopyDownload": "Download printable copy (HTML)",
+    "printCopyHint": "Self-contained confidential file for offline reading and browser printing to PDF. It includes the published content and declared signature; it is not digitally sealed.",
     "evidenceHint": "Confidential copy of the published content and declared signature, with UTC dates and a checked hash. Contains names and email addresses. No private link is included; this file does not certify the signer’s identity and is not digitally sealed.",
     "customerLookup": "Choose an existing client",
     "customerLookupHint": "Optional. Search active clients by name or email, then select one to replace only the contract’s client name and email. Review the fields before saving.",

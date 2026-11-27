@@ -762,3 +762,17 @@ Voir [[Recherche-des-contrats]].
 ![Contract search, English dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/recherche-contrats-en-dark-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/recherche-contrats-en-dark-mobile.png" alt="Contract search, English mobile" width="412">
+
+## Copie imprimable des documents clients
+
+[[Copie-imprimable-des-documents]] : téléchargement autonome depuis le dossier de preuve.
+
+![Copie imprimable depuis une fiche de contrat](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/copie-imprimable-contrats-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/copie-imprimable-contrats-mobile.png" alt="Téléchargement de la copie sur téléphone" width="412">
+
+![Printable copy in English and dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/copie-imprimable-contrats-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/copie-imprimable-contrats-en-dark-mobile.png" alt="Printable copy on mobile in English" width="412">
+
+Toutes les captures utilisent des données fictives. Les liens de ces documents de démonstration sont révoqués avant les captures.
