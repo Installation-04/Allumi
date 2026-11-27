@@ -11,6 +11,7 @@ export function proxy(request: NextRequest) {
   headers.set("x-request-id", requestId);
 
   const { pathname } = request.nextUrl;
+  const isPrivateDocumentExport = /^\/c\/[^/]+\/contrats\/[^/]+\/(?:copie|preuve)\/?$/.test(pathname);
   const isPublic = PUBLIC_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
   if (!isPublic && !request.cookies.has(sessionCookieName())) {
     // The suggestion endpoint returns JSON even before sign-in; it still performs full session/MFA checks.
@@ -23,6 +24,11 @@ export function proxy(request: NextRequest) {
     }
     const redirect = NextResponse.redirect(new URL("/connexion", request.url));
     redirect.headers.set("x-request-id", requestId);
+    if (isPrivateDocumentExport) {
+      redirect.headers.set("Referrer-Policy", "no-referrer");
+      redirect.headers.set("Cache-Control", "private, no-store");
+      redirect.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+    }
     return redirect;
   }
 
@@ -36,7 +42,7 @@ export function proxy(request: NextRequest) {
   const response = NextResponse.next({ request: { headers } });
   response.headers.set("x-request-id", requestId);
   response.headers.set("Content-Security-Policy", policy);
-  if(pathname==="/document"||pathname.startsWith("/document/")){response.headers.set("Referrer-Policy","no-referrer");response.headers.set("X-Robots-Tag","noindex, nofollow, noarchive");response.headers.set("Cache-Control","private, no-store");}
+  if(isPrivateDocumentExport||pathname==="/document"||pathname.startsWith("/document/")){response.headers.set("Referrer-Policy","no-referrer");response.headers.set("X-Robots-Tag","noindex, nofollow, noarchive");response.headers.set("Cache-Control","private, no-store");}
   return response;
 }
 

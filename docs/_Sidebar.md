@@ -158,3 +158,5 @@
 - [[Choisir-un-client-pour-un-contrat]] : préremplissage facultatif du nom/courriel depuis les clients actifs, sous les droits Ventes/Contacts.
 
 - [[Recherche-des-contrats]] : contrats et liens clients dans la recherche globale et les suggestions.
+
+- [[Copie-imprimable-des-documents]] : copie HTML autonome, lecture hors ligne et impression en PDF.

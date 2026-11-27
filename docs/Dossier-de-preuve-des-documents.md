@@ -69,3 +69,7 @@ Le JSON est téléchargé sans cache; Allumi ne conserve pas une nouvelle copie 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contrats-preuve-en-dark-mobile.png" alt="Evidence package on mobile in English" width="412">
 
 Toutes les captures utilisent des données fictives.
+
+## Copie lisible hors ligne
+
+[[Copie-imprimable-des-documents]] décrit le téléchargement HTML autonome du texte publié et de la signature déclarée, sa lecture hors ligne et son impression en PDF depuis le navigateur.
