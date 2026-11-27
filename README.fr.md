@@ -284,6 +284,12 @@ Retrouve les [contrats et liens clients](docs/Recherche-des-contrats.md) dans la
 
 <img src="docs/images/revue-soumission-signee-mobile.png" alt="Revue d’une soumission signée, mobile" width="412">
 
+[Les clients peuvent conserver une copie signée](docs/Copie-client-du-document-signe.md) depuis leur lien privé actif, puis la lire hors ligne ou l’imprimer en PDF. Intégrité et disponibilité du lien vérifiées à chaque téléchargement.
+
+![Signed client copy](docs/images/copie-client-signee-desktop.png)
+
+<img src="docs/images/copie-client-signee-mobile.png" alt="Signed client copy, mobile" width="412">
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

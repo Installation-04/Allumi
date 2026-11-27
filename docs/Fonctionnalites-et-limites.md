@@ -80,3 +80,5 @@ Disponible : [[Recherche-des-contrats]], recherche globale par titre/client/réf
 La [[Copie-imprimable-des-documents]] télécharge le contenu publié et la signature déclarée en HTML autonome, sous Ventes lecture et contrôle d’intégrité. Lecture hors ligne et impression en PDF via le navigateur, sans PDF généré côté serveur ni scellement numérique du fichier.
 
 [[Acceptation-des-soumissions-signees]] : un gestionnaire Ventes peut revoir une copie de soumission signée et confirmer l’acceptation de sa source encore envoyée et valide. Révision/empreinte vérifiées et référence d’audit atomique; aucune acceptation publique automatique ni facture/écriture créée.
+
+[[Copie-client-du-document-signe]] : contrat ou soumission signé téléchargeable en HTML autonome depuis un lien actif, sous contrôle d’intégrité. Aucun compte employé, nouvelle consultation ou mouvement financier; PDF via navigateur et identité déclarative.

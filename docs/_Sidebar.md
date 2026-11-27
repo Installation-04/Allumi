@@ -162,3 +162,5 @@
 - [[Copie-imprimable-des-documents]] : copie HTML autonome, lecture hors ligne et impression en PDF.
 
 - [[Acceptation-des-soumissions-signees]] : revue de la preuve, décision interne et référence d’audit.
+
+- [[Copie-client-du-document-signe]] — téléchargement HTML après signature depuis le portail client.

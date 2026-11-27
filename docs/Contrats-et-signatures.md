@@ -126,3 +126,7 @@ Toutes les références utilisent des données fictives.
 ## Accepter une soumission signée après revue
 
 [[Acceptation-des-soumissions-signees]] relie la preuve à une acceptation interne confirmée, sous Ventes écriture et contrôle d’intégrité/révision. La signature seule ne change pas la source; la conversion en facture reste séparée.
+
+## Copie conservée par le client
+
+Depuis son lien actif, le client peut télécharger une copie HTML autonome après signature, sans compte employé. Les liens expirés/révoqués et sources annulées sont refusés. Voir [[Copie-client-du-document-signe]].

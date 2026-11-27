@@ -44,3 +44,7 @@ L’empreinte affichée couvre **le contenu canonique de publication seulement**
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/copie-imprimable-contrats-en-dark-mobile.png" alt="Printable copy on mobile in English" width="412">
 
 Toutes les captures utilisent des données fictives. Les liens de ces documents de démonstration sont révoqués avant les captures.
+
+## Copie conservée par le client
+
+Depuis son lien actif, le client peut télécharger une copie HTML autonome après signature, sans compte employé. Les liens expirés/révoqués et sources annulées sont refusés. Voir [[Copie-client-du-document-signe]].
