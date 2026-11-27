@@ -3,7 +3,7 @@ import { requireRole } from "@/modules/companies";
 import { todayIso } from "@/modules/ledger";
 import { AppError } from "@/platform/errors";
 import { withCompany, type CompanyContext, type Tx } from "@/platform/tenant";
-import { entryInput, timeFilters, timeQuery, TIME_PAGE_SIZE, TIME_EXPORT_LIMIT, type TimeInput, type TimeEntry, type TimeFilters, type TimeReport } from "../domain/entries";
+import { entryInput, timeFilters, timeQuery, TIME_PAGE_SIZE, TIME_EXPORT_LIMIT, TIME_PRINT_LIMIT, type TimeInput, type TimeEntry, type TimeFilters, type TimeReport } from "../domain/entries";
 
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const select={id:true,workDate:true,project:true,person:true,task:true,notes:true,usage:true,minutes:true,revision:true} as const;
@@ -36,8 +36,8 @@ export async function deleteTimeEntry(actor:CompanyContext,id:string,revision:nu
   if(confirmed!==true)throw new AppError("time.confirm");
   return withCompany(actor,async tx=>{await requireRole(tx,"time.manage");const r=await lock(tx,actor,id,revision);if((await tx.timeEntry.deleteMany({where:{companyId:actor.companyId,id}})).count!==1)throw new AppError("forbidden");return r.date;});
 }
-export async function getTimeLog(actor:CompanyContext,input:TimeFilters,options:{allRows?:boolean}={}):Promise<TimeReport> {
-  const complete=!!options.allRows,limit=TIME_EXPORT_LIMIT;
+export async function getTimeLog(actor:CompanyContext,input:TimeFilters,options:{allRows?:boolean;forPrint?:boolean}={}):Promise<TimeReport> {
+  const complete=!!options.allRows||!!options.forPrint,limit=options.forPrint?TIME_PRINT_LIMIT:TIME_EXPORT_LIMIT;
   let filters:TimeFilters;try{filters=timeFilters(Object.fromEntries(new URLSearchParams(timeQuery(input,input.page))),todayIso());}catch{throw new AppError("time.filters");}
   return withCompany(actor,async tx=>{
     await requireRole(tx,"time.read");
@@ -48,7 +48,7 @@ export async function getTimeLog(actor:CompanyContext,input:TimeFilters,options:
       SELECT n::text AS count,page::text,pages::text,billable::text,nonbillable::text,
        coalesce((SELECT jsonb_agg(detail ORDER BY detail.date DESC,detail.created DESC,detail.id DESC) FROM(SELECT id,to_char(work_date,'YYYY-MM-DD') AS date,created_at AS created,project,person,task,notes,usage,minutes AS "minutes",revision FROM filtered ORDER BY work_date DESC,created_at DESC,id DESC LIMIT ${complete?limit+1:TIME_PAGE_SIZE} OFFSET (CASE WHEN ${complete} THEN 0 ELSE (page-1)*${TIME_PAGE_SIZE} END))detail),'[]'::jsonb) AS rows FROM paging`;
     if(!r||![r.count,r.page,r.pages].every(v=>Number.isSafeInteger(Number(v))))throw new AppError("time.limit");
-    if(complete&&Number(r.count)>limit)throw new AppError("time.exportLimit");
+    if(complete&&Number(r.count)>limit)throw new AppError(options.forPrint?"time.printLimit":"time.exportLimit");
     return {filters,rows:r.rows.map(row=>({id:row.id,date:row.date,project:row.project,person:row.person,task:row.task,notes:row.notes,usage:row.usage,minutes:row.minutes,revision:row.revision})),count:Number(r.count),page:Number(r.page),pageCount:Number(r.pages),billableMinutes:BigInt(r.billable),nonBillableMinutes:BigInt(r.nonbillable)};
   });
 }

@@ -911,7 +911,8 @@
       "confirm": "Confirm deletion.",
       "filters": "Check filters and a period of at most 366 days ending no later than today.",
       "limit": "The result is too large. Narrow the filters.",
-      "exportLimit": "Narrow the filters to at most 5,000 entries for export."
+      "exportLimit": "Narrow the filters to at most 5,000 entries for export.",
+      "printLimit": "Narrow the filters to at most 1,000 entries to print a complete copy."
     }
   },
   "settingsPage": {
@@ -3975,6 +3976,11 @@
     "personHint": "Declared name, up to 80 characters; not linked to an employee account.",
     "taskHint": "Activity description, up to 200 characters.",
     "minutes": "Duration in minutes",
-    "totalMinutes": "Total minutes"
+    "totalMinutes": "Total minutes",
+    "print": "Complete print / PDF",
+    "printTitle": "Time log — print copy",
+    "printHint": "Complete filtered copy read on opening. Print or save a PDF in your browser; paper uses light landscape from either theme.",
+    "allProjects": "All projects or jobs",
+    "printLimits": "Up to 1,000 entries across all filtered pages, including internal notes. Exact h:mm durations; no invoice, payroll or journal entry is created. Data is read only on opening or reloading."
   }
 }

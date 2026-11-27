@@ -296,6 +296,12 @@ Retrouve les [contrats et liens clients](docs/Recherche-des-contrats.md) dans la
 
 <img src="docs/images/carnet-temps-mobile.png" alt="Time log, mobile" width="412">
 
+[Imprime une copie complète du temps](docs/Impression-du-temps.md) sur toutes les pages filtrées, avec durées exactes et notes internes, jusqu’à 1 000 saisies. Impression ou PDF paysage dans le navigateur.
+
+![Time print copy](docs/images/impression-temps-desktop.png)
+
+<img src="docs/images/impression-temps-mobile.png" alt="Time print copy, mobile" width="412">
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

@@ -35,3 +35,5 @@ Le carnet ne crée ni facture, paiement, salaire ou écriture. Aucun tarif ni va
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/carnet-temps-en-dark-mobile.png" alt="Time log on mobile in English" width="412">
 
 Toutes les captures utilisent des données fictives. Voir aussi [[Utilisateurs-et-permissions]] et [[Piste-d-audit]].
+
+[[Impression-du-temps]] : copie filtrée complète jusqu’à 1 000 saisies, toutes pages et notes internes incluses, durées exactes, papier paysage clair et PDF navigateur. Les données sont relues à l’ouverture, sous Comptabilité lecture.

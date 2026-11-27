@@ -911,7 +911,8 @@
       "confirm": "Confirme la suppression.",
       "filters": "Vérifie les filtres et une période de 366 jours maximum jusqu’à aujourd’hui.",
       "limit": "Le résultat est trop grand. Réduis les filtres.",
-      "exportLimit": "Réduis les filtres à 5 000 saisies maximum pour exporter."
+      "exportLimit": "Réduis les filtres à 5 000 saisies maximum pour exporter.",
+      "printLimit": "Réduis les filtres à 1 000 saisies maximum pour imprimer la copie complète."
     }
   },
   "settingsPage": {
@@ -3975,6 +3976,11 @@
     "personHint": "Nom déclaré, 80 caractères maximum; sans lien à un compte employé.",
     "taskHint": "Description de l’activité, 200 caractères maximum.",
     "minutes": "Durée en minutes",
-    "totalMinutes": "Total en minutes"
+    "totalMinutes": "Total en minutes",
+    "print": "Impression / PDF complet",
+    "printTitle": "Carnet de temps — copie imprimable",
+    "printHint": "Copie complète des filtres à l’ouverture. Imprime ou enregistre un PDF dans ton navigateur; le papier est en paysage clair depuis les deux thèmes.",
+    "allProjects": "Tous les projets ou dossiers",
+    "printLimits": "Jusqu’à 1 000 saisies, toutes les pages filtrées et les notes internes incluses. Durées exactes en h:mm; aucune facture, paie ou écriture créée. Copie relue seulement à l’ouverture ou au rechargement."
   }
 }

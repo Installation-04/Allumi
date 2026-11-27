@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { isValidIsoDate, type Locale } from "@/modules/ledger/client";
 import { toCsv, csvFormatFor, type CsvCell } from "@/modules/reports/client";
-export const TIME_PAGE_SIZE=50,TIME_EXPORT_LIMIT=5000,MAX_ENTRY_MINUTES=1440;
+export const TIME_PAGE_SIZE=50,TIME_EXPORT_LIMIT=5000,TIME_PRINT_LIMIT=1000,MAX_ENTRY_MINUTES=1440;
 export const TIME_USES=["BILLABLE","NON_BILLABLE"] as const;
 const line=(min:number,max:number)=>z.string().refine(s=>!/[\p{Cc}\p{Zl}\p{Zp}]/u.test(s)).transform(s=>s.trim()).refine(s=>[...s].length>=min&&[...s].length<=max);
 export const entryInput=z.object({date:z.string().refine(isValidIsoDate),project:line(1,120),person:line(1,80),task:line(1,200),notes:line(0,200),usage:z.enum(TIME_USES),minutes:z.number().int().min(1).max(MAX_ENTRY_MINUTES)});

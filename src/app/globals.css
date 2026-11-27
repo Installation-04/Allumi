@@ -179,12 +179,12 @@ main:has(> .company-workspace) { max-width: none; padding: 0; }
   .budget-print-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); break-inside: avoid; }
 }
 
-/* All trip fields wrap within landscape paper, including long identifiers and purposes. */
+/* Mileage and time fields wrap within landscape paper, including long labels and notes. */
 @media print {
-  .mileage-print { overflow-wrap: anywhere; }
-  .mileage-print table { table-layout: fixed; }
-  .mileage-print th, .mileage-print td { overflow-wrap: anywhere; white-space: normal; }
-  .mileage-print-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); break-inside: avoid; }
+  :is(.mileage-print, .time-print) { overflow-wrap: anywhere; }
+  :is(.mileage-print, .time-print) table { table-layout: fixed; }
+  :is(.mileage-print, .time-print) th, :is(.mileage-print, .time-print) td { overflow-wrap: anywhere; white-space: normal; }
+  :is(.mileage-print-summary, .time-print-summary) { grid-template-columns: repeat(3, minmax(0, 1fr)); break-inside: avoid; }
 }
 
 @media print { .client-document-print { overflow-wrap:anywhere; } .client-document-print header, .client-document-print section { break-inside:avoid; } }
