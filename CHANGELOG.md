@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.111] - 2026-11-27
+
 - Carnet de temps : copie imprimable complète des filtres jusqu’à 1 000 saisies, au-delà de la pagination, avec totaux exacts en h:mm et page de retour conservée.
 - Impression : papier paysage clair depuis les thèmes clair/sombre, notes internes et colonnes longues conservées, commandes masquées et PDF produit par le navigateur; français/anglais et mobile.
 - Contrôles : Comptabilité lecture et isolation conservées, plafond refusé sans copie partielle, lecture sans mouvement financier ni audit métier; CSV inchangé à 5 000 lignes.
