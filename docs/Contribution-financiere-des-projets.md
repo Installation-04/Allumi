@@ -2,6 +2,8 @@
 
 Depuis **Projets → Registre de projets**, ouvre une fiche puis **Contribution comptabilisée**. Le rapport additionne les lignes de revenus et de charges réellement comptabilisées des écritures classées dans ce projet. La contribution nette est la différence revenus moins charges, en cents exacts. Il s’agit d’une lecture de gestion selon le classement actuel.
 
+La fiche du journal propose aussi [[Classement-des-projets-depuis-le-journal]] : projet courant, choix par code stable, déplacement et détachement confirmés, sans recopier le numéro. Une contre-passation renvoie à son originale.
+
 ## Classer une écriture
 
 Avec **Comptabilité en écriture**, choisis **Préparer un classement**. Saisis le numéro interne numérique de l’écriture : par exemple `42` pour `J-00042`, sans préfixe; les zéros initiaux sont acceptés. Clique **Revoir l’écriture**, vérifie la date, les revenus, les charges et le classement actuel, puis coche la confirmation et valide.

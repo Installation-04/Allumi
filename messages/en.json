@@ -920,7 +920,7 @@
       "customerUnavailable": "Choose an active, non-anonymized customer in this company.",
       "codeExists": "This project code already exists in this company.",
       "codeImmutable": "The project code cannot be changed.",
-      "archived": "Reactivate the project before editing it or attaching new time.",
+      "archived": "Reactivate the project before editing it or attaching new time entries or journal entries.",
       "stale": "The project has changed. Reload its details before trying again.",
       "confirm": "Confirm archiving or reactivating the project.",
       "limit": "The result is too large. Narrow the search.",
@@ -4114,5 +4114,25 @@
     "print": "Complete print / PDF",
     "exportLimit": "Narrow dates to at most 5,000 entries for a complete export.",
     "printLimit": "Narrow dates to at most 1,000 entries for a complete print copy."
+  },
+  "entryProject": {
+    "section": "Entry project",
+    "unassigned": "No project",
+    "inherited": "This reversal inherits the current classification of its original entry.",
+    "viewProject": "View project",
+    "original": "View original entry",
+    "classifyOriginal": "Classify original",
+    "classify": "Classify by project",
+    "edit": "Change classification",
+    "title": "Project classification",
+    "current": "Current classification",
+    "entry": "Entry {number} · {date}",
+    "back": "Back to entry",
+    "code": "Destination project code",
+    "hint": "Enter the exact code of an active project. Review the destination before confirming; classification covers the whole entry and its possible reversal.",
+    "preview": "Review project",
+    "target": "Destination to confirm",
+    "same": "This entry is already classified in this project.",
+    "registry": "Open project registry"
   }
 }

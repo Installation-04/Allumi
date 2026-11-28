@@ -7,6 +7,16 @@ import { withCompany,type CompanyContext } from '@/platform/tenant';
 import { entryNumber,financeFilters,FINANCE_PAGE_SIZE,FINANCE_EXPORT_LIMIT,FINANCE_PRINT_LIMIT,type FinanceFilters,type FinanceRow,type ProjectFinance } from '../domain/financials';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export type AssignmentPreview={entryId:string;number:string;date:string;revenue:bigint;expenses:bigint;revision:number;projectId:string|null;code:string|null;name:string|null};
+/** Resolve immutable source references, then reuse the current revisioned preview. */
+export async function getEntryProjectAssignment(actor:CompanyContext,entryId:string):Promise<AssignmentPreview&{inherited:boolean}>{
+ if(!UUID.test(entryId))throw new AppError('projectFinance.entryUnavailable');
+ const source=await withCompany(actor,async tx=>{
+  await requireRole(tx,'project.read');
+  const [row]=await tx.$queryRaw<{number:string;inherited:boolean}[]>`SELECT root.entry_number::text AS number,(root.id<>e.id) AS inherited FROM journal_entry e JOIN journal_entry root ON root.company_id=e.company_id AND root.id=coalesce(e.reverses_entry_id,e.id) WHERE e.company_id=${actor.companyId}::uuid AND e.id=${entryId}::uuid`;
+  if(!row)throw new AppError('projectFinance.entryUnavailable');return row;
+ });
+ return {...await previewProjectAssignment(actor,source.number),inherited:source.inherited};
+}
 export async function previewProjectAssignment(actor:CompanyContext,input:string):Promise<AssignmentPreview>{let number;try{number=entryNumber(input);}catch{throw new AppError('projectFinance.entryNumber');}return withCompany(actor,async tx=>{await requireRole(tx,'project.read');const [r]=await tx.$queryRaw<{entryId:string;number:string;date:string;revenue:string;expenses:string;revision:number;projectId:string|null;code:string|null;name:string|null}[]>`SELECT e.id AS "entryId",e.entry_number::text AS number,to_char(e.entry_date,'YYYY-MM-DD') AS date,coalesce(sum(l.credit_cents-l.debit_cents) FILTER(WHERE a.type='REVENUE'),0)::text AS revenue,coalesce(sum(l.debit_cents-l.credit_cents) FILTER(WHERE a.type='EXPENSE'),0)::text AS expenses,coalesce(x.revision,0) AS revision,x.project_id AS "projectId",p.code,p.name FROM journal_entry e JOIN journal_line l ON l.company_id=e.company_id AND l.entry_id=e.id JOIN account a ON a.company_id=l.company_id AND a.id=l.account_id LEFT JOIN project_entry_assignment x ON x.company_id=e.company_id AND x.entry_id=e.id LEFT JOIN project p ON p.company_id=x.company_id AND p.id=x.project_id WHERE e.company_id=${actor.companyId}::uuid AND e.entry_number=${number} AND e.reverses_entry_id IS NULL AND a.type IN ('REVENUE','EXPENSE') GROUP BY e.id,e.entry_number,e.entry_date,x.revision,x.project_id,p.code,p.name`;if(!r)throw new AppError('projectFinance.entryUnavailable');return {...r,revenue:BigInt(r.revenue),expenses:BigInt(r.expenses)};});}
 export async function assignProjectEntry(actor:CompanyContext,projectId:string,entryId:string,revision:number,detach:boolean,confirmed:boolean){
  if(confirmed!==true)throw new AppError('projectFinance.confirm');if(!UUID.test(projectId)||!UUID.test(entryId)||!Number.isSafeInteger(revision)||revision<0||revision>=2147483647||typeof detach!=='boolean')throw new AppError('projectFinance.invalid');

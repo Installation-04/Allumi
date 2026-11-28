@@ -315,6 +315,12 @@ Find [contracts and client links](docs/Recherche-des-contrats.md) in global sear
 
 <img src="docs/images/contribution-projets-mobile.png" alt="Project contribution, mobile" width="412">
 
+[Classify directly from a journal entry](docs/Classement-des-projets-depuis-le-journal.md): review the current project, choose an active destination by code, confirm a reassignment or detach. Reversals lead back to their original entry; no number to copy.
+
+![Journal project classification](docs/images/classement-journal-desktop.png)
+
+<img src="docs/images/classement-journal-mobile.png" alt="Journal project classification, mobile" width="412">
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

@@ -8,6 +8,7 @@ import { can } from "@/modules/companies";
 import { formatMoney, getEntry, todayIso } from "@/modules/ledger";
 import { accountName, loadCompany } from "../../_lib";
 import { reverseEntryAction } from "../actions";
+import { JournalProjectAssignment } from './_project-assignment';
 
 export const dynamic = "force-dynamic";
 
@@ -80,6 +81,8 @@ export default async function EntryPage({ params }: { params: Promise<{ companyI
           </tfoot>
         </table>
       </div>
+
+      {can(company,'project.read')&&<JournalProjectAssignment actor={actor} entryId={entry.id} manage={can(company,'project.manage')}/>}
 
       {canReverse ? (
         <div className="max-w-lg space-y-3 rounded-lg border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
