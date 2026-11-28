@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.114] - 2026-11-28
+
 - Journal : projet courant visible sur les écritures admissibles et les contre-passations, avec liens vers le projet et l’originale; classement directement depuis la fiche sans recopier un numéro.
 - Parcours : choix de projet actif par code, aperçu de destination, reclassement/détachement confirmés et refus des révisions périmées; code conservé après erreur, vues invalidées après changement.
 - Contrôles et interface : Comptabilité modulaire et gardes existantes, lecture seule plafonnée, aucune donnée client ou mémo supplémentaire; FR/EN/sombre/mobile, guide/README et quatre captures fictives.
