@@ -466,6 +466,7 @@ model Company {
   budgets                Budget[]
   mileageTrips           MileageTrip[]
   timeEntries            TimeEntry[]
+  projects               Project[]
   cashForecastPresets    CashForecastPreset[]
   budgetLines            BudgetLine[]
   budgetMonthlyTargets   BudgetMonthlyTarget[]
@@ -741,6 +742,7 @@ model Contact {
   payments          Payment[]
   attachmentLinks   AttachmentLink[]
   salesEstimates    SalesEstimate[]
+  projects          Project[]
 
   @@unique([companyId, id])
   @@index([companyId, displayName])
@@ -2029,10 +2031,32 @@ model ClientDocumentDelivery {
  @@map("client_document_delivery")
 }
 
+model Project {
+  id String @id @default(uuid(7)) @db.Uuid
+  companyId String @map("company_id") @db.Uuid
+  code String
+  name String
+  description String @default("")
+  customerId String? @map("customer_id") @db.Uuid
+  status String @default("ACTIVE")
+  revision Int @default(1)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  company Company @relation(fields:[companyId],references:[id],onDelete:Restrict)
+  customer Contact? @relation(fields:[companyId,customerId],references:[companyId,id],onDelete:Restrict,map:"project_customer_fkey")
+  timeEntries TimeEntry[]
+  @@unique([companyId,id])
+  @@unique([companyId,code])
+  @@index([companyId,status,code])
+  @@map("project")
+}
+
 model TimeEntry {
   id             String   @id @default(uuid(7)) @db.Uuid
   companyId      String   @map("company_id") @db.Uuid
   workDate       DateTime @map("work_date") @db.Date
+  projectId      String? @map("project_id") @db.Uuid
+  linkedProject  Project? @relation(fields:[companyId,projectId],references:[companyId,id],onDelete:Restrict,map:"time_entry_project_fkey")
   project        String
   person         String
   task           String
@@ -2044,5 +2068,6 @@ model TimeEntry {
   updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
   company        Company  @relation(fields:[companyId],references:[id],onDelete:Restrict)
   @@index([companyId,workDate,createdAt,id])
+  @@index([companyId,projectId,workDate])
   @@map("time_entry")
 }

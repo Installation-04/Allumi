@@ -913,6 +913,18 @@
       "limit": "Le résultat est trop grand. Réduis les filtres.",
       "exportLimit": "Réduis les filtres à 5 000 saisies maximum pour exporter.",
       "printLimit": "Réduis les filtres à 1 000 saisies maximum pour imprimer la copie complète."
+    },
+    "project": {
+      "invalid": "Vérifie le code, le nom, la description et le client du projet.",
+      "notFound": "Projet introuvable ou inaccessible.",
+      "customerUnavailable": "Choisis un client actif et non anonymisé de cette entreprise.",
+      "codeExists": "Ce code de projet existe déjà dans cette entreprise.",
+      "codeImmutable": "Le code de projet ne peut pas être modifié.",
+      "archived": "Réactive le projet avant de le modifier ou d’y rattacher de nouvelles heures.",
+      "stale": "Le projet a changé. Recharge la fiche avant de recommencer.",
+      "confirm": "Confirme l’archivage ou la réactivation du projet.",
+      "limit": "Le résultat est trop grand. Réduis la recherche.",
+      "detachConfirm": "Pour détacher ces heures, vide le code de projet et coche la confirmation."
     }
   },
   "settingsPage": {
@@ -1348,8 +1360,8 @@
     },
     "projets": {
       "title": "Projets",
-      "description": "Suivi manuel du temps partagé par projet ou dossier.",
-      "planned": "Registre de projets, coûts, tarifs, facturation et rentabilité restent à venir."
+      "description": "Projets liés aux clients et suivi manuel des heures.",
+      "planned": "Coûts, tarifs, approbation des heures, facturation et rentabilité restent à venir."
     },
     "paie": {
       "title": "Paie",
@@ -1407,7 +1419,8 @@
       "previsions-tresorerie": "Prévision de trésorerie",
       "kilometrage": "Carnet de kilométrage",
       "contrats": "Contrats et liens clients",
-      "temps": "Carnet de temps"
+      "temps": "Carnet de temps",
+      "projets": "Registre de projets"
     }
   },
   "updates": {
@@ -3940,7 +3953,7 @@
     "back": "Retour au carnet",
     "backYear": "Voir les saisies de cette année",
     "reload": "Recharger la saisie",
-    "shared": "Carnet partagé de l’entreprise. Les intervenants et projets sont des libellés déclarés; aucune facture ou paie n’est créée.",
+    "shared": "Carnet partagé de l’entreprise. Projet enregistré facultatif; intervenants déclarés, sans facture ou paie automatique.",
     "date": "Date du travail",
     "project": "Projet ou dossier",
     "usage": "Facturation",
@@ -3949,7 +3962,7 @@
     "notes": "Note interne",
     "duration": "Durée (h:mm ou minutes)",
     "dateHint": "Date du travail, jusqu’à aujourd’hui à Toronto.",
-    "projectHint": "Libellé libre, 120 caractères maximum. Aucun projet distinct n’est créé.",
+    "projectHint": "Libellé libre si aucun code n’est renseigné, 120 caractères maximum. Avec un code, le nom est repris du registre au rattachement.",
     "notesHint": "Facultative, 200 caractères maximum.",
     "durationHint": "Exemples : 1:30 ou 90. De 1 minute à 24:00 par saisie; pas d’heures décimales.",
     "BILLABLE": "Facturable",
@@ -3972,7 +3985,7 @@
     "page": "Page {page} sur {pages}",
     "previous": "Précédente",
     "next": "Suivante",
-    "limits": "Saisie manuelle sans chronomètre ni contrôle de chevauchement ou de total quotidien par personne. Aucun registre de projets, tarif, facture, validation des heures ou paie. CSV complet limité à 5 000 saisies par export.",
+    "limits": "Saisie manuelle sans chronomètre ni contrôle de chevauchement ou de total quotidien par personne. Projet facultatif, sans tarif, facture, approbation des heures ou paie automatique. CSV complet limité à 5 000 saisies.",
     "personHint": "Nom déclaré, 80 caractères maximum; sans lien à un compte employé.",
     "taskHint": "Description de l’activité, 200 caractères maximum.",
     "minutes": "Durée en minutes",
@@ -3981,6 +3994,64 @@
     "printTitle": "Carnet de temps — copie imprimable",
     "printHint": "Copie complète des filtres à l’ouverture. Imprime ou enregistre un PDF dans ton navigateur; le papier est en paysage clair depuis les deux thèmes.",
     "allProjects": "Tous les projets ou dossiers",
-    "printLimits": "Jusqu’à 1 000 saisies, toutes les pages filtrées et les notes internes incluses. Durées exactes en h:mm; aucune facture, paie ou écriture créée. Copie relue seulement à l’ouverture ou au rechargement."
+    "printLimits": "Jusqu’à 1 000 saisies, toutes les pages filtrées et les notes internes incluses. Durées exactes en h:mm; aucune facture, paie ou écriture créée. Copie relue seulement à l’ouverture ou au rechargement.",
+    "registeredProject": "Code du projet enregistré",
+    "registeredHint": "Facultatif. Saisis un code exact du registre. Le nom du projet est repris au rattachement; son ancien libellé reste conservé tant que le lien ne change pas.",
+    "unlinkConfirm": "Je confirme le détachement du projet enregistré si je vide son code. Le libellé libre restera conservé."
+  },
+  "projects": {
+    "customer": "Client lié",
+    "customerLookup": "Choisir un client existant",
+    "customerLookupHint": "Facultatif. Cherche un client actif par nom, puis sélectionne-le pour lier ce projet. Le nom reste celui du répertoire Contacts.",
+    "customerSearch": "Nom du client à rechercher",
+    "customerFind": "Rechercher un client",
+    "customerLoading": "Recherche en cours…",
+    "customerQueryHint": "Saisis entre 2 et 120 caractères, sans caractère de contrôle.",
+    "customerUnavailable": "Client indisponible",
+    "customerEmpty": "Aucun client actif trouvé. Précise la recherche ou conserve le projet sans client.",
+    "customerMore": "Plus de 20 clients correspondent. Précise la recherche pour retrouver les autres.",
+    "customerResults": "Clients actifs trouvés",
+    "customerUse": "Utiliser {name}",
+    "customerSelected": "Client sélectionné pour ce projet.",
+    "title": "Registre de projets",
+    "detail": "Fiche du projet",
+    "create": "Créer un projet",
+    "save": "Enregistrer le projet",
+    "edit": "Modifier le projet",
+    "back": "Retour aux projets",
+    "code": "Code du projet",
+    "name": "Nom du projet",
+    "description": "Description courte",
+    "status": "État du projet",
+    "ACTIVE": "Actif",
+    "ARCHIVED": "Archivé",
+    "ALL": "Tous les projets",
+    "search": "Rechercher un code ou un nom",
+    "apply": "Appliquer",
+    "reset": "Réinitialiser",
+    "count": "{count} projets pour ces filtres.",
+    "page": "Page {page} sur {pages}",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "empty": "Aucun projet pour ces filtres.",
+    "invalidFilters": "Vérifie la recherche, l’état et le numéro de page.",
+    "hint": "Organise les dossiers de l’entreprise, lie un client si nécessaire et rattache explicitement les heures par code. Aucune facture ou paie n’est créée.",
+    "codeHint": "1 à 30 lettres A–Z, chiffres, points, tirets ou traits de soulignement; conversion en majuscules. Unique dans l’entreprise et non modifiable.",
+    "codeImmutable": "Le code est stable et ne peut pas être modifié.",
+    "nameHint": "Nom sur une ligne, 120 caractères maximum.",
+    "descriptionHint": "Description sur une ligne, 500 caractères maximum.",
+    "noCustomer": "Aucun client lié",
+    "customerHidden": "Données du client masquées. Les droits Contacts en lecture sont requis pour choisir ou changer cette association.",
+    "clearCustomer": "Retirer le client",
+    "noDescription": "Aucune description.",
+    "timeLog": "Carnet de temps",
+    "viewTime": "Consulter les heures liées",
+    "addTime": "Saisir des heures pour ce projet",
+    "snapshotHint": "Les anciens libellés des heures sont conservés lors d’un changement de nom. Les heures libres ne sont jamais rattachées automatiquement.",
+    "archive": "Archiver le projet",
+    "reactivate": "Réactiver le projet",
+    "archiveConfirm": "Je confirme l’archivage. Les heures liées restent consultables et modifiables, mais aucune nouvelle saisie ne peut être rattachée tant que le projet est archivé.",
+    "reactivateConfirm": "Je confirme la réactivation de ce projet pour de nouvelles saisies.",
+    "reload": "Recharger la fiche"
   }
 }

@@ -2026,5 +2026,59 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.112": {
+    "fr-CA": {
+      "title": "Projets clients et heures liées",
+      "added": [
+        {
+          "text": "Dans Projets → Registre de projets, créez des dossiers avec code stable unique, client facultatif, description et archivage/réactivation contrôlés.",
+          "guide": "Projets-et-heures-liees"
+        },
+        {
+          "text": "Rattachez explicitement les heures par code de projet. Le nom est conservé dans les anciennes saisies; un filtre stable retrouve les heures malgré un renommage.",
+          "guide": "Projets-et-heures-liees"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Les données client exigent Contacts lecture; les autres champs et les heures restent sous Comptabilité modulaire. CSV et impression reprennent le code et le libellé historique, en FR/EN, sombre et mobile.",
+          "guide": "Projets-et-heures-liees"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Migration additive du registre et de la référence facultative des heures. Les anciennes saisies ne sont pas rattachées automatiquement; aucune dépendance ou variable nouvelle.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Customer-linked projects and time",
+      "added": [
+        {
+          "text": "From Projects → Project registry, create jobs with a stable unique code, optional customer, description and controlled archiving/reactivation.",
+          "guide": "Projets-et-heures-liees"
+        },
+        {
+          "text": "Explicitly attach time by project code. Existing entry labels are preserved; a stable filter finds linked time even after a rename.",
+          "guide": "Projets-et-heures-liees"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Customer data requires Contacts read access; other fields and time stay under modular Accounting permissions. CSV and print show the code and historical label, in English/French, dark theme and mobile.",
+          "guide": "Projets-et-heures-liees"
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "An additive migration adds the registry and optional time reference. Existing entries are not linked automatically; no new dependency or environment variable.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

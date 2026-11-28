@@ -302,6 +302,12 @@ Retrouve les [contrats et liens clients](docs/Recherche-des-contrats.md) dans la
 
 <img src="docs/images/impression-temps-mobile.png" alt="Time print copy, mobile" width="412">
 
+[Organise les projets et leurs heures](docs/Projets-et-heures-liees.md) avec un code stable, un client facultatif, l’archivage et un rattachement explicite du temps. Les anciens libellés restent conservés.
+
+![Customer-linked project](docs/images/projets-lies-desktop.png)
+
+<img src="docs/images/projets-lies-mobile.png" alt="Project details, mobile" width="412">
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

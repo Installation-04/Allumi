@@ -303,6 +303,12 @@ Find [contracts and client links](docs/Recherche-des-contrats.md) in global sear
 
 <img src="docs/images/impression-temps-mobile.png" alt="Time print copy, mobile" width="412">
 
+[Organize projects and their time](docs/Projets-et-heures-liees.md) with stable codes, optional customer links, archiving and explicit time attachment. Existing time labels stay unchanged.
+
+![Customer-linked project](docs/images/projets-lies-desktop.png)
+
+<img src="docs/images/projets-lies-mobile.png" alt="Project details, mobile" width="412">
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

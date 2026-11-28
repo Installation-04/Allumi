@@ -913,6 +913,18 @@
       "limit": "The result is too large. Narrow the filters.",
       "exportLimit": "Narrow the filters to at most 5,000 entries for export.",
       "printLimit": "Narrow the filters to at most 1,000 entries to print a complete copy."
+    },
+    "project": {
+      "invalid": "Check the project code, name, description and customer.",
+      "notFound": "Project not found or inaccessible.",
+      "customerUnavailable": "Choose an active, non-anonymized customer in this company.",
+      "codeExists": "This project code already exists in this company.",
+      "codeImmutable": "The project code cannot be changed.",
+      "archived": "Reactivate the project before editing it or attaching new time.",
+      "stale": "The project has changed. Reload its details before trying again.",
+      "confirm": "Confirm archiving or reactivating the project.",
+      "limit": "The result is too large. Narrow the search.",
+      "detachConfirm": "To unlink this time, clear the project code and check the confirmation."
     }
   },
   "settingsPage": {
@@ -1348,8 +1360,8 @@
     },
     "projets": {
       "title": "Projects",
-      "description": "Shared manual time tracking by project or job.",
-      "planned": "Project registry, costs, rates, billing and profitability are still planned."
+      "description": "Customer-linked projects and manual time tracking.",
+      "planned": "Costs, rates, time approval, billing and profitability are still planned."
     },
     "paie": {
       "title": "Payroll",
@@ -1407,7 +1419,8 @@
       "previsions-tresorerie": "Cash flow forecast",
       "kilometrage": "Mileage log",
       "contrats": "Contracts and client links",
-      "temps": "Time log"
+      "temps": "Time log",
+      "projets": "Project registry"
     }
   },
   "updates": {
@@ -3940,7 +3953,7 @@
     "back": "Back to time log",
     "backYear": "View entries for this year",
     "reload": "Reload entry",
-    "shared": "Shared company log. People and projects are declared labels; no invoice or payroll is created.",
+    "shared": "Shared company log. Optional registered project and declared people, without automatic invoicing or payroll.",
     "date": "Work date",
     "project": "Project or job",
     "usage": "Billing",
@@ -3949,7 +3962,7 @@
     "notes": "Internal note",
     "duration": "Duration (h:mm or minutes)",
     "dateHint": "Work date, no later than today in Toronto.",
-    "projectHint": "Free label, up to 120 characters. No separate project is created.",
+    "projectHint": "Free label when no code is entered, up to 120 characters. With a code, the registry name is copied when linked.",
     "notesHint": "Optional, up to 200 characters.",
     "durationHint": "Examples: 1:30 or 90. From 1 minute to 24:00 per entry; no decimal hours.",
     "BILLABLE": "Billable",
@@ -3972,7 +3985,7 @@
     "page": "Page {page} of {pages}",
     "previous": "Previous",
     "next": "Next",
-    "limits": "Manual entries without a timer, overlap checks or daily total checks per person. No project registry, rate, invoice, timesheet approval or payroll. Complete CSV limited to 5,000 entries per export.",
+    "limits": "Manual entries without a timer, overlap checks or daily total checks per person. Optional project, without rates, automatic invoicing, time approval or payroll. Complete CSV limited to 5,000 entries.",
     "personHint": "Declared name, up to 80 characters; not linked to an employee account.",
     "taskHint": "Activity description, up to 200 characters.",
     "minutes": "Duration in minutes",
@@ -3981,6 +3994,64 @@
     "printTitle": "Time log — print copy",
     "printHint": "Complete filtered copy read on opening. Print or save a PDF in your browser; paper uses light landscape from either theme.",
     "allProjects": "All projects or jobs",
-    "printLimits": "Up to 1,000 entries across all filtered pages, including internal notes. Exact h:mm durations; no invoice, payroll or journal entry is created. Data is read only on opening or reloading."
+    "printLimits": "Up to 1,000 entries across all filtered pages, including internal notes. Exact h:mm durations; no invoice, payroll or journal entry is created. Data is read only on opening or reloading.",
+    "registeredProject": "Registered project code",
+    "registeredHint": "Optional. Enter an exact registry code. The project name is copied when linked; its existing label stays unchanged while the link is retained.",
+    "unlinkConfirm": "I confirm unlinking the registered project if I clear its code. The free-text label will be preserved."
+  },
+  "projects": {
+    "customer": "Linked customer",
+    "customerLookup": "Choose an existing client",
+    "customerLookupHint": "Optional. Search active customers by name, then select one to link this project. The name stays in the Contacts directory.",
+    "customerSearch": "Customer name to search",
+    "customerFind": "Find a client",
+    "customerLoading": "Searching…",
+    "customerQueryHint": "Enter between 2 and 120 characters, without control characters.",
+    "customerUnavailable": "Customer unavailable",
+    "customerEmpty": "No active customer found. Refine the search or keep the project without a customer.",
+    "customerMore": "More than 20 clients match. Refine the search to find the others.",
+    "customerResults": "Matching active clients",
+    "customerUse": "Use {name}",
+    "customerSelected": "Customer selected for this project.",
+    "title": "Project registry",
+    "detail": "Project details",
+    "create": "Create a project",
+    "save": "Save project",
+    "edit": "Edit project",
+    "back": "Back to projects",
+    "code": "Project code",
+    "name": "Project name",
+    "description": "Short description",
+    "status": "Project status",
+    "ACTIVE": "Active",
+    "ARCHIVED": "Archived",
+    "ALL": "All projects",
+    "search": "Search a code or name",
+    "apply": "Apply",
+    "reset": "Reset",
+    "count": "{count} projects match these filters.",
+    "page": "Page {page} of {pages}",
+    "previous": "Previous",
+    "next": "Next",
+    "empty": "No projects match these filters.",
+    "invalidFilters": "Check the search, status and page number.",
+    "hint": "Organize company jobs, optionally link a customer and explicitly attach time by project code. No invoice or payroll is created.",
+    "codeHint": "1–30 A–Z letters, digits, dots, hyphens or underscores; converted to uppercase. Unique within the company and cannot be changed.",
+    "codeImmutable": "The project code is stable and cannot be changed.",
+    "nameHint": "Single-line name, up to 120 characters.",
+    "descriptionHint": "Single-line description, up to 500 characters.",
+    "noCustomer": "No linked customer",
+    "customerHidden": "Customer data is hidden. Contacts read access is required to select or change this association.",
+    "clearCustomer": "Remove customer",
+    "noDescription": "No description.",
+    "timeLog": "Time log",
+    "viewTime": "View linked time",
+    "addTime": "Log time for this project",
+    "snapshotHint": "Existing time labels are preserved when a project is renamed. Free-text time is never linked automatically.",
+    "archive": "Archive project",
+    "reactivate": "Reactivate project",
+    "archiveConfirm": "I confirm archiving. Linked time remains readable and editable, but new time cannot be attached while the project is archived.",
+    "reactivateConfirm": "I confirm reactivating this project for new time entries.",
+    "reload": "Reload details"
   }
 }

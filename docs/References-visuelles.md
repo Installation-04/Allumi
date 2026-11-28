@@ -826,3 +826,15 @@ Voir [[Impression-du-temps]].
 ![Time print, English dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/impression-temps-en-dark-desktop.png)
 
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/impression-temps-en-dark-mobile.png" alt="Time print, mobile dark theme" width="412">
+
+## Projets clients et heures liées
+
+![Fiche de projet](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/projets-lies-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/projets-lies-mobile.png" alt="Projet mobile" width="412">
+
+![Project in English and dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/projets-lies-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/projets-lies-en-dark-mobile.png" alt="Project mobile in English" width="412">
+
+Données fictives. Voir [[Projets-et-heures-liees]].

@@ -1,0 +1,8 @@
+import { it, expect } from 'vitest';
+import { projectInput, projectFilters, projectQuery, projectCustomerQuery } from '@/modules/projects/client';
+import { entryInput, timeFilters, timeQuery, projectLabel } from '@/modules/time/client';
+it('normalizes stable codes and keeps filter values literal and bounded', () => { expect(projectInput.parse({ code: ' job-112 ', name: ' Projet ', description: '' })).toMatchObject({ code: 'JOB-112', name: 'Projet' }); for (const code of ['', 'a b', 'é', 'A'.repeat(31)])
+    expect(projectInput.safeParse({ code, name: 'Projet', description: '' }).success).toBe(false); const f = projectFilters({ q: '%_', statut: 'ARCHIVED', page: '2' }); expect(projectQuery(f, f.page)).toContain('q=%25_'); for (const q of [{ statut: 'VOID' }, { q: ['a', 'b'] }, { q: 'x'.repeat(121) }, { page: '0' }])
+    expect(() => projectFilters(q)).toThrow(); for (const q of ['x', 'x'.repeat(121), 'a\nb'])
+    expect(() => projectCustomerQuery(q)).toThrow(); });
+it('keeps optional references compatible with legacy labels and exact-code filters', () => { const x = { date: '2026-09-15', project: '', person: 'Camille', task: 'Service', notes: '', usage: 'BILLABLE', minutes: 90 }; expect(entryInput.safeParse(x).success).toBe(false); expect(entryInput.safeParse({ ...x, projectId: '00000000-0000-7000-8000-000000000001' }).success).toBe(true); const f = timeFilters({ dossier: 'job-112' }, '2026-11-28'); expect(timeQuery(f)).toContain('dossier=JOB-112'); expect(() => timeFilters({ dossier: ['A', 'B'] }, '2026-11-28')).toThrow(); expect(projectLabel({ project: 'Ancien nom', projectCode: 'JOB-112' })).toBe('JOB-112 — Ancien nom'); });

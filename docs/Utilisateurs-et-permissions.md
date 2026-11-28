@@ -85,3 +85,7 @@ L’action `migration.manage` est réservée à `OWNER`, l’administrateur d’
 Le [[Carnet-de-kilometrage]] utilise les droits du module **Comptabilité** : lecture pour consulter/exporter tous les trajets partagés, y compris personnels, écriture pour créer/modifier/supprimer. Aucun accès Contacts/Ventes/Taxes n’est requis. Les rôles en lecture seule restent plafonnés même si une surcharge demande l’écriture; une autorisation retirée est revérifiée à chaque action.
 
 Les [[Contrats-et-signatures]] utilisent Ventes : lecture pour les documents et preuves, écriture pour modèles, contrats et publication/envoi/révocation. Le rôle lecture seule ne reçoit pas le lien récupérable. Les accès externes reposent sur un lien privé révocable/expirable, sans session utilisateur; ils ne créent aucune appartenance à l’entreprise.
+
+## Projets et heures liées
+
+[[Projets-et-heures-liees]] et le carnet utilisent Comptabilité lecture/écriture. Choisir, changer ou retirer le client du projet exige aussi Contacts lecture; les données client ne sont pas renvoyées à la page sans cet accès. Les autres champs restent gérables avec Comptabilité écriture en conservant le lien. Le rôle lecture seule est plafonné. Aucune permission Ventes, Taxes ou Audit supplémentaire n’est nécessaire pour ces parcours.
