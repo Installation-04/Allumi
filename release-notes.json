@@ -2080,5 +2080,57 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.113": {
+    "fr-CA": {
+      "title": "Contribution comptabilisée des projets",
+      "added": [
+        {
+          "text": "Classez explicitement une écriture entière dans un projet après aperçu et confirmation; consultez ses revenus, charges et contribution par période.",
+          "guide": "Contribution-financiere-des-projets"
+        },
+        {
+          "text": "Exportez toutes les lignes filtrées en CSV privé jusqu’à 5 000 écritures ou imprimez-les jusqu’à 1 000, sur ordinateur et mobile, en français ou anglais.",
+          "guide": "Contribution-financiere-des-projets"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Les contre-passations suivent le classement actuel de leur originale à leur propre date. Déplacement et détachement sont audités et protégés par révision, sans modifier le grand livre."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Une migration additive ajoute le classement analytique, sans reprise automatique, dépendance ou variable nouvelle. Le rapport ne valorise pas les heures et ne reconstitue pas un classement historique.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Posted project contribution",
+      "added": [
+        {
+          "text": "Explicitly classify a whole journal entry into a project after preview and confirmation, then review posted revenue, expenses and contribution by period.",
+          "guide": "Contribution-financiere-des-projets"
+        },
+        {
+          "text": "Export all filtered rows in a private CSV up to 5,000 entries or print up to 1,000, on desktop and mobile, in English or French.",
+          "guide": "Contribution-financiere-des-projets"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Reversals follow their original’s current classification at their own date. Reassignment and detachment are audited and revision-protected without modifying the ledger."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "An additive migration adds analytical classification without automatic backfill, new dependencies or variables. The report does not value time or reconstruct past classifications.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }
