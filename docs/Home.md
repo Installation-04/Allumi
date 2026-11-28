@@ -148,3 +148,4 @@ Suggestions : [[Suggestions-de-recherche]] — résultats autorisés pendant la 
 
 - [[Projets-et-heures-liees]] — registre, client facultatif, archivage et heures liées par code stable.
 - [[Contribution-financiere-des-projets]] — classement analytique confirmé, revenus/charges comptabilisés, CSV et impression par période.
+- [[Classement-des-projets-depuis-le-journal]] — projet courant sur l’écriture, choix de destination et confirmation sans recopier le numéro.

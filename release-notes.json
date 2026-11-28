@@ -2132,5 +2132,57 @@
         }
       ]
     }
+  },
+  "0.4.0-alpha.114": {
+    "fr-CA": {
+      "title": "Classez les écritures par projet depuis le journal",
+      "added": [
+        {
+          "text": "Depuis la fiche journal, consultez le projet courant et choisissez une destination active par code sans recopier le numéro d’écriture.",
+          "guide": "Classement-des-projets-depuis-le-journal"
+        },
+        {
+          "text": "Revoyez la destination avant de confirmer le classement ou le détachement. Les contre-passations ramènent à leur originale.",
+          "guide": "Classement-des-projets-depuis-le-journal"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Les changements réutilisent les révisions, permissions et gardes existantes. Un formulaire périmé est refusé et le code saisi reste disponible; les vues relisent ensuite le classement."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "Aucune migration, dépendance ou variable nouvelle. Le classement demeure analytique et courant, sans modifier le grand livre ni valoriser les heures.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    },
+    "en": {
+      "title": "Classify entries by project from the journal",
+      "added": [
+        {
+          "text": "From a journal entry, review its current project and choose an active destination by code without copying the entry number.",
+          "guide": "Classement-des-projets-depuis-le-journal"
+        },
+        {
+          "text": "Review the destination before confirming classification or detachment. Reversals lead back to their original entry.",
+          "guide": "Classement-des-projets-depuis-le-journal"
+        }
+      ],
+      "improved": [
+        {
+          "text": "Changes reuse existing revisions, permissions and guards. A stale form is refused and the entered code remains available; views then read the current classification."
+        }
+      ],
+      "fixed": [],
+      "installation": [
+        {
+          "text": "No new migration, dependency or variable. Classification remains analytical and current, without modifying the ledger or valuing time.",
+          "guide": "Mise-a-jour"
+        }
+      ]
+    }
   }
 }

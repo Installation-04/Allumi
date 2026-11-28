@@ -90,3 +90,5 @@ La [[Copie-imprimable-des-documents]] télécharge le contenu publié et la sign
 [[Projets-et-heures-liees]] : code stable unique, client facultatif sous Contacts lecture, archivage/réactivation, rattachement explicite des heures et noms historiques conservés; Comptabilité modulaire, révisions/audit et aucune opération financière automatique.
 
 [[Contribution-financiere-des-projets]] : classement actuel d’une écriture entière par projet, revenus/charges comptabilisés, contre-passations héritées à leur date et exports complets bornés. Pas de répartition entre projets, classement historique à date, coûts des heures, budget ou marge complète; aucune modification du grand livre.
+
+[[Classement-des-projets-depuis-le-journal]] : classement courant visible depuis l’écriture, choix de projet actif par code et changement/détachement confirmés; contre-passations héritées et révisions conservées. Sans recopie de numéro ni modification du grand livre.

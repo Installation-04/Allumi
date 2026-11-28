@@ -920,7 +920,7 @@
       "customerUnavailable": "Choisis un client actif et non anonymisé de cette entreprise.",
       "codeExists": "Ce code de projet existe déjà dans cette entreprise.",
       "codeImmutable": "Le code de projet ne peut pas être modifié.",
-      "archived": "Réactive le projet avant de le modifier ou d’y rattacher de nouvelles heures.",
+      "archived": "Réactive le projet avant de le modifier ou d’y rattacher de nouvelles heures ou écritures.",
       "stale": "Le projet a changé. Recharge la fiche avant de recommencer.",
       "confirm": "Confirme l’archivage ou la réactivation du projet.",
       "limit": "Le résultat est trop grand. Réduis la recherche.",
@@ -4114,5 +4114,25 @@
     "print": "Impression / PDF complet",
     "exportLimit": "Réduis les dates à 5 000 écritures maximum pour exporter la copie complète.",
     "printLimit": "Réduis les dates à 1 000 écritures maximum pour imprimer la copie complète."
+  },
+  "entryProject": {
+    "section": "Projet de l’écriture",
+    "unassigned": "Sans projet",
+    "inherited": "La contre-passation hérite du classement actuel de son écriture originale.",
+    "viewProject": "Voir le projet",
+    "original": "Voir l’écriture originale",
+    "classifyOriginal": "Classer l’originale",
+    "classify": "Classer par projet",
+    "edit": "Modifier le classement",
+    "title": "Classement par projet",
+    "current": "Classement actuel",
+    "entry": "Écriture {number} · {date}",
+    "back": "Retour à l’écriture",
+    "code": "Code du projet destinataire",
+    "hint": "Saisis le code exact d’un projet actif. Revois sa destination avant de confirmer; le classement porte sur l’écriture entière et sa contre-passation éventuelle.",
+    "preview": "Revoir le projet",
+    "target": "Destination à confirmer",
+    "same": "Cette écriture est déjà classée dans ce projet.",
+    "registry": "Ouvrir le registre de projets"
   }
 }

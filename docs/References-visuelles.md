@@ -850,3 +850,15 @@ Données fictives. Voir [[Projets-et-heures-liees]].
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contribution-projets-en-dark-mobile.png" alt="Project contribution in English on mobile" width="412">
 
 Données fictives et classement courant. Voir [[Contribution-financiere-des-projets]].
+
+## Classer depuis le journal
+
+![Classement journal](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/classement-journal-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/classement-journal-mobile.png" alt="Classement journal mobile" width="412">
+
+![Journal classification in English and dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/classement-journal-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/classement-journal-en-dark-mobile.png" alt="Journal classification on mobile in English" width="412">
+
+Données fictives. Voir [[Classement-des-projets-depuis-le-journal]].

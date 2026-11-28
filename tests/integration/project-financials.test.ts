@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { beforeAll, afterAll, expect, it } from 'vitest';
 import type pg from 'pg';
-import { createProject, getProject, setProjectArchived, assignProjectEntry, previewProjectAssignment, getProjectFinance, financeCsv } from '@/modules/projects';
+import { createProject, getProject, setProjectArchived, assignProjectEntry, previewProjectAssignment, getEntryProjectAssignment, getProjectFinance, financeCsv } from '@/modules/projects';
 import { postManualEntry, reverseEntry, lockPeriod } from '@/modules/ledger';
 import { owner } from './helpers';
 import { W, seedWorld, appClient, inContext, asOwnerA, sqlstate } from './world';
@@ -14,6 +14,32 @@ const ledger = async () => (await db.query('SELECT (SELECT jsonb_agg(e ORDER BY 
 beforeAll(async () => { db = await owner(); await seedWorld(db); app = await appClient(); await db.query("INSERT INTO number_sequence(company_id,key,next_value,prefix,padding) VALUES($1,'JOURNAL_ENTRY',1,'J-',5)", [W.companyA]); });
 afterAll(async () => { await app?.end(); await db?.end(); });
 
+it('resolves an original and its counter to one current classification without ledger or audit writes', async () => {
+  const id=await project('JOURNAL114'),sale=await post('2026-03-01',W.bank,W.sales,12345n),counter=await reverseEntry(a,sale.id,{date:'2026-03-02'});
+  const unassigned=await getEntryProjectAssignment(reader,counter.id);expect(unassigned).toMatchObject({entryId:sale.id,number:String(sale.number),inherited:true,projectId:null,revision:0});
+  await assignProjectEntry(a,id,sale.id,0,false,true);
+  const before=await ledger(),audit=(await db.query('SELECT count(*)::text AS n FROM audit_log')).rows[0].n;
+  const original=await getEntryProjectAssignment(reader,sale.id),reversal=await getEntryProjectAssignment(reader,counter.id);
+  expect(original).toMatchObject({entryId:sale.id,projectId:id,code:'JOURNAL114',revision:1,inherited:false,revenue:12345n});expect(reversal).toEqual({...original,inherited:true});
+  expect(Object.keys(reversal).sort()).toEqual(['entryId','number','date','revenue','expenses','revision','projectId','code','name','inherited'].sort());
+  expect(await ledger()).toEqual(before);expect((await db.query('SELECT count(*)::text AS n FROM audit_log')).rows[0].n).toBe(audit);
+});
+it('refuses unavailable sources without exposing foreign entries or balance-only originals', async () => {
+  const e=await post('2026-03-03',W.bank,W.capital,100n),sale=await post('2026-03-03',W.bank,W.sales,100n);
+  for(const [who,id] of [[a,e.id],[b,sale.id],[a,'not-a-uuid'],[a,randomUUID()]] as const)await expect(getEntryProjectAssignment(who,id)).rejects.toMatchObject({key:'projectFinance.entryUnavailable'});
+});
+it('resolves archived and detached classifications at their current revision including stale preview refusal',async()=>{
+  const id=await project('HISTORY114'),sale=await post('2026-03-04',W.bank,W.sales,100n),counter=await reverseEntry(a,sale.id,{date:'2026-03-05'});
+  await assignProjectEntry(a,id,sale.id,0,false,true);const preview=await getEntryProjectAssignment(a,counter.id);
+  await setProjectArchived(a,id,1,true,true);expect((await getEntryProjectAssignment(reader,counter.id)).code).toBe('HISTORY114');
+  await assignProjectEntry(a,id,sale.id,1,true,true);expect(await getEntryProjectAssignment(reader,counter.id)).toMatchObject({projectId:null,revision:2,inherited:true});
+  await expect(assignProjectEntry(a,id,preview.entryId,preview.revision,true,true)).rejects.toMatchObject({key:'projectFinance.stale'});
+});
+it('reads classifications without directory/sales permissions and denies a revoked Accounting module',async()=>{
+  const sale=await post('2026-03-06',W.bank,W.sales,100n);
+  await db.query("UPDATE membership SET role='USER',module_access='{\"accounting\":\"read\",\"contacts\":\"none\",\"sales\":\"none\",\"taxes\":\"none\",\"audit\":\"none\"}' WHERE company_id=$1 AND user_id=$2",[W.companyA,W.userAccountant]);
+  try{expect(await getEntryProjectAssignment(accountant,sale.id)).toMatchObject({projectId:null,inherited:false});await db.query("UPDATE membership SET module_access='{\"accounting\":\"none\"}' WHERE company_id=$1 AND user_id=$2",[W.companyA,W.userAccountant]);await expect(getEntryProjectAssignment(accountant,sale.id)).rejects.toMatchObject({key:'forbidden'});}finally{await db.query("UPDATE membership SET role='ACCOUNTANT',module_access='{}' WHERE company_id=$1 AND user_id=$2",[W.companyA,W.userAccountant]);}
+});
 it('classifies whole immutable entries and includes counters on their own dates with exact signed cents', async () => {
   const id = await project('SCOPE113'), sale = await post('2026-02-28', W.bank, W.sales, 12345n), expense = await post('2026-03-01', W.expenses, W.bank, 2345n), credit = await post('2026-03-31', W.sales, W.bank, 111n);
   const reversed = await reverseEntry(a, sale.id, { date: '2026-03-15' }), before = await ledger();
