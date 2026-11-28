@@ -452,6 +452,12 @@ it('guards the project registry and optional composite time references without g
  const [fk]=await q<{def:string}>("SELECT pg_get_constraintdef(oid) AS def FROM pg_constraint WHERE conname='time_entry_project_fkey'");expect(fk?.def).toContain('FOREIGN KEY (company_id, project_id) REFERENCES project(company_id, id)');
 });
 
+it('keeps project financial classification separate from immutable ledger rows with audited tenant scope',async()=>{
+ expect(await q("SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('project_entry_assignment_guard','project_entry_assignment_audit')")).toHaveLength(2);
+ expect(await q("SELECT conname FROM pg_constraint WHERE conname IN ('project_entry_assignment_company_id_entry_id_fkey','project_entry_assignment_company_id_project_id_fkey','project_entry_assignment_company_id_entry_id_key','project_entry_assignment_revision')")).toHaveLength(4);
+ const policies=await q<{cmd:string;qual:string|null;with_check:string|null}>("SELECT cmd,qual,with_check FROM pg_policies WHERE tablename='project_entry_assignment' AND permissive='RESTRICTIVE'");expect(policies.map(p=>p.cmd).sort()).toEqual(['INSERT','SELECT','UPDATE']);for(const p of policies)expect(`${p.qual}${p.with_check}`).toContain('accounting');
+ expect((await q("SELECT has_table_privilege('allumi_app','project_entry_assignment','DELETE') AS del,has_function_privilege('public','project_entry_assignment_guard()','EXECUTE') AS public_execute,has_table_privilege('allumi_app','journal_entry','UPDATE') AS ledger_update"))[0]).toEqual({del:false,public_execute:false,ledger_update:false});
+});
 it('restricts the project client read-lock capability without changing Contacts update policies',async()=>{
  const [fn]=await q<{definer:boolean;volatility:string;config:string[];public_execute:boolean;app_execute:boolean;owner:string}>("SELECT prosecdef AS definer,provolatile AS volatility,proconfig AS config,has_function_privilege('public',oid,'EXECUTE') AS public_execute,has_function_privilege('allumi_app',oid,'EXECUTE') AS app_execute,pg_get_userbyid(proowner) AS owner FROM pg_proc WHERE proname='project_lock_customer'");
  expect(fn).toMatchObject({definer:true,volatility:'v',public_execute:false,app_execute:true,config:['search_path=pg_catalog, public']});expect(fn?.owner).not.toBe('allumi_app');

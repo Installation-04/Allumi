@@ -309,6 +309,12 @@ Find [contracts and client links](docs/Recherche-des-contrats.md) in global sear
 
 <img src="docs/images/projets-lies-mobile.png" alt="Project details, mobile" width="412">
 
+[Review posted project contribution](docs/Contribution-financiere-des-projets.md) by period. Explicit, audited classification of whole journal entries; reversals follow their original at their own date. Complete CSV and print copies, without changing the ledger. Current classification; time costs and full project profitability remain separate.
+
+![Posted project contribution](docs/images/contribution-projets-desktop.png)
+
+<img src="docs/images/contribution-projets-mobile.png" alt="Project contribution, mobile" width="412">
+
 ### Monthly budgets
 
 Allocate annual revenue and expense targets across the twelve fiscal periods, propose an exact equal split, and compare each period with posted actuals. Missing targets differ from zero; the annual cap, revisions and permissions protect changes. Export a private CSV in English or French. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

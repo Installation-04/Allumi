@@ -31,6 +31,10 @@ L’archivage exige une confirmation et une révision à jour. Il conserve les p
 
 Un projet archivé ne peut être renommé ou changer de client avant sa réactivation. Chaque création, modification, archivage, réactivation et changement des heures est audité. La consultation, les recherches et les exports ne créent pas de modification métier.
 
+## Contribution financière
+
+**Contribution comptabilisée** ouvre les revenus/charges des écritures explicitement classées, avec périodes, contre-passations à leur date, CSV et impression. Ce classement actuel et audité est indépendant des heures et ne modifie pas le grand livre. Voir [[Contribution-financiere-des-projets]].
+
 ## Périmètre
 
 Le registre organise les dossiers et leurs durées déclarées. Il ne crée ni facture, paiement, salaire ou écriture. Les personnes restent des libellés déclarés; chronomètre, contrôle des chevauchements ou du total quotidien par personne, approbation des heures, tarifs, coûts et rentabilité restent distincts. La relation client du projet est courante; elle ne constitue pas un historique de facturation.

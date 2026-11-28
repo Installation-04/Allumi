@@ -1,0 +1,17 @@
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { getTranslations } from '@/platform/i18n/server';
+import { financeFilters,financeQuery,getProjectFinance } from '@/modules/projects';
+import { todayIso,formatMoney } from '@/modules/ledger';
+import { AppError } from '@/platform/errors';
+import { TABLE_CLASS,TH_CLASS,TD_CLASS } from '@/app/_components/table';
+import { FOCUS } from '@/app/_components/focus';
+import { loadCompany } from '../../../../_lib';
+import { StatementPrint } from '../../../../_statement-print';
+export const dynamic='force-dynamic';
+export async function generateMetadata(){return {title:(await getTranslations('projectFinance'))('printTitle')};}
+export default async function Page({params,searchParams}:{params:Promise<{companyId:string;projectId:string}>;searchParams:Promise<Record<string,string|string[]|undefined>>}){
+ const {company,actor,locale}=await loadCompany(params,'project.read'),{projectId}=await params,t=await getTranslations('projectFinance'),base=`/c/${company.id}/projets/${projectId}/finances`;let r;
+ try{r=await getProjectFinance(actor,projectId,financeFilters(await searchParams,todayIso()),'print');}catch(e){if(e instanceof AppError&&e.key==='project.notFound')notFound();if(e instanceof RangeError||(e instanceof AppError&&['projectFinance.filters','projectFinance.printLimit','projectFinance.limit'].includes(e.key)))return <section><h1>{t('printTitle')}</h1><p role="alert">{e instanceof AppError?(await getTranslations('errors'))(e.key as 'projectFinance.filters'):t('invalidFilters')}</p><Link href={base}>{t('backReport')}</Link></section>;throw e;}
+ return <section className="project-finance-print statement-print statement-print-comparison min-w-0 space-y-5 break-words [overflow-wrap:anywhere]"><StatementPrint companyName={company.name}/><div className="print-controls"><Link className={`inline-flex min-h-11 items-center underline ${FOCUS}`} href={`${base}?${financeQuery(r.filters,r.filters.page)}`}>{t('backReport')}</Link></div><h1 className="text-2xl font-semibold">{t('printTitle')}</h1><h2 className="font-semibold">{r.code} — {r.name}</h2><p>{t('period',{from:r.filters.from,to:r.filters.to,count:r.count})}</p><p className="text-sm">{t('scope')}</p><dl className="grid gap-3 sm:grid-cols-3 print:grid-cols-3">{([['revenue',r.revenue],['expenses',r.expenses],['contribution',r.revenue-r.expenses]] as const).map(([k,v])=><div key={k}><dt>{t(k)}</dt><dd className="font-semibold">{formatMoney(v,locale)}</dd></div>)}</dl>{r.rows.length?<div className="overflow-x-auto"><table className={`${TABLE_CLASS} table-fixed [overflow-wrap:anywhere]`}><caption className="sr-only">{t('title')}</caption><thead><tr>{(['date','number','original','reversal','revenue','expenses','contribution'] as const).map(k=><th key={k} scope="col" className={TH_CLASS}>{t(k)}</th>)}</tr></thead><tbody>{r.rows.map(x=><tr key={x.id}><th scope="row" className={`${TD_CLASS} text-left`}>{x.date}</th><td className={TD_CLASS}>{x.number}</td><td className={TD_CLASS}>{x.rootNumber}</td><td className={TD_CLASS}>{t(x.reversed?'yes':'no')}</td><td className={TD_CLASS}>{formatMoney(x.revenue,locale)}</td><td className={TD_CLASS}>{formatMoney(x.expenses,locale)}</td><td className={TD_CLASS}>{formatMoney(x.revenue-x.expenses,locale)}</td></tr>)}</tbody></table></div>:<p>{t('empty')}</p>}<p className="text-sm">{t('limits')}</p></section>;
+}

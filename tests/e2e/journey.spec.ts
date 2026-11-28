@@ -4730,3 +4730,68 @@ test('registered projects preserve time snapshots, archived history and modular 
         await db.end();
     }
 });
+
+test('project contribution classifies immutable originals, dated reversals and private complete reports', async ({ page, browser }) => {
+  test.setTimeout(180000); cspViolations.length = 0; watchCsp(page.context());
+  if (updateCookies) await page.context().addCookies(updateCookies);
+  await page.goto('/');
+  if (!updateCookies) {
+    await expect(page).toHaveURL(/\/setup$/); await page.locator('[name="setupToken"]').fill('e2e-setup-token-123456789');
+    await page.getByLabel("Nom de l'entreprise").fill('Atelier Exemple inc.'); await page.getByLabel('Ton nom').fill('Alex Exemple'); await page.getByLabel('Courriel').fill(EMAIL);
+    await page.getByLabel('Mot de passe', { exact: true }).fill(PASSWORD); await page.getByLabel('Confirmation du mot de passe').fill(PASSWORD);
+    await page.getByRole('button', { name: "Créer l'entreprise et commencer", exact: true }).click(); await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
+  }
+  if (!/^\/c\/[0-9a-f-]{36}/.test(new URL(page.url()).pathname)) await page.getByRole('link', { name: 'Atelier Exemple inc.', exact: true }).click();
+  await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
+  const company = new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)![0], companyId = company.split('/')[2], db = new pg.Client({ connectionString: e2eUrls().owner });
+  await db.connect(); let userId = '', role = '', access: unknown = null, backup = '';
+  try {
+    const m = (await db.query('SELECT m.user_id,m.role,m.module_access FROM membership m JOIN app_user u ON u.id=m.user_id WHERE m.company_id=$1 AND u.email=$2', [companyId, EMAIL])).rows[0];
+    userId = m.user_id; role = m.role; access = m.module_access;
+    const urls = e2eUrls(), env: NodeJS.ProcessEnv = { ...process.env, DATABASE_URL: urls.owner, APP_DATABASE_URL: urls.app, LOG_LEVEL: 'silent' };
+    for (const key of ['APP_URL', 'AUTH_SECRET', 'ENCRYPTION_KEY']) delete env[key];
+    const fixture = JSON.parse(execFileSync(process.execPath, ['--conditions=react-server', '--import=tsx', 'tests/e2e/seed-project-financials.ts', userId, companyId!], { env, timeout: 90000, encoding: 'utf8' })) as Record<'sale' | 'expense' | 'previous' | 'counter', { id: string; number: string }>;
+    const ledger = async () => (await db.query('SELECT (SELECT jsonb_agg(e ORDER BY id) FROM journal_entry e) AS entries,(SELECT jsonb_agg(l ORDER BY id) FROM journal_line l) AS lines')).rows, before = await ledger();
+    await page.goto(company + '/projets/nouveau'); await page.getByLabel('Code du projet', { exact: true }).fill('WEB113'); await page.getByLabel('Nom du projet', { exact: true }).fill('Services — projet exemple');
+    await page.getByRole('button', { name: 'Créer un projet', exact: true }).click(); await expect(page).toHaveURL(/\/projets\/[0-9a-f-]{36}$/);
+    const detail = new URL(page.url()).pathname, base = detail + '/finances', query = '?du=2023-03-01&au=2023-03-31', filtered = base + query;
+    await page.getByRole('link', { name: 'Contribution comptabilisée', exact: true }).click(); await expect(page).toHaveURL(base);
+    const prepare = async (number: string) => { await page.goto(base + '/rattacher'); await page.getByLabel('Numéro interne de l’écriture', { exact: true }).fill(number); await page.getByRole('button', { name: 'Revoir l’écriture', exact: true }).click(); };
+    const confirm = async () => { await page.getByRole('region', { name: 'Aperçu du classement analytique', exact: true }).getByRole('checkbox').check(); await page.getByRole('button', { name: 'Confirmer le classement', exact: true }).click(); await expect(page).toHaveURL(base); };
+    await prepare(fixture.counter.number); await expect(page.getByRole('main').getByRole('alert')).toContainText(/[Éé]criture originale/);
+    for (const e of [fixture.sale, fixture.expense, fixture.previous]) { await prepare(e.number); await expect(page.getByRole('region', { name: 'Aperçu du classement analytique', exact: true })).toContainText('Sans projet'); await confirm(); }
+    await page.goto(filtered); await expect(page.getByRole('main')).toContainText('3 écritures classées');
+    await expect(page.locator('.finance-summary').getByText('Revenus comptabilisés', { exact: true }).locator('..').locator('dd')).toHaveText('2 400,00 $');
+    await expect(page.locator('.finance-summary').getByText('Contribution nette', { exact: true }).locator('..').locator('dd')).toHaveText('2 050,00 $');
+    await expectNoPageOverflow(page); await captureReference(page, 'contribution-projets', page.getByRole('heading', { name: 'Contribution comptabilisée du projet', exact: true }), false, true, true);
+    const csv = await page.request.get(base + '/export' + query); expect(csv.status()).toBe(200); expect(csv.headers()['cache-control']).toBe('private, no-store');
+    expect((await csv.body()).subarray(0, 3)).toEqual(Buffer.from([239, 187, 191])); const text = await csv.text(); expect(text).toContain('-100,00'); expect(text).toContain('2050,00'); expect(text).not.toContain('PF113-PRIVATE');
+    for (const q of ['du=x', 'du=2023-03-01&du=2023-03-01', 'page=0']) expect((await page.request.get(base + '/export?' + q)).status()).toBe(400);
+    await page.getByRole('link', { name: 'Impression / PDF complet', exact: true }).click(); await expect(page.locator('.project-finance-print tbody tr')).toHaveCount(3);
+    await page.emulateMedia({ media: 'print' }); await expect(page.locator('.print-controls').first()).toBeHidden(); await page.emulateMedia({ media: 'screen' });
+    await page.goto(filtered); await page.getByRole('button', { name: 'English', exact: true }).click(); await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await page.getByRole('combobox', { name: 'Appearance', exact: true }).selectOption('dark'); await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expectNoPageOverflow(page); await captureReference(page, 'contribution-projets-en-dark', page.getByRole('heading', { name: 'Posted project contribution', exact: true }), false, true, true);
+    const en = await page.request.get(base + '/export' + query); expect(await en.text()).toContain('-100.00');
+    await page.getByRole('combobox', { name: 'Appearance', exact: true }).selectOption('light'); await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await page.getByRole('button', { name: 'Français', exact: true }).click(); await expect(page.locator('html')).toHaveAttribute('lang', 'fr-CA');
+    await prepare(fixture.expense.number); await db.query('UPDATE project_entry_assignment SET project_id=NULL,revision=revision+1 WHERE entry_id=$1', [fixture.expense.id]);
+    await page.getByRole('region', { name: 'Aperçu du classement analytique', exact: true }).getByRole('checkbox').check(); await page.getByRole('button', { name: 'Détacher cette écriture', exact: true }).click();
+    await expect(page.getByRole('main').getByRole('alert')).toContainText('Le classement a changé');
+    await prepare(fixture.expense.number); await confirm();
+    backup = (await db.query("INSERT INTO app_user(id,email,display_name,updated_at) VALUES(gen_random_uuid(),'finance-'||gen_random_uuid()::text||'@example.test','Backup owner',now()) RETURNING id")).rows[0].id;
+    await db.query("INSERT INTO membership(id,company_id,user_id,role,updated_at) VALUES(gen_random_uuid(),$1,$2,'OWNER',now())", [companyId, backup]);
+    await db.query("UPDATE membership SET role='READ_ONLY',module_access='{\"accounting\":\"write\",\"contacts\":\"none\",\"sales\":\"none\",\"taxes\":\"none\",\"audit\":\"none\"}' WHERE company_id=$1 AND user_id=$2", [companyId, userId]);
+    await page.goto(filtered); await expect(page.getByRole('link', { name: 'Préparer un classement', exact: true })).toHaveCount(0);
+    expect((await page.request.get(base + '/rattacher?ecriture=' + fixture.sale.number)).status()).toBe(404); expect((await page.request.get(base + '/export' + query)).status()).toBe(200);
+    expect(await (await page.request.get(filtered)).text()).not.toContain('PF113-PRIVATE');
+    await db.query("UPDATE membership SET module_access='{\"accounting\":\"none\"}' WHERE company_id=$1 AND user_id=$2", [companyId, userId]);
+    for (const path of [filtered, base + '/export' + query, base + '/imprimer' + query]) expect((await page.request.get(path)).status()).toBe(404);
+    const guest = await browser.newContext(); try { const r = await guest.request.get(new URL(filtered, page.url()).href, { maxRedirects: 0 }); expect(r.status()).toBe(307); expect(r.headers()['location']).toContain('/connexion'); } finally { await guest.close(); }
+    expect(await ledger()).toEqual(before); expect(cspViolations).toEqual([]);
+  } finally {
+    if (userId && role) await db.query('UPDATE membership SET role=$3::member_role,module_access=$4::jsonb WHERE company_id=$1 AND user_id=$2', [companyId, userId, role, JSON.stringify(access ?? {})]);
+    if (backup) { await db.query('DELETE FROM membership WHERE company_id=$1 AND user_id=$2', [companyId, backup]); await db.query('UPDATE app_user SET disabled_at=now() WHERE id=$1', [backup]); }
+    await db.end();
+  }
+});

@@ -4,6 +4,13 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.113] - 2026-11-27
+
+- Projets : contribution comptabilisée par période, classement actuel confirmé d’une écriture entière, revenus/charges exacts et contre-passations à leur propre date; grand livre inchangé.
+- Contrôles : révisions conservées après détachement, audit/RLS Comptabilité, nouveaux liens aux projets actifs, concurrence et lecture seule; aucun mémo ou répertoire exposé.
+- Rapports : CSV privé complet jusqu’à 5 000 écritures, impression/PDF jusqu’à 1 000, FR/EN/sombre/mobile, guide/README et quatre captures fictives; plafonds refusés sans copie partielle.
+- Installation : migration additive du classement analytique, sans nouvelle dépendance ou variable ni reprise automatique; coûts des heures, ventilation et rentabilité complète distincts.
+
 ## [0.4.0-alpha.112] - 2026-11-27
 
 - Projets : registre par entreprise avec code stable, client facultatif, recherche littérale, archivage/réactivation et révisions auditées.
