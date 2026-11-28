@@ -170,3 +170,4 @@
 - [[Impression-du-temps]] — copie complète filtrée et PDF navigateur.
 
 - [[Projets-et-heures-liees]] — registre, client facultatif, archivage et heures liées par code stable.
+- [[Contribution-financiere-des-projets]] — classement analytique confirmé, revenus/charges comptabilisés, CSV et impression par période.

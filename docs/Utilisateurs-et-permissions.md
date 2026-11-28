@@ -89,3 +89,5 @@ Les [[Contrats-et-signatures]] utilisent Ventes : lecture pour les documents et 
 ## Projets et heures liées
 
 [[Projets-et-heures-liees]] et le carnet utilisent Comptabilité lecture/écriture. Choisir, changer ou retirer le client du projet exige aussi Contacts lecture; les données client ne sont pas renvoyées à la page sans cet accès. Les autres champs restent gérables avec Comptabilité écriture en conservant le lien. Le rôle lecture seule est plafonné. Aucune permission Ventes, Taxes ou Audit supplémentaire n’est nécessaire pour ces parcours.
+
+[[Contribution-financiere-des-projets]] : Comptabilité lecture pour rapport/aperçu/CSV/impression, écriture pour classer/déplacer/détacher une écriture entière après confirmation. L’écran de préparation demande écriture. Les permissions Contacts/Ventes/Taxes/Audit ne sont pas nécessaires; aucun mémo, coordonnée ou contenu de pièce n’est renvoyé par ces vues. Lecture seule reste plafonnée, RLS et révisions sont contrôlées à chaque action.

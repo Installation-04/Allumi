@@ -88,3 +88,5 @@ La [[Copie-imprimable-des-documents]] télécharge le contenu publié et la sign
 [[Impression-du-temps]] : copie filtrée complète jusqu’à 1 000 saisies, toutes pages et notes internes incluses, durées exactes, papier paysage clair et PDF navigateur. Les données sont relues à l’ouverture, sous Comptabilité lecture.
 
 [[Projets-et-heures-liees]] : code stable unique, client facultatif sous Contacts lecture, archivage/réactivation, rattachement explicite des heures et noms historiques conservés; Comptabilité modulaire, révisions/audit et aucune opération financière automatique.
+
+[[Contribution-financiere-des-projets]] : classement actuel d’une écriture entière par projet, revenus/charges comptabilisés, contre-passations héritées à leur date et exports complets bornés. Pas de répartition entre projets, classement historique à date, coûts des heures, budget ou marge complète; aucune modification du grand livre.

@@ -838,3 +838,15 @@ Voir [[Impression-du-temps]].
 <img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/projets-lies-en-dark-mobile.png" alt="Project mobile in English" width="412">
 
 Données fictives. Voir [[Projets-et-heures-liees]].
+
+## Contribution financière des projets
+
+![Contribution du projet](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contribution-projets-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contribution-projets-mobile.png" alt="Contribution du projet mobile" width="412">
+
+![Posted contribution in English and dark theme](https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contribution-projets-en-dark-desktop.png)
+
+<img src="https://raw.githubusercontent.com/wiki/Installation-04/Allumi/images/contribution-projets-en-dark-mobile.png" alt="Project contribution in English on mobile" width="412">
+
+Données fictives et classement courant. Voir [[Contribution-financiere-des-projets]].

@@ -308,6 +308,12 @@ Retrouve les [contrats et liens clients](docs/Recherche-des-contrats.md) dans la
 
 <img src="docs/images/projets-lies-mobile.png" alt="Project details, mobile" width="412">
 
+[Consulte la contribution comptabilisée par projet](docs/Contribution-financiere-des-projets.md) et période. Classement explicite et audité des écritures entières; contre-passations à leur propre date, CSV et impression complets, sans modification du grand livre. Classement courant; coûts des heures et rentabilité complète restent distincts.
+
+![Posted project contribution](docs/images/contribution-projets-desktop.png)
+
+<img src="docs/images/contribution-projets-mobile.png" alt="Project contribution, mobile" width="412">
+
 ### Budgets mensuels
 
 Répartissez les objectifs annuels sur les douze périodes fiscales, proposez une division exacte et comparez chaque période au réel comptabilisé. Champs vides distincts de zéro, plafond annuel, révisions et permissions protègent les changements. Export CSV privé FR/EN. [Guide](https://github.com/Installation-04/Allumi/wiki/Budgets-mensuels).

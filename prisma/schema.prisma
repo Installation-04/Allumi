@@ -467,6 +467,7 @@ model Company {
   mileageTrips           MileageTrip[]
   timeEntries            TimeEntry[]
   projects               Project[]
+  projectEntryAssignments ProjectEntryAssignment[]
   cashForecastPresets    CashForecastPreset[]
   budgetLines            BudgetLine[]
   budgetMonthlyTargets   BudgetMonthlyTarget[]
@@ -646,6 +647,7 @@ model JournalEntry {
   reversedBy   JournalEntry? @relation("Reversal")
   lines        JournalLine[]
 
+  projectAssignment     ProjectEntryAssignment?
   salesDocumentPosted    SalesDocument?    @relation("SalesDocumentPosting")
   salesDocumentVoided    SalesDocument?    @relation("SalesDocumentVoid")
   purchaseDocumentPosted PurchaseDocument? @relation("PurchaseDocumentPosting")
@@ -2045,6 +2047,7 @@ model Project {
   company Company @relation(fields:[companyId],references:[id],onDelete:Restrict)
   customer Contact? @relation(fields:[companyId,customerId],references:[companyId,id],onDelete:Restrict,map:"project_customer_fkey")
   timeEntries TimeEntry[]
+  entryAssignments ProjectEntryAssignment[]
   @@unique([companyId,id])
   @@unique([companyId,code])
   @@index([companyId,status,code])
@@ -2070,4 +2073,20 @@ model TimeEntry {
   @@index([companyId,workDate,createdAt,id])
   @@index([companyId,projectId,workDate])
   @@map("time_entry")
+}
+
+model ProjectEntryAssignment {
+  id String @id @default(uuid(7)) @db.Uuid
+  companyId String @map("company_id") @db.Uuid
+  entryId String @map("entry_id") @db.Uuid
+  projectId String? @map("project_id") @db.Uuid
+  revision Int @default(1)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  company Company @relation(fields:[companyId],references:[id],onDelete:Restrict)
+  entry JournalEntry @relation(fields:[companyId,entryId],references:[companyId,id],onDelete:Restrict)
+  project Project? @relation(fields:[companyId,projectId],references:[companyId,id],onDelete:Restrict)
+  @@unique([companyId,entryId])
+  @@index([companyId,projectId,entryId])
+  @@map("project_entry_assignment")
 }
