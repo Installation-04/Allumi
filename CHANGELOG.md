@@ -4,6 +4,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/); versi
 
 ## [Non publié]
 
+## [0.4.0-alpha.112] - 2026-11-27
+
 - Projets : registre par entreprise avec code stable, client facultatif, recherche littérale, archivage/réactivation et révisions auditées.
 - Heures : rattachement explicite par code, anciens libellés conservés, filtres stables et CSV/impression compatibles; aucune conversion automatique ni mouvement financier.
 - Contrôles et interface : RLS Comptabilité, données client sous Contacts lecture, archivage sérialisé et rôle lecture seule plafonné; FR/EN/sombre/mobile, validations de langue stabilisées et quatre captures fictives.
