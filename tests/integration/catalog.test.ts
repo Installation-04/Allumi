@@ -443,3 +443,17 @@ it('restricts signed-copy capabilities to a stable read-only function with fixed
  const [f]=await q<{definer:boolean;volatility:string;config:string[];public_execute:boolean;app_execute:boolean;body:string}>("SELECT prosecdef AS definer,provolatile AS volatility,proconfig AS config,has_function_privilege('public',oid,'EXECUTE') AS public_execute,has_function_privilege('allumi_app',oid,'EXECUTE') AS app_execute,pg_get_functiondef(oid) AS body FROM pg_proc WHERE oid='client_document_public_copy(text)'::regprocedure");
  expect(f).toMatchObject({definer:true,volatility:'s',public_execute:false,app_execute:true});expect(f?.config).toContain('search_path=pg_catalog, public');expect(f?.body).toContain('statement_timestamp()');expect(f?.body).toContain('sha256');expect(f?.body).not.toMatch(/\b(UPDATE|INSERT|DELETE|EXECUTE)\b/);
 });
+
+it('guards the project registry and optional composite time references without granting deletion',async()=>{
+ expect(await q("SELECT conname FROM pg_constraint WHERE conname IN ('project_customer_fkey','project_code','project_text','project_status','project_revision','time_entry_project_fkey')")).toHaveLength(6);
+ expect(await q("SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('project_guard','project_audit')")).toHaveLength(2);
+ const policies=await q<{cmd:string;qual:string|null;with_check:string|null}>("SELECT cmd,qual,with_check FROM pg_policies WHERE tablename='project' AND permissive='RESTRICTIVE'");expect(policies.map(p=>p.cmd).sort()).toEqual(['INSERT','SELECT','UPDATE']);for(const p of policies)expect(`${p.qual}${p.with_check}`).toContain('accounting');
+ expect((await q("SELECT has_table_privilege('allumi_app','project','DELETE') AS del,has_table_privilege('allumi_app','project','TRUNCATE') AS trunc,has_function_privilege('public','project_guard()','EXECUTE') AS public_execute"))[0]).toEqual({del:false,trunc:false,public_execute:false});
+ const [fk]=await q<{def:string}>("SELECT pg_get_constraintdef(oid) AS def FROM pg_constraint WHERE conname='time_entry_project_fkey'");expect(fk?.def).toContain('FOREIGN KEY (company_id, project_id) REFERENCES project(company_id, id)');
+});
+
+it('restricts the project client read-lock capability without changing Contacts update policies',async()=>{
+ const [fn]=await q<{definer:boolean;volatility:string;config:string[];public_execute:boolean;app_execute:boolean;owner:string}>("SELECT prosecdef AS definer,provolatile AS volatility,proconfig AS config,has_function_privilege('public',oid,'EXECUTE') AS public_execute,has_function_privilege('allumi_app',oid,'EXECUTE') AS app_execute,pg_get_userbyid(proowner) AS owner FROM pg_proc WHERE proname='project_lock_customer'");
+ expect(fn).toMatchObject({definer:true,volatility:'v',public_execute:false,app_execute:true,config:['search_path=pg_catalog, public']});expect(fn?.owner).not.toBe('allumi_app');
+ const [policy]=await q<{qual:string}>("SELECT qual FROM pg_policies WHERE tablename='contact' AND policyname='module_update'");expect(policy?.qual).toContain("'contacts'::text");expect(policy?.qual).toContain("'write'::text");
+});

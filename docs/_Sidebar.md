@@ -168,3 +168,5 @@
 - [[Carnet-de-temps]] — heures déclarées, facturables ou non, filtres et CSV.
 
 - [[Impression-du-temps]] — copie complète filtrée et PDF navigateur.
+
+- [[Projets-et-heures-liees]] — registre, client facultatif, archivage et heures liées par code stable.

@@ -29,6 +29,7 @@ export const ROUTE_ACCESS: Record<string, readonly Action[]> = {
   budgets: ["ledger.read"],
   kilometrage: ["mileage.read"],
   temps: ["time.read"],
+  projets: ["project.read"],
   balance: ["ledger.read"],
   exercices: ["ledger.read"],
   taxes: ["taxes.read"],

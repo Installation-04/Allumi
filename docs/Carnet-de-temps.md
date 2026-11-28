@@ -4,7 +4,7 @@ Ouvre **Projets → Carnet de temps**, puis **Nouvelle saisie de temps**. Le car
 
 ## Enregistrer les heures
 
-Renseigne la date du travail, le **Projet ou dossier**, l’**Intervenant déclaré**, l’activité, une note interne facultative et le caractère **Facturable** ou **Non facturable**. Les noms de projet et d’intervenant sont des libellés libres; ils ne créent pas de registre de projets, salariés ou clients.
+Renseigne la date du travail, le **Projet ou dossier**, l’**Intervenant déclaré**, l’activité, une note interne facultative et le caractère **Facturable** ou **Non facturable**. Tu peux renseigner explicitement le code d’un projet enregistré (voir [[Projets-et-heures-liees]]); sinon, le projet reste un libellé libre. L’intervenant reste déclaré, sans compte salarié associé.
 
 La durée accepte **h:mm** ou des minutes entières : `1:30` et `90` représentent exactement 90 minutes. Les heures décimales comme `1,5` ou `1.5` sont refusées. Chaque saisie est limitée à **1 minute à 24:00**. La date ne peut pas dépasser aujourd’hui à Toronto. Les calculs utilisent des minutes entières, sans arrondi monétaire.
 
@@ -12,7 +12,7 @@ Les libellés projet/intervenant/activité sont limités à 120/80/200 caractèr
 
 ## Filtrer et exporter
 
-Choisis une plage inclusive de 366 jours maximum, un libellé de projet et/ou le type de facturation. La recherche projet ignore la casse et traite les caractères `%`, `_` et `\` littéralement. Les totaux facturable/non facturable portent sur **tout le filtre**, même lorsque la liste dépasse une page. L’écran affiche les durées en h:mm et 50 lignes par page.
+Choisis une plage inclusive de 366 jours maximum, un code de projet enregistré, un libellé de projet et/ou le type de facturation. La recherche projet ignore la casse et traite les caractères `%`, `_` et `\` littéralement. Les totaux facturable/non facturable portent sur **tout le filtre**, même lorsque la liste dépasse une page. L’écran affiche les durées en h:mm et 50 lignes par page.
 
 **Exporter le CSV complet** reprend toutes les lignes filtrées, jusqu’à 5 000. Le CSV UTF-8 est privé, dans la langue de l’interface, avec **durées et totaux en minutes entières**. Les libellés et notes internes y figurent : conserve le fichier de façon appropriée. L’export est bloqué au-delà du plafond; réduis alors les filtres.
 
@@ -22,7 +22,7 @@ La fiche permet la modification ou une suppression avec confirmation explicite. 
 
 ## Limites
 
-Le carnet ne crée ni facture, paiement, salaire ou écriture. Aucun tarif ni valorisation financière n’est calculé. Il ne comporte pas de chronomètre, d’heures de début/fin, de contrôle de chevauchement ou de total quotidien par personne, de validation des heures ou de registre de projets. Plusieurs saisies peuvent donc représenter plus de 24 heures pour un même libellé de personne; ce carnet est déclaratif. Facturation, paie, coûts et rentabilité de projets restent des fonctionnalités distinctes.
+Le carnet ne crée ni facture, paiement, salaire ou écriture. Aucun tarif ni valorisation financière n’est calculé. Il ne comporte pas de chronomètre, d’heures de début/fin, de contrôle de chevauchement ou de total quotidien par personne ni d’approbation des heures. Plusieurs saisies peuvent donc représenter plus de 24 heures pour un même libellé de personne; ce carnet est déclaratif. Facturation, paie, coûts et rentabilité de projets restent des fonctionnalités distinctes.
 
 ## Références visuelles
 
@@ -37,3 +37,5 @@ Le carnet ne crée ni facture, paiement, salaire ou écriture. Aucun tarif ni va
 Toutes les captures utilisent des données fictives. Voir aussi [[Utilisateurs-et-permissions]] et [[Piste-d-audit]].
 
 [[Impression-du-temps]] : copie filtrée complète jusqu’à 1 000 saisies, toutes pages et notes internes incluses, durées exactes, papier paysage clair et PDF navigateur. Les données sont relues à l’ouverture, sous Comptabilité lecture.
+
+[[Projets-et-heures-liees]] : registre facultatif, code stable, client sous droits Contacts et noms historiques conservés. Aucun rattachement automatique des anciennes saisies; détachement confirmé.

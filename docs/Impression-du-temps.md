@@ -1,6 +1,6 @@
 # Impression complète du carnet de temps
 
-Dans **Projets → Carnet de temps**, choisis les dates, le projet ou dossier et le caractère facturable, puis ouvre **Impression / PDF complet**. La copie reprend toutes les lignes filtrées, même depuis la deuxième page du carnet, jusqu’à **1 000 saisies**. Au-delà, réduis les filtres : aucune copie partielle n’est produite. Le CSV conserve son plafond distinct de 5 000 lignes.
+Dans **Projets → Carnet de temps**, choisis les dates, le code de projet enregistré facultatif, le libellé de projet ou dossier et le caractère facturable, puis ouvre **Impression / PDF complet**. La copie reprend toutes les lignes filtrées, même depuis la deuxième page du carnet, jusqu’à **1 000 saisies**. Au-delà, réduis les filtres : aucune copie partielle n’est produite. Le CSV conserve son plafond distinct de 5 000 lignes.
 
 La copie affiche l’entreprise, la période inclusive, les filtres, les intervenants déclarés, activités, notes internes et durées. Les totaux facturables/non facturables et toutes les lignes proviennent du même instantané. Les durées sont exprimées en **h:mm**, sans montant ni conversion monétaire.
 
@@ -16,7 +16,7 @@ Sur téléphone, le tableau se consulte par défilement horizontal à l’écran
 
 Les droits **Comptabilité en lecture** suffisent, même sans accès Ventes, Contacts, Taxes ou Audit. Le serveur vérifie l’accès à chaque ouverture. Aucun accès d’une autre entreprise n’est possible; le retrait des droits bloque les ouvertures suivantes. Un fichier déjà conservé n’est pas retiré à distance.
 
-La copie contient les notes internes et des noms déclarés : conserve-la dans un emplacement approprié. Ouvrir ou imprimer n’ajoute pas de modification ni d’audit métier et ne crée aucune facture, paie ou écriture. Le carnet reste déclaratif, sans registre de projets ou d’employés ni vérification des chevauchements. Voir [[Carnet-de-temps]].
+La copie contient les notes internes et des noms déclarés : conserve-la dans un emplacement approprié. Ouvrir ou imprimer n’ajoute pas de modification ni d’audit métier et ne crée aucune facture, paie ou écriture. Le carnet reste déclaratif, avec un projet enregistré facultatif (voir [[Projets-et-heures-liees]]), sans registre d’employés ni vérification des chevauchements. Voir [[Carnet-de-temps]].
 
 ## Références visuelles
 

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "@/platform/i18n/server";
 import { AppError } from "@/platform/errors";
 import { todayIso } from "@/modules/ledger";
-import { getTimeLog, timeFilters, timeQuery, duration } from "@/modules/time";
+import { getTimeLog, timeFilters, timeQuery, duration, projectLabel } from "@/modules/time";
 import { TABLE_CLASS, TH_CLASS, TD_CLASS } from "@/app/_components/table";
 import { FOCUS } from "@/app/_components/focus";
 import { loadCompany } from "../../_lib";
@@ -39,12 +39,13 @@ export default async function Page({ params, searchParams }: {
       {([["BILLABLE", report.billableMinutes], ["NON_BILLABLE", report.nonBillableMinutes], ["total", report.billableMinutes + report.nonBillableMinutes]] as const).map(([key, minutes]) => <div key={key} className="min-w-0 rounded border border-stone-300 p-3 dark:border-stone-700"><dt className="text-sm">{t(key)}</dt><dd className="mt-2 font-semibold tabular-nums">{duration(minutes, locale)}</dd></div>)}
     </dl>
     <p className="text-sm">{t("project")}: {filters.project || t("allProjects")} · {t("usage")}: {t(filters.usage)}</p>
+    {filters.projectCode&&<p className="text-sm">{t("registeredProject")}: {filters.projectCode}</p>}
     <p className="text-sm">{t("shared")}</p>
     {report.rows.length === 0 ? <p>{t("empty")}</p> : <div className="overflow-x-auto"><table className={`${TABLE_CLASS} min-w-[56rem] table-fixed [overflow-wrap:anywhere]`}>
       <caption className="sr-only">{t("title")}</caption>
       <colgroup>{["w-[11%]", "w-[14%]", "w-[10%]", "w-[17%]", "w-[17%]", "w-[19%]", "w-[12%]"].map((width, i) => <col key={i} className={width}/>)}</colgroup>
       <thead><tr>{(["date", "project", "usage", "person", "task", "notes", "duration"] as const).map(key => <th scope="col" key={key} className={TH_CLASS}>{t(key)}</th>)}</tr></thead>
-      <tbody>{report.rows.map(entry => <tr key={entry.id}><th scope="row" className={`${TD_CLASS} text-left font-medium`}>{entry.date}</th><td className={TD_CLASS}>{entry.project}</td><td className={TD_CLASS}>{t(entry.usage)}</td><td className={TD_CLASS}>{entry.person}</td><td className={TD_CLASS}>{entry.task}</td><td className={TD_CLASS}>{entry.notes || "—"}</td><td className={`${TD_CLASS} tabular-nums`}>{duration(entry.minutes, locale)}</td></tr>)}</tbody>
+      <tbody>{report.rows.map(entry => <tr key={entry.id}><th scope="row" className={`${TD_CLASS} text-left font-medium`}>{entry.date}</th><td className={TD_CLASS}>{projectLabel(entry)}</td><td className={TD_CLASS}>{t(entry.usage)}</td><td className={TD_CLASS}>{entry.person}</td><td className={TD_CLASS}>{entry.task}</td><td className={TD_CLASS}>{entry.notes || "—"}</td><td className={`${TD_CLASS} tabular-nums`}>{duration(entry.minutes, locale)}</td></tr>)}</tbody>
     </table></div>}
     <p className="text-sm">{t("printLimits")}</p>
   </section>;

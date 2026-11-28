@@ -26,7 +26,7 @@ test.describe.configure({ mode: "serial" });
 let updateCookies: Awaited<ReturnType<BrowserContext["cookies"]>>;
 
 /** Optional wiki references from the isolated, fictional browser-test company only. */
-async function captureReference(page: Page, name: string, mobileHeading?: string | Locator, fullPage?: boolean, focusAll = false) {
+async function captureReference(page: Page, name: string, mobileHeading?: string | Locator, fullPage?: boolean, focusAll = false, contentOnly = false) {
   if (process.env.ALLUMI_SCREENSHOTS !== "1") return;
   // One prefix, or several separated by commas.
   if (process.env.ALLUMI_SCREENSHOT_PREFIX && !process.env.ALLUMI_SCREENSHOT_PREFIX.split(",").some((prefix) => name.startsWith(prefix))) return;
@@ -37,7 +37,9 @@ async function captureReference(page: Page, name: string, mobileHeading?: string
     await expect(heading, `reference ${name}: ${mobileHeading}`).toBeVisible();
     await heading.evaluate((element) => element.scrollIntoView({ block: "start" }));
   }
-  await page.screenshot({ scale: "css", path: `docs/images/${name}-${process.env.E2E_MOBILE === "1" ? "mobile" : "desktop"}.png`, fullPage: fullPage ?? process.env.E2E_MOBILE !== "1", animations: "disabled" });
+  const options = { scale: "css" as const, path: `docs/images/${name}-${process.env.E2E_MOBILE === "1" ? "mobile" : "desktop"}.png`, animations: "disabled" as const };
+  if (contentOnly && mobileHeading && typeof mobileHeading !== "string") await mobileHeading.locator("..").screenshot(options);
+  else await page.screenshot({ ...options, fullPage: fullPage ?? process.env.E2E_MOBILE !== "1" });
 }
 
 /** The recovery codes list, in either language; the page also lists the signed-in devices. */
@@ -4530,4 +4532,201 @@ test("time print includes every filtered page, exact hours and private read-only
   backup=(await db.query("INSERT INTO app_user(id,email,display_name,updated_at) VALUES(gen_random_uuid(),'time-print-'||gen_random_uuid()::text||'@example.test','Backup owner',now()) RETURNING id")).rows[0].id;await db.query("INSERT INTO membership(id,company_id,user_id,role,updated_at) VALUES(gen_random_uuid(),$1,$2,'OWNER',now())",[companyId,backup]);await db.query("UPDATE membership SET role='READ_ONLY',module_access='{\"accounting\":\"write\",\"sales\":\"none\",\"contacts\":\"none\",\"taxes\":\"none\",\"audit\":\"none\"}' WHERE company_id=$1 AND user_id=$2",[companyId,userId]);await page.goto(copy);await expect(page.locator('.time-print tbody tr')).toHaveCount(107);await db.query("UPDATE membership SET module_access='{\"accounting\":\"none\"}' WHERE company_id=$1 AND user_id=$2",[companyId,userId]);expect((await page.request.get(copy)).status()).toBe(404);expect((await page.request.get('/c/00000000-0000-7000-8000-999999999999/temps/imprimer?'+query)).status()).toBe(404);
   const guest=await browser.newContext();try{const r=await guest.request.get(new URL(copy,page.url()).href,{maxRedirects:0});expect(r.status()).toBe(307);expect(r.headers()['location']).toContain('/connexion');}finally{await guest.close();}await db.query('UPDATE membership SET role=$3::member_role,module_access=$4::jsonb WHERE company_id=$1 AND user_id=$2',[companyId,userId,role,JSON.stringify(access??{})]);seed('capacity');await page.goto(copy);await expect(page.getByRole('main').getByRole('alert')).toContainText('1 000 saisies');await expect(page.locator('.time-print table')).toHaveCount(0);await page.goto(source);await expect(page.getByRole('link',{name:'Impression / PDF complet',exact:true})).toHaveCount(0);expect((await page.request.get(base+'/export?'+query)).status()).toBe(200);expect(cspViolations).toEqual([]);
  }finally{if(userId&&role)await db.query('UPDATE membership SET role=$3::member_role,module_access=$4::jsonb WHERE company_id=$1 AND user_id=$2',[companyId,userId,role,JSON.stringify(access??{})]);if(backup){await db.query('DELETE FROM membership WHERE company_id=$1 AND user_id=$2',[companyId,backup]);await db.query('UPDATE app_user SET disabled_at=now() WHERE id=$1',[backup]);}await db.end();}
+});
+
+test('registered projects preserve time snapshots, archived history and modular customer privacy', async ({ page, browser }) => {
+    test.setTimeout(240000);
+    cspViolations.length = 0;
+    watchCsp(page.context());
+    if (updateCookies)
+        await page.context().addCookies(updateCookies);
+    await page.goto('/');
+    if (!updateCookies) {
+        await expect(page).toHaveURL(/\/setup$/);
+        await page.locator('[name="setupToken"]').fill('e2e-setup-token-123456789');
+        await page.getByLabel("Nom de l'entreprise").fill('Atelier Exemple inc.');
+        await page.getByLabel('Ton nom').fill('Alex Exemple');
+        await page.getByLabel('Courriel').fill(EMAIL);
+        await page.getByLabel('Mot de passe', { exact: true }).fill(PASSWORD);
+        await page.getByLabel('Confirmation du mot de passe').fill(PASSWORD);
+        await page.getByRole('button', { name: "Créer l'entreprise et commencer", exact: true }).click();
+        await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
+    }
+    if (!/^\/c\/[0-9a-f-]{36}/.test(new URL(page.url()).pathname))
+        await page.getByRole('link', { name: 'Atelier Exemple inc.', exact: true }).click();
+    await expect(page).toHaveURL(/\/c\/[0-9a-f-]{36}$/);
+    const company = new URL(page.url()).pathname.match(/^\/c\/[0-9a-f-]{36}/)![0], companyId = company.split('/')[2], base = company + '/projets', times = company + '/temps', db = new pg.Client({ connectionString: e2eUrls().owner });
+    await db.connect();
+    let userId = '', role = '', access: unknown = null, backup = '';
+    try {
+        const m = (await db.query('SELECT m.user_id,m.role,m.module_access FROM membership m JOIN app_user u ON u.id=m.user_id WHERE m.company_id=$1 AND u.email=$2', [companyId, EMAIL])).rows[0];
+        userId = m.user_id;
+        role = m.role;
+        access = m.module_access;
+        const financial = async () => (await db.query('SELECT (SELECT count(*) FROM journal_entry)::text AS entries,(SELECT count(*) FROM sales_document)::text AS invoices,(SELECT count(*) FROM payment)::text AS payments')).rows, before = await financial();
+        const customer = (await db.query("INSERT INTO contact(id,company_id,is_customer,display_name,email,updated_at) VALUES(gen_random_uuid(),$1,true,'Client Projet 112','project112@example.test',now()) RETURNING id", [companyId])).rows[0].id;
+        const expand = async (box: Locator) => { if (!(await box.evaluate(el => el.hasAttribute('open'))))
+            await box.locator('summary').click(); };
+        await page.goto(company + '/espace/projets');
+        await page.getByRole('heading', { name: 'Projets', exact: true }).locator('..').locator('..').getByRole('link', { name: 'Registre de projets', exact: true }).click();
+        await expect(page).toHaveURL(base);
+        await page.getByRole('link', { name: 'Créer un projet', exact: true }).click();
+        await page.getByLabel('Code du projet', { exact: true }).fill('BAD CODE');
+        await page.getByLabel('Nom du projet', { exact: true }).fill('Projet Démo 112');
+        await page.getByLabel('Description courte', { exact: true }).fill('Planification et suivi fictifs');
+        await page.getByLabel('Nom du client à rechercher', { exact: true }).fill('Client Projet 112');
+        await page.getByRole('button', { name: 'Rechercher un client', exact: true }).click();
+        await page.getByRole('button', { name: 'Utiliser Client Projet 112', exact: true }).click();
+        await page.getByRole('button', { name: 'Créer un projet', exact: true }).click();
+        await expect(page.getByRole('main').getByRole('alert')).toContainText('Vérifie le code');
+        await expect(page.getByLabel('Nom du projet', { exact: true })).toHaveValue('Projet Démo 112');
+        await expect(page.locator('input[name="customerId"]')).toHaveValue(customer);
+        await page.getByLabel('Code du projet', { exact: true }).fill('web112');
+        await page.getByRole('button', { name: 'Créer un projet', exact: true }).click();
+        await expect(page).toHaveURL(/\/projets\/[0-9a-f-]{36}$/);
+        const detail = page.url(), id = new URL(detail).pathname.split('/').at(-1)!;
+        await expect(page.getByRole('main')).toContainText('WEB112 — Projet Démo 112');
+        await expect(page.getByRole('main')).toContainText('Client Projet 112');
+        const lookup = await page.request.get(base + '/clients?q=Client+Projet+112');
+        expect(lookup.status()).toBe(200);
+        expect(lookup.headers()['cache-control']).toContain('no-store');
+        expect(await lookup.json()).toEqual({ rows: [{ id: customer, displayName: 'Client Projet 112' }], hasMore: false });
+        expect((await page.request.get(base + '/clients?q=x&q=y')).status()).toBe(400);
+        const saveTime = async (task: string, minutes: string) => { await page.getByLabel('Date du travail', { exact: true }).fill('2026-09-15'); await page.getByLabel('Intervenant déclaré', { exact: true }).fill('Alex Exemple'); await page.getByLabel('Activité', { exact: true }).fill(task); await page.getByLabel('Durée (h:mm ou minutes)', { exact: true }).fill(minutes); await page.getByRole('button', { name: 'Enregistrer le temps', exact: true }).click(); await expect(page).toHaveURL(/\/temps\/[0-9a-f-]{36}$/); return page.url(); };
+        await page.getByRole('link', { name: 'Saisir des heures pour ce projet', exact: true }).click();
+        await expect(page.getByLabel('Code du projet enregistré', { exact: true })).toHaveValue('WEB112');
+        const firstTime = await saveTime('Heures liées avant renommage', '2:05');
+        await expect(page.getByRole('link', { name: 'Code du projet enregistré: WEB112', exact: true })).toBeVisible();
+        await page.goto(times + '/nouveau');
+        await page.getByLabel('Projet ou dossier', { exact: true }).fill('Projet Démo 112');
+        await saveTime('Temps libre conservé', '5');
+        await page.goto(detail);
+        const edit = page.locator('details').filter({ has: page.locator('summary', { hasText: 'Modifier le projet' }) });
+        await expand(edit);
+        await edit.getByLabel('Nom du projet', { exact: true }).fill('Nouveau nom projet 112');
+        await edit.getByRole('button', { name: 'Enregistrer le projet', exact: true }).click();
+        await expect(page.getByRole('main')).toContainText('WEB112 — Nouveau nom projet 112');
+        await page.goto(firstTime);
+        await expect(page.getByRole('main')).toContainText('Projet Démo 112');
+        await page.goto(detail);
+        await page.getByRole('link', { name: 'Saisir des heures pour ce projet', exact: true }).click();
+        await expect(page.getByLabel('Projet ou dossier', { exact: true })).toHaveValue('Nouveau nom projet 112');
+        await saveTime('Heures liées après renommage', '60');
+        const filtered = times + '?du=2026-09-01&au=2026-09-30&dossier=WEB112';
+        await page.goto(filtered);
+        await expect(page.getByRole('main')).toContainText('2 saisies');
+        await expect(page.getByText('Temps total (h:mm)', { exact: true }).locator('..').locator('dd')).toHaveText('3:05');
+        const csv = await page.request.get(times + '/export?du=2026-09-01&au=2026-09-30&dossier=WEB112');
+        expect(csv.status()).toBe(200);
+        const csvText = await csv.text();
+        expect(csvText).toContain('WEB112 — Projet Démo 112');
+        expect(csvText).toContain('WEB112 — Nouveau nom projet 112');
+        expect(csvText).not.toContain('Temps libre conservé');
+        await page.getByRole('link', { name: 'Impression / PDF complet', exact: true }).click();
+        await expect(page.locator('.time-print tbody tr')).toHaveCount(2);
+        await expect(page.locator('.time-print')).toContainText('Code du projet enregistré: WEB112');
+        await page.goto(detail);
+        await expectNoPageOverflow(page);
+        await captureReference(page, 'projets-lies', page.getByRole('heading', { name: 'Fiche du projet', exact: true }), false, true, true);
+        await page.getByRole('button', { name: 'English', exact: true }).click();
+        await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+        await page.getByRole('combobox', { name: 'Appearance', exact: true }).selectOption('dark');
+        await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+        await expect(page.getByRole('heading', { name: 'Project details', exact: true })).toBeVisible();
+        await expectNoPageOverflow(page);
+        await captureReference(page, 'projets-lies-en-dark', page.getByRole('heading', { name: 'Project details', exact: true }), false, true, true);
+        await page.getByRole('combobox', { name: 'Appearance', exact: true }).selectOption('light');
+        await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+        await page.getByRole('button', { name: 'Français', exact: true }).click();
+        await expect(page.locator('html')).toHaveAttribute('lang', 'fr-CA');
+        await expect(page.getByRole('heading', { name: 'Fiche du projet', exact: true })).toBeVisible();
+        await expand(edit);
+        await edit.getByLabel('Nom du projet', { exact: true }).fill('Édition périmée');
+        await db.query("UPDATE project SET description='Changement concurrent',revision=revision+1 WHERE id=$1", [id]);
+        await edit.getByRole('button', { name: 'Enregistrer le projet', exact: true }).click();
+        await expect(page.getByRole('main').getByRole('alert')).toContainText('Le projet a changé');
+        await expect(edit.getByLabel('Nom du projet', { exact: true })).toHaveValue('Édition périmée');
+        await page.getByRole('link', { name: 'Recharger la fiche', exact: true }).click();
+        await expect(page.getByRole('main')).toContainText('Changement concurrent');
+        const archive = page.locator('details').filter({ has: page.locator('summary', { hasText: 'Archiver le projet' }) });
+        await expand(archive);
+        await archive.getByRole('checkbox').check();
+        await archive.getByRole('button', { name: 'Archiver le projet', exact: true }).click();
+        await expect(page.getByRole('main')).toContainText('Archivé');
+        await expect(page.getByRole('link', { name: 'Saisir des heures pour ce projet', exact: true })).toHaveCount(0);
+        expect((await page.request.get(times + '/nouveau?dossier=WEB112')).status()).toBe(404);
+        await page.goto(firstTime);
+        const timeEdit = page.locator('details').filter({ has: page.locator('summary', { hasText: 'Modifier le temps' }) });
+        await expand(timeEdit);
+        await timeEdit.getByLabel('Durée (h:mm ou minutes)', { exact: true }).fill('2:30');
+        await timeEdit.getByRole('button', { name: 'Enregistrer les modifications', exact: true }).click();
+        await expect(page.getByRole('main')).toContainText('2:30');
+        await expand(timeEdit);
+        await timeEdit.getByLabel('Code du projet enregistré', { exact: true }).fill('');
+        await timeEdit.getByRole('button', { name: 'Enregistrer les modifications', exact: true }).click();
+        await expect(page.getByRole('main').getByRole('alert')).toContainText('coche la confirmation');
+        await timeEdit.getByRole('checkbox').check();
+        await timeEdit.getByRole('button', { name: 'Enregistrer les modifications', exact: true }).click();
+        await expect(page.getByRole('link', { name: 'Code du projet enregistré: WEB112', exact: true })).toHaveCount(0);
+        await page.goto(detail);
+        const reactivate = page.locator('details').filter({ has: page.locator('summary', { hasText: 'Réactiver le projet' }) });
+        await expand(reactivate);
+        await reactivate.getByRole('checkbox').check();
+        await reactivate.getByRole('button', { name: 'Réactiver le projet', exact: true }).click();
+        await expect(page.getByRole('link', { name: 'Saisir des heures pour ce projet', exact: true })).toBeVisible();
+        backup = (await db.query("INSERT INTO app_user(id,email,display_name,updated_at) VALUES(gen_random_uuid(),'projects-'||gen_random_uuid()::text||'@example.test','Backup owner',now()) RETURNING id")).rows[0].id;
+        await db.query("INSERT INTO membership(id,company_id,user_id,role,updated_at) VALUES(gen_random_uuid(),$1,$2,'OWNER',now())", [companyId, backup]);
+        await db.query("UPDATE membership SET role='USER',module_access='{\"accounting\":\"write\",\"contacts\":\"read\",\"sales\":\"none\"}' WHERE company_id=$1 AND user_id=$2", [companyId, userId]);
+    await page.goto(base + '/nouveau');
+    await page.getByLabel('Code du projet', { exact: true }).fill('READWEB112');
+    await page.getByLabel('Nom du projet', { exact: true }).fill('Projet Contacts lecture');
+    await page.getByLabel('Nom du client à rechercher', { exact: true }).fill('Client Projet 112');
+    await page.getByRole('button', { name: 'Rechercher un client', exact: true }).click();
+    await page.getByRole('button', { name: 'Utiliser Client Projet 112', exact: true }).click();
+    await page.getByRole('button', { name: 'Créer un projet', exact: true }).click();
+    await expect(page).toHaveURL(/\/projets\/[0-9a-f-]{36}$/);
+    await expect(page.getByRole('main')).toContainText('Client Projet 112');
+    await db.query("UPDATE membership SET role='USER',module_access='{\"accounting\":\"write\",\"contacts\":\"none\",\"sales\":\"none\",\"taxes\":\"none\",\"audit\":\"none\"}' WHERE company_id=$1 AND user_id=$2", [companyId, userId]);
+        await page.goto(detail);
+        await expect(page.getByRole('main')).toContainText('Données du client masquées');
+        const hidden = await (await page.request.get(detail)).text();
+        expect(hidden).not.toContain('Client Projet 112');
+        expect(hidden).not.toContain(customer);
+        expect((await page.request.get(base + '/clients?q=Client')).status()).toBe(404);
+        await expand(edit);
+        await edit.getByLabel('Description courte', { exact: true }).fill('Modification autorisée sans Contacts');
+        await edit.getByRole('button', { name: 'Enregistrer le projet', exact: true }).click();
+        await expect(page.getByRole('main')).toContainText('Modification autorisée sans Contacts');
+        expect((await db.query('SELECT customer_id FROM project WHERE id=$1', [id])).rows[0].customer_id).toBe(customer);
+        expect((await page.request.get(times + '/export?du=2026-09-01&au=2026-09-30&dossier=WEB112')).status()).toBe(200);
+        await db.query("UPDATE membership SET role='READ_ONLY',module_access='{\"accounting\":\"write\",\"contacts\":\"none\"}' WHERE company_id=$1 AND user_id=$2", [companyId, userId]);
+        await page.goto(detail);
+        await expect(page.locator('summary', { hasText: 'Modifier le projet' })).toHaveCount(0);
+        await expect(page.locator('summary', { hasText: 'Archiver le projet' })).toHaveCount(0);
+        expect((await page.request.get(base + '/nouveau')).status()).toBe(404);
+        await db.query("UPDATE membership SET module_access='{\"accounting\":\"none\"}' WHERE company_id=$1 AND user_id=$2", [companyId, userId]);
+        for (const path of [base, detail, company + '/espace/projets'])
+            expect((await page.request.get(path)).status()).toBe(404);
+        expect((await page.request.get('/c/00000000-0000-7000-8000-999999999999/projets/' + id)).status()).toBe(404);
+        const guest = await browser.newContext();
+        try {
+            const r = await guest.request.get(detail, { maxRedirects: 0 });
+            expect(r.status()).toBe(307);
+            expect(r.headers()['location']).toContain('/connexion');
+        }
+        finally {
+            await guest.close();
+        }
+        expect(await financial()).toEqual(before);
+        expect(cspViolations).toEqual([]);
+    }
+    finally {
+        if (userId && role)
+            await db.query('UPDATE membership SET role=$3::member_role,module_access=$4::jsonb WHERE company_id=$1 AND user_id=$2', [companyId, userId, role, JSON.stringify(access ?? {})]);
+        if (backup) {
+            await db.query('DELETE FROM membership WHERE company_id=$1 AND user_id=$2', [companyId, backup]);
+            await db.query('UPDATE app_user SET disabled_at=now() WHERE id=$1', [backup]);
+        }
+        await db.end();
+    }
 });
